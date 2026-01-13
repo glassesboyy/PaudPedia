@@ -2,7 +2,7 @@
 ## Platform Paud Pedia - System Flows & Process
 
 **Tech Stack:**
-- Backend: Laravel 12+ (REST API) + MySQL 8.0
+- Backend: Laravel 12 (REST API) + MySQL 8.0
 - Admin Panel: Laravel Filament (Admin & Moderator)
 - Public Frontend: Next.js/Nuxt.js (Guest, User - Shopping & LMS)
 - SIAKAD Frontend: React/Vue + Vite (Parent, Teacher, Headmaster - School Management)

@@ -2,7 +2,7 @@
 ## Platform Paud Pedia - Skema & Struktur Database
 
 **Database:** MySQL 8.0  
-**Backend:** Laravel 11+  
+**Backend:** Laravel 12
 **Tujuan:** Spesifikasi skema database lengkap - Tabel, Kolom, Relasi, Constraint
 
 **Cakupan:**

@@ -7,7 +7,7 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Laravel 11+** - REST API, Business Logic, Authentication
+- **Laravel 12+** - REST API, Business Logic, Authentication
 - **MySQL 8.0** - Primary Database (InnoDB Engine)
 - **Redis** - Cache, Session, Queue Management
 - **AWS S3 / MinIO** - File Storage (Images, PDFs, Files)
@@ -29,18 +29,16 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 
 ## 📋 Struktur Dokumentasi
 
-### 1. [PRD.md](./PRD.md) - Product Requirements Document
+### 1. [PRD.md](/docs/PRD.md) - Product Requirements Document
 **Isi:**
 - Product vision & objectives
 - Target market & user personas
 - Feature requirements (functional & non-functional)
 - User stories & acceptance criteria
 
-**Untuk:** Product Manager, Stakeholder, Developer
-
 ---
 
-### 2. [ERD.md](./ERD.md) - Entity Relationship Diagram
+### 2. [ERD.md](/docs/ERD.md) - Entity Relationship Diagram
 **Isi:**
 - Skema database lengkap (25 tables)
 - Tipe data MySQL untuk setiap kolom
@@ -48,41 +46,33 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 - Indexes & optimization strategy
 - Laravel migration examples
 
-**Untuk:** Backend Developer, Database Administrator
-
 ---
 
-### 3. [CLASS_DIAGRAM.md](./CLASS_DIAGRAM.md) - Class Diagram
+### 3. [CLASS_DIAGRAM.md](/docs/CLASS_DIAGRAM.md) - Class Diagram
 **Isi:**
 - Entity definitions (attributes & methods)
 - Relationships & cardinality
 - Business logic structure
 - Design patterns
 
-**Untuk:** Backend Developer (Laravel Models)
-
 ---
 
-### 4. [USE_CASE.md](./USE_CASE.md) - Use Cases Per Role
+### 4. [USE_CASE.md](/docs/USE_CASE.md) - Use Cases Per Role
 **Isi:**
 - 7 roles: Guest, User, Parent, Teacher, Headmaster, Moderator, Admin
 - Use cases per role (what they can do)
 - Permission & access control matrix
 - Subscription impact (Free vs Pro)
 
-**Untuk:** Frontend Developer, QA Tester, Product Manager
-
 ---
 
-### 5. [FLOWS.md](./FLOWS.md) - System Flows
+### 5. [FLOWS.md](/docs/FLOWS.md) - System Flows
 **Isi:**
 - Multi-tenant flows (school registration, user management)
 - Subscription flows (Free to Pro upgrade)
 - Payment flows (Midtrans integration)
 - Content management flows
 - Email notification flows
-
-**Untuk:** Frontend Developer, Backend Developer, QA Tester
 
 ---
 
@@ -175,39 +165,6 @@ api.paudpedia.com       → Laravel API
 
 ---
 
-## 🚀 Deployment Architecture
-
-```
-┌─────────────────┐
-│   Nginx (SSL)   │
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    │         │
-┌───▼────┐ ┌──▼────────┐
-│ Laravel│ │ Next.js/  │
-│  API   │ │ Nuxt.js   │
-└───┬────┘ └──┬────────┘
-    │         │
-    └────┬────┘
-         │
-    ┌────▼────┐
-    │  MySQL  │
-    │  8.0    │
-    └─────────┘
-    
-    ┌─────────┐
-    │  Redis  │
-    └─────────┘
-    
-    ┌─────────┐
-    │   S3/   │
-    │  MinIO  │
-    └─────────┘
-```
-
----
-
 ## 📖 Cara Membaca Dokumentasi
 
 ### Untuk Memahami Sistem Secara Keseluruhan
@@ -227,24 +184,6 @@ api.paudpedia.com       → Laravel API
 
 ---
 
-## 🔄 Update History
-
-| Tanggal | Versi | Update |
-|---------|-------|--------|
-| 2026-01-14 | 2.0 | Update tech stack (Laravel + MySQL + Filament + Next/Nuxt + React/Vue+Vite) |
-| 2026-01-13 | 1.5 | Added detailed table of contents untuk semua dokumen |
-| 2026-01-13 | 1.0 | Initial documentation |
-
----
-
-## 📞 Kontak
-
-**Project:** PaudPedia Platform  
-**Repository:** glassesboyy/PaudPedia  
-**Stack:** Laravel 11+ | MySQL 8.0 | Filament | Next.js/Nuxt | React/Vue+Vite
-
----
-
 ## ⚡ Quick Links
 
 - [Product Requirements](./PRD.md)
@@ -254,5 +193,3 @@ api.paudpedia.com       → Laravel API
 - [System Flows](./FLOWS.md)
 
 ---
-
-**Happy Coding! 🚀**
