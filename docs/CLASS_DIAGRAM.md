@@ -2,8 +2,8 @@
 ## Platform Paud Pedia - Entity Relationship & Structure
 
 **Tech Stack:**
-- Backend: Laravel 11+ (REST API)
-- Database: MySQL 8.0 (InnoDB Engine)
+- Backend: Laravel 12 (REST API)
+- Database: MySQL 8.0
 - Admin Panel: Laravel Filament
 - Frontend: Next.js/Nuxt.js (Public) + React/Vue+Vite (SIAKAD)
 

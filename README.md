@@ -7,10 +7,8 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Laravel 12+** - REST API, Business Logic, Authentication
-- **MySQL 8.0** - Primary Database (InnoDB Engine)
-- **Redis** - Cache, Session, Queue Management
-- **AWS S3 / MinIO** - File Storage (Images, PDFs, Files)
+- **Laravel 12** - REST API, Business Logic, Authentication
+- **MySQL 8.0** - Primary Database
 
 ### Frontend
 | Platform | Technology | Purpose |
