@@ -1,5 +1,5 @@
 # ENTITY RELATIONSHIP DIAGRAM (ERD)
-## Platform Paud Ceria - Skema & Struktur Database
+## Platform Paud Pedia - Skema & Struktur Database
 
 **Versi:** 1.0  
 **Terakhir Diperbarui:** 14 Januari 2026  
@@ -354,7 +354,7 @@ Semua tabel memiliki:
 
 **Enum:**
 - `score`: 'BB', 'MB', 'BSH', 'BSB' (Belum Berkembang, Mulai Berkembang, Berkembang Sesuai Harapan, Berkembang Sangat Baik)
-- `semester`: '1', '2'
+- `semester`: '1', '2', '3', '4'
 
 **Foreign Key:**
 - `school_id` → `schools.id` ON DELETE CASCADE

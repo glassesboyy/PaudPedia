@@ -1,5 +1,5 @@
 # FLOWS DOKUMENTASI
-## Platform Paud Ceria - System Flows & Process
+## Platform Paud Pedia - System Flows & Process
 
 ## 📋 Daftar Isi
 

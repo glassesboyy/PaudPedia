@@ -1,17 +1,12 @@
 # PRODUCT REQUIREMENTS DOCUMENT (PRD)
-## Platform Paud Ceria - Multi-Tenant SIAKAD & E-Learning Platform
-
-**Versi:** 1.0  
-**Terakhir Diperbarui:** January 14, 2026  
-**Product Owner:** [To be filled]  
-**Target Launch:** Q2 2026
+## Platform Paud Pedia - Multi-Tenant SIAKAD & E-Learning Platform
 
 ---
 
 ## 📋 Gambaran Umum Dokumen
 
 ### Tujuan
-This PRD defines the Product Vision, features, requirements, and success criteria for Platform Paud Ceria - a dual-dual-purpose platform combining:
+This PRD defines the Product Vision, features, requirements, and success criteria for Platform Paud Pedia - a dual-dual-purpose platform combining:
 1. **SIAKAD (Multi-Tenant School Management System)** untuk institusi PAUD
 2. **Public E-Learning & Marketplace** untuk edukasi parenting
 
@@ -45,7 +40,7 @@ This PRD defines the Product Vision, features, requirements, and success criteri
 ## 🎯 Ringkasan Eksekutif
 
 ### Nama Produk
-**Platform Paud Ceria** (Paud Ceria Platform)
+**Platform Paud Pedia** (Paud Pedia Platform)
 
 ### Tipe Produk
 Solusi SaaS Dual-Platform:
@@ -90,7 +85,7 @@ Solusi SaaS Dual-Platform:
 4. **Mendorong Pendidikan Berkualitas:** Memungkinkan hasil pendidikan yang lebih baik melalui insight berbasis data dan pengembangan profesional
 
 ### Core Values
-- **Kesederhanaan:** Cukup mudah untuk guru dan orang tua yang tidak tech-savvy
+- **Kesederhanaan:** Mudah digunakan oleh guru dan orang tua meskipun tidak terbiasa dengan teknologi
 - **Aksesibilitas:** Tier gratis memastikan small schools can benefit
 - **Privasi:** Penanganan data anak yang aman
 - **Sesuai Usia:** Dirancang untuk konteks PAUD (usia 0-6)
@@ -98,789 +93,557 @@ Solusi SaaS Dual-Platform:
 
 ---
 
-## 🎯 Target Market
+## 🎯 Target Pasar
 
-### Primary Market: PAUD Institutions
+### Pasar Utama: Lembaga PAUD
 
-**Market Size (Indonesia):**
-- Total PAUD institutions: ~200,000+ (TK, KB, TPA, SPS)
-- Target segment: Urban/semi-urban schools with 20-100 siswa
-- Initial focus: Jabodetabek region
+**Ukuran Pasar (Indonesia):**
+- Total lembaga PAUD: ±200.000+ (237.751 lembaga pada tahun 2024)
+- Segmen target: PAUD di wilayah perkotaan dan semi-perkotaan dengan 20–100 siswa
 
-**School Profiles:**
-- **Small Schools (50-70%):** 10-30 siswa, 2-5 teachers, limited budget
-- **Medium Schools (25-35%):** 30-80 siswa, 5-10 teachers, moderate budget
-- **Large Schools (5-10%):** 80+ siswa, 10+ teachers, established budget
+**Permasalahan Utama:**
+1. Pencatatan absensi masih manual (menggunakan kertas)
+2. Komunikasi dengan orang tua tidak teratur (tersebar di banyak grup WhatsApp)
+3. Belum memiliki data dan arsip siswa dalam bentuk digital
+4. Proses pembuatan laporan memakan waktu lama
+5. Keterbatasan anggaran untuk menggunakan aplikasi atau SaaS yang mahal
 
-**Pain Points:**
-1. Manual attendance tracking (paper-based)
-2. Difficult parent communication (WhatsApp chaos)
-3. No digital student records
-4. Time-consuming report generation
-5. Limited budget for expensive SaaS solutions
-6. Complex existing systems designed for SD/SMP
+### Pasar Sekunder: Orang Tua & Pendidik
 
-### Secondary Market: Parents & Educators
+**Karakteristik Pengguna:**
+- Orang tua dengan anak usia 0–6 tahun
+- Mayoritas ibu (70–80% sebagai pengambil keputusan)
+- Tinggal di wilayah perkotaan dan semi-perkotaan, kelas menengah
+- Pengguna smartphone
+- Aktif menggunakan media sosial
 
-**Demographics:**
-- Parents with children usia 0-6
-- Primarily mothers (70-80% decision makers)
-- Urban/semi-urban, middle class
-- Smartphone users
-- Active on social media
-
-**Pain Points:**
-1. Lack of transparency on child's development
-2. Limited access to quality parenting education
-3. Difficulty finding trusted resources
-4. Need for practical tips & templates
-5. Desire for professional development (educators)
+**Permasalahan Utama:**
+1. Kurangnya transparansi terhadap perkembangan anak
+2. Akses terbatas ke edukasi parenting yang berkualitas
+3. Kesulitan menemukan sumber belajar yang terpercaya
+4. Membutuhkan tips praktis dan template yang siap digunakan
+5. Keinginan untuk meningkatkan kompetensi dan pengembangan profesional (bagi pendidik)
 
 ---
 
-## 👥 User Personas
+## 👥 Persona Pengguna
 
-### Persona 1: Bu Sari - PAUD Headmaster (Age 38)
+### Persona 1: Bu Sari – Kepala PAUD (Usia 38 Tahun)
 
-**Background:**
-- Owns a small TK with 35 siswa
-- 8 years experience in early childhood education
-- Limited technical skills
-- Uses WhatsApp for parent communication
-- Manages attendance on paper
+**Latar Belakang:**
+- Pemilik TK kecil dengan 35 siswa
+- Pengalaman 8 tahun di bidang pendidikan anak usia dini
+- Kemampuan teknologi terbatas
+- Menggunakan WhatsApp untuk komunikasi dengan orang tua
+- Absensi siswa masih dicatat secara manual (kertas)
 
-**Goals:**
-- Reduce administrative time
-- Professional school image
-- Better parent satisfaction
-- Track student development digitally
+**Tujuan:**
+- Mengurangi waktu untuk pekerjaan administrasi
+- Meningkatkan citra sekolah agar terlihat lebih profesional
+- Meningkatkan kepuasan orang tua
+- Mencatat dan memantau perkembangan siswa secara digital
 
-**Frustrations:**
-- Spending 3+ hours/week on manual reports
-- Lost paper records
-- Parent complaints about lack of updates
-- Cannot afford expensive school management systems
+**Kendala:**
+- Menghabiskan lebih dari 3 jam per minggu untuk membuat laporan manual
+- Data dan arsip kertas sering hilang
+- Keluhan orang tua karena kurangnya informasi perkembangan anak
+- Tidak mampu membeli sistem manajemen sekolah yang mahal
 
-**Use Cases:**
-- Register school (Gratis Plan)
-- Add teachers and siswa
-- Monitor daily attendance
-- Generate Progress reports
-- eventually upgrade to Pro when school grows
-
----
-
-### Persona 2: Bu Ani - PAUD Teacher (Age 28)
-
-**Background:**
-- Teacher at TK Melati (60 siswa)
-- Handles Kelas A (20 siswa)
-- Uses smartphone daily
-- Moderate technical skills
-
-**Goals:**
-- Quick attendance input (< 5 min/day)
-- Easy assessment recording
-- View student Progress
-- Professional development
-
-**Frustrations:**
-- Paper attendance gets lost
-- Repetitive manual data entry
-- Cannot track student Progress over time
-- Limited training opportunities
-
-**Use Cases:**
-- Daily attendance input
-- Record Penilaian siswas
-- View class roster
-- Access parenting education kursuss for professional development
+**Skenario Penggunaan:**
+- Mendaftarkan sekolah (Paket Gratis)
+- Menambahkan data guru dan siswa
+- Memantau absensi harian
+- Menghasilkan laporan perkembangan siswa
+- Meningkatkan paket ke Pro ketika jumlah siswa bertambah
 
 ---
 
-### Persona 3: Ibu Rina - Parent (Age 32)
+### Persona 2: Bu Ani – Guru PAUD (Usia 28 Tahun)
 
-**Background:**
-- Mother of 2 children (4 years, 6 years)
-- Both children attend TK Melati
-- Works full-time
-- Active on Instagram & WhatsApp
+**Latar Belakang:**
+- Guru di TK Melati dengan total 60 siswa
+- Mengajar Kelas A dengan 20 siswa
+- Menggunakan smartphone setiap hari
+- Kemampuan teknologi tingkat menengah
 
-**Goals:**
-- Monitor children's development
-- Stay informed about school activities
-- Learn effective parenting strategies
-- Access quality educational resources
+**Tujuan:**
+- Mengisi absensi dengan cepat (kurang dari 5 menit per hari)
+- Pencatatan penilaian siswa yang mudah
+- Melihat perkembangan siswa dari waktu ke waktu
+- Mengikuti pengembangan kompetensi dan pelatihan profesional
 
-**Frustrations:**
-- Minimal communication from school
-- No visibility on daily activities
-- Scattered parenting tips from unreliable sources
-- Expensive parenting workshops
+**Kendala:**
+- Data absensi berbasis kertas sering hilang
+- Pengisian data yang berulang dan memakan waktu
+- Sulit memantau perkembangan siswa secara berkelanjutan
+- Akses terbatas ke pelatihan guru
 
-**Use Cases:**
-- View children's attendance & assessments
-- Download Progress reports
-- Purchase webinars on child development
-- Read Gratis parenting articles
-
----
-
-### Persona 4: Pak Budi - Moderator/Content Creator (Age 35)
-
-**Background:**
-- Parenting expert & child psychologist
-- Creates educational content
-- Wants to reach wider audience
-- Limited technical web skills
-
-**Goals:**
-- Share knowledge with parents
-- Monetize expertise through webinars/kursuss
-- Build personal brand
-- Easy content management
-
-**Frustrations:**
-- Complex LMS platforms
-- High platform fees
-- Technical setup barriers
-
-**Use Cases:**
-- Create & publish webinars
-- Build Kursus online
-- Write Artikel blog
-- Manage mentor profile
+**Skenario Penggunaan:**
+- Mengisi absensi harian
+- Mencatat penilaian siswa
+- Melihat daftar siswa dalam kelas
+- Mengakses kursus edukasi parenting untuk pengembangan profesional
 
 ---
 
-### Persona 5: Admin - Platform Administrator (Age 30)
+### Persona 3: Ibu Rina – Orang Tua Murid (Usia 32 Tahun)
 
-**Background:**
-- Manages entire platform
-- Technical background
-- Business-minded
+**Latar Belakang:**
+- Ibu dengan dua anak (usia 4 dan 6 tahun)
+- Kedua anak bersekolah di TK Melati
+- Bekerja penuh waktu
+- Aktif menggunakan Instagram dan WhatsApp
 
-**Goals:**
-- Platform growth & stability
-- Revenue optimization
-- User satisfaction
-- Quality content moderation
+**Tujuan:**
+- Memantau perkembangan anak secara rutin
+- Mendapatkan informasi kegiatan sekolah
+- Mempelajari pola asuh yang efektif
+- Mengakses sumber edukasi anak yang berkualitas
 
-**Use Cases:**
-- Manage all users & schools
-- Configure site settings
-- View analytics & reports
-- Handle customer support
-- Approve content & testimonials
+**Kendala:**
+- Komunikasi dari sekolah sangat terbatas
+- Tidak mengetahui aktivitas anak sehari-hari di sekolah
+- Informasi parenting tersebar dan tidak selalu terpercaya
+- Biaya seminar atau workshop parenting cukup mahal
+
+**Skenario Penggunaan:**
+- Melihat absensi dan penilaian anak
+- Mengunduh laporan perkembangan anak
+- Membeli webinar tentang tumbuh kembang anak
+- Membaca artikel parenting gratis
+
+---
+
+### Persona 4: Pak Budi – Moderator / Pembuat Konten (Usia 35 Tahun)
+
+**Latar Belakang:**
+- Pakar parenting dan psikolog anak
+- Membuat konten edukasi
+- Ingin menjangkau audiens yang lebih luas
+- Kemampuan teknis web terbatas
+
+**Tujuan:**
+- Membagikan pengetahuan kepada orang tua
+- Memonetisasi keahlian melalui webinar dan kursus
+- Membangun personal branding
+- Mengelola konten dengan mudah
+
+**Kendala:**
+- Platform LMS yang rumit
+- Biaya platform yang tinggi
+- Hambatan teknis dalam proses pengaturan
+
+**Skenario Penggunaan:**
+- Membuat dan menerbitkan webinar
+- Mengelola kursus online
+- Menulis artikel blog
+- Mengelola profil sebagai mentor
+
+---
+
+### Persona 5: Admin – Administrator Platform (Usia 30 Tahun)
+
+**Latar Belakang:**
+- Mengelola seluruh sistem platform
+- Memiliki latar belakang teknis
+- Berorientasi pada pengembangan bisnis
+
+**Tujuan:**
+- Menjaga pertumbuhan dan kestabilan platform
+- Mengoptimalkan pendapatan
+- Menjaga kepuasan pengguna
+- Memastikan kualitas dan moderasi konten
+
+**Skenario Penggunaan:**
+- Mengelola seluruh pengguna dan data sekolah
+- Mengatur konfigurasi sistem
+- Melihat analitik dan laporan
+- Menangani dukungan pelanggan
+- Menyetujui konten dan testimoni
 
 ---
 
 ## 📦 Requirement fitur
 
-### MVP Features (Version 1.0)
+#### 🏫 SIAKAD Multi-Tenant
 
-#### 🏫 Multi-Tenant SIAKAD
+**1. Manajemen Sekolah**
+- [ ] FR-SM-01: Pendaftaran sekolah (kepala sekolah daftar mandiri)
+- [ ] FR-SM-02: Pengelolaan profil sekolah (nama, alamat, logo)
+- [ ] FR-SM-03: Tampilan paket berlangganan (Gratis vs Pro)
+- [ ] FR-SM-04: Upgrade ke Paket Pro (pembayaran via Midtrans)
+- [ ] FR-SM-05: Pembatasan jumlah siswa (Gratis: 20 siswa, Pro: tanpa batas)
 
-**1. School Management**
-- [ ] FR-SM-01: School registration (headmaster self-signup)
-- [ ] FR-SM-02: School profile management (name, address, logo)
-- [ ] FR-SM-03: Subscription plan display (Gratis vs Pro)
-- [ ] FR-SM-04: Upgrade to Pro Plan (Midtrans payment)
-- [ ] FR-SM-05: Student limit enforcement (Gratis: 20, Pro: unlimited)
+**2. Manajemen Pengguna**
+- [ ] FR-UM-01: Pendaftaran guru oleh kepala sekolah
+- [ ] FR-UM-02: Pengiriman otomatis kredensial login ke email guru
+- [ ] FR-UM-03: Akses multi-sekolah (1 akun pengguna untuk beberapa sekolah)
+- [ ] FR-UM-04: Dashboard berdasarkan peran (Kepala Sekolah, Guru, Orang Tua)
 
-**2. User Management**
-- [ ] FR-UM-01: Teacher registration by headmaster
-- [ ] FR-UM-02: Auto-send email credentials to teachers
-- [ ] FR-UM-03: Multi-school access (1 user, multiple schools)
-- [ ] FR-UM-04: Role-based dashboard (Headmaster, Teacher, Parent)
+**3. Manajemen Kelas**
+- [ ] FR-CM-01: Membuat, mengubah, dan menghapus kelas
+- [ ] FR-CM-02: Menetapkan wali kelas pada setiap kelas
+- [ ] FR-CM-03: Dukungan satu guru mengajar beberapa kelas (Many-to-One)
+- [ ] FR-CM-04: Pengaturan kapasitas kelas (opsional)
 
-**3. Class Management**
-- [ ] FR-CM-01: Create/edit/delete classes
-- [ ] FR-CM-02: Assign Wali kelas to class
-- [ ] FR-CM-03: Support multiple classes per teacher (Many-to-One)
-- [ ] FR-CM-04: Class capacity setting (optional)
+**4. Manajemen Orang Tua**
+- [ ] FR-PM-01: Membuat profil orang tua secara terpisah (waiting list)
+- [ ] FR-PM-02: Email orang tua harus unik per sekolah
+- [ ] FR-PM-03: Pembuatan akun pengguna secara otomatis beserta kredensial
+- [ ] FR-PM-04: Pengiriman email sambutan kepada orang tua
+- [ ] FR-PM-05: Melihat database orang tua dengan fitur pencarian
 
-**4. Parent Management (v3.0 - Independent Entity)**
-- [ ] FR-PM-01: Create parent profile standalone (waiting list)
-- [ ] FR-PM-02: Email unique constraint per school
-- [ ] FR-PM-03: Auto-create user account with credentials
-- [ ] FR-PM-04: Send welcome email to parent
-- [ ] FR-PM-05: View parent database with search
+**5. Manajemen Siswa**
+- [ ] FR-STM-01: Menambahkan data siswa dengan form 2 tab (Data Siswa & Data Orang Tua)
+- [ ] FR-STM-02: Pilihan orang tua dari data yang sudah ada atau membuat data baru
+- [ ] FR-STM-03: Otomatis menghubungkan data siswa dengan profil orang tua
+- [ ] FR-STM-04: Mengubah dan menghapus data siswa (khusus Kepala Sekolah)
+- [ ] FR-STM-05: Melihat daftar siswa (Guru: hanya baca)
+- [ ] FR-STM-06: Profil siswa dengan fitur unggah foto
+- [ ] FR-STM-07: Tanpa akun login untuk siswa
 
-**5. Student Management**
-- [ ] FR-STM-01: Add student with 2-tab form (Data Siswa + Data Orang Tua)
-- [ ] FR-STM-02: Dropdown parent selection (existing) OR create new parent
-- [ ] FR-STM-03: Auto-link student to parent profile
-- [ ] FR-STM-04: Edit/delete student (Headmaster only)
-- [ ] FR-STM-05: View student list (Teacher: read-only)
-- [ ] FR-STM-06: Student profile with photo upload
-- [ ] FR-STM-07: Tanpa login siswa (v3.0 - removed Student role)
+**6. Manajemen Absensi**
+- [ ] FR-AT-01: Pengisian absensi harian oleh guru
+- [ ] FR-AT-02: Status absensi: Hadir, Sakit, Izin, Alpha
+- [ ] FR-AT-03: Filter berdasarkan kelas (hanya kelas yang diampu guru)
+- [ ] FR-AT-04: Tampilan absensi untuk orang tua (riwayat & ringkasan)
+- [ ] FR-AT-05: Tampilan kalender absensi untuk orang tua
+- [ ] FR-AT-06: Perhitungan persentase kehadiran siswa
 
-**6. Attendance Management**
-- [ ] FR-AT-01: Daily attendance input by teacher
-- [ ] FR-AT-02: Status: Hadir, Sakit, Izin, Alpha
-- [ ] FR-AT-03: Filter by class (teacher's assigned classes only)
-- [ ] FR-AT-04: Parent view: attendance history & summary
-- [ ] FR-AT-05: Calendar view for parents
-- [ ] FR-AT-06: Attendance percentage calculation
+**7. Manajemen Penilaian (PAUD)**
+- [ ] FR-AS-01: Input penilaian berdasarkan kategori (Kognitif, Motorik, Sosial-Emosional)
+- [ ] FR-AS-02: Skala penilaian PAUD: BB, MB, BSH, BSB
+- [ ] FR-AS-03: Penilaian berbasis semester (Semester 1, 2, 3, 4)
+- [ ] FR-AS-04: Tampilan riwayat penilaian untuk orang tua
+- [ ] FR-AS-05: Catatan guru pada setiap penilaian
 
-**7. Assessment Management (PAUD)**
-- [ ] FR-AS-01: Input assessment by category (Kognitif, Motorik, Sosial-Emosional)
-- [ ] FR-AS-02: PAUD scoring: BB, MB, BSH, BSB
-- [ ] FR-AS-03: Semester-based assessment (Semester 1, 2)
-- [ ] FR-AS-04: Parent view: assessment history
-- [ ] FR-AS-05: Catatan guru per assessment
+**8. Manajemen Keuangan (khusus Paket Pro)**
+- [ ] FR-FN-01: Pencatatan pembayaran SPP
+- [ ] FR-FN-02: Pencatatan tabungan siswa
+- [ ] FR-FN-03: Metode pembayaran: Tunai dan Transfer
+- [ ] FR-FN-04: Tampilan riwayat pembayaran untuk orang tua (hanya baca)
+- [ ] FR-FN-05: Ringkasan keuangan per siswa
 
-**8. manajemen keuangan (khusus Pro Plan)**
-- [ ] FR-FN-01: Record SPP payments
-- [ ] FR-FN-02: Track student savings (Tabungan)
-- [ ] FR-FN-03: Metode pembayaran: Cash, Transfer
-- [ ] FR-FN-04: Parent view: payment history (read-only)
-- [ ] FR-FN-05: Finance summary per student
-
-**9. Reports (khusus Pro Plan)**
-- [ ] FR-RP-01: Generate PDF Progress report (rapor)
-- [ ] FR-RP-02: Include: attendance, assessments, photo
-- [ ] FR-RP-03: Parent download PDF report
-- [ ] FR-RP-04: School logo on report header
+**9. Laporan (khusus Paket Pro)**
+- [ ] FR-RP-01: Generate laporan perkembangan siswa dalam format PDF (rapor)
+- [ ] FR-RP-02: Memuat data absensi, penilaian, dan foto siswa
+- [ ] FR-RP-03: Orang tua dapat mengunduh laporan PDF
+- [ ] FR-RP-04: Logo sekolah ditampilkan pada header laporan
 
 ---
 
-#### 🌐 Public Platform (B2C)
+#### 🌐 Platform Publik (B2C)
 
-**10. Content Management**
-- [ ] FR-CT-01: Create/edit/delete webinars (Moderator)
-- [ ] FR-CT-02: Manual Zoom link input (no API integration)
-- [ ] FR-CT-03: Create/edit/delete kursuss with modules & lessons (Moderator)
-- [ ] FR-CT-04: Video (YouTube embed), PDF, Quiz support
-- [ ] FR-CT-05: Create/edit/delete Produk digital (Moderator)
-- [ ] FR-CT-06: File upload for produks (PDF, ZIP, max 50MB)
-- [ ] FR-CT-07: Create/edit/delete articles (Moderator)
-- [ ] FR-CT-08: Rich text editor for articles
-- [ ] FR-CT-09: SEO-friendly URLs (slugs)
+**10. Manajemen Konten Webinar**
+- [ ] FR-CT-01: Membuat, mengubah, dan menghapus webinar (Moderator)
+- [ ] FR-CT-02: Input link Zoom secara manual
+- [ ] FR-CT-03: Membuat, mengubah, dan menghapus kursus dengan modul dan materi (Moderator)
+- [ ] FR-CT-04: Mendukung video (embed YouTube), PDF, dan kuis
+- [ ] FR-CT-05: Membuat, mengubah, dan menghapus produk digital (Moderator)
+- [ ] FR-CT-06: Unggah file produk (PDF, ZIP, maksimal 50MB)
+- [ ] FR-CT-07: Membuat, mengubah, dan menghapus artikel (Moderator)
+- [ ] FR-CT-08: Editor teks kaya (rich text editor) untuk artikel
+- [ ] FR-CT-09: URL ramah SEO (slug)
 
-**11. Mentor Management**
-- [ ] FR-MN-01: Create/edit/delete mentor profiles
-- [ ] FR-MN-02: Assign mentor to webinars/kursuss
-- [ ] FR-MN-03: Mentor bio, photo, expertise
+**11. Manajemen Mentor**
+- [ ] FR-MN-01: Membuat, mengubah, dan menghapus profil mentor
+- [ ] FR-MN-02: Menetapkan mentor pada webinar dan kursus
+- [ ] FR-MN-03: Informasi mentor meliputi bio, foto, dan keahlian
 
-**12. Category & Organization**
-- [ ] FR-CG-01: Kategori untuk kursus, produk, artikel
-- [ ] FR-CG-02: Featured content (homepage display)
-- [ ] FR-CG-03: Search & filter functionality
+**12. Kategori & Pengelompokan Konten**
+- [ ] FR-CG-01: Pengelompokan kategori untuk kursus, produk, dan artikel
+- [ ] FR-CG-02: Konten unggulan (ditampilkan di halaman utama)
+- [ ] FR-CG-03: Fitur pencarian dan filter konten
 
 **13. E-Commerce**
-- [ ] FR-EC-01: Browse webinars/kursuss/produks
-- [ ] FR-EC-02: Add to cart
-- [ ] FR-EC-03: Checkout with Midtrans payment
-- [ ] FR-EC-04: Kode promo application
-- [ ] FR-EC-05: Order history in My Account
-- [ ] FR-EC-06: Auto-enroll to kursus after payment
-- [ ] FR-EC-07: Email with Zoom link (webinar) or download link (produk)
+- [ ] FR-EC-01: Menjelajahi webinar, kursus, dan produk digital
+- [ ] FR-EC-02: Menambahkan item ke keranjang
+- [ ] FR-EC-03: Proses checkout dengan pembayaran melalui Midtrans
+- [ ] FR-EC-04: Penggunaan kode promo
+- [ ] FR-EC-05: Riwayat pesanan di halaman Akun Saya
+- [ ] FR-EC-06: Otomatis terdaftar ke kursus setelah pembayaran berhasil
+- [ ] FR-EC-07: Pengiriman email berisi link Zoom (webinar), link unduhan (produk) atau link kursus (kursus)
 
-**14. Learning Management (LMS)**
-- [ ] FR-LM-01: kursus player (video/PDF viewer)
-- [ ] FR-LM-02: Lesson completion tracking
-- [ ] FR-LM-03: Progress percentage calculation
-- [ ] FR-LM-04: Auto-generate certificate at 100% completion
-- [ ] FR-LM-05: Certificate download
+**14. Manajemen Pembelajaran (LMS)**
+- [ ] FR-LM-01: Pemutar kursus (video / penampil PDF)
+- [ ] FR-LM-02: Pelacakan penyelesaian materi
+- [ ] FR-LM-03: Perhitungan persentase progres belajar
+- [ ] FR-LM-04: Pembuatan sertifikat otomatis setelah 100% penyelesaian
+- [ ] FR-LM-05: Unduh sertifikat
 
-**15. Public Pages**
-- [ ] FR-PP-01: Landing page with hero, features, stats
-- [ ] FR-PP-02: About Us page
-- [ ] FR-PP-03: Contact page
-- [ ] FR-PP-04: Privacy Policy page
-- [ ] FR-PP-05: Blog/artikel page (Gratis access)
-- [ ] FR-PP-06: Testimonials section
+**15. Halaman Publik**
+- [ ] FR-PP-01: Halaman landing dengan hero, fitur, dan statistik
+- [ ] FR-PP-02: Halaman Tentang Kami
+- [ ] FR-PP-03: Halaman Kontak
+- [ ] FR-PP-04: Halaman Kebijakan Privasi
+- [ ] FR-PP-05: Halaman blog / artikel (akses gratis)
+- [ ] FR-PP-06: Bagian testimoni pengguna
 
-**16. User Account**
-- [ ] FR-UA-01: User registration & login
-- [ ] FR-UA-02: Email verification
-- [ ] FR-UA-03: Password reset
-- [ ] FR-UA-04: My Account dashboard
-- [ ] FR-UA-05: Profile management
-- [ ] FR-UA-06: My kursuss (enrolled kursuss)
-- [ ] FR-UA-07: My produks (purchased produks)
-- [ ] FR-UA-08: My Webinars (registered webinars)
-
----
-
-#### 🔧 Admin Features
-
-**17. Platform Administration**
-- [ ] FR-AD-01: View all users & schools
-- [ ] FR-AD-02: Manage site settings (logo, contact, social media)
-- [ ] FR-AD-03: View sales analytics (revenue, transaksi)
-- [ ] FR-AD-04: Manual kursus enrollment (troubleshooting)
-- [ ] FR-AD-05: Manual certificate generation (troubleshooting)
-- [ ] FR-AD-06: Approve/reject testimonials
-- [ ] FR-AD-07: Manage Kode promos
+**16. Akun Pengguna**
+- [ ] FR-UA-01: Pendaftaran dan login pengguna
+- [ ] FR-UA-02: Verifikasi email
+- [ ] FR-UA-03: Reset kata sandi
+- [ ] FR-UA-04: Dashboard Akun Saya
+- [ ] FR-UA-05: Pengelolaan profil pengguna
+- [ ] FR-UA-06: Kursus Saya (kursus yang diikuti)
+- [ ] FR-UA-07: Produk Saya (produk yang dibeli)
+- [ ] FR-UA-08: Webinar Saya (webinar yang diikuti)
 
 ---
 
-### Non-Functional Requirements
+#### 🔧 Fitur Admin
 
-**Performance:**
-- [ ] NFR-PF-01: Page load time < 3 seconds
-- [ ] NFR-PF-02: Support 1,000+ concurrent users
-- [ ] NFR-PF-03: API response time < 500ms
-
-**Security:**
-- [ ] NFR-SC-01: HTTPS encryption
-- [ ] NFR-SC-02: Row Tingkat Security (RLS) (RLS) for Isolasi Multi-Tenant
-- [ ] NFR-SC-03: Secure file storage (signed URLs)
-- [ ] NFR-SC-04: Password hashing (bcrypt)
-- [ ] NFR-SC-05: Email verification required
-
-**Usability:**
-- [ ] NFR-US-01: Mobile-responsive design (80% users on mobile)
-- [ ] NFR-US-02: Bahasa Indonesia interface
-- [ ] NFR-US-03: Maximum 3 clicks to key features
-- [ ] NFR-US-04: Form validation with helpful error messages
-
-**Reliability:**
-- [ ] NFR-RL-01: 99.5% uptime
-- [ ] NFR-RL-02: Automated daily backups
-- [ ] NFR-RL-03: Error logging & monitoring
-
-**Compatibility:**
-- [ ] NFR-CP-01: Support Chrome, Firefox, Safari (latest 2 versions)
-- [ ] NFR-CP-02: Support iOS & Android browsers
-- [ ] NFR-CP-03: Minimum screen width: 320px (mobile)
+**17. Administrasi Platform**
+- [ ] FR-AD-01: Melihat seluruh pengguna dan data sekolah
+- [ ] FR-AD-02: Mengelola pengaturan situs (logo, kontak, media sosial)
+- [ ] FR-AD-03: Melihat analitik penjualan (pendapatan, transaksi)
+- [ ] FR-AD-04: Pendaftaran kursus secara manual (untuk keperluan troubleshooting)
+- [ ] FR-AD-05: Pembuatan sertifikat secara manual (untuk keperluan troubleshooting)
+- [ ] FR-AD-06: Mengelola kode promo
 
 ---
 
-## 📖 User story
+### Kebutuhan Non-Fungsional
 
-### Epic 1: School Onboarding
+**Performa:**
+- [ ] NFR-PF-01: Waktu muat halaman kurang dari 10 detik
+- [ ] NFR-PF-02: Mendukung lebih dari 1.000 pengguna aktif secara bersamaan
+- [ ] NFR-PF-03: Waktu respons API kurang dari 500 ms
 
-**US-1.1: School Registration (Headmaster)**
-- **As a** PAUD headmaster
-- **I want to** register my school with basic information
-- **So that** I can start using the platform for Gratis
+**Keamanan:**
+- [ ] NFR-SC-01: Menggunakan enkripsi HTTPS
+- [ ] NFR-SC-02: Penerapan Row Level Security (RLS) untuk isolasi data multi-tenant
+- [ ] NFR-SC-03: Penyimpanan file yang aman (menggunakan signed URL)
+- [ ] NFR-SC-04: Enkripsi kata sandi (password hashing)
+- [ ] NFR-SC-05: Verifikasi email wajib untuk pengguna
 
-**Acceptance Criteria:**
-- [ ] Form includes: school name, NPSN (optional), address, headmaster name, email, password
-- [ ] Email verification sent automatically
-- [ ] School created with Gratis Plan (20 student limit)
-- [ ] Headmaster automatically created with 'headmaster' role
-- [ ] Redirect to dashboard after email verification
-
----
-
-**US-1.2: Teacher Invitation (Headmaster)**
-- **As a** headmaster
-- **I want to** add teachers to my school
-- **So that** they can help manage siswa and input data
-
-**Acceptance Criteria:**
-- [ ] Form includes: teacher name, email, phone (optional)
-- [ ] Password auto-generated or manual input
-- [ ] Email with credentials sent automatically
-- [ ] Teacher can login and access school dashboard
-- [ ] Headmaster can edit/remove teachers
+**Kemudahan Penggunaan (Usability):**
+- [ ] NFR-US-01: Desain responsif untuk perangkat mobile (±80% pengguna menggunakan mobile)
+- [ ] NFR-US-02: Antarmuka menggunakan Bahasa Indonesia
+- [ ] NFR-US-04: Validasi form dengan pesan kesalahan yang jelas dan membantu
 
 ---
 
-### Epic 2: Student & Parent Management
+## 📖 User Story
 
-**US-2.1: Parent Profile Creation (Headmaster)**
-- **As a** headmaster
-- **I want to** create parent profiles independently
-- **So that** I can prepare parent database before student enrollment
+### Epic 1: Onboarding Sekolah
 
-**Acceptance Criteria:**
-- [ ] Form includes: email (unique per school), father name, mother name, phone, address
-- [ ] Email validation: must be unique within school
-- [ ] Auto-create user account with credentials
-- [ ] Email sent to parent with login details
-- [ ] Parent can login even without children (waiting list)
+**US-1.1: Pendaftaran Sekolah (Kepala Sekolah)**
+- **Sebagai** kepala PAUD
+- **Saya ingin** mendaftarkan sekolah dengan informasi dasar
+- **Sehingga** saya dapat mulai menggunakan platform dengan Paket Gratis
 
----
-
-**US-2.2: Student Registration with Parent Selection (Headmaster)**
-- **As a** headmaster
-- **I want to** register a student and link them to a parent (existing or new)
-- **So that** parents can monitor their children's Progress
-
-**Acceptance Criteria:**
-- [ ] Tab 1: Student data (name, birth date, Jenis kelamin, class)
-- [ ] Tab 2: Parent selection (dropdown existing OR create new)
-- [ ] If existing: show parent preview (email, names, existing children)
-- [ ] If new: show parent form (email, names, phone)
-- [ ] Email sent to parent (existing: "child added", new: "account created")
-- [ ] Student linked to parent_profile_id (required)
-- [ ] NO student account created (v3.0 - removed Student role)
+**Kriteria Penerimaan (Acceptance Criteria):**
+- [ ] Form berisi: nama sekolah, NPSN (opsional), alamat, nama kepala sekolah, email, kata sandi
+- [ ] Verifikasi email dikirim secara otomatis
+- [ ] Sekolah dibuat dengan Paket Gratis (batas 20 siswa)
+- [ ] Akun kepala sekolah otomatis dibuat dengan peran “Kepala Sekolah”
+- [ ] Dialihkan ke dashboard setelah email terverifikasi
 
 ---
 
-### Epic 3: Daily Operations
+**US-1.2: Undangan Guru (Kepala Sekolah)**
+- **Sebagai** kepala sekolah
+- **Saya ingin** menambahkan guru ke dalam sekolah
+- **Sehingga** guru dapat membantu mengelola siswa dan menginput data
 
-**US-3.1: Daily Attendance Input (Teacher)**
-- **As a** teacher
-- **I want to** record daily attendance for my class in under 5 minutes
-- **So that** parents can see real-time attendance
-
-**Acceptance Criteria:**
-- [ ] Select date (default: today)
-- [ ] Select class (dropdown: classes where teacher is homeroom)
-- [ ] Student list displayed with checkboxes: Hadir, Sakit, Izin, Alpha
-- [ ] Save button updates all siswa at once
-- [ ] Success notification displayed
-- [ ] Attendance cannot be duplicated (student_id + date unique)
+**Kriteria Penerimaan:**
+- [ ] Form berisi: nama guru, email, nomor telepon (opsional)
+- [ ] Kata sandi dibuat otomatis atau diisi manual
+- [ ] Email berisi kredensial login dikirim secara otomatis
+- [ ] Guru dapat login dan mengakses dashboard sekolah
+- [ ] Kepala sekolah dapat mengubah atau menghapus data guru
 
 ---
 
-**US-3.2: Attendance Monitoring (Parent)**
-- **As a** parent
-- **I want to** view my child's attendance history
-- **So that** I can monitor their school participation
+### Epic 2: Manajemen Siswa & Orang Tua
 
-**Acceptance Criteria:**
-- [ ] Select child (dropdown if multiple children)
-- [ ] Select period (This bulan, This Semester, Custom)
-- [ ] Summary displayed: Total Hadir, Sakit, Izin, Alpha, Percentage
-- [ ] Calendar view shows color-coded attendance
-- [ ] Export to PDF (optional)
+**US-2.1: Pembuatan Profil Orang Tua (Kepala Sekolah)**
+- **Sebagai** kepala sekolah
+- **Saya ingin** membuat profil orang tua secara terpisah
+- **Sehingga** data orang tua dapat disiapkan sebelum pendaftaran siswa
 
----
-
-**US-3.3: Penilaian siswa (Teacher)**
-- **As a** teacher
-- **I want to** record Penilaian siswas by category
-- **So that** I can track developmental Progress
-
-**Acceptance Criteria:**
-- [ ] Select student, category (Kognitif, Motorik, Sosial-Emosional)
-- [ ] Input indicator (specific skill/behavior)
-- [ ] Select score: BB, MB, BSH, BSB
-- [ ] Add optional notes
-- [ ] Select semester (1 or 2)
-- [ ] Save and continue to next student
+**Kriteria Penerimaan:**
+- [ ] Form berisi: email (unik per sekolah), nama ayah, nama ibu, nomor telepon, alamat, dan lainnya jika diperlukan
+- [ ] Validasi email: harus unik dalam satu sekolah
+- [ ] Akun pengguna dibuat otomatis beserta kredensial
+- [ ] Email dikirim ke orang tua berisi detail login
+- [ ] Orang tua dapat login meskipun belum memiliki anak terdaftar (waiting list)
 
 ---
 
-### Epic 4: Subscription & Billing
+**US-2.2: Pendaftaran Siswa dengan Pemilihan Orang Tua (Kepala Sekolah)**
+- **Sebagai** kepala sekolah
+- **Saya ingin** mendaftarkan siswa dan menghubungkannya dengan data orang tua (yang sudah ada atau baru)
+- **Sehingga** orang tua dapat memantau perkembangan anak
 
-**US-4.1: Pro Plan Upgrade (Headmaster)**
-- **As a** headmaster
-- **I want to** upgrade to Pro Plan when my school grows beyond 20 siswa
-- **So that** I can add siswa unlimited and access premium features
-
-**Acceptance Criteria:**
-- [ ] Upgrade button visible on Gratis Plan dashboard
-- [ ] Pricing page shows: Gratis vs Pro comparison
-- [ ] Checkout flow: Rp 200,000/bulan
-- [ ] Payment via Midtrans (multiple Metode pembayarans)
-- [ ] After payment success: subscription_plan = 'pro', student_limit = unlimited
-- [ ] Email confirmation sent
-- [ ] Pro features unlocked immediately
+**Kriteria Penerimaan:**
+- [ ] Tab 1: Data siswa (nama, tanggal lahir, jenis kelamin, kelas)
+- [ ] Tab 2: Pemilihan orang tua (dropdown data yang sudah ada atau tambah baru)
+- [ ] Jika orang tua sudah ada: tampilkan pratinjau (email, nama, daftar anak)
+- [ ] Jika orang tua baru: tampilkan form orang tua (email, nama, nomor telepon, dan lainnya yang diperlukan)
+- [ ] Email dikirim ke orang tua (orang tua lama: “anak ditambahkan”, orang tua baru: “akun dibuat”)
+- [ ] Siswa terhubung ke `parent_profile_id` (wajib)
+- [ ] Tidak ada akun login untuk siswa
 
 ---
 
-**US-4.2: PDF Report Generation (Pro Plan - Parent)**
-- **As a** parent with Pro Plan school
-- **I want to** download my child's Progress report as PDF
-- **So that** I can keep a physical record
+### Epic 3: Operasional Harian
 
-**Acceptance Criteria:**
-- [ ] "Download PDF" button visible (khusus Pro Plan)
-- [ ] PDF includes: school logo, student photo, attendance summary, assessments
-- [ ] PDF formatted professionally (A4 size)
-- [ ] Download triggers immediately
-- [ ] Paket Gratis: button disabled with "🔒 khusus Pro Plan" label
+**US-3.1: Pengisian Absensi Harian (Guru)**
+- **Sebagai** guru
+- **Saya ingin** mengisi absensi harian kelas kurang dari 5 menit
+- **Sehingga** orang tua dapat melihat absensi secara real-time
 
----
-
-### Epic 5: Marketplace publik
-
-**US-5.1: Webinar Purchase (User)**
-- **As a** parent/educator
-- **I want to** purchase a webinar about child development
-- **So that** I can learn from experts
-
-**Acceptance Criteria:**
-- [ ] Browse webinars (title, mentor, Harga, schedule)
-- [ ] Click "Daftar" → Redirect to checkout
-- [ ] Apply Kode promo (optional)
-- [ ] Pay via Midtrans
-- [ ] After payment: email sent with Zoom link
-- [ ] Zoom link accessible in My Account → Webinars tab
+**Kriteria Penerimaan:**
+- [ ] Pilih tanggal (default: hari ini)
+- [ ] Pilih kelas (dropdown kelas yang diampu sebagai wali kelas)
+- [ ] Daftar siswa dengan opsi: Hadir, Sakit, Izin, Alpha
+- [ ] Tombol simpan memperbarui seluruh data siswa sekaligus
+- [ ] Notifikasi berhasil ditampilkan
+- [ ] Data absensi tidak boleh duplikat (kombinasi student_id + tanggal unik)
 
 ---
 
-**US-5.2: kursus Enrollment & Completion (User)**
-- **As a** parent/educator
-- **I want to** enroll in an online kursus and track my Progress
-- **So that** I can learn at my own pace
+**US-3.2: Pemantauan Absensi (Orang Tua)**
+- **Sebagai** orang tua
+- **Saya ingin** melihat riwayat absensi anak
+- **Sehingga** saya dapat memantau kehadiran anak di sekolah
 
-**Acceptance Criteria:**
-- [ ] Browse kursuss, view syllabus
-- [ ] Purchase kursus → Auto-enroll after payment
-- [ ] kursus player: play video, view PDF, take quiz
-- [ ] Progress bar updates automatically (% completed)
-- [ ] Certificate auto-generated at 100% completion
-- [ ] Certificate downloadable from My Account
-
----
-
-**US-5.3: Digital produk Purchase (User)**
-- **As a** parent
-- **I want to** buy an e-book about parenting
-- **So that** I can read practical tips
-
-**Acceptance Criteria:**
-- [ ] Browse produks (title, Harga, Tipe file, file size)
-- [ ] Add to cart or direct checkout
-- [ ] Pay via Midtrans
-- [ ] After payment: email sent with download link
-- [ ] Download button in My Account → produks tab
-- [ ] Download link never expires (permanent access)
+**Kriteria Penerimaan:**
+- [ ] Pilih anak (dropdown jika memiliki lebih dari satu anak)
+- [ ] Pilih periode (Bulan Ini, Semester Ini, Kustom)
+- [ ] Ringkasan ditampilkan: total Hadir, Sakit, Izin, Alpha, persentase kehadiran
+- [ ] Tampilan kalender dengan kode warna absensi (opsional/good to be true)
+- [ ] Ekspor ke PDF (opsional/good to be true)
 
 ---
 
-### Epic 6: Content Creation
+**US-3.3: Penilaian Siswa (Guru)**
+- **Sebagai** guru
+- **Saya ingin** mencatat penilaian siswa berdasarkan kategori
+- **Sehingga** perkembangan siswa dapat dipantau
 
-**US-6.1: kursus Creation (Moderator)**
-- **As a** content moderator
-- **I want to** create an online kursus with multiple modules
-- **So that** I can share structured knowledge
-
-**Acceptance Criteria:**
-- [ ] Create kursus: title, description, mentor, category, Harga
-- [ ] Add modules (chapters) with ordering
-- [ ] Add lessons: video (YouTube URL), PDF (upload), quiz (questions)
-- [ ] Set lesson order within module
-- [ ] Preview kursus before publishing
-- [ ] Publish/unpublish toggle
-- [ ] kursus appears in Marketplace publik when published
+**Kriteria Penerimaan:**
+- [ ] Pilih siswa dan kategori (Kognitif, Motorik, Sosial-Emosional, dan lainnya)
+- [ ] Input indikator (kemampuan atau perilaku tertentu)
+- [ ] Pilih nilai: BB, MB, BSH, BSB
+- [ ] Tambahkan catatan (opsional)
+- [ ] Pilih semester (1, 2, 3, atau 4)
+- [ ] Simpan dan lanjut ke siswa berikutnya
 
 ---
 
-**US-6.2: Article Writing (Moderator)**
-- **As a** moderator
-- **I want to** write and publish Artikel blog
-- **So that** I can improve SEO and engage visitors
+### Epic 4: Langganan & Pembayaran
 
-**Acceptance Criteria:**
-- [ ] Rich text editor with formatting options
-- [ ] Upload images within content
-- [ ] Set featured image, title, slug, meta description
-- [ ] Add tags (comma-separated)
-- [ ] Save as draft or publish immediately
-- [ ] Published articles appear at /artikel/[slug]
-- [ ] Public access (no login required)
+**US-4.1: Upgrade ke Paket Pro (Kepala Sekolah)**
+- **Sebagai** kepala sekolah
+- **Saya ingin** meningkatkan paket ke Pro ketika jumlah siswa melebihi 20
+- **Sehingga** saya dapat menambah siswa tanpa batas dan mengakses fitur premium
 
----
-
-## 📊 Metrik kesuksesan
-
-### Business Metrics
-
-**School Acquisition (SIAKAD):**
-- [ ] **Target:** 100 schools registered in first 3 bulans
-- [ ] **Measure:** Total schools in database
-- [ ] **Goal:** 20% conversion from Gratis to Pro within 6 bulans
-
-**Revenue:**
-- [ ] **Target:** Rp 50,000,000/bulan by bulan 6
-- [ ] **Breakdown:**
-  - Pro Plan subscriptions: 50 schools × Rp 200,000 = Rp 10,000,000
-  - Webinar: 400 tickets × Rp 100,000 = Rp 40,000,000
-
-**User Growth (Public Platform):**
-- [ ] **Target:** 5,000 registered users in first 6 bulans
-- [ ] **Measure:** Total user accounts
-- [ ] **Goal:** 30% active users (bulanly active)
-
-### produk Metrics
-
-**Engagement (SIAKAD):**
-- [ ] Daily Active Teachers: 60% of registered teachers
-- [ ] Daily Attendance Input Rate: 80% of active schools
-- [ ] Parent Login Rate: 40% of parents per bulan
-
-**Engagement (Public Platform):**
-- [ ] kursus Completion Rate: 60% of enrolled users
-- [ ] Average Time on Site: 5+ minutes
-- [ ] Article Page Views: 10,000+/bulan
-
-### Quality Metrics
-
-**Performance:**
-- [ ] Page Load Time: < 3 seconds (95th percentile)
-- [ ] Uptime: 99.5%
-- [ ] Error Rate: < 0.5%
-
-**User Satisfaction:**
-- [ ] Net Promoter Score (NPS): > 50
-- [ ] Customer Satisfaction (CSAT): > 4/5
-- [ ] Support Ticket Resolution: < 24 hours
+**Kriteria Penerimaan:**
+- [ ] Tombol upgrade terlihat pada dashboard Paket Gratis
+- [ ] Halaman harga menampilkan perbandingan Paket Gratis dan Pro
+- [ ] Alur checkout: Rp200.000/bulan
+- [ ] Pembayaran melalui Midtrans (berbagai metode pembayaran)
+- [ ] Setelah pembayaran berhasil: paket = Pro, batas siswa = tanpa batas
+- [ ] Email konfirmasi dikirim
+- [ ] Fitur Pro langsung aktif
 
 ---
 
-## 🚀 Kriteria peluncuran
+**US-4.2: Unduh Laporan PDF (Paket Pro – Orang Tua)**
+- **Sebagai** orang tua dari sekolah dengan Paket Pro
+- **Saya ingin** mengunduh laporan perkembangan anak dalam bentuk PDF
+- **Sehingga** saya dapat menyimpannya sebagai arsip
 
-### MVP Launch (Version 1.0)
-
-**Must Have (Go/No-Go):**
-- [ ] All FR-SM (School Management) features complete
-- [ ] All FR-UM (User Management) features complete
-- [ ] FR-STM-01 to FR-STM-05 (Student Management core) complete
-- [ ] FR-AT-01 to FR-AT-04 (Attendance core) complete
-- [ ] FR-EC-01 to FR-EC-07 (E-Commerce core) complete
-- [ ] NFR-SC-01 to NFR-SC-05 (Security) implemented
-- [ ] NFR-US-01 to NFR-US-04 (Usability) tested
-- [ ] 99.5% uptime demonstrated in staging (1 week)
-- [ ] User acceptance testing with 5+ PAUD schools
-- [ ] Mobile responsiveness tested on iOS & Android
-
-**Nice to Have:**
-- [ ] FR-FN (manajemen keuangan) - can be released post-MVP
-- [ ] FR-RP (laporan PDF) - can be released post-MVP
-- [ ] Advanced analytics dashboard
-
-**Launch Blockers:**
-- Payment integration failure (Midtrans)
-- Critical security vulnerabilities
-- Major performance issues (> 5 sec load time)
-- Data loss or corruption bugs
+**Kriteria Penerimaan:**
+- [ ] Tombol “Unduh PDF” tersedia (khusus Paket Pro)
+- [ ] PDF memuat: logo sekolah, foto siswa, ringkasan absensi, dan penilaian
+- [ ] Format PDF profesional (ukuran A4)
+- [ ] Proses unduh berjalan langsung
+- [ ] Paket Gratis: tombol nonaktif dengan label “🔒 khusus Paket Pro”
 
 ---
 
-## 🗺️ Future Roadmap
+### Epic 5: Marketplace Publik
 
-### Version 1.1 (Q3 2026) - Enhanced SIAKAD
-- [ ] Bulk student upload (CSV import)
-- [ ] WhatsApp notification integration
-- [ ] Mobile app (React Native)
-- [ ] Advanced analytics dashboard
-- [ ] Custom report templates
+**US-5.1: Pembelian Webinar (Pengguna)**
+- **Sebagai** pengguna biasa/publik
+- **Saya ingin** membeli webinar tentang perkembangan anak atau lainnya yang diinginkan
+- **Sehingga** saya dapat belajar dari para ahli
 
-### Version 1.2 (Q4 2026) - Communication Hub
-- [ ] In-app messaging (teacher ↔ parent)
-- [ ] Announcement system
-- [ ] event calendar
-- [ ] Photo sharing (daily activities)
-- [ ] Video updates
-
-### Version 2.0 (Q1 2027) - Multi-Tingkat Education
-- [ ] Support for SD (Elementary) schools
-- [ ] Student portal (for SD siswa)
-- [ ] Homework assignment system
-- [ ] Online quiz & exams
-- [ ] Grade calculation & ranking
-
-### Version 2.1 (Q2 2027) - Advanced LMS
-- [ ] Live streaming webinars (no Zoom)
-- [ ] Interactive quizzes with timer
-- [ ] Peer discussion forums
-- [ ] Instructor dashboard & analytics
-- [ ] Affiliate program
-
-### Version 3.0 (Q3 2027) - Enterprise Features
-- [ ] White-label option for large school chains
-- [ ] API for third-party integrations
-- [ ] Advanced RLS with custom roles
-- [ ] Multi-language support (English)
-- [ ] Offline mode (Progressive Web App)
+**Kriteria Penerimaan:**
+- [ ] Menjelajahi daftar webinar (judul, mentor, harga, jadwal)
+- [ ] Klik “Daftar” → diarahkan ke halaman checkout
+- [ ] Menggunakan kode promo (opsional)
+- [ ] Pembayaran melalui Midtrans
+- [ ] Setelah pembayaran: email dikirim berisi link Zoom
+- [ ] Link Zoom tersedia di Akun Saya → tab Webinar
 
 ---
 
-## 📋 Out of Scope (Not in MVP)
+**US-5.2: Pendaftaran & Penyelesaian Kursus (Pengguna)**
+- **Sebagai** pengguna biasa/publik
+- **Saya ingin** mengikuti kursus online dan memantau progres belajar
+- **Sehingga** saya dapat belajar sesuai waktu sendiri
 
-### Technical
-- ❌ Native mobile apps (iOS/Android)
-- ❌ Offline functionality
-- ❌ Real-time collaboration
-- ❌ Video hosting (use YouTube embed)
-- ❌ Live chat support
-- ❌ Advanced AI/ML features
-
-### Features
-- ❌ Homework management
-- ❌ Online exams
-- ❌ Student portal (removed in v3.0)
-- ❌ Video conferencing (use external Zoom)
-- ❌ SMS notifications
-- ❌ Parent-teacher messaging
-- ❌ Attendance QR code scanning
-
-### Business
-- ❌ Multi-currency support
-- ❌ International expansion
-- ❌ Franchise management
-- ❌ Payroll system
-- ❌ Inventory management
+**Kriteria Penerimaan:**
+- [ ] Menjelajahi kursus dan melihat silabus
+- [ ] Membeli kursus → otomatis terdaftar setelah pembayaran
+- [ ] Pemutar kursus: video, PDF, dan kuis
+- [ ] Progress bar diperbarui otomatis (% selesai)
+- [ ] Sertifikat dibuat otomatis saat progres 100%
+- [ ] Sertifikat dapat diunduh dari Akun Saya
 
 ---
 
-## 📝 Assumptions & Dependencies
+**US-5.3: Pembelian Produk Digital (Pengguna)**
+- **Sebagai** pengguna biasa/publik
+- **Saya ingin** membeli e-book parenting
+- **Sehingga** saya dapat membaca tips praktis
 
-### Assumptions
-1. Target schools have stable internet connection
-2. Teachers and parents own smartphones
-3. Users are comfortable with Bahasa Indonesia
-4. Midtrans payment gateway is reliable
-5. Zoom will continue offering Gratis tier for webinars
-
-### Dependencies
-- **Midtrans:** Payment processing (critical)
-- **Supabase:** Database & authentication (critical)
-- **Cloudinary/S3:** File storage (critical)
-- **YouTube:** Video embedding (medium)
-- **Zoom:** Webinar hosting (medium - can be replaced)
-
-### Risks
-1. **Low adoption:** Schools prefer manual/paper-based → Mitigation: Gratis tier, easy onboarding
-2. **Competition:** Existing players (Gredu, Kelas Kita) → Mitigation: PAUD-specific features
-3. **Payment failure:** Midtrans outage → Mitigation: Manual payment option
-4. **Data privacy concerns:** Parents worried about child data → Mitigation: Transparent privacy policy
-5. **Technical debt:** Rapid MVP development → Mitigation: Code review, refactoring sprints
+**Kriteria Penerimaan:**
+- [ ] Menjelajahi produk (judul, harga, tipe file, ukuran file)
+- [ ] Tambah ke keranjang atau langsung checkout
+- [ ] Pembayaran melalui Midtrans
+- [ ] Setelah pembayaran: email dikirim berisi link unduhan
+- [ ] Tombol unduh tersedia di Akun Saya → tab Produk
+- [ ] Link unduhan tidak kedaluwarsa (akses permanen)
 
 ---
 
-## 🔐 Privacy & Compliance
+### Epic 6: Pembuatan Konten
 
-### Data Protection
-- [ ] Comply with Indonesian data protection regulations
-- [ ] Secure storage of children's personal data
-- [ ] Parental consent for data collection
-- [ ] Data retention policy (7 years)
-- [ ] Right to data deletion (GDPR-style)
+**US-6.1: Pembuatan Kursus (Moderator)**
+- **Sebagai** moderator konten
+- **Saya ingin** membuat kursus online dengan beberapa modul
+- **Sehingga** saya dapat membagikan materi secara terstruktur
 
-### Child Safety
-- [ ] No public display of children's photos
-- [ ] Tanpa login siswa (v3.0 - removed)
-- [ ] Parent authentication required for access
-- [ ] Secure file storage (signed URLs)
-
----
-
-## 📞 Support & Documentation
-
-### User Support
-- Email support: support@paudceria.com
-- Response time: < 24 hours
-- Knowledge base (FAQ)
-- Video tutorials (YouTube)
-
-### Documentation
-- User manual (PDF)
-- Quick start guide
-- Video walkthrough
-- API documentation (for developers)
+**Kriteria Penerimaan:**
+- [ ] Membuat kursus: judul, deskripsi, mentor, kategori, harga
+- [ ] Menambahkan modul dengan urutan
+- [ ] Menambahkan materi: video (URL YouTube), PDF (unggah), kuis
+- [ ] Mengatur urutan materi dalam modul
+- [ ] Pratinjau kursus sebelum dipublikasikan
+- [ ] Tombol publish / unpublish
+- [ ] Kursus tampil di marketplace publik setelah dipublikasikan
 
 ---
 
-## ✅ Approval & Sign-Off
+**US-6.2: Penulisan Artikel (Moderator)**
+- **Sebagai** moderator
+- **Saya ingin** menulis dan mempublikasikan artikel blog
+- **Sehingga** dapat meningkatkan SEO dan keterlibatan pengunjung
 
-| Role | Name | Signature | Date |
-|------|------|-----------|------|
-| produk Owner | [Name] | _________ | _____ |
-| Tech Lead | [Name] | _________ | _____ |
-| UX Designer | [Name] | _________ | _____ |
-| Business Owner | [Name] | _________ | _____ |
+**Kriteria Penerimaan:**
+- [ ] Editor teks lengkap dengan opsi pemformatan
+- [ ] Unggah gambar di dalam konten
+- [ ] Mengatur gambar utama, judul, slug, dan deskripsi meta
+- [ ] Menambahkan tag (dipisahkan dengan koma)
+- [ ] Simpan sebagai draft atau langsung publikasikan
+- [ ] Artikel yang dipublikasikan dapat diakses di /artikel/[slug]
+- [ ] Akses publik tanpa perlu login
 
 ---
 

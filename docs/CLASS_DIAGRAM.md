@@ -1,5 +1,5 @@
 # CLASS DIAGRAM
-## Platform Paud Ceria - Entity Relationship & Structure
+## Platform Paud Pedia - Entity Relationship & Structure
 
 **Tujuan:** Blueprint untuk class diagram - Entity definitions, attributes, dan relationships
 
@@ -248,7 +248,7 @@
 - `score` : String (ex: "BB", "MB", "BSH", "BSB")
 - `notes` : Text (optional)
 - `assessment_date` : Date
-- `semester` : Enum ('1', '2')
+- `semester` : Enum ('1', '2', '3', '4')
 - `created_at` : Timestamp
 - `updated_at` : Timestamp
 

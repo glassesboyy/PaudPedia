@@ -1,5 +1,5 @@
 # USE CASE DOKUMENTASI
-## Platform Paud Ceria - Per Role
+## Platform Paud Pedia - Per Role
 
 > **Note:** Untuk flows detail, lihat [FLOWS.md](./FLOWS.md)  
 > Untuk flow summary, lihat [FLOWS_SUMMARY.md](./FLOWS_SUMMARY.md)
