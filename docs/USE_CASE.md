@@ -1,6 +1,16 @@
 # USE CASE DOKUMENTASI
 ## Platform Paud Pedia - Per Role
 
+**Tech Stack:**
+- Backend: Laravel 12 (REST API) + MySQL 8.0
+- Admin Panel: Laravel Filament (Admin & Moderator Dashboard)
+- Public Frontend: Next.js/Nuxt.js (Guest & User roles - E-Learning & Marketplace)
+- SIAKAD Frontend: React/Vue + Vite (Parent, Teacher, Headmaster roles - School Management)
+
+> **Catatan:** Dokumentasi ini fokus pada use cases per role. Untuk flow detail sistem, lihat [FLOWS.md](./FLOWS.md)
+
+---
+
 ## 📋 Daftar Isi
 
 1. [Roles Overview](#roles-overview)
@@ -355,10 +365,3 @@ Dashboard: Show school selector
 - Saat akses menu Keuangan: Redirect → Upgrade page
 
 ---
-
-*For detailed flows, see [FLOWS.md](./FLOWS.md)*  
-*For quick flow reference, see [FLOWS_SUMMARY.md](./FLOWS_SUMMARY.md)*
-
----
-
-*Last Updated: January 14, 2026*

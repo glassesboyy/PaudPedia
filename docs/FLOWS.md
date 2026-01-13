@@ -1,6 +1,18 @@
 # FLOWS DOKUMENTASI
 ## Platform Paud Pedia - System Flows & Process
 
+**Tech Stack:**
+- Backend: Laravel 12+ (REST API) + MySQL 8.0
+- Admin Panel: Laravel Filament (Admin & Moderator)
+- Public Frontend: Next.js/Nuxt.js (Guest, User - Shopping & LMS)
+- SIAKAD Frontend: React/Vue + Vite (Parent, Teacher, Headmaster - School Management)
+
+**Tujuan:** Dokumentasi alur sistem secara detail untuk setiap fitur
+
+> **Catatan:** Flow ini menjelaskan interaksi antara frontend dan backend API
+
+---
+
 ## 📋 Daftar Isi
 
 1. [Multi-Tenant Flows](#-multi-tenant-flows)
@@ -643,5 +655,3 @@ Article Management:
 10. **Subscription Upgraded** → Email konfirmasi Pro Plan
 
 ---
-
-*Last Updated: January 13, 2026*

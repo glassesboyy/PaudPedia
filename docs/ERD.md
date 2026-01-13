@@ -1,6 +1,8 @@
 # ENTITY RELATIONSHIP DIAGRAM (ERD)
 ## Platform Paud Pedia - Skema & Struktur Database
 
+**Database:** MySQL 8.0  
+**Backend:** Laravel 11+  
 **Tujuan:** Spesifikasi skema database lengkap - Tabel, Kolom, Relasi, Constraint
 
 **Cakupan:**
@@ -73,8 +75,10 @@
 ## 🗄️ Gambaran Umum Database
 
 ### Tipe Database
-- **PostgreSQL 14+** (direkomendasikan)
-- Mendukung: UUID, JSON, ENUM, Full-text search, Row Tingkat Security (RLS) (RLS)
+- **MySQL 8.0** (Production)
+- **Engine:** InnoDB (untuk transaction support & foreign key)
+- **Character Set:** utf8mb4 (untuk emoji & multilingual support)
+- **Collation:** utf8mb4_unicode_ci
 
 ### Konvensi Penamaan
 - **Tabel:** Plural, snake_case (contoh: `users`, `school_members`)
@@ -84,34 +88,51 @@
 - **Unique Constraint:** `uq_{table}_{columns}` (contoh: `uq_parent_profiles_school_email`)
 
 ### Kolom Standar
-Semua tabel memiliki:
-- `id` : UUID (Primary Key, default: gen_random_uuid())
-- `created_at` : TIMESTAMP (default: now())
-- `updated_at` : TIMESTAMP (default: now(), auto-update saat ada perubahan)
+Semua tabel memiliki (Laravel conventions):
+- `id` : BIGINT UNSIGNED (Primary Key, Auto Increment) atau CHAR(36) untuk UUID
+- `created_at` : TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+- `updated_at` : TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+### ID Strategy
+**Option 1: Auto-Increment (Recommended for MySQL)**
+- `id` : BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+- Lebih performa untuk indexing & joins
+- Native MySQL support
+
+**Option 2: UUID (Alternative)**
+- `id` : CHAR(36) PRIMARY KEY
+- Better untuk distributed systems
+- Laravel UUID support dengan package
+
+**Pilihan:** Gunakan **BIGINT UNSIGNED** untuk performa optimal di MySQL
 
 ---
 
 ## 🔑 Skema Inti (Core Schema)
 
-### Tabel: `users` (Supabase Auth)
-**Deskripsi:** Tabel autentikasi dasar (dikelola oleh Supabase Auth)
+### Tabel: `users` (Laravel Auth)
+**Deskripsi:** Tabel autentikasi dasar (Laravel default users table)
 
 | Kolom | Tipe | Constraint | Deskripsi |
 |--------|------|-------------|-------------|
-| `id` | UUID | PK, NOT NULL | ID pengguna |
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID pengguna |
+| `name` | VARCHAR(255) | NOT NULL | Nama lengkap |
 | `email` | VARCHAR(255) | UNIQUE, NOT NULL | Alamat email |
-| `encrypted_password` | VARCHAR(255) | NOT NULL | Password terenkripsi |
-| `email_confirmed_at` | TIMESTAMP | NULL | Waktu verifikasi email |
+| `email_verified_at` | TIMESTAMP | NULL | Waktu verifikasi email |
+| `password` | VARCHAR(255) | NOT NULL | Password terenkripsi (bcrypt) |
 | `phone` | VARCHAR(20) | NULL | Nomor telepon |
-| `created_at` | TIMESTAMP | NOT NULL | Waktu pembuatan akun |
-| `updated_at` | TIMESTAMP | NOT NULL | Waktu update terakhir |
+| `remember_token` | VARCHAR(100) | NULL | Token remember me |
+| `created_at` | TIMESTAMP | NULL | Waktu pembuatan akun |
+| `updated_at` | TIMESTAMP | NULL | Waktu update terakhir |
 
 **Index:**
-- `idx_users_email` (UNIQUE)
+- `PRIMARY KEY` (`id`)
+- `UNIQUE KEY` (`email`)
 
 **Catatan:**
-- Dikelola oleh sistem Supabase Auth
-- Diperluas oleh tabel `teachers`, `parent_profiles` untuk data tambahan
+- Dikelola oleh Laravel Authentication
+- Extended oleh tabel `teachers`, `parent_profiles`
+- Password hashing menggunakan bcrypt via Laravel
 
 ---
 
@@ -120,19 +141,21 @@ Semua tabel memiliki:
 
 | Kolom | Tipe | Constraint | Deskripsi |
 |--------|------|-------------|-------------|
-| `id` | UUID | PK, NOT NULL | ID profil |
-| `user_id` | UUID | FK → users.id, UNIQUE, NOT NULL | Referensi ke user autentikasi |
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID profil |
+| `user_id` | BIGINT UNSIGNED | FK → users.id, UNIQUE, NOT NULL | Referensi ke user |
 | `full_name` | VARCHAR(255) | NOT NULL | Nama lengkap |
 | `avatar_url` | TEXT | NULL | URL gambar avatar |
 | `bio` | TEXT | NULL | Biografi singkat |
-| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
-| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+| `created_at` | TIMESTAMP | NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NULL | Waktu diupdate |
 
 **Foreign Key:**
-- `user_id` → `users.id` ON DELETE CASCADE
+- `FOREIGN KEY` (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 
 **Index:**
-- `idx_user_profiles_user_id` (UNIQUE)
+- `PRIMARY KEY` (`id`)
+- `UNIQUE KEY` (`user_id`)
+- `INDEX` `idx_user_profiles_user_id` (`user_id`)
 
 ---
 
@@ -143,7 +166,7 @@ Semua tabel memiliki:
 
 | Kolom | Tipe | Constraint | Deskripsi |
 |--------|------|-------------|-------------|
-| `id` | UUID | PK, NOT NULL | ID sekolah |
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID sekolah |
 | `name` | VARCHAR(255) | NOT NULL | Nama sekolah |
 | `npsn` | VARCHAR(20) | UNIQUE, NULL | Nomor Pokok Sekolah Nasional |
 | `address` | TEXT | NULL | Alamat lengkap |
@@ -1055,78 +1078,3 @@ users → articles [Content Creation]
 - Full-text Search: 1
 
 ---
-
-## 🔐 Pertimbangan Keamanan
-
-### Row Tingkat Security (RLS) (RLS)
-
-**Isolasi Multi-Tenant:**
-```sql
--- Example RLS Policy for students table
-CREATE POLICY students_isolation ON students
-  FOR ALL
-  USING (
-    school_id IN (
-      SELECT school_id FROM school_members 
-      WHERE user_id = auth.uid()
-    )
-  );
-```
-
-**Akses Berbasis Role:**
-```sql
--- Contoh: Only headmaster can delete students
-CREATE POLICY students_delete ON students
-  FOR DELETE
-  USING (
-    school_id IN (
-      SELECT school_id FROM school_members 
-      WHERE user_id = auth.uid() AND role = 'headmaster'
-    )
-  );
-```
-
-### Data Sensitif
-
-**Kolom Terenkripsi:**
-- `users.encrypted_password` (Supabase Auth managed)
-- `promo_codes.code` (consider hashing for security)
-
-**Audit Trail:**
-- All `created_at`, `updated_at` timestamps
-- Consider adding: `created_by`, `updated_by`, `deleted_at` for critical tables
-
----
-
-## 📝 Notes
-
-### Strategi Migrasi
-1. Create tables in order of dependencies (users → schools → classes → students)
-2. Add indexes after initial data load for better performance
-3. Enable RLS policies after testing
-4. Use database migrations for versioning (e.g., Supabase Migrations, Prisma, TypeORM)
-
-### Integritas Data
-- Use `ON DELETE CASCADE` for dependent data (e.g., school deleted → all students deleted)
-- Use `ON DELETE RESTRICT` for critical mereferensi (e.g., cannot delete teacher if they have attendance records)
-- Use `ON DELETE SET NULL` for optional mereferensi (e.g., class deleted → student.class_id = NULL)
-
-### Tips Performa
-- Partition large tables by `school_id` (multi-tenancy)
-- Use composite indexes for frequent query patterns
-- Implement database connection pooling
-- Use materialized views for analytics (e.g., attendance summary)
-
-### Skalabilitas
-- Consider sharding by `school_id` for very large deployments
-- Implement read replicas for reporting queries
-- Use caching (Redis) for frequently accessed data
-- Archive old data (graduated students, old assessments)
-
----
-
-*Terakhir Diperbarui: January 14, 2026*
-*Versi: 1.0 - Initial ERD Specification*
-*Database: PostgreSQL 14+*
-*Total Tabel: 25*
-*Total Relasi: 50+*

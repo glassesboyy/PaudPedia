@@ -1,6 +1,12 @@
 # CLASS DIAGRAM
 ## Platform Paud Pedia - Entity Relationship & Structure
 
+**Tech Stack:**
+- Backend: Laravel 11+ (REST API)
+- Database: MySQL 8.0 (InnoDB Engine)
+- Admin Panel: Laravel Filament
+- Frontend: Next.js/Nuxt.js (Public) + React/Vue+Vite (SIAKAD)
+
 **Tujuan:** Blueprint untuk class diagram - Entity definitions, attributes, dan relationships
 
 **Cakupan:**
@@ -8,6 +14,8 @@
 - ✅ Attributes per entity
 - ✅ Relationships & Cardinality
 - ✅ Primary Keys & Foreign Keys
+
+> **Catatan:** Untuk skema database detail dengan tipe data MySQL, lihat [ERD.md](./ERD.md)
 
 ---
 

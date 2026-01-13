@@ -1,12 +1,18 @@
 # PRODUCT REQUIREMENTS DOCUMENT (PRD)
 ## Platform Paud Pedia - Multi-Tenant SIAKAD & E-Learning Platform
 
+**Tech Stack:**
+- Backend: Laravel 12 (REST API) + MySQL 8.0
+- Admin Panel: Laravel Filament (Admin & Moderator Dashboard)
+- Public Frontend: Next.js/Nuxt.js (E-Learning & Marketplace)
+- SIAKAD Frontend: React/Vue + Vite (Multi-Tenant School Management)
+
 ---
 
 ## 📋 Gambaran Umum Dokumen
 
 ### Tujuan
-This PRD defines the Product Vision, features, requirements, and success criteria for Platform Paud Pedia - a dual-dual-purpose platform combining:
+This PRD defines the Product Vision, features, requirements, and success criteria for Platform Paud Pedia - a dual-purpose platform combining:
 1. **SIAKAD (Multi-Tenant School Management System)** untuk institusi PAUD
 2. **Public E-Learning & Marketplace** untuk edukasi parenting
 
@@ -17,7 +23,6 @@ This PRD defines the Product Vision, features, requirements, and success criteri
 - ✅ User story
 - ✅ Metrik kesuksesan
 - ✅ Kriteria peluncuran
-- ❌ Implementasi teknis (lihat dokumen teknis)
 - ❌ Skema database (see ERD.md/CLASS_DIAGRAM.md)
 - ❌ Flow detail (see FLOWS.md)
 
@@ -668,8 +673,3 @@ Solusi SaaS Dual-Platform:
 - [ ] Akses publik tanpa perlu login
 
 ---
-
-*Terakhir Diperbarui: January 14, 2026*
-*Versi: 1.0 - Initial PRD*
-*Document Status: Draft*
-*Next Review: February 1, 2026*
