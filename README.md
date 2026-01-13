@@ -89,7 +89,6 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 ## 🎯 Quick Start untuk Developer
 
 ### Backend Developer (Laravel)
-1. Baca: **DOKUMENTASI.md** → Tech Stack & Architecture
 2. Baca: **ERD.md** → Database Schema
 3. Baca: **CLASS_DIAGRAM.md** → Laravel Models & Relationships
 4. Baca: **FLOWS.md** → API Endpoints & Business Logic
@@ -213,7 +212,6 @@ api.paudpedia.com       → Laravel API
 
 ### Untuk Memahami Sistem Secara Keseluruhan
 1. **PRD.md** → Product vision & requirements
-2. **DOKUMENTASI.md** → Technical architecture
 3. **USE_CASE.md** → User perspective
 
 ### Untuk Development
