@@ -3,10 +3,29 @@
 
 ## 📋 Daftar Isi
 
-1. [Multi-Tenant Flows](#multi-tenant-flows)
-2. [Subscription Flows](#subscription-flows)
-3. [Payment Flows](#payment-flows)
-4. [Content Management Flows](#content-management-flows)
+1. [Multi-Tenant Flows](#-multi-tenant-flows)
+   - [Flow 1: School Registration (Headmaster Onboarding)](#flow-1-school-registration-headmaster-onboarding)
+   - [Flow 2: Teacher Registration (Manual by Headmaster)](#flow-2-teacher-registration-manual-by-headmaster)
+   - [Flow 3: Kelas Management](#flow-3-kelas-management)
+   - [Flow 4: Parent Management (Independent)](#flow-4-parent-management-independent)
+   - [Flow 5: Student Registration (by Headmaster)](#flow-5-student-registration-by-headmaster)
+   - [Flow 6: Multi-School Access (One User, Multiple Roles)](#flow-6-multi-school-access-one-user-multiple-roles)
+2. [Subscription Flows](#-subscription-flows)
+   - [Flow 1: New School Registration (Free Plan)](#flow-1-new-school-registration-free-plan)
+   - [Flow 2: Upgrade to Pro Plan](#flow-2-upgrade-to-pro-plan)
+   - [Flow 3: Feature Gating (Free vs Pro)](#flow-3-feature-gating-free-vs-pro)
+3. [Payment Flows](#-payment-flows)
+   - [Flow 1: Webinar Purchase](#flow-1-webinar-purchase)
+   - [Flow 2: Product Digital Purchase](#flow-2-product-digital-purchase)
+   - [Flow 3: Course Enrollment](#flow-3-course-enrollment)
+4. [Content Management Flows](#-content-management-flows)
+   - [Flow 1: Absensi Input & View](#flow-1-absensi-input--view)
+   - [Flow 2: Moderator Buat Webinar](#flow-2-moderator-buat-webinar)
+   - [Flow 3: Moderator Buat Kursus](#flow-3-moderator-buat-kursus)
+   - [Flow 4: User Complete Course & Get Certificate](#flow-4-user-complete-course--get-certificate)
+   - [Flow 5: Moderator Buat Produk Digital](#flow-5-moderator-buat-produk-digital)
+   - [Flow 6: Moderator Buat Artikel](#flow-6-moderator-buat-artikel)
+5. [Email Notification Flows](#-email-notification-flows)
 
 ---
 

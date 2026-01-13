@@ -18,22 +18,44 @@ This PRD defines the Product Vision, features, requirements, and success criteri
 - ✅ Metrik kesuksesan
 - ✅ Kriteria peluncuran
 - ❌ Implementasi teknis (lihat dokumen teknis)
-- ❌ Skema database (see ERD.md)
+- ❌ Skema database (see ERD.md/CLASS_DIAGRAM.md)
 - ❌ Flow detail (see FLOWS.md)
 
 ---
 
 ## 📋 Daftar Isi
 
-1. [Ringkasan Eksekutif](#executive-summary)
-2. [Product Vision](#produk-vision)
-3. [Target Market](#target-market)
-4. [User Personas](#user-personas)
-5. [Requirement fitur](#feature-requirements)
-6. [User story](#user-stories)
-7. [Metrik kesuksesan](#success-metrics)
-8. [Kriteria peluncuran](#launch-criteria)
-9. [Future Roadmap](#future-roadmap)
+1. [Ringkasan Eksekutif](#-ringkasan-eksekutif)
+   - [Nama Produk](#nama-produk)
+   - [Tipe Produk](#tipe-produk)
+   - [Target Market](#target-market)
+   - [Key Differentiators](#key-differentiators)
+   - [Business Model](#business-model)
+2. [Product Vision](#-product-vision)
+   - [Pernyataan Visi](#pernyataan-visi)
+   - [Misi](#misi)
+   - [Core Values](#core-values)
+3. [Target Pasar](#-target-pasar)
+   - [Pasar Utama: Lembaga PAUD](#pasar-utama-lembaga-paud)
+   - [Pasar Sekunder: Orang Tua & Pendidik](#pasar-sekunder-orang-tua--pendidik)
+4. [Persona Pengguna](#-persona-pengguna)
+   - [Persona 1: Bu Sari – Kepala PAUD](#persona-1-bu-sari--kepala-paud-usia-38-tahun)
+   - [Persona 2: Bu Ani – Guru PAUD](#persona-2-bu-ani--guru-paud-usia-28-tahun)
+   - [Persona 3: Ibu Rina – Orang Tua Murid](#persona-3-ibu-rina--orang-tua-murid-usia-32-tahun)
+   - [Persona 4: Pak Budi – Moderator / Pembuat Konten](#persona-4-pak-budi--moderator--pembuat-konten-usia-35-tahun)
+   - [Persona 5: Admin – Administrator Platform](#persona-5-admin--administrator-platform-usia-30-tahun)
+5. [Requirement Fitur](#-requirement-fitur)
+   - [🏫 SIAKAD Multi-Tenant](#-siakad-multi-tenant)
+   - [🌐 Platform Publik (B2C)](#-platform-publik-b2c)
+   - [🔧 Fitur Admin](#-fitur-admin)
+   - [Kebutuhan Non-Fungsional](#kebutuhan-non-fungsional)
+6. [User Story](#-user-story)
+   - [Epic 1: Onboarding Sekolah](#epic-1-onboarding-sekolah)
+   - [Epic 2: Manajemen Siswa & Orang Tua](#epic-2-manajemen-siswa--orang-tua)
+   - [Epic 3: Operasional Harian](#epic-3-operasional-harian)
+   - [Epic 4: Langganan & Pembayaran](#epic-4-langganan--pembayaran)
+   - [Epic 5: Marketplace Publik](#epic-5-marketplace-publik)
+   - [Epic 6: Pembuatan Konten](#epic-6-pembuatan-konten)
 
 ---
 

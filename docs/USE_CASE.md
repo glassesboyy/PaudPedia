@@ -1,16 +1,21 @@
 # USE CASE DOKUMENTASI
 ## Platform Paud Pedia - Per Role
 
-> **Note:** Untuk flows detail, lihat [FLOWS.md](./FLOWS.md)  
-> Untuk flow summary, lihat [FLOWS_SUMMARY.md](./FLOWS_SUMMARY.md)
-
----
-
 ## 📋 Daftar Isi
 
 1. [Roles Overview](#roles-overview)
 2. [Use Cases Per Role](#use-cases-per-role)
+   - [1. Guest (Pengunjung)](#1-guest-pengunjung)
+   - [2. User (Pengguna Terdaftar)](#2-user-pengguna-terdaftar)
+   - [3. Parent (Orang Tua)](#3-parent-orang-tua)
+   - [4. Teacher (Guru)](#4-teacher-guru)
+   - [5. Headmaster (Kepala Sekolah)](#5-headmaster-kepala-sekolah)
+   - [6. Moderator (Content Manager)](#6-moderator-content-manager)
+   - [7. Admin (Super Admin)](#7-admin-super-admin)
 3. [Key Differences](#key-differences)
+   - [🏫 SIAKAD Roles Comparison](#-siakad-roles-comparison)
+   - [🌐 Public Platform Roles Comparison](#-public-platform-roles-comparison)
+   - [💳 Subscription Impact](#-subscription-impact)
 
 ---
 

@@ -1,8 +1,6 @@
 # ENTITY RELATIONSHIP DIAGRAM (ERD)
 ## Platform Paud Pedia - Skema & Struktur Database
 
-**Versi:** 1.0  
-**Terakhir Diperbarui:** 14 Januari 2026  
 **Tujuan:** Spesifikasi skema database lengkap - Tabel, Kolom, Relasi, Constraint
 
 **Cakupan:**
@@ -13,20 +11,62 @@
 - ✅ Index
 - ✅ Tipe enum
 - ✅ Kardinalitas relasi
-- ❌ Optimasi query (lihat dokumen teknis)
-- ❌ Script migrasi (lihat dokumen teknis)
 
 ---
 
 ## 📋 Daftar Isi
 
-1. [Database Overview](#database-overview)
-2. [Core Schema](#core-schema)
-3. [Multi-Tenant Schema](#multi-tenant-schema)
-4. [Content Management Schema](#content-management-schema)
-5. [Commerce Schema](#commerce-schema)
-6. [Indexes & Constraints](#indexes--constraints)
-7. [Peta Relasi ERD](#erd-relationship-map)
+1. [Database Overview](#️-gambaran-umum-database)
+   - [Tipe Database](#tipe-database)
+   - [Konvensi Penamaan](#konvensi-penamaan)
+   - [Kolom Standar](#kolom-standar)
+2. [Core Schema](#-skema-inti-core-schema)
+   - [Tabel: users](#tabel-users-supabase-auth)
+   - [Tabel: user_profiles](#tabel-user_profiles)
+3. [Multi-Tenant Schema](#-skema-multi-tenant)
+   - [Tabel: schools](#tabel-schools)
+   - [Tabel: school_members](#tabel-school_members)
+   - [Tabel: teachers](#tabel-teachers)
+   - [Tabel: classes](#tabel-classes)
+   - [Tabel: parent_profiles](#tabel-parent_profiles)
+   - [Tabel: students](#tabel-students)
+   - [Tabel: attendance](#tabel-attendance)
+   - [Tabel: assessments](#tabel-assessments)
+   - [Tabel: finances](#tabel-finances)
+4. [Content Management Schema](#-content-management-schema)
+   - [Tabel: mentors](#tabel-mentors)
+   - [Tabel: categories](#tabel-categories)
+   - [Tabel: webinars](#tabel-webinars)
+   - [Tabel: courses](#tabel-courses)
+   - [Tabel: modules](#tabel-modules)
+   - [Tabel: lessons](#tabel-lessons)
+   - [Tabel: course_enrollments](#tabel-course_enrollments)
+   - [Tabel: lesson_Progress](#tabel-lesson_progress)
+   - [Tabel: products](#tabel-products)
+   - [Tabel: articles](#tabel-articles)
+   - [Tabel: testimonials](#tabel-testimonials)
+5. [Commerce Schema](#-commerce-schema)
+   - [Tabel: orders](#tabel-orders)
+   - [Tabel: order_items](#tabel-order_items)
+   - [Tabel: promo_codes](#tabel-promo_codes)
+   - [Tabel: site_settings](#tabel-site_settings)
+6. [Indexes & Constraints](#-indexes--constraints)
+   - [Index Performa](#index-performa)
+   - [Ringkasan Unique Constraint](#ringkasan-unique-constraint)
+7. [Peta Relasi ERD](#️-peta-relasi-erd)
+   - [Domain Multi-Tenant](#domain-multi-tenant)
+   - [Domain Manajemen Konten](#domain-manajemen-konten)
+   - [Domain Perdagangan](#domain-perdagangan)
+   - [Lintas Domain](#lintas-domain)
+8. [Statistik Database](#-statistik-database)
+9. [Pertimbangan Keamanan](#-pertimbangan-keamanan)
+   - [Row Tingkat Security (RLS)](#row-tingkat-security-rls-rls)
+   - [Data Sensitif](#data-sensitif)
+10. [Notes](#-notes)
+    - [Strategi Migrasi](#strategi-migrasi)
+    - [Integritas Data](#integritas-data)
+    - [Tips Performa](#tips-performa)
+    - [Skalabilitas](#skalabilitas)
 
 ---
 
