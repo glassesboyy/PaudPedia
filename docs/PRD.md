@@ -132,7 +132,7 @@ Solusi SaaS Dual-Platform:
 1. **Spesifik PAUD:** Dirancang khusus untuk pendidikan anak usia dini (usia 0-6), bukan adaptasi dari sistem SD/SMP
 2. **Monitoring Khusus Orang Tua:** Tanpa login siswa (desain sesuai usia)
 3. **Model Pendapatan Ganda:** Langganan sekolah (B2B) + Marketplace publik (B2C)
-4. **Freemium Model:** Gratis tier (20 siswa) → Tier Pro (unlimited + fitur premium)
+4. **Freemium Model:** Gratis tier (20 siswa + 5 guru) → Tier Pro (unlimited + fitur premium)
 5. **Ekosistem Terintegrasi:** Manajemen sekolah + edukasi parenting dalam satu platform
 
 ### Business Model
@@ -656,7 +656,7 @@ Solusi SaaS Dual-Platform:
 **Kriteria Penerimaan (Acceptance Criteria):**
 - [ ] Form berisi: nama sekolah, NPSN (opsional), alamat, nama kepala sekolah, email, kata sandi
 - [ ] Verifikasi email dikirim secara otomatis
-- [ ] Sekolah dibuat dengan Paket Gratis (batas 20 siswa)
+- [ ] Sekolah dibuat dengan Paket Gratis (batas 20 siswa + 5 guru)
 - [ ] Akun kepala sekolah otomatis dibuat dengan peran “Kepala Sekolah”
 - [ ] Dialihkan ke dashboard setelah email terverifikasi
 

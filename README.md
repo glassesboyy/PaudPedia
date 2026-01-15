@@ -25,6 +25,65 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 
 ---
 
+## 🏗️ Backend Architecture
+
+**Single Laravel 12 Project** di `app.paudpedia.com` dengan arsitektur berlayer:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    FRONTEND CLIENTS                         │
+├─────────────────────────────────────────────────────────────┤
+│  Next.js/Nuxt        React/Vue+Vite      Laravel Filament   │
+│  (Public Site)       (SIAKAD)            (Admin Panel)      │
+│  paudpedia.com       sikola.paudpedia    app.paudpedia.com  │
+└──────┬───────────────────┬────────────────────┬─────────────┘
+       │                   │                    │
+       │ REST API          │ REST API           │ Direct Access
+       │ (Laravel Sanctum) │ (Laravel Sanctum)  │ (Session Auth)
+       │                   │                    │
+       ▼                   ▼                    ▼
+┌─────────────────────────────────────────────────────────────┐
+│              LARAVEL 12 BACKEND (app.paudpedia.com)         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌──────────────────┐        ┌─────────────────────────┐   │
+│  │  API Controllers │        │  Filament Resources     │   │
+│  │  /api/v1/*       │        │  /admin, /moderator     │   │
+│  └────────┬─────────┘        └───────────┬─────────────┘   │
+│           │                              │                 │
+│           └──────────┬───────────────────┘                 │
+│                      ▼                                     │
+│           ┌──────────────────────┐                         │
+│           │   SERVICE LAYER      │                         │
+│           │  (Business Logic)    │                         │
+│           │  - SchoolService     │                         │
+│           │  - StudentService    │                         │
+│           │  - CourseService     │                         │
+│           └──────────┬───────────┘                         │
+│                      ▼                                     │
+│           ┌──────────────────────┐                         │
+│           │   ELOQUENT MODELS    │                         │
+│           │  (Database Layer)    │                         │
+│           └──────────┬───────────┘                         │
+│                      ▼                                     │
+└─────────────────────────────────────────────────────────────┘
+                       │
+                       ▼
+              ┌────────────────┐
+              │  MySQL 8.0     │
+              │  Database      │
+              └────────────────┘
+```
+
+**Key Points:**
+- ✅ **Single Project:** API & Filament dalam 1 Laravel project
+- ✅ **Shared Service Layer:** Business logic digunakan bersama oleh API Controllers & Filament Resources
+- ✅ **Filament:** Akses langsung ke Service Layer (tidak consume API)
+- ✅ **API:** Untuk frontend clients (Next.js, React/Vue) via REST endpoints
+- ✅ **Authentication:** Sanctum (API) vs Session (Filament)
+
+---
+
 ## 📋 Struktur Dokumentasi
 
 ### 1. [PRD.md](/docs/PRD.md) - Product Requirements Document
@@ -77,10 +136,15 @@ Selamat datang di dokumentasi lengkap **Platform PaudPedia** - Multi-Tenant SIAK
 ## 🎯 Quick Start untuk Developer
 
 ### Backend Developer (Laravel)
+1. Baca: **PRD.md** → Backend Architecture (Service Layer concept)
 2. Baca: **ERD.md** → Database Schema
 3. Baca: **CLASS_DIAGRAM.md** → Laravel Models & Relationships
 4. Baca: **FLOWS.md** → API Endpoints & Business Logic
-5. Implementasi: Migration, Models, Controllers, API Routes
+5. Implementasi:
+   - **Service Layer:** Business logic (SchoolService, StudentService, etc.)
+   - **API Controllers:** REST endpoints untuk frontend (`/api/v1/*`)
+   - **Filament Resources:** Admin panel resources (`/admin`, `/moderator`)
+   - **Models & Migrations:** Eloquent models + database migrations
 
 ### Frontend Developer (Next.js/Nuxt - Public Site)
 1. Baca: **PRD.md** → Feature Requirements
@@ -121,16 +185,17 @@ sikola.paudpedia.com    → React/Vue+Vite (SIAKAD)
 ├── /nilai (assessment)
 └── /laporan (reports)
 
-admin.paudpedia.com     → Laravel Filament
-├── /admin (super admin)
-├── /moderator (content manager)
-├── /users
-├── /schools
-└── /analytics
-
-api.paudpedia.com       → Laravel API
-└── /api/v1/*
+app.paudpedia.com       → Laravel 12 (Single Backend Project)
+├── /api/v1/* (REST API endpoints (consumed by Next.js & React/Vue frontends))
+├── /admin (Laravel Filament (Admin Panel))
+└── /moderator (Laravel Filament (Moderator Panel))
 ```
+
+**Architecture Notes:**
+- **Single Laravel Project:** API & Filament dalam satu project di `app.paudpedia.com`
+- **Filament:** Akses langsung ke **Service Layer** (tidak consume API)
+- **API:** Untuk **frontend clients** (Next.js, React/Vue) via REST endpoints
+- **Shared Logic:** Business logic di Service Layer digunakan oleh API Controllers & Filament
 
 ---
 
