@@ -12,19 +12,42 @@
 ## 📋 Gambaran Umum Dokumen
 
 ### Tujuan
-This PRD defines the Product Vision, features, requirements, and success criteria for Platform Paud Pedia - a dual-purpose platform combining:
+Dokumen ini mendefinisikan Product Vision, features, requirements, dan success criteria untuk Platform Paud Pedia - sebuah platform dual-purpose yang menggabungkan:
 1. **SIAKAD (Multi-Tenant School Management System)** untuk institusi PAUD
 2. **Public E-Learning & Marketplace** untuk edukasi parenting
 
 ### Scope
 - ✅ Product Vision & objectives
 - ✅ Target pengguna & persona
-- ✅ Requirement fitur
+- ✅ Requirement fitur (dipisah berdasarkan user roles)
 - ✅ User story
 - ✅ Metrik kesuksesan
 - ✅ Kriteria peluncuran
 - ❌ Skema database (see ERD.md/CLASS_DIAGRAM.md)
 - ❌ Flow detail (see FLOWS.md)
+
+### Struktur Requirements
+Requirements diorganisir berdasarkan **User Roles & Access Level**:
+
+1. **🏫 SIAKAD Multi-Tenant** - Internal school features (Headmaster, Teacher, Parent)
+2. **🌐 Platform Publik (B2C) - Public Features** - User-facing marketplace (Guest, Registered User)
+3. **🔧 Fitur Admin & Moderator** - Backend management (Admin, Moderator)
+
+**Rationale:**
+- ✅ **Clarity:** Jelas siapa yang mengakses fitur apa
+- ✅ **Tech Stack Alignment:** Public Features (Next.js/Nuxt) vs Admin Features (Laravel Filament)
+- ✅ **Development Focus:** Frontend team fokus pada public features, Backend team fokus pada admin/moderator features
+### Struktur Requirements
+Requirements diorganisir berdasarkan **User Roles & Access Level**:
+
+1. **🏫 SIAKAD Multi-Tenant** - Internal school features (Headmaster, Teacher, Parent)
+2. **🌐 Platform Publik (B2C) - Public Features** - User-facing marketplace (Guest, Registered User)
+3. **🔧 Fitur Admin & Moderator** - Backend management (Admin, Moderator)
+
+**Rationale:**
+- ✅ **Clarity:** Jelas siapa yang mengakses fitur apa
+- ✅ **Tech Stack Alignment:** Public Features (Next.js/Nuxt) vs Admin Features (Laravel Filament)
+- ✅ **Development Focus:** Frontend team fokus pada public features, Backend team fokus pada admin/moderator features
 
 ---
 
@@ -51,8 +74,35 @@ This PRD defines the Product Vision, features, requirements, and success criteri
    - [Persona 5: Admin – Administrator Platform](#persona-5-admin--administrator-platform-usia-30-tahun)
 5. [Requirement Fitur](#-requirement-fitur)
    - [🏫 SIAKAD Multi-Tenant](#-siakad-multi-tenant)
-   - [🌐 Platform Publik (B2C)](#-platform-publik-b2c)
-   - [🔧 Fitur Admin](#-fitur-admin)
+     - [1. Manajemen Sekolah](#1-manajemen-sekolah)
+     - [2. Manajemen Pengguna](#2-manajemen-pengguna)
+     - [3. Manajemen Kelas](#3-manajemen-kelas)
+     - [4. Manajemen Orang Tua](#4-manajemen-orang-tua)
+     - [5. Manajemen Siswa](#5-manajemen-siswa)
+     - [6. Manajemen Absensi](#6-manajemen-absensi)
+     - [7. Manajemen Penilaian (PAUD)](#7-manajemen-penilaian-paud)
+     - [8. Manajemen Keuangan (Pro Plan)](#8-manajemen-keuangan-khusus-paket-pro)
+     - [9. Laporan (Pro Plan)](#9-laporan-khusus-paket-pro)
+   - [🌐 Platform Publik (B2C) - Public Features](#-platform-publik-b2c---public-features)
+     - [10. Browse & Beli Webinar](#10-browse--beli-webinar)
+     - [11. Browse & Beli Kursus](#11-browse--beli-kursus)
+     - [12. Browse & Beli Produk Digital](#12-browse--beli-produk-digital)
+     - [13. Baca Artikel](#13-baca-artikel)
+     - [14. Lihat Profil Mentor](#14-lihat-profil-mentor)
+     - [15. Fitur Pencarian & Filter](#15-fitur-pencarian--filter)
+     - [16. E-Commerce (Keranjang & Checkout)](#16-e-commerce-keranjang--checkout)
+     - [17. Learning Management System (LMS)](#17-learning-management-system-lms)
+     - [18. Halaman Publik](#18-halaman-publik)
+     - [19. Akun Pengguna](#19-akun-pengguna)
+   - [🔧 Fitur Admin & Moderator](#-fitur-admin--moderator)
+     - [20. Manajemen Konten (Moderator Only)](#20-manajemen-konten-moderator-only-)
+       - [20.1 CRUD Webinar](#201-crud-webinar)
+       - [20.2 CRUD Kursus](#202-crud-kursus)
+       - [20.3 CRUD Produk Digital](#203-crud-produk-digital)
+       - [20.4 CRUD Artikel](#204-crud-artikel)
+       - [20.5 CRUD Mentor](#205-crud-mentor)
+       - [20.6 Manajemen Kategori](#206-manajemen-kategori)
+     - [21. Administrasi Platform (Admin Only)](#21-administrasi-platform-admin-only-)
    - [Kebutuhan Non-Fungsional](#kebutuhan-non-fungsional)
 6. [User Story](#-user-story)
    - [Epic 1: Onboarding Sekolah](#epic-1-onboarding-sekolah)
@@ -87,14 +137,29 @@ Solusi SaaS Dual-Platform:
 
 ### Business Model
 **B2B (SIAKAD):**
-- Paket Gratis: Rp 0/bulan (20 siswa maksimal, fitur dasar)
-- Paket Pro: Rp 200,000/bulan (siswa unlimited, laporan PDF, manajemen keuangan)
+- **Paket Gratis:** Rp 0/bulan
+  - Batas maksimal: 20 siswa
+  - Batas maksimal: 5 guru/teacher
+  - Fitur dasar: Manajemen siswa, absensi, penilaian
+  - Tidak termasuk: Generate PDF rapor, manajemen keuangan
+  
+- **Paket Pro:** Rp 200,000/bulan
+  - Siswa unlimited
+  - Guru/teacher unlimited
+  - Semua fitur: Generate PDF rapor, manajemen keuangan (SPP & Tabungan)
+  - Priority support
 
 **B2C (Public Platform):**
 - Webinar: Rp 50,000 - 200,000/event
 - Courses: Rp 100,000 - 500,000/kursus
 - Produk Digital: Rp 25,000 - 150,000/produk
 - Artikel: Gratis (SEO & engagement)
+
+**Rasionale Batasan Paket Gratis:**
+- **20 Siswa:** Sesuai dengan ukuran PAUD kecil (1-2 kelas)
+- **5 Guru:** Reasonable untuk sekolah kecil (1 kepala sekolah + 2-4 guru)
+- **Mencegah Abuse:** Batasan guru mencegah sekolah besar memakai paket gratis selamanya
+- **Upgrade Incentive:** Sekolah yang berkembang (>20 siswa atau >5 guru) akan upgrade ke Pro
 
 ---
 
@@ -290,16 +355,21 @@ Solusi SaaS Dual-Platform:
 
 ---
 
-## 📦 Requirement fitur
+## 📦 Requirement Fitur
 
 #### 🏫 SIAKAD Multi-Tenant
+> **Tech Stack:** React/Vue + Vite (Frontend) | Laravel API (Backend)  
+> **User Roles:** Headmaster, Teacher, Parent
 
 **1. Manajemen Sekolah**
 - [ ] FR-SM-01: Pendaftaran sekolah (kepala sekolah daftar mandiri)
 - [ ] FR-SM-02: Pengelolaan profil sekolah (nama, alamat, logo)
 - [ ] FR-SM-03: Tampilan paket berlangganan (Gratis vs Pro)
 - [ ] FR-SM-04: Upgrade ke Paket Pro (pembayaran via Midtrans)
-- [ ] FR-SM-05: Pembatasan jumlah siswa (Gratis: 20 siswa, Pro: tanpa batas)
+- [ ] FR-SM-05: Pembatasan jumlah siswa (Gratis: 20 siswa, Pro: unlimited)
+- [ ] FR-SM-06: Pembatasan jumlah guru (Gratis: 5 guru, Pro: unlimited)
+- [ ] FR-SM-07: Notifikasi saat mendekati batas (siswa atau guru)
+- [ ] FR-SM-08: Block penambahan siswa/guru baru saat limit tercapai (Free Plan)
 
 **2. Manajemen Pengguna**
 - [ ] FR-UM-01: Pendaftaran guru oleh kepala sekolah
@@ -338,7 +408,7 @@ Solusi SaaS Dual-Platform:
 - [ ] FR-AT-06: Perhitungan persentase kehadiran siswa
 
 **7. Manajemen Penilaian (PAUD)**
-- [ ] FR-AS-01: Input penilaian berdasarkan kategori (Kognitif, Motorik, Sosial-Emosional)
+- [ ] FR-AS-01: Input penilaian berdasarkan kategori (Kognitif, Motorik, Sosial-Emosional, Etc)
 - [ ] FR-AS-02: Skala penilaian PAUD: BB, MB, BSH, BSB
 - [ ] FR-AS-03: Penilaian berbasis semester (Semester 1, 2, 3, 4)
 - [ ] FR-AS-04: Tampilan riwayat penilaian untuk orang tua
@@ -359,74 +429,197 @@ Solusi SaaS Dual-Platform:
 
 ---
 
-#### 🌐 Platform Publik (B2C)
+#### 🌐 Platform Publik (B2C) - Public Features
+> **Tech Stack:** Next.js/Nuxt.js (Frontend) | Laravel API (Backend)  
+> **User Roles:** Guest, Registered User
 
-**10. Manajemen Konten Webinar**
-- [ ] FR-CT-01: Membuat, mengubah, dan menghapus webinar (Moderator)
-- [ ] FR-CT-02: Input link Zoom secara manual
-- [ ] FR-CT-03: Membuat, mengubah, dan menghapus kursus dengan modul dan materi (Moderator)
-- [ ] FR-CT-04: Mendukung video (embed YouTube), PDF, dan kuis
-- [ ] FR-CT-05: Membuat, mengubah, dan menghapus produk digital (Moderator)
-- [ ] FR-CT-06: Unggah file produk (PDF, ZIP, maksimal 50MB)
-- [ ] FR-CT-07: Membuat, mengubah, dan menghapus artikel (Moderator)
-- [ ] FR-CT-08: Editor teks kaya (rich text editor) untuk artikel
-- [ ] FR-CT-09: URL ramah SEO (slug)
+**10. Browse & Beli Webinar**
+- [ ] FR-WB-P01: Menjelajahi daftar webinar (guest & user)
+- [ ] FR-WB-P02: Lihat detail webinar (judul, deskripsi, mentor, harga, jadwal, durasi)
+- [ ] FR-WB-P03: Filter webinar berdasarkan kategori, harga, tanggal
+- [ ] FR-WB-P04: Search webinar by keyword
+- [ ] FR-WB-P05: Tambah webinar ke keranjang (user only)
+- [ ] FR-WB-P06: Akses link Zoom webinar setelah pembayaran berhasil
+- [ ] FR-WB-P07: Lihat daftar webinar yang diikuti di "Akun Saya → Webinar Saya"
+- [ ] FR-WB-P08: Notifikasi email reminder H-1 webinar
 
-**11. Manajemen Mentor**
-- [ ] FR-MN-01: Membuat, mengubah, dan menghapus profil mentor
-- [ ] FR-MN-02: Menetapkan mentor pada webinar dan kursus
-- [ ] FR-MN-03: Informasi mentor meliputi bio, foto, dan keahlian
+**11. Browse & Beli Kursus**
+- [ ] FR-CR-P01: Menjelajahi daftar kursus (guest & user)
+- [ ] FR-CR-P02: Lihat detail kursus (silabus, mentor, harga, tingkat kesulitan)
+- [ ] FR-CR-P03: Preview lesson gratis (video/PDF yang di-set preview)
+- [ ] FR-CR-P04: Filter kursus berdasarkan kategori, harga, tingkat kesulitan
+- [ ] FR-CR-P05: Search kursus by keyword
+- [ ] FR-CR-P06: Tambah kursus ke keranjang (user only)
+- [ ] FR-CR-P07: Otomatis terdaftar ke kursus setelah pembayaran berhasil
+- [ ] FR-CR-P08: Lihat daftar kursus yang diikuti di "Akun Saya → Kursus Saya"
 
-**12. Kategori & Pengelompokan Konten**
-- [ ] FR-CG-01: Pengelompokan kategori untuk kursus, produk, dan artikel
-- [ ] FR-CG-02: Konten unggulan (ditampilkan di halaman utama)
-- [ ] FR-CG-03: Fitur pencarian dan filter konten
+**12. Browse & Beli Produk Digital**
+- [ ] FR-PR-P01: Menjelajahi daftar produk digital (guest & user)
+- [ ] FR-PR-P02: Lihat detail produk (deskripsi, harga, tipe file, ukuran file)
+- [ ] FR-PR-P03: Filter produk berdasarkan kategori, harga, tipe file
+- [ ] FR-PR-P04: Search produk by keyword
+- [ ] FR-PR-P05: Tambah produk ke keranjang (user only)
+- [ ] FR-PR-P06: Download produk setelah pembayaran berhasil
+- [ ] FR-PR-P07: Lihat daftar produk yang dibeli di "Akun Saya → Produk Saya"
+- [ ] FR-PR-P08: Akses unlimited download (tidak ada expiry link)
 
-**13. E-Commerce**
-- [ ] FR-EC-01: Menjelajahi webinar, kursus, dan produk digital
-- [ ] FR-EC-02: Menambahkan item ke keranjang
-- [ ] FR-EC-03: Proses checkout dengan pembayaran melalui Midtrans
-- [ ] FR-EC-04: Penggunaan kode promo
-- [ ] FR-EC-05: Riwayat pesanan di halaman Akun Saya
-- [ ] FR-EC-06: Otomatis terdaftar ke kursus setelah pembayaran berhasil
-- [ ] FR-EC-07: Pengiriman email berisi link Zoom (webinar), link unduhan (produk) atau link kursus (kursus)
+**13. Baca Artikel**
+- [ ] FR-AR-P01: Menjelajahi daftar artikel (guest & user)
+- [ ] FR-AR-P02: Baca artikel lengkap (akses gratis tanpa login)
+- [ ] FR-AR-P03: Filter artikel berdasarkan kategori, tags
+- [ ] FR-AR-P04: Search artikel by keyword
+- [ ] FR-AR-P05: Lihat artikel featured di homepage
+- [ ] FR-AR-P06: Tampilkan reading time otomatis
+- [ ] FR-AR-P07: Navigasi artikel terkait (related articles)
 
-**14. Manajemen Pembelajaran (LMS)**
-- [ ] FR-LM-01: Pemutar kursus (video / penampil PDF)
-- [ ] FR-LM-02: Pelacakan penyelesaian materi
-- [ ] FR-LM-03: Perhitungan persentase progres belajar
-- [ ] FR-LM-04: Pembuatan sertifikat otomatis setelah 100% penyelesaian
-- [ ] FR-LM-05: Unduh sertifikat
+**14. Lihat Profil Mentor**
+- [ ] FR-MN-P01: Browse daftar mentor (guest & user)
+- [ ] FR-MN-P02: Lihat profil mentor (bio, foto, keahlian, social media links)
+- [ ] FR-MN-P03: Lihat webinar & kursus yang diampu mentor
+- [ ] FR-MN-P04: Filter mentor berdasarkan keahlian
 
-**15. Halaman Publik**
-- [ ] FR-PP-01: Halaman landing dengan hero, fitur, dan statistik
-- [ ] FR-PP-02: Halaman Tentang Kami
-- [ ] FR-PP-03: Halaman Kontak
-- [ ] FR-PP-04: Halaman Kebijakan Privasi
-- [ ] FR-PP-05: Halaman blog / artikel (akses gratis)
-- [ ] FR-PP-06: Bagian testimoni pengguna
+**15. Fitur Pencarian & Filter**
+- [ ] FR-SF-01: Search bar global (cari webinar, kursus, produk, artikel)
+- [ ] FR-SF-02: Filter konten berdasarkan kategori
+- [ ] FR-SF-03: Filter konten berdasarkan harga (gratis, berbayar, range harga)
+- [ ] FR-SF-04: Sort konten (terbaru, terpopuler, termurah, termahal)
+- [ ] FR-SF-05: Tampilkan konten featured di homepage
 
-**16. Akun Pengguna**
-- [ ] FR-UA-01: Pendaftaran dan login pengguna
-- [ ] FR-UA-02: Verifikasi email
-- [ ] FR-UA-03: Reset kata sandi
-- [ ] FR-UA-04: Dashboard Akun Saya
-- [ ] FR-UA-05: Pengelolaan profil pengguna
-- [ ] FR-UA-06: Kursus Saya (kursus yang diikuti)
-- [ ] FR-UA-07: Produk Saya (produk yang dibeli)
-- [ ] FR-UA-08: Webinar Saya (webinar yang diikuti)
+**16. E-Commerce (Keranjang & Checkout)**
+- [ ] FR-EC-01: Tambah item ke keranjang (webinar, kursus, produk)
+- [ ] FR-EC-02: Update quantity di keranjang
+- [ ] FR-EC-03: Hapus item dari keranjang
+- [ ] FR-EC-04: Tampilkan ringkasan order (subtotal, diskon, total)
+- [ ] FR-EC-05: Proses checkout dengan pembayaran melalui Midtrans
+- [ ] FR-EC-06: Penggunaan kode promo saat checkout
+- [ ] FR-EC-07: Riwayat pesanan di "Akun Saya → Riwayat Transaksi"
+- [ ] FR-EC-08: Detail status pembayaran (pending, paid, failed)
+- [ ] FR-EC-09: Email konfirmasi setelah pembayaran berhasil
+- [ ] FR-EC-10: Email berisi link Zoom (webinar), link kursus, atau link download (produk)
+
+**17. Learning Management System (LMS)**
+- [ ] FR-LM-01: Pemutar kursus (video player untuk YouTube embed)
+- [ ] FR-LM-02: PDF viewer untuk lesson tipe PDF
+- [ ] FR-LM-03: Pelacakan penyelesaian lesson (mark as complete)
+- [ ] FR-LM-04: Perhitungan persentase progres belajar otomatis
+- [ ] FR-LM-05: Progress bar per kursus (0-100%)
+- [ ] FR-LM-06: Lock lesson berikutnya sampai lesson sebelumnya selesai (opsional)
+- [ ] FR-LM-07: Pembuatan sertifikat otomatis setelah 100% penyelesaian
+- [ ] FR-LM-08: Download sertifikat dalam format PDF
+- [ ] FR-LM-09: Tampilkan sertifikat di "Akun Saya → Sertifikat Saya"
+- [ ] FR-LM-10: Share sertifikat ke social media (opsional)
+
+**18. Halaman Publik**
+- [ ] FR-PP-01: Halaman landing dengan hero section, fitur unggulan, dan statistik platform
+- [ ] FR-PP-02: Section featured courses/webinars/products
+- [ ] FR-PP-03: Section testimonials (rotating atau grid)
+- [ ] FR-PP-04: Halaman Tentang Kami (visi, misi, tim)
+- [ ] FR-PP-05: Halaman Kontak (form kontak + info)
+- [ ] FR-PP-06: Halaman Kebijakan Privasi
+- [ ] FR-PP-07: Halaman Syarat & Ketentuan
+- [ ] FR-PP-08: Halaman blog/artikel (akses gratis, SEO-friendly)
+- [ ] FR-PP-09: Halaman FAQ (Frequently Asked Questions)
+- [ ] FR-PP-10: Footer dengan links & social media
+
+**19. Akun Pengguna**
+- [ ] FR-UA-01: Pendaftaran pengguna (email & password)
+- [ ] FR-UA-02: Login pengguna (email & password)
+- [ ] FR-UA-03: Verifikasi email setelah registrasi
+- [ ] FR-UA-04: Reset kata sandi (forgot password)
+- [ ] FR-UA-05: Dashboard "Akun Saya" (overview)
+- [ ] FR-UA-06: Edit profil pengguna (nama, email, foto, bio)
+- [ ] FR-UA-07: Ubah password
+- [ ] FR-UA-08: Tab "Kursus Saya" (kursus yang diikuti + progress)
+- [ ] FR-UA-09: Tab "Produk Saya" (produk yang dibeli + download link)
+- [ ] FR-UA-10: Tab "Webinar Saya" (webinar yang diikuti + Zoom link)
+- [ ] FR-UA-11: Tab "Sertifikat Saya" (semua sertifikat yang didapat)
+- [ ] FR-UA-12: Tab "Riwayat Transaksi" (order history)
+- [ ] FR-UA-13: Logout
 
 ---
 
-#### 🔧 Fitur Admin
+#### 🔧 Fitur Admin & Moderator
+> **Tech Stack:** Laravel Filament (Admin Panel)  
+> **User Roles:** Admin, Moderator
 
-**17. Administrasi Platform**
-- [ ] FR-AD-01: Melihat seluruh pengguna dan data sekolah
+**20. Manajemen Konten (Moderator Only)** 🔒
+
+**20.1 CRUD Webinar**
+- [ ] FR-WB-M01: Membuat webinar baru (Moderator)
+- [ ] FR-WB-M02: Mengubah detail webinar (judul, deskripsi, harga, jadwal)
+- [ ] FR-WB-M03: Menghapus webinar (Moderator)
+- [ ] FR-WB-M04: Input link Zoom secara manual (meeting ID & passcode)
+- [ ] FR-WB-M05: Menetapkan mentor pada webinar
+- [ ] FR-WB-M06: Upload thumbnail webinar
+- [ ] FR-WB-M07: Set harga & harga original (untuk tampilan diskon)
+- [ ] FR-WB-M08: Publish/unpublish webinar
+- [ ] FR-WB-M09: Set jadwal webinar (tanggal & waktu)
+- [ ] FR-WB-M10: Set durasi webinar (dalam menit)
+
+**20.2 CRUD Kursus**
+- [ ] FR-CR-M01: Membuat kursus baru (Moderator)
+- [ ] FR-CR-M02: Mengubah detail kursus (judul, deskripsi, harga, kategori)
+- [ ] FR-CR-M03: Menghapus kursus (Moderator)
+- [ ] FR-CR-M04: Membuat dan mengelola modul kursus
+- [ ] FR-CR-M05: Membuat dan mengelola lesson dalam modul
+- [ ] FR-CR-M06: Mendukung berbagai tipe konten lesson (video YouTube embed, PDF, kuis, teks)
+- [ ] FR-CR-M07: Mengatur urutan modul dan lesson (drag & drop atau numbering)
+- [ ] FR-CR-M08: Set lesson sebagai preview gratis
+- [ ] FR-CR-M09: Upload thumbnail kursus
+- [ ] FR-CR-M10: Set tingkat kesulitan (Beginner, Intermediate, Advanced)
+- [ ] FR-CR-M11: Menetapkan mentor pada kursus
+- [ ] FR-CR-M12: Publish/unpublish kursus
+
+**20.3 CRUD Produk Digital**
+- [ ] FR-PR-M01: Membuat produk digital baru (Moderator)
+- [ ] FR-PR-M02: Mengubah detail produk (judul, deskripsi, harga, kategori)
+- [ ] FR-PR-M03: Menghapus produk digital (Moderator)
+- [ ] FR-PR-M04: Upload file produk (PDF, ZIP, DOC, PPT, maksimal 50MB)
+- [ ] FR-PR-M05: Upload thumbnail produk
+- [ ] FR-PR-M06: Set harga & harga original (untuk tampilan diskon)
+- [ ] FR-PR-M07: Tampilkan informasi file (tipe & ukuran file)
+- [ ] FR-PR-M08: Active/inactive produk
+- [ ] FR-PR-M09: Set kategori produk
+
+**20.4 CRUD Artikel**
+- [ ] FR-AR-M01: Membuat artikel baru (Moderator)
+- [ ] FR-AR-M02: Mengubah artikel (Moderator)
+- [ ] FR-AR-M03: Menghapus artikel (Moderator)
+- [ ] FR-AR-M04: Editor teks kaya (rich text editor) dengan support gambar
+- [ ] FR-AR-M05: Upload featured image
+- [ ] FR-AR-M06: Auto-generate slug dari judul (editable)
+- [ ] FR-AR-M07: Set meta description untuk SEO
+- [ ] FR-AR-M08: Tambah tags (multi-select atau comma-separated)
+- [ ] FR-AR-M09: Save as draft atau publish langsung
+- [ ] FR-AR-M10: Set artikel sebagai featured
+- [ ] FR-AR-M11: Auto-calculate reading time
+
+**20.5 CRUD Mentor**
+- [ ] FR-MN-M01: Membuat profil mentor baru (Moderator)
+- [ ] FR-MN-M02: Mengubah profil mentor (Moderator)
+- [ ] FR-MN-M03: Menghapus profil mentor (Moderator)
+- [ ] FR-MN-M04: Upload foto profil mentor
+- [ ] FR-MN-M05: Informasi mentor (nama, title/gelar, bio, keahlian)
+- [ ] FR-MN-M06: Tambah social media links (Instagram, LinkedIn, dll)
+- [ ] FR-MN-M07: Set mentor sebagai active/inactive
+- [ ] FR-MN-M08: Assign mentor ke webinar dan kursus
+
+**20.6 Manajemen Kategori**
+- [ ] FR-CG-M01: Membuat kategori untuk kursus, produk, dan artikel (Moderator)
+- [ ] FR-CG-M02: Edit kategori (Moderator)
+- [ ] FR-CG-M03: Hapus kategori (Moderator)
+- [ ] FR-CG-M04: Set konten sebagai featured (ditampilkan di halaman utama)
+
+**21. Administrasi Platform (Admin Only)** 🔒
+- [ ] FR-AD-01: Melihat seluruh pengguna dan data sekolah (Admin)
 - [ ] FR-AD-02: Mengelola pengaturan situs (logo, kontak, media sosial)
 - [ ] FR-AD-03: Melihat analitik penjualan (pendapatan, transaksi)
-- [ ] FR-AD-04: Pendaftaran kursus secara manual (untuk keperluan troubleshooting)
-- [ ] FR-AD-05: Pembuatan sertifikat secara manual (untuk keperluan troubleshooting)
-- [ ] FR-AD-06: Mengelola kode promo
+- [ ] FR-AD-04: Melihat statistik platform (total user, total kursus, revenue)
+- [ ] FR-AD-05: Pendaftaran kursus secara manual (untuk keperluan troubleshooting)
+- [ ] FR-AD-06: Pembuatan sertifikat secara manual (untuk keperluan troubleshooting)
+- [ ] FR-AD-07: Mengelola kode promo (create, edit, delete, activate/deactivate)
+- [ ] FR-AD-08: Approve/reject testimoni user
+- [ ] FR-AD-09: Manage user roles & permissions (Admin, Moderator)
 
 ---
 
@@ -565,8 +758,8 @@ Solusi SaaS Dual-Platform:
 
 **US-4.1: Upgrade ke Paket Pro (Kepala Sekolah)**
 - **Sebagai** kepala sekolah
-- **Saya ingin** meningkatkan paket ke Pro ketika jumlah siswa melebihi 20
-- **Sehingga** saya dapat menambah siswa tanpa batas dan mengakses fitur premium
+- **Saya ingin** meningkatkan paket ke Pro ketika jumlah siswa melebihi 20 dan guru melebihi 5
+- **Sehingga** saya dapat menambah siswa dan guru tanpa batas dan mengakses fitur premium
 
 **Kriteria Penerimaan:**
 - [ ] Tombol upgrade terlihat pada dashboard Paket Gratis
@@ -618,7 +811,7 @@ Solusi SaaS Dual-Platform:
 **Kriteria Penerimaan:**
 - [ ] Menjelajahi kursus dan melihat silabus
 - [ ] Membeli kursus → otomatis terdaftar setelah pembayaran
-- [ ] Pemutar kursus: video, PDF, dan kuis
+- [ ] Pemutar kursus: video, PDF, kuis, dan konten kursus lainnya sesuai yang dibuat
 - [ ] Progress bar diperbarui otomatis (% selesai)
 - [ ] Sertifikat dibuat otomatis saat progres 100%
 - [ ] Sertifikat dapat diunduh dari Akun Saya

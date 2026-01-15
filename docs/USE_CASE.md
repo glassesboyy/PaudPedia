@@ -350,6 +350,7 @@ Dashboard: Show school selector
 |---------|-----------|----------|
 | **Limits** |
 | Student limit | 20 max | Unlimited |
+| Teacher limit | 5 max | Unlimited |
 | **Features** |
 | Input siswa & absensi | ✅ | ✅ |
 | Input nilai asesmen | ✅ | ✅ |
@@ -361,6 +362,7 @@ Dashboard: Show school selector
 
 **Free Plan Restrictions:**
 - Saat add student ke-21: Error → "Upgrade ke Pro untuk unlimited siswa"
+- Saat add teacher ke-6: Error → "Upgrade ke Pro untuk unlimited guru"
 - Saat klik "Generate PDF": Disabled button → "🔒 Pro Plan Only"
 - Saat akses menu Keuangan: Redirect → Upgrade page
 

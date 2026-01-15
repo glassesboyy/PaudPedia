@@ -100,6 +100,7 @@
 - `logo_url` : String (optional)
 - `subscription_plan` : Enum ('free', 'pro')
 - `student_limit` : Integer (20 for free, unlimited for pro)
+- `teacher_limit` : Integer (5 for free, unlimited for pro)
 - `subscription_expires_at` : Timestamp (nullable)
 - `created_at` : Timestamp
 - `updated_at` : Timestamp
@@ -111,6 +112,10 @@
 - Has Many → ParentProfile (orang tua di sekolah)
 - Has Many → Attendance (absensi records)
 - Has Many → Assessment (nilai records)
+
+**Catatan:**
+- Free Plan: student_limit = 20, teacher_limit = 5
+- Pro Plan: student_limit & teacher_limit = NULL atau unlimited
 
 ---
 
@@ -362,13 +367,13 @@
 - `slug` : String (unique)
 - `description` : Text
 - `thumbnail_url` : String
-- `Harga` : Decimal
-- `original_Harga` : Decimal (untuk diskon display)
+- `price` : Decimal
+- `original_price` : Decimal (untuk diskon display)
 - `zoom_link` : String
 - `zoom_meeting_id` : String
 - `zoom_passcode` : String (optional)
 - `scheduled_at` : Timestamp
-- `Durasi_minutes` : Integer
+- `duration_minutes` : Integer
 - `max_participants` : Integer (optional)
 - `is_active` : Boolean
 - `created_at` : Timestamp
@@ -395,10 +400,10 @@
 - `slug` : String (unique)
 - `description` : Text
 - `thumbnail_url` : String
-- `Harga` : Decimal
-- `original_Harga` : Decimal (optional)
+- `price` : Decimal
+- `price_Harga` : Decimal (optional)
 - `Tingkat` : Enum ('beginner', 'intermediate', 'advanced')
-- `Durasi_hours` : Integer (estimated)
+- `duration_hours` : Integer (estimated)
 - `is_published` : Boolean
 - `created_at` : Timestamp
 - `updated_at` : Timestamp
@@ -439,7 +444,7 @@
 - `title` : String
 - `content_type` : Enum ('video', 'pdf', 'quiz', 'text')
 - `content_url` : String (YouTube embed URL or file URL)
-- `Durasi_minutes` : Integer (optional)
+- `duration_minutes` : Integer (optional)
 - `order` : Integer (sequence)
 - `is_preview` : Boolean (Preview gratis lesson)
 - `created_at` : Timestamp
@@ -459,7 +464,7 @@
 - `course_id` : UUID (FK → Course)
 - `user_id` : UUID (FK → User)
 - `enrolled_at` : Timestamp
-- `Progress_percentage` : Integer (0-100)
+- `progress_percentage` : Integer (0-100)
 - `completed_at` : Timestamp (nullable)
 - `certificate_url` : String (nullable)
 - `created_at` : Timestamp

@@ -360,11 +360,11 @@ Context Switching:
 1. Visit /daftar-sekolah
 2. Fill form → Submit
 3. System creates:
-   - School (subscription_plan: 'free', student_limit: 20)
+   - School (subscription_plan: 'free', student_limit: 20, teacher_limit: 5)
    - Headmaster account
 4. Email aktivasi
 5. Login → Dashboard (Free Plan)
-6. Status: Free Plan (20 siswa max)
+6. Status: Free Plan (20 siswa max, 5 guru max)
 ```
 
 ---
@@ -384,6 +384,7 @@ Context Switching:
    │                                        │
    │  Fitur yang unlock:                    │
    │  ✓ Unlimited Siswa                     │
+   │  ✓ Unlimited Guru                      │
    │  ✓ Generate PDF Rapor                  │
    │  ✓ Keuangan (SPP & Tabungan)           │
    │                                        │
@@ -395,7 +396,8 @@ Context Switching:
 6. Selesaikan pembayaran
 7. Midtrans webhook → Update schools:
    - subscription_plan = 'pro'
-   - student_limit = 999999
+   - student_limit = NULL (unlimited)
+   - teacher_limit = NULL (unlimited)
 8. Email konfirmasi
 9. Dashboard: Pro features unlocked
 ```

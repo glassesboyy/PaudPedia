@@ -175,6 +175,7 @@ Semua tabel memiliki (Laravel conventions):
 | `logo_url` | TEXT | NULL | URL logo sekolah |
 | `subscription_plan` | ENUM | NOT NULL, DEFAULT 'free' | Tipe paket langganan |
 | `student_limit` | INTEGER | NOT NULL, DEFAULT 20 | Batas maksimal siswa |
+| `teacher_limit` | INTEGER | NOT NULL, DEFAULT 5 | Batas maksimal guru |
 | `subscription_expires_at` | TIMESTAMP | NULL | Waktu kadaluarsa paket Pro |
 | `is_active` | BOOLEAN | NOT NULL, DEFAULT true | Status aktif |
 | `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
@@ -184,12 +185,18 @@ Semua tabel memiliki (Laravel conventions):
 - `subscription_plan`: 'free', 'pro'
 
 **Index:**
-- `idx_schools_npsn` (UNIQUE, WHERE npsn IS NOT NULL)
-- `idx_schools_subscription_plan`
+- `PRIMARY KEY` (`id`)
+- `UNIQUE KEY` (`npsn`) WHERE npsn IS NOT NULL
+- `INDEX` `idx_schools_subscription_plan` (`subscription_plan`)
 
 **Constraint:**
 - CHECK: `student_limit >= 0`
-- CHECK: `subscription_plan = 'free' AND student_limit <= 20 OR subscription_plan = 'pro'`
+- CHECK: `teacher_limit >= 0`
+- CHECK: `subscription_plan = 'free' AND student_limit = 20 AND teacher_limit = 5 OR subscription_plan = 'pro'`
+
+**Catatan:**
+- Free Plan: student_limit = 20, teacher_limit = 5
+- Pro Plan: student_limit & teacher_limit bisa di-set NULL (unlimited) atau angka besar
 
 ---
 
