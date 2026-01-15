@@ -481,9 +481,8 @@ Solusi SaaS Dual-Platform:
 **15. Fitur Pencarian & Filter**
 - [ ] FR-SF-01: Search bar global (cari webinar, kursus, produk, artikel)
 - [ ] FR-SF-02: Filter konten berdasarkan kategori
-- [ ] FR-SF-03: Filter konten berdasarkan harga (gratis, berbayar, range harga)
+- [ ] FR-SF-03: Filter konten berdasarkan harga (gratis, berbayar, range harga) -> khusus yang memiliki harga
 - [ ] FR-SF-04: Sort konten (terbaru, terpopuler, termurah, termahal)
-- [ ] FR-SF-05: Tampilkan konten featured di homepage
 
 **16. E-Commerce (Keranjang & Checkout)**
 - [ ] FR-EC-01: Tambah item ke keranjang (webinar, kursus, produk)
@@ -626,19 +625,18 @@ Solusi SaaS Dual-Platform:
 ### Kebutuhan Non-Fungsional
 
 **Performa:**
-- [ ] NFR-PF-01: Waktu muat halaman kurang dari 10 detik
-- [ ] NFR-PF-02: Mendukung lebih dari 1.000 pengguna aktif secara bersamaan
-- [ ] NFR-PF-03: Waktu respons API kurang dari 500 ms
+- [ ] NFR-PF-01: Waktu muat halaman kurang lebih 10 detik
+- [ ] NFR-PF-02: Mendukung kurang lebih 100 pengguna aktif secara bersamaan
+- [ ] NFR-PF-03: Waktu respons API kurang lebih 500 ms
 
 **Keamanan:**
 - [ ] NFR-SC-01: Menggunakan enkripsi HTTPS
 - [ ] NFR-SC-02: Penerapan Row Level Security (RLS) untuk isolasi data multi-tenant
-- [ ] NFR-SC-03: Penyimpanan file yang aman (menggunakan signed URL)
-- [ ] NFR-SC-04: Enkripsi kata sandi (password hashing)
-- [ ] NFR-SC-05: Verifikasi email wajib untuk pengguna
+- [ ] NFR-SC-03: Enkripsi kata sandi (password hashing)
+- [ ] NFR-SC-04: Verifikasi email wajib untuk pengguna
 
 **Kemudahan Penggunaan (Usability):**
-- [ ] NFR-US-01: Desain responsif untuk perangkat mobile (±80% pengguna menggunakan mobile)
+- [ ] NFR-US-01: Desain responsif untuk perangkat mobile
 - [ ] NFR-US-02: Antarmuka menggunakan Bahasa Indonesia
 - [ ] NFR-US-04: Validasi form dengan pesan kesalahan yang jelas dan membantu
 
