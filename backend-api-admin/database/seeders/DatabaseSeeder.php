@@ -15,11 +15,46 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seed in correct order (respect foreign keys)
+        $this->call([
+            // Permissions & Roles (MUST BE FIRST)
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            
+            // Core data
+            UserSeeder::class,
+            CategorySeeder::class,
+            MentorSeeder::class,
+            
+            // School management
+            SchoolSeeder::class,
+            SchoolMemberSeeder::class,
+            TeacherSeeder::class,
+            ClassRoomSeeder::class,
+            ParentProfileSeeder::class,
+            StudentSeeder::class,
+            
+            // Student data (requires students)
+            AttendanceSeeder::class,
+            AssessmentSeeder::class,
+            FinanceSeeder::class,
+            
+            // Content management
+            WebinarSeeder::class,
+            CourseSeeder::class,
+            ModuleSeeder::class,
+            LessonSeeder::class,
+            ProductSeeder::class,
+            ArticleSeeder::class,
+            TestimonialSeeder::class,
+            
+            // Commerce
+            PromoCodeSeeder::class,
+            OrderSeeder::class,
+            CourseEnrollmentSeeder::class,
+            
+            // Site settings
+            SiteSettingSeeder::class,
         ]);
     }
 }
