@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('max_participants')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
             
             // Indexes
             $table->index('mentor_id');

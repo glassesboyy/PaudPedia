@@ -64,7 +64,7 @@ Platform ini memiliki **7 roles** dengan tanggung jawab berbeda:
 | UC-G-07 | Login | Masuk dengan email/password |
 
 **Restrictions:**
-- ❌ Tidak bisa add to cart
+- ❌ Tidak bisa manage cart
 - ❌ Tidak bisa checkout
 - ❌ Tidak bisa akses dashboard
 
@@ -78,7 +78,7 @@ Platform ini memiliki **7 roles** dengan tanggung jawab berbeda:
 
 | ID | Use Case | Deskripsi |
 |----|----------|-----------|
-| UC-U-01 | Add to cart | Tambah produk/webinar/kursus ke cart |
+| UC-U-01 | Manage cart | Tambah/Hapus produk/webinar/kursus ke cart |
 | UC-U-02 | Apply promo code | Pakai kode promo saat checkout |
 | UC-U-03 | Checkout & payment | Bayar via Midtrans |
 | UC-U-04 | View my purchases | Lihat riwayat pembelian |

@@ -148,7 +148,7 @@
 - `id` : UUID (PK)
 - `user_id` : UUID (FK → User, unique)
 - `school_id` : UUID (FK → School)
-- `employee_id` : String (optional)
+- `nip` : String (optional)
 - `specialization` : String (optional)
 - `bio` : Text (optional)
 - `created_at` : Timestamp

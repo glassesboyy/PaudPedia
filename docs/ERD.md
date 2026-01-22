@@ -242,7 +242,7 @@ Semua tabel memiliki (Laravel conventions):
 | `id` | UUID | PK, NOT NULL | ID Guru |
 | `user_id` | UUID | FK → users.id, UNIQUE, NOT NULL | Referensi user |
 | `school_id` | UUID | FK → schools.id, NOT NULL | Referensi sekolah |
-| `employee_id` | VARCHAR(50) | NULL | Nomor pegawai |
+| `nip` | VARCHAR(50) | NULL | Nomor induk pegawai |
 | `specialization` | VARCHAR(255) | NULL | Spesialisasi mengajar |
 | `bio` | TEXT | NULL | Biografi |
 | `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
