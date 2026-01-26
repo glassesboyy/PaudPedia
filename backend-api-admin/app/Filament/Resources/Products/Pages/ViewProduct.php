@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Webinars\Pages;
+namespace App\Filament\Resources\Products\Pages;
 
-use App\Filament\Resources\Webinars\WebinarResource;
+use App\Filament\Resources\Products\ProductResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewWebinar extends ViewRecord
+class ViewProduct extends ViewRecord
 {
-    protected static string $resource = WebinarResource::class;
+    protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {

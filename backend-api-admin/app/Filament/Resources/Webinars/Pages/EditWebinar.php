@@ -42,18 +42,12 @@ class EditWebinar extends EditRecord
     {
         return $this->getResource()::getUrl('index');
     }
-
-    protected function getSavedNotificationTitle(): ?string
+    
+    protected function getSavedNotification(): ?Notification
     {
-        return 'Webinar berhasil diperbarui';
-    }
-
-    protected function afterSave(): void
-    {
-        Notification::make()
-            ->title('Webinar Berhasil Diperbarui')
-            ->body('Perubahan pada webinar "' . $this->record->title . '" telah disimpan.')
+        return Notification::make()
             ->success()
-            ->send();
+            ->title('Webinar berhasil diperbarui')
+            ->body('Perubahan telah disimpan.');
     }
 }

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Webinars\Pages;
+namespace App\Filament\Resources\Products\Pages;
 
-use App\Filament\Resources\Webinars\WebinarResource;
+use App\Filament\Resources\Products\ProductResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateWebinar extends CreateRecord
+class CreateProduct extends CreateRecord
 {
-    protected static string $resource = WebinarResource::class;
+    protected static string $resource = ProductResource::class;
 
     protected function getRedirectUrl(): string
     {
@@ -19,7 +19,7 @@ class CreateWebinar extends CreateRecord
     {
         return Notification::make()
             ->success()
-            ->title('Webinar berhasil dibuat')
-            ->body('Webinar baru telah ditambahkan.');
+            ->title('Produk berhasil dibuat')
+            ->body('Produk digital baru telah ditambahkan.');
     }
 }

@@ -19,12 +19,11 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('thumbnail_url')->nullable();
             $table->text('file_url')->nullable(); // download link
-            $table->string('file_type')->nullable(); // ex: "PDF", "ZIP"
-            $table->bigInteger('file_size')->nullable(); // in bytes
             $table->decimal('price', 10, 2)->default(0);
             $table->decimal('original_price', 10, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
             
             // Indexes
             $table->index('category_id');

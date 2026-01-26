@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'category_id',
@@ -18,15 +19,12 @@ class Product extends Model
         'description',
         'thumbnail_url',
         'file_url',
-        'file_type',
-        'file_size',
         'price',
         'original_price',
         'is_active',
     ];
 
     protected $casts = [
-        'file_size' => 'integer',
         'price' => 'decimal:2',
         'original_price' => 'decimal:2',
         'is_active' => 'boolean',
@@ -62,24 +60,6 @@ class Product extends Model
         }
 
         return (int) round((($this->original_price - $this->price) / $this->original_price) * 100);
-    }
-
-    public function getFormattedFileSizeAttribute(): string
-    {
-        if (!$this->file_size) {
-            return 'Unknown';
-        }
-
-        $units = ['B', 'KB', 'MB', 'GB'];
-        $size = $this->file_size;
-        $unit = 0;
-
-        while ($size > 1024 && $unit < count($units) - 1) {
-            $size /= 1024;
-            $unit++;
-        }
-
-        return round($size, 2) . ' ' . $units[$unit];
     }
 
     public function getTotalPurchasesAttribute(): int

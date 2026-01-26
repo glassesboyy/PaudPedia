@@ -127,14 +127,12 @@ class MentorInfolist
                         TextEntry::make('created_at')
                             ->label('Dibuat Pada')
                             ->dateTime('d F Y, H:i')
-                            ->timezone('Asia/Jakarta')
-                            ->icon('heroicon-o-clock'),
+                            ->timezone('Asia/Jakarta'),
                         
                         TextEntry::make('updated_at')
                             ->label('Terakhir Diupdate')
                             ->dateTime('d F Y, H:i')
                             ->timezone('Asia/Jakarta')
-                            ->icon('heroicon-o-arrow-path')
                             ->since(),
                     ])
                     ->columns(1)
