@@ -44,7 +44,9 @@ class WebinarForm
                         Select::make('mentor_id')
                             ->label('Mentor')
                             ->required()
-                            ->relationship('mentor', 'name')
+                            ->relationship('mentor', 'name', function ($query) {
+                                $query->where('is_active', true);
+                            })
                             ->searchable()
                             ->preload()
                             ->createOptionForm([
@@ -103,13 +105,12 @@ class WebinarForm
                                     ->url()
                                     ->placeholder('https://youtube.com/@username')
                                     ->prefixIcon('heroicon-o-play-circle'),
-
-                                Toggle::make('is_active')
-                                    ->label('Aktif')
-                                    ->default(true)
-                                    ->helperText('Hanya mentor aktif yang dapat dipilih')
-                                    ->inline(false),
                             ])
+                            ->createOptionUsing(function (array $data) {
+                                // Auto-activate mentor created from webinar form
+                                $data['is_active'] = true;
+                                return \App\Models\Mentor::create($data)->getKey();
+                            })
                             ->placeholder('Pilih mentor')
                             ->helperText('Mentor yang akan mengisi webinar'),
 
