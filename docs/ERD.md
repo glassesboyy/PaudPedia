@@ -753,7 +753,6 @@ Semua tabel memiliki (Laravel conventions):
 | `excerpt` | VARCHAR(500) | NULL | Kutipan singkat |
 | `featured_image_url` | TEXT | NULL | URL gambar unggulan |
 | `tags` | JSONB | NULL | Array tag |
-| `reading_time_minutes` | INTEGER | NULL | Waktu baca |
 | `view_count` | INTEGER | NOT NULL, DEFAULT 0 | Penghitung tampilan |
 | `is_featured` | BOOLEAN | NOT NULL, DEFAULT false | Status unggulan |
 | `is_published` | BOOLEAN | NOT NULL, DEFAULT false | Status publikasi |

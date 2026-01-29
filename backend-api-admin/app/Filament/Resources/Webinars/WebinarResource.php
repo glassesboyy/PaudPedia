@@ -32,7 +32,7 @@ class WebinarResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Webinar';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Konten E-Commerce';
+    protected static string|UnitEnum|null $navigationGroup = 'Konten & E-Commerce';
 
     protected static ?int $navigationSort = 1;
 

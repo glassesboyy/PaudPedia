@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
@@ -91,7 +92,7 @@ class ProductForm
                             ->image()
                             ->directory('products/thumbnails')
                             ->imageEditor()
-                            ->maxSize(2048) // 2MB
+                            ->maxSize(2048)
                             ->helperText('Gambar preview produk. Maksimal 2MB'),
                     ])
                     ->columns(1)
@@ -115,8 +116,19 @@ class ProductForm
                             ->numeric()
                             ->prefix('Rp')
                             ->minValue(0)
-                            ->placeholder('0')
-                            ->helperText('Harga coret untuk menampilkan diskon. Kosongkan jika tidak ada diskon'),
+                            ->placeholder('150000')
+                            ->helperText('Jika ada diskon, isi harga sebelum diskon')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, $get, $set) {
+                                $price = $get('price');
+                                if ($state && $price && $state > $price) {
+                                    $discount = round((($state - $price) / $state) * 100);
+                                    Notification::make()
+                                        ->title('Diskon: ' . $discount . '%')
+                                        ->success()
+                                        ->send();
+                                }
+                            }),
                     ])
                     ->columns(1)
                     ->collapsible(),

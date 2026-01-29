@@ -24,10 +24,15 @@ class ProductInfolist
 
                         TextEntry::make('title')
                             ->label('Judul')
-                            ->weight(FontWeight::Bold),
+                            ->size('large')
+                            ->weight(FontWeight::Bold)
+                            ->copyable()
+                            ->columnSpanFull(),
 
                         TextEntry::make('slug')
                             ->label('Slug')
+                            ->copyable()
+                            ->badge()
                             ->copyable()
                             ->color('gray'),
 
@@ -120,8 +125,7 @@ class ProductInfolist
                             ->visible(fn (Product $record): bool => $record->trashed()),
                     ])
                     ->columns(1)
-                    ->collapsible()
-                    ->collapsed(),
+                    ->collapsible(),
             ]);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Webinars\Pages;
+namespace App\Filament\Resources\Articles\Pages;
 
-use App\Filament\Resources\Webinars\WebinarResource;
+use App\Filament\Resources\Articles\ArticleResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -10,9 +10,9 @@ use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
-class EditWebinar extends EditRecord
+class EditArticle extends EditRecord
 {
-    protected static string $resource = WebinarResource::class;
+    protected static string $resource = ArticleResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -22,27 +22,34 @@ class EditWebinar extends EditRecord
             
             DeleteAction::make()
                 ->label('Hapus')
-                ->modalHeading('Hapus Webinar?')
-                ->modalDescription('Webinar akan dihapus sementara dan dapat dipulihkan nanti.')
+                ->modalHeading('Hapus Artikel?')
+                ->modalDescription('Artikel akan dihapus sementara dan dapat dipulihkan nanti.')
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title('Webinar dihapus')
-                        ->body('Webinar berhasil dihapus.'),
+                        ->title('Artikel berhasil dihapus')
+                        ->body('Artikel berhasil dihapus.')
                 ),
         ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Karena field author_id sudah tidak ada di form,
+        unset($data['author_id']);
+        return $data;
     }
 
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
-    
+
     protected function getSavedNotification(): ?Notification
     {
         return Notification::make()
             ->success()
-            ->title('Webinar berhasil diperbarui')
-            ->body('Perubahan data webinar telah disimpan.');
+            ->title('Artikel berhasil diperbarui')
+            ->body('Perubahan data artikel telah disimpan.');
     }
 }

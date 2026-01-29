@@ -41,8 +41,8 @@ class WebinarsTable
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(fn (Webinar $record): string => $record->title)
-                    ->weight('medium'),
+                    ->weight('medium')
+                    ->wrap(),
 
                 TextColumn::make('mentor.name')
                     ->label('Mentor')
@@ -77,7 +77,7 @@ class WebinarsTable
                         $record->discount_percentage ? $record->discount_percentage . '%' : null
                     )
                     ->badge()
-                    ->color('warning')
+                    ->color('danger')
                     ->placeholder('-'),
 
                 TextColumn::make('total_purchases')

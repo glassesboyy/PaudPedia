@@ -543,7 +543,6 @@
 - `excerpt` : String (meta description)
 - `featured_image_url` : String
 - `tags` : JSON (array of strings)
-- `reading_time_minutes` : Integer (auto-calculated)
 - `view_count` : Integer (default: 0)
 - `is_featured` : Boolean
 - `is_published` : Boolean

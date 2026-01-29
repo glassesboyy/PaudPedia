@@ -53,21 +53,16 @@ class ArticleSeeder extends Seeder
         ];
 
         foreach ($articles as $articleData) {
-            $article = Article::create([
+            Article::create([
                 ...$articleData,
                 'category_id' => $categories->random()->id,
                 'author_id' => $authors->random()->id,
                 'slug' => Str::slug($articleData['title']),
                 'featured_image_url' => null,
-                'reading_time_minutes' => fake()->numberBetween(3, 10),
                 'view_count' => fake()->numberBetween(0, 1000),
                 'is_published' => true,
                 'published_at' => now()->subDays(fake()->numberBetween(1, 30)),
             ]);
-
-            // Update reading time based on content
-            $article->reading_time_minutes = $article->calculateReadingTime();
-            $article->save();
         }
     }
 

@@ -11,6 +11,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use app\Models\Mentor;
 use Illuminate\Support\Str;
 
 class WebinarForm
@@ -109,7 +110,7 @@ class WebinarForm
                             ->createOptionUsing(function (array $data) {
                                 // Auto-activate mentor created from webinar form
                                 $data['is_active'] = true;
-                                return \App\Models\Mentor::create($data)->getKey();
+                                return Mentor::create($data)->getKey();
                             })
                             ->placeholder('Pilih mentor')
                             ->helperText('Mentor yang akan mengisi webinar'),
@@ -127,7 +128,7 @@ class WebinarForm
                             ->directory('webinars/thumbnails')
                             ->imageEditor()
                             ->maxSize(2048)
-                            ->helperText('Ukuran maksimal 2MB, rasio 16:9'),
+                            ->helperText('Ukuran maksimal 2MB'),
                     ])
                     ->columns(1)
                     ->collapsible(),

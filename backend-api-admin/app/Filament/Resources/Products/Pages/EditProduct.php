@@ -21,6 +21,7 @@ class EditProduct extends EditRecord
             DeleteAction::make()
                 ->label('Hapus')
                 ->modalHeading('Hapus Produk?')
+                ->modalDescription('Produk akan dihapus sementara dan dapat dipulihkan nanti.')
                 ->successNotification(
                     Notification::make()
                         ->success()
@@ -40,6 +41,6 @@ class EditProduct extends EditRecord
         return Notification::make()
             ->success()
             ->title('Produk berhasil diperbarui')
-            ->body('Perubahan telah disimpan.');
+            ->body('Perubahan data produk telah disimpan.');
     }
 }

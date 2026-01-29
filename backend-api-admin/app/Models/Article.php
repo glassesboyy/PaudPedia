@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'category_id',
@@ -19,7 +20,6 @@ class Article extends Model
         'excerpt',
         'featured_image_url',
         'tags',
-        'reading_time_minutes',
         'view_count',
         'is_featured',
         'is_published',
@@ -28,7 +28,6 @@ class Article extends Model
 
     protected $casts = [
         'tags' => 'array',
-        'reading_time_minutes' => 'integer',
         'view_count' => 'integer',
         'is_featured' => 'boolean',
         'is_published' => 'boolean',
@@ -77,14 +76,6 @@ class Article extends Model
     public function incrementViewCount(): void
     {
         $this->increment('view_count');
-    }
-
-    public function calculateReadingTime(): int
-    {
-        $wordCount = str_word_count(strip_tags($this->content));
-        $minutes = ceil($wordCount / 200); // Average reading speed: 200 words/minute
-        
-        return max(1, $minutes);
     }
 
     public function getFormattedPublishedDateAttribute(): string

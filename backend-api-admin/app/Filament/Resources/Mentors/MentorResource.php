@@ -30,7 +30,7 @@ class MentorResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Mentor';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Konten E-Commerce';
+    protected static string|UnitEnum|null $navigationGroup = 'Konten & E-Commerce';
 
     protected static ?int $navigationSort = 3;
 

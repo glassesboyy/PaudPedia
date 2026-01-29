@@ -21,12 +21,12 @@ return new class extends Migration
             $table->text('excerpt')->nullable(); // meta description
             $table->text('featured_image_url')->nullable();
             $table->json('tags')->nullable(); // array of strings
-            $table->integer('reading_time_minutes')->nullable();
             $table->integer('view_count')->default(0);
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_published')->default(false);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             // Indexes
             $table->index('category_id');

@@ -8,7 +8,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
-use Filament\Support\Enums\TextSize;
+use App\Models\Webinar;
 
 class WebinarInfolist
 {
@@ -23,17 +23,24 @@ class WebinarInfolist
                             ->defaultImageUrl(url('/images/default-webinar.png')),
 
                         TextEntry::make('title')
-                            ->label('Judul Webinar')
+                            ->label('Judul')
+                            ->size('large')
                             ->weight(FontWeight::Bold)
-                            ->size(TextSize::Large)
-                            ->color('primary'),
+                            ->copyable()
+                            ->columnSpanFull(),
                         
                         TextEntry::make('slug')
-                            ->label('Slug'),
+                            ->label('Slug')
+                            ->copyable()
+                            ->badge()
+                            ->copyable()
+                            ->color('gray'),
                         
                         TextEntry::make('mentor.name')
                             ->label('Mentor')
-                            ->color('success'),
+                            ->badge()
+                            ->color('info')
+                            ->placeholder('Tidak ada Mentor'),
 
                         TextEntry::make('description')
                             ->label('Deskripsi')
@@ -70,12 +77,14 @@ class WebinarInfolist
                         TextEntry::make('original_price')
                             ->label('Harga Asli')
                             ->money('IDR')
-                            ->placeholder('Tidak ada diskon')
-                            ->color('gray'),
+                            ->color('gray')
+                            ->placeholder('Tidak ada diskon'),
                         
                         TextEntry::make('discount_percentage')
                             ->label('Diskon')
-                            ->suffix('%')
+                            ->getStateUsing(fn (Webinar $record): ?string => 
+                                $record->discount_percentage ? $record->discount_percentage . '%' : null
+                            )
                             ->badge()
                             ->color('danger')
                             ->placeholder('-'),
@@ -136,6 +145,14 @@ class WebinarInfolist
                             ->dateTime('d F Y, H:i')
                             ->timezone('Asia/Jakarta')
                             ->since(),
+
+                        TextEntry::make('deleted_at')
+                            ->label('Dihapus Pada')
+                            ->dateTime('d F Y, H:i')
+                            ->timezone('Asia/Jakarta')
+                            ->color('danger')
+                            ->placeholder('Tidak dihapus')
+                            ->visible(fn (Webinar $record): bool => $record->trashed()),
                     ])
                     ->columns(1)
                     ->collapsible(),

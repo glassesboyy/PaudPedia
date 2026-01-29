@@ -39,8 +39,8 @@ class ProductsTable
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(fn (Product $record): string => $record->title)
-                    ->weight('medium'),
+                    ->weight('medium')
+                    ->wrap(),
 
                 TextColumn::make('category.name')
                     ->label('Kategori')
