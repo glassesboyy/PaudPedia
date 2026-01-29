@@ -258,6 +258,7 @@ Dashboard: Show school selector
 | UC-MOD-12 | Delete artikel | Hapus artikel |
 | UC-MOD-13 | Manage mentor profiles | Add/edit/delete mentor |
 | UC-MOD-14 | Manage testimonials | Add/edit/delete testimonial |
+| UC-MOD-15 | Manage kateogri | Add/edit/delete kategori |
 
 **Key Features:**
 - ✅ Full content creation access

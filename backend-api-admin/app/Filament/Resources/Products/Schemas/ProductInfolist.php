@@ -33,7 +33,6 @@ class ProductInfolist
                             ->label('Slug')
                             ->copyable()
                             ->badge()
-                            ->copyable()
                             ->color('gray'),
 
                         TextEntry::make('category.name')

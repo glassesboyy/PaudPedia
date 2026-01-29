@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\Mentor;
 use App\Models\Product;
 use App\Models\Webinar;
 use App\Policies\ArticlePolicy;
+use App\Policies\CategoryPolicy;
 use App\Policies\MentorPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\WebinarPolicy;
@@ -21,6 +23,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Article::class => ArticlePolicy::class,
+        Category::class => CategoryPolicy::class,
         Mentor::class => MentorPolicy::class,
         Product::class => ProductPolicy::class,
         Webinar::class => WebinarPolicy::class,

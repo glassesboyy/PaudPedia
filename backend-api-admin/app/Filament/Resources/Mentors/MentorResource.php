@@ -22,7 +22,7 @@ class MentorResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $recordTitleAttribute = 'title';
 
     protected static ?string $navigationLabel = 'Mentor';
 
@@ -32,7 +32,7 @@ class MentorResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Konten & E-Commerce';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
