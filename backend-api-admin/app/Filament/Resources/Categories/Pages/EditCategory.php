@@ -22,9 +22,12 @@ class EditCategory extends EditRecord
     {
         return [
             ViewAction::make()
-                ->label('Lihat'),
+                ->label('Lihat')
+                ->icon('heroicon-o-eye'),
+
             DeleteAction::make()
                 ->label('Hapus')
+                ->icon('heroicon-o-trash')
                 ->modalHeading('Hapus Kategori?')
                 ->modalDescription('Data kategori akan dihapus permanent dan tidak dapat dikembalikan, kategori yang masih terhubung dengan konten lain tidak dapat dihapus.')
                 ->before(function ($record, $action) {
@@ -46,7 +49,7 @@ class EditCategory extends EditRecord
                     Notification::make()
                         ->success()
                         ->title('Kategori berhasil dihapus')
-                        ->body('Data kategori berhasil dihapus.')
+                        ->body('Data kategori berhasil dihapus permanent dan tidak dapat dikembalikan.')
                 ),
         ];
     }

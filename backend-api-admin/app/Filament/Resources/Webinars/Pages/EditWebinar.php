@@ -18,17 +18,19 @@ class EditWebinar extends EditRecord
     {
         return [
             ViewAction::make()
-                ->label('Lihat'),
+                ->label('Lihat')
+                ->icon('heroicon-o-eye'),
             
             DeleteAction::make()
                 ->label('Hapus')
+                ->icon('heroicon-o-trash')
                 ->modalHeading('Hapus Webinar?')
                 ->modalDescription('Webinar akan dihapus sementara dan dapat dipulihkan nanti.')
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title('Webinar dihapus')
-                        ->body('Webinar berhasil dihapus.'),
+                        ->title('Webinar berhasil dihapus')
+                        ->body('Data webinar berhasil dihapus dan dapat dipulihkan nanti.')
                 ),
         ];
     }

@@ -4,8 +4,6 @@ namespace App\Filament\Resources\Articles\Pages;
 
 use App\Filament\Resources\Articles\ArticleResource;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -18,17 +16,19 @@ class EditArticle extends EditRecord
     {
         return [
             ViewAction::make()
-                ->label('Lihat'),
+                ->label('Lihat')
+                ->icon('heroicon-o-eye'),
             
             DeleteAction::make()
                 ->label('Hapus')
+                ->icon('heroicon-o-trash')
                 ->modalHeading('Hapus Artikel?')
                 ->modalDescription('Artikel akan dihapus sementara dan dapat dipulihkan nanti.')
                 ->successNotification(
                     Notification::make()
                         ->success()
                         ->title('Artikel berhasil dihapus')
-                        ->body('Artikel berhasil dihapus.')
+                        ->body('Data artikel berhasil dihapus dan tidak dapat dipulihkan.')
                 ),
         ];
     }

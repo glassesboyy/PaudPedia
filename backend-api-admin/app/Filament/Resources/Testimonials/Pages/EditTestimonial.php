@@ -22,12 +22,20 @@ class EditTestimonial extends EditRecord
     {
         return [
             ViewAction::make()
-                ->label('Lihat'),
+                ->label('Lihat')
+                ->icon('heroicon-o-eye'),
+
             DeleteAction::make()
                 ->label('Hapus')
-                ->modalHeading('Hapus Testimoni')
-                ->modalDescription('Apakah Anda yakin ingin menghapus testimoni ini? Data akan dihapus permanent.')
-                ->successNotificationTitle('Testimoni berhasil dihapus'),
+                ->icon('heroicon-o-trash')
+                ->modalHeading('Hapus Testimoni?')
+                ->modalDescription('Data testimoni akan dihapus permanent dan tidak dapat dikembalikan')
+                ->successNotification(
+                    Notification::make()
+                        ->success()
+                        ->title('Testimoni berhasil dihapus')
+                        ->body('Data testimoni berhasil dihapus permanent dan tidak dapat dikembalikan.')
+                ),
         ];
     }
 

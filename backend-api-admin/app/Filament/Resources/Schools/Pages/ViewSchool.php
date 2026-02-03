@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Pages;
+namespace App\Filament\Resources\Schools\Pages;
 
-use App\Filament\Resources\Categories\CategoryResource;
+use App\Filament\Resources\Schools\SchoolResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewCategory extends ViewRecord
+class ViewSchool extends ViewRecord
 {
-    protected static string $resource = CategoryResource::class;
+    protected static string $resource = SchoolResource::class;
 
     protected function getHeaderActions(): array
     {

@@ -15,6 +15,7 @@ class ViewArticle extends ViewRecord
         return [
             EditAction::make()
                 ->label('Edit')
+                ->icon('heroicon-o-pencil'),
         ];
     }
 }

@@ -33,7 +33,7 @@ class WebinarsTable
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('Thumbnail')
-                    ->circular()
+                    ->imageHeight(150)
                     ->defaultImageUrl(url('/images/default-webinar.png')),
 
                 TextColumn::make('title')

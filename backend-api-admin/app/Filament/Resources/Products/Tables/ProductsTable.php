@@ -31,7 +31,7 @@ class ProductsTable
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('Thumbnail')
-                    ->circular()
+                    ->imageHeight(150)
                     ->defaultImageUrl(url('/images/default-product.png')),
 
                 TextColumn::make('title')

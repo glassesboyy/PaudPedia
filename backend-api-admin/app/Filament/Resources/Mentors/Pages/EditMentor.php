@@ -16,9 +16,20 @@ class EditMentor extends EditRecord
     {
         return [
             ViewAction::make()
-                ->label('Lihat'),
+                ->label('Lihat')
+                ->icon('heroicon-o-eye'),
+
             DeleteAction::make()
-                ->label('Hapus'),
+                ->label('Hapus')
+                ->icon('heroicon-o-trash')
+                ->modalHeading('Hapus Mentor?')
+                ->modalDescription('Data mentor akan dihapus permanent dan tidak dapat dikembalikan')
+                ->successNotification(
+                    Notification::make()
+                        ->success()
+                        ->title('Mentor berhasil dihapus')
+                        ->body('Data mentor berhasil dihapus permanent dan tidak dapat dikembalikan.')
+                ),
         ];
     }
 

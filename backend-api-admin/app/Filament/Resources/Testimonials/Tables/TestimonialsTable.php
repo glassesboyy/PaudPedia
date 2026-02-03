@@ -29,6 +29,7 @@ class TestimonialsTable
                     ->label('Foto')
                     ->disk('public')
                     ->circular()
+                    ->imageHeight(150)
                     ->defaultImageUrl(url('/images/default-avatar.png')),
 
                 TextColumn::make('display_name')

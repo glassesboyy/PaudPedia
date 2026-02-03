@@ -16,17 +16,19 @@ class EditProduct extends EditRecord
     {
         return [
             ViewAction::make()
-                ->label('Lihat'),
-            
+                ->label('Lihat')
+                ->icon('heroicon-o-eye'),
+
             DeleteAction::make()
                 ->label('Hapus')
+                ->icon('heroicon-o-trash')
                 ->modalHeading('Hapus Produk?')
                 ->modalDescription('Produk akan dihapus sementara dan dapat dipulihkan nanti.')
                 ->successNotification(
                     Notification::make()
                         ->success()
                         ->title('Produk dihapus')
-                        ->body('Produk berhasil dihapus.'),
+                        ->body('Data produk berhasil dihapus permanent dan tidak dapat dikembalikan.'),
                 ),
         ];
     }
