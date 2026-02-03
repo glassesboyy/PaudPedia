@@ -6,11 +6,13 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\Mentor;
 use App\Models\Product;
+use App\Models\Testimonial;
 use App\Models\Webinar;
 use App\Policies\ArticlePolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\MentorPolicy;
 use App\Policies\ProductPolicy;
+use App\Policies\TestimonialPolicy;
 use App\Policies\WebinarPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -26,6 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         Category::class => CategoryPolicy::class,
         Mentor::class => MentorPolicy::class,
         Product::class => ProductPolicy::class,
+        Testimonial::class => TestimonialPolicy::class,
         Webinar::class => WebinarPolicy::class,
     ];
 
