@@ -81,7 +81,7 @@ class UserForm
                         ->label('Foto Profil')
                         ->image()
                         ->imageEditor()
-                        ->imageAspectRatios([
+                        ->imageAspectRatio([
                             '1:1',
                         ])
                         ->automaticallyCropImagesToAspectRatio()
@@ -101,16 +101,15 @@ class UserForm
                         ->label('Status Aktif')
                         ->default(true)
                         ->helperText('Nonaktifkan untuk melarang pengguna login')
-                        ->columnSpan(1),
+                ->columnSpan(1),
 
-                    Select::make('roles')
+                    Select::make('role')
                         ->label('Role Pengguna')
-                        ->relationship('roles', 'name')
-                        ->multiple()
-                        ->preload()
-                        ->options(fn () => Role::all()->pluck('name', 'id'))
-                        ->helperText('Pilih satu atau lebih role untuk pengguna ini')
+                        ->options(fn () => Role::all()->pluck('name', 'name'))
+                        ->required()
+                        ->native(false)
                         ->searchable()
+                        ->helperText('Pilih satu role untuk pengguna ini')
                         ->columnSpan(1),
                 ])
                 ->columns(2),

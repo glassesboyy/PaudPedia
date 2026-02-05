@@ -31,7 +31,7 @@ class ArticlesTable
             ->columns([
                 ImageColumn::make('featured_image_url')
                     ->label('Gambar')
-                    ->imageHeight(150)
+                    ->imageHeight(50)
                     ->defaultImageUrl(url('/images/placeholder.png')),
 
                 TextColumn::make('title')

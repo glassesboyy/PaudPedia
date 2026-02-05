@@ -30,7 +30,7 @@ class SchoolsTable
                 ImageColumn::make('logo_url')
                     ->label('Logo')
                     ->disk('public')
-                    ->imageHeight(150)
+                    ->imageHeight(50)
                     ->defaultImageUrl(url('/images/default-school.png')),
 
                 TextColumn::make('name')

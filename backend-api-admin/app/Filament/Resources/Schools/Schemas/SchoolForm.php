@@ -56,7 +56,7 @@ class SchoolForm
                         ->label('Logo Sekolah')
                         ->image()
                         ->imageEditor()
-                        ->imageAspectRatios([
+                        ->imageAspectRatio([
                             '1:1',
                         ])
                         ->automaticallyCropImagesToAspectRatio()

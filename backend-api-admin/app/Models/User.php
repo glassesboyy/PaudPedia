@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Gender;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -123,6 +124,24 @@ class User extends Authenticatable
     public function getAgeAttribute(): ?int
     {
         return $this->date_of_birth?->age;
+    }
+
+    /**
+     * Get Filament avatar URL for navbar and profile display
+     */
+    public function getFilamentAvatarUrl(): ?string
+    {
+        if ($this->avatar_url) {
+            // Check if it's already a full URL
+            if (str_starts_with($this->avatar_url, 'http')) {
+                return $this->avatar_url;
+            }
+            
+            // Return asset URL
+            return asset('storage/' . $this->avatar_url);
+        }
+        
+        return asset('/images/default-avatar.png');
     }
 }
 

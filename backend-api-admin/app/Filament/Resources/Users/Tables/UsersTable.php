@@ -33,7 +33,7 @@ class UsersTable
                     ->label('Avatar')
                     ->disk('public')
                     ->circular()
-                    ->imageHeight(150)
+                    ->imageHeight(50)
                     ->defaultImageUrl(url('/images/default-avatar.png')),
 
                 TextColumn::make('name')
@@ -46,7 +46,6 @@ class UsersTable
                     ->label('Email')
                     ->searchable()
                     ->sortable()
-                    ->icon('heroicon-m-envelope')
                     ->copyable()
                     ->copyMessage('Email disalin!'),
 

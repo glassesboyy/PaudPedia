@@ -30,11 +30,14 @@ class UserService
                 $data['password'] = Hash::make($data['password']);
             }
 
+            // Auto verify email when created by admin
+            $data['email_verified_at'] = now();
+
             $user = User::create($data);
 
-            // Assign roles if provided
-            if (isset($data['roles'])) {
-                $user->syncRoles($data['roles']);
+            // Assign role if provided (single role)
+            if (isset($data['role'])) {
+                $user->syncRoles([$data['role']]);
             }
 
             DB::commit();
@@ -85,9 +88,9 @@ class UserService
 
             $user->update($data);
 
-            // Sync roles if provided
-            if (isset($data['roles'])) {
-                $user->syncRoles($data['roles']);
+            // Sync role if provided (single role)
+            if (isset($data['role'])) {
+                $user->syncRoles([$data['role']]);
             }
 
             DB::commit();
@@ -137,14 +140,16 @@ class UserService
     /**
      * Toggle user active status
      *
-     * @param User $user
+     * @param int|User $userId
      * @return User
      * @throws \Exception
      */
-    public function toggleActiveStatus(User $user): User
+    public function toggleActiveStatus(int|User $userId): User
     {
         DB::beginTransaction();
         try {
+            $user = $userId instanceof User ? $userId : User::findOrFail($userId);
+            
             $user->is_active = !$user->is_active;
             $user->save();
 

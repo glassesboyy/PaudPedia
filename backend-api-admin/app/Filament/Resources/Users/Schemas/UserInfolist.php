@@ -20,6 +20,7 @@ class UserInfolist
                         ->label('Foto Profil')
                         ->disk('public')
                         ->imageHeight(150)
+                        ->circular()
                         ->defaultImageUrl(url('/images/default-avatar.png'))
                         ->columnSpanFull(),
 

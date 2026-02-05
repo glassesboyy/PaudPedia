@@ -53,10 +53,18 @@ class EditUser extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Load current role into form
+        $data['role'] = $this->record->roles->first()?->name;
+        
+        return $data;
+    }
+
     protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
     {
         $userService = app(UserService::class);
-        return $userService->updateUser($record->id, $data);
+        return $userService->updateUser($record, $data);
     }
 
     protected function getSavedNotification(): ?Notification

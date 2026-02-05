@@ -67,8 +67,7 @@ class SchoolResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         $total = static::getModel()::count();
-        $active = static::getModel()::where('is_active', true)->count();
-        return "{$active}/{$total}";
+        return "{$total}";
     }
 
     public static function getNavigationBadgeColor(): ?string
