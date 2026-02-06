@@ -95,23 +95,6 @@ class PromoCodeInfolist
                             )
                             ->formatStateUsing(fn ($state) => number_format($state) . ' kali')
                             ->columnSpan(1),
-
-                        TextEntry::make('remaining_usage')
-                            ->label('Sisa Kuota')
-                            ->badge()
-                            ->color(fn ($state) => match(true) {
-                                $state === null => 'success',
-                                $state === 0 => 'danger',
-                                $state > 0 && $state <= 10 => 'warning',
-                                default => 'primary',
-                            })
-                            ->formatStateUsing(fn ($state, $record) => 
-                                $record->usage_limit 
-                                    ? number_format($record->usage_limit - $record->usage_count) . ' kali' 
-                                    : 'Unlimited'
-                            )
-                            ->visible(fn ($record) => $record->usage_limit !== null)
-                            ->columnSpan(1),
                     ])
                     ->columns(1),
 
@@ -137,22 +120,6 @@ class PromoCodeInfolist
                                     : $state?->format('d F Y, H:i') ?? 'Unlimited'
                             )
                             ->columnSpan(1),
-
-                        TextEntry::make('status_periode')
-                            ->label('Status Periode')
-                            ->badge()
-                            ->color(fn ($record) => match(true) {
-                                !$record->start_date || $record->start_date->isFuture() => 'warning',
-                                $record->end_date && $record->end_date->isPast() => 'danger',
-                                default => 'success',
-                            })
-                            ->formatStateUsing(fn ($record) => match(true) {
-                                !$record->start_date => 'Belum Dimulai',
-                                $record->start_date->isFuture() => 'Belum Dimulai',
-                                $record->end_date && $record->end_date->isPast() => 'Sudah Berakhir',
-                                default => 'Sedang Berlangsung',
-                            })
-                            ->columnSpan(1),
                     ])
                     ->columns(1),
 
@@ -165,26 +132,6 @@ class PromoCodeInfolist
                             ->color('primary')
                             ->icon('heroicon-m-shopping-cart')
                             ->formatStateUsing(fn ($state) => number_format($state) . ' transaksi')
-                            ->columnSpan(1),
-
-                        TextEntry::make('usage_percentage')
-                            ->label('Persentase Penggunaan')
-                            ->badge()
-                            ->color(function ($record) {
-                                if (!$record->usage_limit) return 'gray';
-                                $percentage = ($record->usage_count / $record->usage_limit) * 100;
-                                return match(true) {
-                                    $percentage >= 100 => 'danger',
-                                    $percentage >= 80 => 'warning',
-                                    default => 'success',
-                                };
-                            })
-                            ->formatStateUsing(fn ($record) => 
-                                $record->usage_limit 
-                                    ? round(($record->usage_count / $record->usage_limit) * 100, 1) . '%' 
-                                    : 'N/A'
-                            )
-                            ->visible(fn ($record) => $record->usage_limit !== null)
                             ->columnSpan(1),
                     ])
                     ->columns(1),

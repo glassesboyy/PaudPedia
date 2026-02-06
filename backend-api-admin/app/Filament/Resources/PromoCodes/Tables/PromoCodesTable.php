@@ -15,11 +15,9 @@ use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class PromoCodesTable
 {
@@ -35,12 +33,17 @@ class PromoCodesTable
                     ->copyable()
                     ->copyMessage('Kode promo disalin!')
                     ->badge()
-                    ->color('success')
-                    ->icon('heroicon-m-ticket')
-                    ->limit(20),
+                    ->color('success'),
+
+                TextColumn::make('description')
+                    ->label('Deskripsi')
+                    ->searchable()
+                    ->limit(50)
+                    ->placeholder('-')
+                    ->wrap(),
 
                 TextColumn::make('discount_type')
-                    ->label('Tipe')
+                    ->label('Tipe Diskon')
                     ->badge()
                     ->color(fn ($state) => match($state) {
                         DiscountType::PERCENTAGE => 'info',
@@ -62,66 +65,56 @@ class PromoCodesTable
                     ->sortable(),
 
                 TextColumn::make('min_purchase_amount')
-                    ->label('Min. Belanja')
-                    ->money('IDR')
+                    ->label('Min. Pembelian')
+                    ->formatStateUsing(fn ($state) => 
+                        $state ? 'Rp ' . number_format($state, 0, ',', '.') : '-'
+                    )
+                    ->placeholder('-')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('max_discount_amount')
+                    ->label('Max. Diskon')
+                    ->formatStateUsing(fn ($state) => 
+                        $state ? 'Rp ' . number_format($state, 0, ',', '.') : '-'
+                    )
                     ->placeholder('-')
                     ->toggleable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('usage_limit')
+                    ->label('Batas Penggunaan')
+                    ->formatStateUsing(fn ($state) => 
+                        $state ? number_format($state) : 'Unlimited'
+                    )
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'warning' : 'success')
+                    ->alignCenter()
                     ->sortable(),
 
-                TextColumn::make('usage_stats')
-                    ->label('Penggunaan')
-                    ->formatStateUsing(fn ($record) => 
-                        number_format($record->usage_count) . 
-                        ($record->usage_limit ? ' / ' . number_format($record->usage_limit) : ' / ∞')
-                    )
+                TextColumn::make('usage_count')
+                    ->label('Sudah Digunakan')
+                    ->formatStateUsing(fn ($state) => number_format($state) . 'x')
                     ->badge()
-                    ->color(function ($record) {
-                        if (!$record->usage_limit) return 'gray';
-                        $percentage = ($record->usage_count / $record->usage_limit) * 100;
-                        return match(true) {
-                            $percentage >= 100 => 'danger',
-                            $percentage >= 80 => 'warning',
-                            default => 'primary',
-                        };
-                    })
+                    ->color('primary')
                     ->alignCenter()
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->orderBy('usage_count', $direction);
-                    }),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('periode')
-                    ->label('Periode')
-                    ->formatStateUsing(fn ($record) => 
-                        ($record->start_date ? $record->start_date->format('d/m/Y') : '-') . 
-                        ' s/d ' . 
-                        ($record->end_date ? $record->end_date->format('d/m/Y') : '∞')
-                    )
-                    ->icon('heroicon-m-calendar')
-                    ->toggleable(),
+                TextColumn::make('start_date')
+                    ->label('Mulai')
+                    ->dateTime('d M Y')
+                    ->placeholder('-')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->color(function ($record) {
-                        return match(true) {
-                            !$record->is_active => 'danger',
-                            !$record->isValid() => 'warning',
-                            default => 'success',
-                        };
-                    })
-                    ->formatStateUsing(function ($record) {
-                        return match(true) {
-                            !$record->is_active => 'Nonaktif',
-                            $record->start_date && $record->start_date->isFuture() => 'Belum Dimulai',
-                            $record->end_date && $record->end_date->isPast() => 'Kadaluarsa',
-                            $record->usage_limit && $record->usage_count >= $record->usage_limit => 'Kuota Habis',
-                            default => 'Aktif',
-                        };
-                    })
-                    ->alignCenter()
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->orderBy('is_active', $direction);
-                    }),
+                TextColumn::make('end_date')
+                    ->label('Berakhir')
+                    ->dateTime('d M Y')
+                    ->placeholder('-')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 IconColumn::make('is_active')
                     ->label('Aktif')
@@ -131,18 +124,17 @@ class PromoCodesTable
                     ->trueColor('success')
                     ->falseColor('danger')
                     ->alignCenter()
-                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Dibuat')
-                    ->dateTime('d M Y')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
                     ->label('Diperbarui')
-                    ->dateTime('d M Y')
+                    ->dateTime('d M Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -151,7 +143,7 @@ class PromoCodesTable
                     ->label('Tipe Diskon')
                     ->options([
                         DiscountType::PERCENTAGE->value => 'Persentase (%)',
-                        DiscountType::FIXED->value => 'Nominal Tetap (Rp)',
+                        DiscountType::FIXED->value => 'Fixed (Rp)',
                     ])
                     ->placeholder('Semua Tipe')
                     ->native(false),
@@ -162,34 +154,6 @@ class PromoCodesTable
                     ->trueLabel('Hanya Aktif')
                     ->falseLabel('Hanya Nonaktif')
                     ->native(false),
-
-                Filter::make('valid_now')
-                    ->label('Berlaku Saat Ini')
-                    ->query(function (Builder $query): Builder {
-                        return $query->where('is_active', true)
-                            ->where('start_date', '<=', now())
-                            ->where(function($q) {
-                                $q->whereNull('end_date')
-                                  ->orWhere('end_date', '>=', now());
-                            });
-                    })
-                    ->toggle(),
-
-                Filter::make('expired')
-                    ->label('Sudah Kadaluarsa')
-                    ->query(function (Builder $query): Builder {
-                        return $query->whereNotNull('end_date')
-                            ->where('end_date', '<', now());
-                    })
-                    ->toggle(),
-
-                Filter::make('quota_full')
-                    ->label('Kuota Penuh')
-                    ->query(function (Builder $query): Builder {
-                        return $query->whereNotNull('usage_limit')
-                            ->whereRaw('usage_count >= usage_limit');
-                    })
-                    ->toggle(),
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -200,22 +164,23 @@ class PromoCodesTable
                         ->label('Edit'),
 
                     Action::make('toggle_status')
-                        ->label(fn ($record) => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
-                        ->icon(fn ($record) => $record->is_active ? 'heroicon-m-x-circle' : 'heroicon-m-check-circle')
-                        ->color(fn ($record) => $record->is_active ? 'warning' : 'success')
+                        ->label(fn (PromoCode $record) => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
+                        ->icon(fn (PromoCode $record) => $record->is_active ? 'heroicon-m-x-circle' : 'heroicon-m-check-circle')
+                        ->color(fn (PromoCode $record) => $record->is_active ? 'warning' : 'success')
                         ->requiresConfirmation()
-                        ->modalHeading(fn ($record) => $record->is_active ? 'Nonaktifkan Kode Promo?' : 'Aktifkan Kode Promo?')
-                        ->modalDescription(fn ($record) => $record->is_active 
-                            ? 'Kode promo tidak akan bisa digunakan oleh pengguna.' 
+                        ->modalHeading(fn (PromoCode $record) => $record->is_active ? 'Nonaktifkan Kode Promo?' : 'Aktifkan Kode Promo?')
+                        ->modalDescription(fn (PromoCode $record) => $record->is_active 
+                            ? 'Kode promo tidak akan bisa digunakan oleh pengguna setelah dinonaktifkan.' 
                             : 'Kode promo akan aktif dan bisa digunakan oleh pengguna.')
+                        ->modalSubmitActionLabel(fn (PromoCode $record) => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
                         ->action(function (PromoCode $record) {
                             $promoCodeService = app(PromoCodeService::class);
                             $promoCodeService->toggleActiveStatus($record);
 
                             Notification::make()
                                 ->success()
-                                ->title('Status berhasil diubah')
-                                ->body('Kode promo ' . $record->code . ' sekarang ' . ($record->is_active ? 'aktif' : 'nonaktif'))
+                                ->title('Status Berhasil Diubah')
+                                ->body('Kode promo "' . $record->code . '" sekarang ' . ($record->is_active ? 'aktif' : 'nonaktif') . '.')
                                 ->send();
                         }),
 
@@ -223,23 +188,10 @@ class PromoCodesTable
                         ->label('Hapus')
                         ->modalHeading('Hapus Kode Promo?')
                         ->modalDescription('Data kode promo akan dihapus permanent dan tidak dapat dikembalikan.')
-                        ->before(function ($record, $action) {
-                            $promoCodeService = app(PromoCodeService::class);
-                            
-                            if (!$promoCodeService->canBeDeleted($record)) {
-                                Notification::make()
-                                    ->danger()
-                                    ->title('Tidak Dapat Menghapus')
-                                    ->body('Kode promo sudah digunakan dalam transaksi dan tidak bisa dihapus.')
-                                    ->send();
-                                
-                                $action->cancel();
-                            }
-                        })
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Kode promo berhasil dihapus')
+                                ->title('Kode Promo Berhasil Dihapus')
                                 ->body('Data kode promo berhasil dihapus.')
                         ),
                 ])

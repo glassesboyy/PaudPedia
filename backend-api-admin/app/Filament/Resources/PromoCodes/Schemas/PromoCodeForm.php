@@ -55,19 +55,19 @@ class PromoCodeForm
                             ->columnSpan(1),
 
                         TextInput::make('discount_value')
-                            ->label(fn ($get) => $get('discount_type') === DiscountType::PERCENTAGE->value 
+                            ->label(fn ($get) => $get('discount_type') == DiscountType::PERCENTAGE 
                                 ? 'Nilai Diskon (%)' 
                                 : 'Nilai Diskon (Rp)')
                             ->required()
                             ->numeric()
                             ->minValue(0)
-                            ->maxValue(fn ($get) => $get('discount_type') === DiscountType::PERCENTAGE->value ? 100 : 999999999)
-                            ->prefix(fn ($get) => $get('discount_type') === DiscountType::FIXED->value ? 'Rp' : '')
-                            ->suffix(fn ($get) => $get('discount_type') === DiscountType::PERCENTAGE->value ? '%' : '')
-                            ->placeholder(fn ($get) => $get('discount_type') === DiscountType::PERCENTAGE->value 
+                            ->maxValue(fn ($get) => $get('discount_type') == DiscountType::PERCENTAGE ? 100 : 999999999)
+                            ->prefix(fn ($get) => $get('discount_type') == DiscountType::FIXED ? 'Rp' : '')
+                            ->suffix(fn ($get) => $get('discount_type') == DiscountType::PERCENTAGE ? '%' : '')
+                            ->placeholder(fn ($get) => $get('discount_type') == DiscountType::PERCENTAGE 
                                 ? 'Contoh: 50 (untuk 50%)' 
                                 : 'Contoh: 100000 (untuk Rp 100.000)')
-                            ->helperText(fn ($get) => $get('discount_type') === DiscountType::PERCENTAGE->value 
+                            ->helperText(fn ($get) => $get('discount_type') == DiscountType::PERCENTAGE 
                                 ? 'Masukkan nilai 0-100 untuk persentase diskon' 
                                 : 'Masukkan nominal diskon dalam Rupiah')
                             ->columnSpan(1),
@@ -79,7 +79,7 @@ class PromoCodeForm
                             ->prefix('Rp')
                             ->placeholder('Contoh: 500000 (untuk Rp 500.000)')
                             ->helperText('Opsional - Batas maksimal potongan untuk diskon persentase')
-                            ->visible(fn ($get) => $get('discount_type') === DiscountType::PERCENTAGE->value)
+                            ->visible(fn ($get) => $get('discount_type') == DiscountType::PERCENTAGE)
                             ->columnSpan(1),
                     ])
                     ->columns(1)

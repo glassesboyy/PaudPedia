@@ -40,7 +40,7 @@ class PromoCode extends Model
     // Relationships
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'promo_code', 'code');
     }
 
     // Scopes
