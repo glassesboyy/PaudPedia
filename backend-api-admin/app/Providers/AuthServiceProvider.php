@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\Mentor;
 use App\Models\Product;
+use App\Models\PromoCode;
 use App\Models\School;
 use App\Models\Testimonial;
 use App\Models\User;
@@ -14,6 +15,7 @@ use App\Policies\ArticlePolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\MentorPolicy;
 use App\Policies\ProductPolicy;
+use App\Policies\PromoCodePolicy;
 use App\Policies\SchoolPolicy;
 use App\Policies\TestimonialPolicy;
 use App\Policies\UserPolicy;
@@ -32,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
         Category::class => CategoryPolicy::class,
         Mentor::class => MentorPolicy::class,
         Product::class => ProductPolicy::class,
+        PromoCode::class => PromoCodePolicy::class,
         School::class => SchoolPolicy::class,
         Testimonial::class => TestimonialPolicy::class,
         User::class => UserPolicy::class,
