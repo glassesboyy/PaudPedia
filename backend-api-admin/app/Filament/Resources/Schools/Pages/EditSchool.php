@@ -42,7 +42,7 @@ class EditSchool extends EditRecord
     protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
     {
         $schoolService = app(SchoolService::class);
-        return $schoolService->updateSchoolSubscription($record->id, $data);
+        return $schoolService->updateSchoolSubscription($record, $data);
     }
 
     protected function getSavedNotification(): ?Notification

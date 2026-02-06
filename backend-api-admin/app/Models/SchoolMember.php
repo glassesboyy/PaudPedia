@@ -14,13 +14,13 @@ class SchoolMember extends Model
     protected $fillable = [
         'school_id',
         'user_id',
-        'role',
+        'role_type',
         'is_active',
         'joined_at',
     ];
 
     protected $casts = [
-        'role' => RoleType::class,
+        'role_type' => RoleType::class,
         'is_active' => 'boolean',
         'joined_at' => 'datetime',
     ];
@@ -44,37 +44,37 @@ class SchoolMember extends Model
 
     public function scopeByRole($query, RoleType $role)
     {
-        return $query->where('role', $role);
+        return $query->where('role_type', $role);
     }
 
     public function scopeHeadmasters($query)
     {
-        return $query->where('role', RoleType::HEADMASTER);
+        return $query->where('role_type', RoleType::HEADMASTER);
     }
 
     public function scopeTeachers($query)
     {
-        return $query->where('role', RoleType::TEACHER);
+        return $query->where('role_type', RoleType::TEACHER);
     }
 
     public function scopeParents($query)
     {
-        return $query->where('role', RoleType::PARENT);
+        return $query->where('role_type', RoleType::PARENT);
     }
 
     // Helper Methods
     public function isHeadmaster(): bool
     {
-        return $this->role === RoleType::HEADMASTER;
+        return $this->role_type === RoleType::HEADMASTER;
     }
 
     public function isTeacher(): bool
     {
-        return $this->role === RoleType::TEACHER;
+        return $this->role_type === RoleType::TEACHER;
     }
 
     public function isParent(): bool
     {
-        return $this->role === RoleType::PARENT;
+        return $this->role_type === RoleType::PARENT;
     }
 }

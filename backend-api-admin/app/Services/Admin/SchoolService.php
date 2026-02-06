@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Models\School;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Enums\SubscriptionPlan;
 
 class SchoolService
 {
@@ -29,15 +30,11 @@ class SchoolService
                     Storage::disk('public')->delete($oldLogoUrl);
                 }
                 
-                $data['logo_url'] = $data['logo_url']->store('schools', 'public');
+                $data['logo_url'] = $data['logo_url']->store('school-logos', 'public');
             }
 
-            // Update limits based on subscription plan if changed
-            if (isset($data['subscription_plan'])) {
-                $plan = $data['subscription_plan'];
-                $data['student_limit'] = $plan->studentLimit() ?? 9999;
-                $data['teacher_limit'] = $plan->teacherLimit() ?? 9999;
-            }
+            // Remove computed fields (handled by accessors)
+            unset($data['student_limit'], $data['teacher_limit']);
 
             $school->update($data);
 

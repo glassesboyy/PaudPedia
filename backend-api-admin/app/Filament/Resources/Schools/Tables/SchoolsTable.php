@@ -30,6 +30,7 @@ class SchoolsTable
                 ImageColumn::make('logo_url')
                     ->label('Logo')
                     ->disk('public')
+                    ->circular()
                     ->imageHeight(50)
                     ->defaultImageUrl(url('/images/default-school.png')),
 
@@ -58,13 +59,40 @@ class SchoolsTable
                     ->formatStateUsing(fn (SubscriptionPlan $state): string => $state->label())
                     ->sortable(),
 
+                TextColumn::make('headmaster_name')
+                    ->label('Kepala Sekolah')
+                    ->searchable()
+                    ->icon('heroicon-m-user-circle')
+                    ->placeholder('Belum ada')
+                    ->limit(30)
+                    ->tooltip(fn ($state) => $state),
+
                 TextColumn::make('total_students')
                     ->label('Total Siswa')
                     ->badge()
                     ->color('primary')
+                    ->icon('heroicon-o-academic-cap')
+                    ->alignCenter()
+                    ->placeholder('0')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('total_teachers')
+                    ->label('Total Guru')
+                    ->badge()
+                    ->color('success')
                     ->icon('heroicon-o-users')
                     ->alignCenter()
-                    ->placeholder('0'),
+                    ->placeholder('0')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('total_classes')
+                    ->label('Total Kelas')
+                    ->badge()
+                    ->color('warning')
+                    ->icon('heroicon-o-building-library')
+                    ->alignCenter()
+                    ->placeholder('0')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('phone')
                     ->label('Telepon')
@@ -92,7 +120,7 @@ class SchoolsTable
                     ->alignCenter()
                     ->sortable(),
 
-                TextColumn::make('subscription_ends_at')
+                TextColumn::make('subscription_ended_at')
                     ->label('Berakhir')
                     ->date('d M Y')
                     ->sortable()
@@ -126,7 +154,7 @@ class SchoolsTable
                     ->falseLabel('Hanya nonaktif')
                     ->native(false),
 
-                Filter::make('subscription_ends_at')
+                Filter::make('subscription_ended_at')
                     ->schema([
                         DatePicker::make('subscription_from')
                             ->label('Berakhir dari')
@@ -139,11 +167,11 @@ class SchoolsTable
                         return $query
                             ->when(
                                 $data['subscription_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('subscription_ends_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('subscription_ended_at', '>=', $date),
                             )
                             ->when(
                                 $data['subscription_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('subscription_ends_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('subscription_ended_at', '<=', $date),
                             );
                     }),
 
@@ -179,7 +207,7 @@ class SchoolsTable
                     DeleteAction::make()
                         ->label('Hapus')
                         ->modalHeading('Hapus Sekolah?')
-                        ->modalDescription('Sekolah akan dihapus sementara dan dapat dipulihkan nanti.')
+                        ->modalDescription('Data sekolah akan dihapus permanent dan tidak dapat dikembalikan.')
                         ->successNotification(
                             Notification::make()
                                 ->success()
@@ -195,7 +223,7 @@ class SchoolsTable
                     DeleteBulkAction::make()
                         ->label('Hapus yang Dipilih')
                         ->modalHeading('Hapus Sekolah Terpilih?')
-                        ->modalDescription('Sekolah yang dipilih akan dihapus sementara.')
+                        ->modalDescription('Data sekolah yang dipilih akan dihapus permanent dan tidak dapat dikembalikan.')
                         ->successNotification(
                             Notification::make()
                                 ->success()

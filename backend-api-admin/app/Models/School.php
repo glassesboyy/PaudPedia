@@ -20,59 +20,83 @@ class School extends Model
         'email',
         'logo_url',
         'subscription_plan',
-        'student_limit',
-        'teacher_limit',
-        'subscription_expires_at',
+        'subscription_started_at',
+        'subscription_ended_at',
         'is_active',
     ];
 
     protected $casts = [
         'subscription_plan' => SubscriptionPlan::class,
-        'student_limit' => 'integer',
-        'teacher_limit' => 'integer',
-        'subscription_expires_at' => 'datetime',
+        'subscription_started_at' => 'datetime',
+        'subscription_ended_at' => 'datetime',
         'is_active' => 'boolean',
+    ];
+
+    protected $appends = [
+        'total_students',
+        'total_teachers',
+        'total_classes',
+        'headmaster_name',
+        'headmaster_email',
+        'headmaster_phone',
     ];
 
     // Relationships
     public function members(): HasMany
     {
-        return $this->hasMany(SchoolMember::class);
+        return $this->hasMany(SchoolMember::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
+    }
+
+    public function headmaster(): HasMany
+    {
+        return $this->hasMany(SchoolMember::class)
+            ->where('school_id', $this->id) // 🔒 DATA ISOLATION
+            ->where('role_type', \App\Enums\RoleType::HEADMASTER)
+            ->with('user'); // Eager load user data
     }
 
     public function teachers(): HasMany
     {
-        return $this->hasMany(Teacher::class);
+        return $this->hasMany(Teacher::class)
+            ->where('school_id', $this->id) // 🔒 DATA ISOLATION
+            ->with('user'); // Eager load user data
     }
 
     public function classes(): HasMany
     {
-        return $this->hasMany(ClassRoom::class);
+        return $this->hasMany(ClassRoom::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
     }
 
     public function students(): HasMany
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(Student::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
     }
 
     public function parentProfiles(): HasMany
     {
-        return $this->hasMany(ParentProfile::class);
+        return $this->hasMany(ParentProfile::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
     }
 
     public function attendance(): HasMany
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(Attendance::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
     }
 
     public function assessments(): HasMany
     {
-        return $this->hasMany(Assessment::class);
+        return $this->hasMany(Assessment::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
     }
 
     public function finances(): HasMany
     {
-        return $this->hasMany(Finance::class);
+        return $this->hasMany(Finance::class)
+            ->where('school_id', $this->id); // 🔒 DATA ISOLATION
     }
 
     // Scopes
@@ -89,6 +113,97 @@ class School extends Model
     public function scopeFree($query)
     {
         return $query->where('subscription_plan', SubscriptionPlan::FREE);
+    }
+
+    // Accessors
+    protected function totalStudents(): Attribute
+    {
+        return Attribute::make(
+            // 🔒 Count hanya siswa yang school_id = $this->id
+            get: fn () => $this->students()->where('school_id', $this->id)->count(),
+        );
+    }
+
+    protected function totalTeachers(): Attribute
+    {
+        return Attribute::make(
+            // 🔒 Count hanya guru yang school_id = $this->id
+            get: fn () => $this->teachers()->where('school_id', $this->id)->count(),
+        );
+    }
+
+    protected function totalClasses(): Attribute
+    {
+        return Attribute::make(
+            // 🔒 Count hanya kelas yang school_id = $this->id
+            get: fn () => $this->classes()->where('school_id', $this->id)->count(),
+        );
+    }
+
+    protected function headmasterName(): Attribute
+    {
+        return Attribute::make(
+            // 🔒 Ambil hanya headmaster dari school_id = $this->id
+            get: function () {
+                $headmaster = $this->headmaster()
+                    ->where('school_id', $this->id) // Double check data isolation
+                    ->with('user')
+                    ->first();
+                
+                return $headmaster?->user?->name ?? '-';
+            },
+        );
+    }
+
+    protected function headmasterEmail(): Attribute
+    {
+        return Attribute::make(
+            // 🔒 Ambil hanya headmaster dari school_id = $this->id
+            get: function () {
+                $headmaster = $this->headmaster()
+                    ->where('school_id', $this->id) // Double check data isolation
+                    ->with('user')
+                    ->first();
+                
+                return $headmaster?->user?->email ?? '-';
+            },
+        );
+    }
+
+    protected function headmasterPhone(): Attribute
+    {
+        return Attribute::make(
+            // 🔒 Ambil hanya headmaster dari school_id = $this->id
+            get: function () {
+                $headmaster = $this->headmaster()
+                    ->where('school_id', $this->id) // Double check data isolation
+                    ->with('user')
+                    ->first();
+                
+                return $headmaster?->user?->phone ?? '-';
+            },
+        );
+    }
+
+    protected function studentLimit(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->subscription_plan->studentLimit() ?? 9999,
+        );
+    }
+
+    protected function teacherLimit(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->subscription_plan->teacherLimit() ?? 9999,
+        );
+    }
+
+    protected function logoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? asset('storage/' . $value) : null,
+        );
     }
 
     // Helper Methods

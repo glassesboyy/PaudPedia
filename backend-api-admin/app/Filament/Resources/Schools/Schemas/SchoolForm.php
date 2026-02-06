@@ -36,8 +36,10 @@ class SchoolForm
 
                     TextInput::make('phone')
                         ->label('Nomor Telepon')
-                        ->tel()
+                        ->numeric()
                         ->maxLength(20)
+                        ->placeholder('Contoh: 0271123456')
+                        ->helperText('Hanya angka, tanpa spasi atau karakter khusus')
                         ->columnSpan(1),
 
                     TextInput::make('email')
@@ -77,40 +79,15 @@ class SchoolForm
                         ->options(SubscriptionPlan::class)
                         ->required()
                         ->native(false)
-                        ->live()
                         ->helperText('FREE: 20 siswa, 5 guru | PRO: Unlimited')
-                        ->afterStateUpdated(function ($state, callable $set) {
-                            // Auto-update limits based on plan
-                            if ($state) {
-                                $plan = SubscriptionPlan::from($state);
-                                $set('student_limit', $plan->studentLimit() ?? 9999);
-                                $set('teacher_limit', $plan->teacherLimit() ?? 9999);
-                            }
-                        })
                         ->columnSpan(1),
 
-                    DatePicker::make('subscription_expires_at')
+                    DatePicker::make('subscription_ended_at')
                         ->label('Tanggal Kadaluarsa')
                         ->native(false)
                         ->minDate(now())
                         ->displayFormat('d/m/Y')
                         ->helperText('Kosongkan untuk langganan tanpa batas waktu')
-                        ->columnSpan(1),
-
-                    TextInput::make('student_limit')
-                        ->label('Batas Siswa')
-                        ->numeric()
-                        ->disabled()
-                        ->dehydrated()
-                        ->helperText('Otomatis diatur berdasarkan paket langganan')
-                        ->columnSpan(1),
-
-                    TextInput::make('teacher_limit')
-                        ->label('Batas Guru')
-                        ->numeric()
-                        ->disabled()
-                        ->dehydrated()
-                        ->helperText('Otomatis diatur berdasarkan paket langganan')
                         ->columnSpan(1),
                 ])
                 ->columns(2),

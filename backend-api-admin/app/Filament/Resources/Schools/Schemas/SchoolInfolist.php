@@ -6,6 +6,9 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use App\Enums\SubscriptionPlan;
+use Filament\Infolists\Components\RepeatableEntry;
+use App\Enums\StudentStatus;
 use Filament\Support\Enums\FontWeight;
 
 class SchoolInfolist
@@ -59,6 +62,27 @@ class SchoolInfolist
                         ->color(fn (bool $state): string => $state ? 'success' : 'danger')
                         ->formatStateUsing(fn (bool $state): string => $state ? 'Aktif' : 'Nonaktif')
                         ->columnSpan(1),
+
+                    TextEntry::make('headmaster_name')
+                        ->label('Kepala Sekolah')
+                        ->icon('heroicon-m-user-circle')
+                        ->weight(FontWeight::Bold)
+                        ->placeholder('Belum ada kepala sekolah')
+                        ->columnSpan(2),
+
+                    TextEntry::make('headmaster_email')
+                        ->label('Email Kepala Sekolah')
+                        ->icon('heroicon-m-envelope')
+                        ->copyable()
+                        ->copyMessage('Email disalin!')
+                        ->placeholder('Belum ada')
+                        ->columnSpan(1),
+
+                    TextEntry::make('headmaster_phone')
+                        ->label('Telepon Kepala Sekolah')
+                        ->icon('heroicon-m-phone')
+                        ->placeholder('Belum ada')
+                        ->columnSpan(1),
                 ])
                 ->columns(2),
 
@@ -67,14 +91,15 @@ class SchoolInfolist
                     TextEntry::make('subscription_plan')
                         ->label('Paket Langganan')
                         ->badge()
-                        ->color(fn (string $state): string => match($state) {
-                            'pro' => 'success',
-                            'free' => 'warning',
+                        ->color(fn ($state) => match($state) {
+                            SubscriptionPlan::PRO => 'success',
+                            SubscriptionPlan::FREE => 'warning',
                             default => 'gray',
                         })
+                        ->formatStateUsing(fn ($state) => $state instanceof SubscriptionPlan ? $state->label() : $state)
                         ->columnSpan(1),
 
-                    TextEntry::make('subscription_expires_at')
+                    TextEntry::make('subscription_ended_at')
                         ->label('Kadaluarsa')
                         ->date('d F Y')
                         ->placeholder('Tidak ada batas')
@@ -94,21 +119,125 @@ class SchoolInfolist
                 ])
                 ->columns(2),
 
+            Section::make('Data Guru')
+                ->description('Daftar guru yang terdaftar di sekolah ini')
+                ->schema([
+                    RepeatableEntry::make('teachers')
+                        ->label('')
+                        ->schema([
+                            TextEntry::make('user.name')
+                                ->label('Nama'),
+
+                            TextEntry::make('specialization')
+                                ->label('Spesialisasi')
+                                ->badge()
+                                ->color('info')
+                                ->placeholder('Tidak ada'),
+                        ])
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->state(fn ($record) => $record->teachers()->where('school_id', $record->id)->with('user')->get()),
+                ])
+                ->collapsible()
+                ->collapsed(),
+
+            Section::make('Data Siswa')
+                ->description('Daftar siswa yang terdaftar di sekolah ini')
+                ->schema([
+                    RepeatableEntry::make('students')
+                        ->label('')
+                        ->schema([
+                            TextEntry::make('name')
+                                ->label('Nama Siswa'),
+
+                            TextEntry::make('nisn')
+                                ->label('NISN')
+                                ->badge()
+                                ->color('gray')
+                                ->placeholder('Tidak ada'),
+
+                            TextEntry::make('class.name')
+                                ->label('Kelas')
+                                ->badge()
+                                ->color('warning')
+                                ->placeholder('Belum ada kelas'),
+
+                            TextEntry::make('status')
+                                ->label('Status')
+                                ->badge()
+                                ->color(fn ($state) => match($state->value ?? $state) {
+                                    'active' => 'success',
+                                    'inactive' => 'danger',
+                                    'graduated' => 'info',
+                                    default => 'gray',
+                                })
+                                ->formatStateUsing(fn ($state) => $state instanceof StudentStatus ? $state->label() : $state),
+                        ])
+                        ->columns(4)
+                        ->columnSpanFull()
+                        ->state(fn ($record) => $record->students()->where('school_id', $record->id)->with('class')->limit(50)->get()),
+                ])
+                ->collapsible()
+                ->collapsed(),
+
+            Section::make('Data Kelas')
+                ->description('Daftar kelas yang tersedia di sekolah ini')
+                ->schema([
+                    RepeatableEntry::make('classes')
+                        ->label('')
+                        ->schema([
+                            TextEntry::make('name')
+                                ->label('Nama Kelas')
+                                ->weight('bold'),
+
+                            TextEntry::make('level')
+                                ->label('Tingkat')
+                                ->badge()
+                                ->color('info'),
+
+                            TextEntry::make('capacity')
+                                ->label('Kapasitas')
+                                ->badge()
+                                ->color('success')
+                                ->formatStateUsing(fn ($state) => $state . ' siswa'),
+
+                            TextEntry::make('students_count')
+                                ->label('Jumlah Siswa')
+                                ->counts('students')
+                                ->badge()
+                                ->color('primary'),
+
+                            TextEntry::make('homeroomTeacher.user.name')
+                                ->label('Wali Kelas')
+                                ->placeholder('Belum ada wali kelas'),
+
+                            TextEntry::make('academic_year')
+                                ->label('Tahun Ajaran')
+                                ->badge()
+                                ->color('gray'),
+                        ])
+                        ->columns(3)
+                        ->columnSpanFull()
+                        ->state(fn ($record) => $record->classes()->where('school_id', $record->id)->with(['homeroomTeacher.user', 'students'])->get()),
+                ])
+                ->collapsible()
+                ->collapsed(),
+
             Section::make('Statistik')
                 ->schema([
-                    TextEntry::make('students_count')
+                    TextEntry::make('total_students')
                         ->label('Total Siswa')
                         ->numeric()
                         ->icon('heroicon-m-academic-cap')
                         ->columnSpan(1),
 
-                    TextEntry::make('teachers_count')
+                    TextEntry::make('total_teachers')
                         ->label('Total Guru')
                         ->numeric()
                         ->icon('heroicon-m-users')
                         ->columnSpan(1),
 
-                    TextEntry::make('classes_count')
+                    TextEntry::make('total_classes')
                         ->label('Total Kelas')
                         ->numeric()
                         ->icon('heroicon-m-building-library')
