@@ -37,28 +37,13 @@ class TestimonialResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $approved = static::getModel()::where('is_approved', true)->count();
         $total = static::getModel()::count();
-        
-        return "{$approved}/{$total}";
+        return "{$total}";
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        $approved = static::getModel()::where('is_approved', true)->count();
-        $total = static::getModel()::count();
-        
-        if ($total === 0) {
-            return 'gray';
-        }
-        
-        $percentage = ($approved / $total) * 100;
-        
-        return match (true) {
-            $percentage >= 80 => 'success',
-            $percentage >= 50 => 'warning',
-            default => 'danger',
-        };
+        return 'success';
     }
 
     public static function form(Schema $schema): Schema

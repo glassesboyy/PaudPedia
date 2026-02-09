@@ -8,6 +8,7 @@ use App\Models\Mentor;
 use App\Models\Product;
 use App\Models\PromoCode;
 use App\Models\School;
+use App\Models\SiteSetting;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\Webinar;
@@ -17,6 +18,7 @@ use App\Policies\MentorPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\PromoCodePolicy;
 use App\Policies\SchoolPolicy;
+use App\Policies\SiteSettingPolicy;
 use App\Policies\TestimonialPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WebinarPolicy;
@@ -36,6 +38,7 @@ class AuthServiceProvider extends ServiceProvider
         Product::class => ProductPolicy::class,
         PromoCode::class => PromoCodePolicy::class,
         School::class => SchoolPolicy::class,
+        SiteSetting::class => SiteSettingPolicy::class,
         Testimonial::class => TestimonialPolicy::class,
         User::class => UserPolicy::class,
         Webinar::class => WebinarPolicy::class,

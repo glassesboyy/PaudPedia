@@ -73,6 +73,6 @@ class UserResource extends Resource
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'primary';
+        return 'success';
     }
 }

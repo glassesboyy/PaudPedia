@@ -54,7 +54,7 @@ class SiteSetting extends Model
         };
     }
 
-    protected static function prepareValue(mixed $value, string $type): string
+    public static function prepareValue(mixed $value, string $type): string
     {
         return match($type) {
             'boolean' => $value ? '1' : '0',
