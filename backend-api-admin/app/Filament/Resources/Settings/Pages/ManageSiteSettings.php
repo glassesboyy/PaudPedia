@@ -64,12 +64,14 @@ class ManageSiteSettings extends Page implements HasSchemas
 
                     TextInput::make('site_tagline')
                         ->label('Tagline')
+                        ->required()
                         ->maxLength(255)
                         ->placeholder('Contoh: Platform Pendidikan Anak Usia Dini Terpadu')
                         ->helperText('Tagline atau slogan website'),
 
                     Textarea::make('site_description')
                         ->label('Deskripsi Situs')
+                        ->required()
                         ->rows(3)
                         ->maxLength(500)
                         ->placeholder('Deskripsi singkat tentang platform')
@@ -92,12 +94,14 @@ class ManageSiteSettings extends Page implements HasSchemas
                     TextInput::make('contact_phone')
                         ->label('Nomor Telepon')
                         ->tel()
+                        ->required()
                         ->maxLength(20)
                         ->placeholder('Contoh: 021-12345678')
                         ->helperText('Nomor telepon yang bisa dihubungi'),
 
                     Textarea::make('contact_address')
                         ->label('Alamat')
+                        ->required()
                         ->rows(3)
                         ->maxLength(500)
                         ->placeholder('Contoh: Jl. Pendidikan No. 123, Jakarta')
@@ -140,8 +144,40 @@ class ManageSiteSettings extends Page implements HasSchemas
                         ->placeholder('Contoh: https://youtube.com/@paudpedia')
                         ->helperText('Link channel YouTube')
                         ->prefixIcon('heroicon-m-globe-alt'),
+
+                    TextInput::make('social_tiktok')
+                        ->label('TikTok')
+                        ->url()
+                        ->maxLength(255)
+                        ->placeholder('Contoh: https://tiktok.com/@paudpedia')
+                        ->helperText('Link profil TikTok')
+                        ->prefixIcon('heroicon-m-globe-alt'),
+
+                    TextInput::make('social_linkedin')
+                        ->label('LinkedIn')
+                        ->url()
+                        ->maxLength(255)
+                        ->placeholder('Contoh: https://linkedin.com/company/paudpedia')
+                        ->helperText('Link profil LinkedIn')
+                        ->prefixIcon('heroicon-m-globe-alt'),
+
+                    TextInput::make('social_telegram')
+                        ->label('Telegram')
+                        ->url()
+                        ->maxLength(255)
+                        ->placeholder('Contoh: https://t.me/paudpedia')
+                        ->helperText('Link channel/group Telegram')
+                        ->prefixIcon('heroicon-m-globe-alt'),
+
+                    TextInput::make('social_discord')
+                        ->label('Discord')
+                        ->url()
+                        ->maxLength(255)
+                        ->placeholder('Contoh: https://discord.gg/paudpedia')
+                        ->helperText('Link server Discord')
+                        ->prefixIcon('heroicon-m-globe-alt'),
                 ])
-                ->columns(1)
+                ->columns(2)
                 ->collapsible(),
 
             Section::make('Pengaturan Pembayaran (Midtrans)')
@@ -149,12 +185,14 @@ class ManageSiteSettings extends Page implements HasSchemas
                 ->schema([
                     TextInput::make('midtrans_client_key')
                         ->label('Client Key')
+                        ->required()
                         ->maxLength(255)
                         ->placeholder('SB-Mid-client-xxx atau Mid-client-xxx')
                         ->helperText('Midtrans Client Key untuk frontend'),
 
                     TextInput::make('midtrans_server_key')
                         ->label('Server Key')
+                        ->required()
                         ->password()
                         ->maxLength(255)
                         ->placeholder('SB-Mid-server-xxx atau Mid-server-xxx')
@@ -162,6 +200,7 @@ class ManageSiteSettings extends Page implements HasSchemas
 
                     Toggle::make('midtrans_is_production')
                         ->label('Mode Production')
+                        ->required()
                         ->helperText('Aktifkan untuk menggunakan production environment Midtrans')
                         ->default(false),
                 ])
@@ -174,6 +213,7 @@ class ManageSiteSettings extends Page implements HasSchemas
                 ->schema([
                     TextInput::make('free_max_students')
                         ->label('Maks. Siswa (Paket Gratis)')
+                        ->required()
                         ->numeric()
                         ->minValue(0)
                         ->default(20)
@@ -181,6 +221,7 @@ class ManageSiteSettings extends Page implements HasSchemas
 
                     TextInput::make('free_max_teachers')
                         ->label('Maks. Guru (Paket Gratis)')
+                        ->required()
                         ->numeric()
                         ->minValue(0)
                         ->default(5)
@@ -188,6 +229,7 @@ class ManageSiteSettings extends Page implements HasSchemas
 
                     TextInput::make('pro_monthly_price')
                         ->label('Harga Pro (Bulanan)')
+                        ->required()
                         ->numeric()
                         ->prefix('Rp')
                         ->minValue(0)

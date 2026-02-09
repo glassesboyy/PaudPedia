@@ -25,6 +25,10 @@ class SiteSettingSeeder extends Seeder
             ['key' => 'social_instagram', 'value' => 'https://instagram.com/paudpedia', 'type' => 'string', 'description' => 'Instagram URL'],
             ['key' => 'social_twitter', 'value' => 'https://twitter.com/paudpedia', 'type' => 'string', 'description' => 'Twitter URL'],
             ['key' => 'social_youtube', 'value' => 'https://youtube.com/@paudpedia', 'type' => 'string', 'description' => 'YouTube URL'],
+            ['key' => 'social_tiktok', 'value' => 'https://tiktok.com/@paudpedia', 'type' => 'string', 'description' => 'TikTok URL'],
+            ['key' => 'social_linkedin', 'value' => 'https://linkedin.com/company/paudpedia', 'type' => 'string', 'description' => 'LinkedIn URL'],
+            ['key' => 'social_telegram', 'value' => 'https://t.me/paudpedia', 'type' => 'string', 'description' => 'Telegram URL'],
+            ['key' => 'social_discord', 'value' => 'https://discord.gg/paudpedia', 'type' => 'string', 'description' => 'Discord URL'],
 
             // Pengaturan Pembayaran (Midtrans)
             ['key' => 'midtrans_client_key', 'value' => 'SB-Mid-client-xxx', 'type' => 'string', 'description' => 'Midtrans Client Key'],
