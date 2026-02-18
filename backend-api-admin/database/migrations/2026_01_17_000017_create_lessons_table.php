@@ -19,13 +19,11 @@ return new class extends Migration
             $table->text('content_url')->nullable(); // YouTube embed URL or file URL
             $table->integer('duration_minutes')->nullable();
             $table->integer('order')->default(0); // sequence
-            $table->boolean('is_preview')->default(false); // free preview
             $table->timestamps();
             
             // Indexes
             $table->index('module_id');
             $table->index(['module_id', 'order']);
-            $table->index('is_preview');
         });
     }
 

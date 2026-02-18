@@ -632,7 +632,6 @@ Semua tabel memiliki (Laravel conventions):
 | `content_url` | TEXT | NULL | URL konten |
 | `Durasi_minutes` | INTEGER | NULL | Durasi |
 | `order` | INTEGER | NOT NULL | Urutan tampilan |
-| `is_preview` | BOOLEAN | NOT NULL, DEFAULT false | Preview gratis |
 | `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
 | `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
 

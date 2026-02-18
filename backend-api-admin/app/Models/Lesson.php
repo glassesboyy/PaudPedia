@@ -19,14 +19,12 @@ class Lesson extends Model
         'content_url',
         'duration_minutes',
         'order',
-        'is_preview',
     ];
 
     protected $casts = [
         'content_type' => ContentType::class,
         'duration_minutes' => 'integer',
         'order' => 'integer',
-        'is_preview' => 'boolean',
     ];
 
     // Relationships
@@ -41,11 +39,6 @@ class Lesson extends Model
     }
 
     // Scopes
-    public function scopePreview($query)
-    {
-        return $query->where('is_preview', true);
-    }
-
     public function scopeByType($query, ContentType $type)
     {
         return $query->where('content_type', $type);
@@ -65,10 +58,5 @@ class Lesson extends Model
     public function isQuiz(): bool
     {
         return $this->content_type === ContentType::QUIZ;
-    }
-
-    public function canBePreview(): bool
-    {
-        return $this->content_type->canBePreview();
     }
 }

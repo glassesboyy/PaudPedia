@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('duration_hours')->nullable();
             $table->boolean('is_published')->default(false);
             $table->timestamps();
+            $table->softDeletes();
             
             // Indexes
             $table->index('mentor_id');

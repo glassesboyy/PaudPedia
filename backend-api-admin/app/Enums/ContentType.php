@@ -57,14 +57,6 @@ enum ContentType: string
     }
 
     /**
-     * Check if content can be previewed
-     */
-    public function canBePreview(): bool
-    {
-        return in_array($this, [self::VIDEO, self::TEXT]);
-    }
-
-    /**
      * Get allowed file extensions
      */
     public function allowedExtensions(): array

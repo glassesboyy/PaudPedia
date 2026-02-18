@@ -446,7 +446,6 @@
 - `content_url` : String (YouTube embed URL or file URL)
 - `duration_minutes` : Integer (optional)
 - `order` : Integer (sequence)
-- `is_preview` : Boolean (Preview gratis lesson)
 - `created_at` : Timestamp
 - `updated_at` : Timestamp
 

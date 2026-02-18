@@ -58,8 +58,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 'Konten & E-Commerce',
-                'Sekolah',
-                'Pengguna',
+                'Manajemen Sistem',
                 'Pengaturan',
             ])
             ->sidebarCollapsibleOnDesktop();

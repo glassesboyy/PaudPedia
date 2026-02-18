@@ -36,7 +36,6 @@ class LessonSeeder extends Seeder
                     'content_url' => $this->getContentUrl($contentType),
                     'duration_minutes' => fake()->numberBetween(10, 60),
                     'order' => $i,
-                    'is_preview' => $i === 1, // First lesson is preview
                 ]);
             }
         }
