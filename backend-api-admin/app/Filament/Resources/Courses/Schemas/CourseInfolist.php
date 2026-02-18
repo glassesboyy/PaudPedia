@@ -146,11 +146,28 @@ class CourseInfolist
                                             ->formatStateUsing(fn ($state) => $state instanceof ContentType ? $state->label() : $state)
                                             ->color(fn ($state) => $state instanceof ContentType ? $state->color() : 'gray'),
 
-                                        TextEntry::make('content_url')
-                                            ->label('URL Konten')
+                                        // Video URL - untuk tipe VIDEO
+                                        TextEntry::make('video_url')
+                                            ->label('URL Video')
                                             ->url(fn ($state) => $state, shouldOpenInNewTab: true)
-                                            ->placeholder('Tidak ada URL')
-                                            ->color('primary'),
+                                            ->placeholder('-')
+                                            ->color('primary')
+                                            ->visible(fn ($record) => $record->content_type === ContentType::VIDEO),
+
+                                        // PDF File - untuk tipe PDF
+                                        TextEntry::make('pdf_file')
+                                            ->label('File PDF')
+                                            ->url(fn ($state) => $state ? asset('storage/' . $state) : null, shouldOpenInNewTab: true)
+                                            ->placeholder('-')
+                                            ->color('primary')
+                                            ->visible(fn ($record) => $record->content_type === ContentType::PDF),
+
+                                        // Text Content - untuk tipe TEXT
+                                        TextEntry::make('text_content')
+                                            ->label('Konten Teks')
+                                            ->html()
+                                            ->placeholder('-')
+                                            ->visible(fn ($record) => $record->content_type === ContentType::TEXT),
 
                                         TextEntry::make('duration_minutes')
                                             ->label('Durasi')
@@ -158,6 +175,44 @@ class CourseInfolist
                                             ->placeholder('-'),
                                     ])
                                     ->columns(1),
+
+                                // Quiz Section
+                                Section::make('Quiz')
+                                    ->schema([
+                                        TextEntry::make('quiz.title')
+                                            ->label('Judul Quiz')
+                                            ->weight(FontWeight::Bold),
+
+                                        TextEntry::make('quiz.description')
+                                            ->label('Deskripsi Quiz')
+                                            ->placeholder('Tidak ada deskripsi'),
+
+                                        RepeatableEntry::make('quiz.questions')
+                                            ->label('Pertanyaan')
+                                            ->schema([
+                                                TextEntry::make('question')
+                                                    ->label('Pertanyaan')
+                                                    ->weight(FontWeight::Medium),
+
+                                                RepeatableEntry::make('answers')
+                                                    ->label('Pilihan Jawaban')
+                                                    ->schema([
+                                                        TextEntry::make('answer')
+                                                            ->label('')
+                                                            ->formatStateUsing(fn ($state, $record) =>
+                                                                $record->is_correct
+                                                                    ? "✓ {$state}"
+                                                                    : "○ {$state}"
+                                                            )
+                                                            ->color(fn ($record) => $record->is_correct ? 'success' : 'gray'),
+                                                    ])
+                                                    ->columns(1),
+                                            ])
+                                            ->columns(1),
+                                    ])
+                                    ->visible(fn ($record) => $record->quiz !== null)
+                                    ->collapsible()
+                                    ->collapsed(),
                             ])
                             ->columns(1),
                     ])

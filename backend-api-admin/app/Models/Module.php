@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Module extends Model
 {
@@ -33,6 +34,11 @@ class Module extends Model
         return $this->hasMany(Lesson::class)->orderBy('order');
     }
 
+    public function quiz(): HasOne
+    {
+        return $this->hasOne(Quiz::class);
+    }
+
     // Helper Methods
     public function getTotalLessonsAttribute(): int
     {
@@ -42,5 +48,10 @@ class Module extends Model
     public function getTotalDurationAttribute(): int
     {
         return $this->lessons()->sum('duration_minutes');
+    }
+
+    public function hasQuiz(): bool
+    {
+        return $this->quiz()->exists();
     }
 }

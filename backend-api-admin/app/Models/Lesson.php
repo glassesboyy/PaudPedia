@@ -16,7 +16,9 @@ class Lesson extends Model
         'module_id',
         'title',
         'content_type',
-        'content_url',
+        'video_url',
+        'pdf_file',
+        'text_content',
         'duration_minutes',
         'order',
     ];
@@ -55,8 +57,21 @@ class Lesson extends Model
         return $this->content_type === ContentType::PDF;
     }
 
-    public function isQuiz(): bool
+    public function isText(): bool
     {
-        return $this->content_type === ContentType::QUIZ;
+        return $this->content_type === ContentType::TEXT;
+    }
+
+    /**
+     * Get the content based on content type
+     */
+    public function getContent(): ?string
+    {
+        return match($this->content_type) {
+            ContentType::VIDEO => $this->video_url,
+            ContentType::PDF => $this->pdf_file,
+            ContentType::TEXT => $this->text_content,
+            default => null,
+        };
     }
 }

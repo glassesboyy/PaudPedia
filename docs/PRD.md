@@ -561,13 +561,23 @@ Solusi SaaS Dual-Platform:
 - [ ] FR-CR-M03: Menghapus kursus (Moderator)
 - [ ] FR-CR-M04: Membuat dan mengelola modul kursus
 - [ ] FR-CR-M05: Membuat dan mengelola lesson dalam modul
-- [ ] FR-CR-M06: Mendukung berbagai tipe konten lesson (video YouTube embed, PDF, kuis, teks)
+- [ ] FR-CR-M06: Mendukung berbagai tipe konten lesson:
+  - Video: Input URL (YouTube embed)
+  - PDF: Upload file (maksimal 10MB)
+  - Teks: Rich text editor (WYSIWYG)
 - [ ] FR-CR-M07: Mengatur urutan modul dan lesson (drag & drop atau numbering)
-- [ ] FR-CR-M08: Set lesson sebagai preview gratis
-- [ ] FR-CR-M09: Upload thumbnail kursus
-- [ ] FR-CR-M10: Set tingkat kesulitan (Beginner, Intermediate, Advanced)
-- [ ] FR-CR-M11: Menetapkan mentor pada kursus
-- [ ] FR-CR-M12: Publish/unpublish kursus
+- [ ] FR-CR-M08: Upload thumbnail kursus
+- [ ] FR-CR-M09: Set tingkat kesulitan (Beginner, Intermediate, Advanced)
+- [ ] FR-CR-M10: Menetapkan mentor pada kursus
+- [ ] FR-CR-M11: Publish/unpublish kursus
+
+**20.2.1 Manajemen Quiz (Per Modul)**
+- [ ] FR-QZ-M01: Membuat quiz opsional untuk setiap modul (1 quiz per modul)
+- [ ] FR-QZ-M02: Set judul dan deskripsi quiz
+- [ ] FR-QZ-M03: Membuat dan mengelola pertanyaan quiz (minimal 1 pertanyaan)
+- [ ] FR-QZ-M04: Membuat pilihan jawaban (multiple choice, 2-6 opsi per pertanyaan)
+- [ ] FR-QZ-M05: Set jawaban yang benar (single select)
+- [ ] FR-QZ-M06: Menampilkan skor quiz
 
 **20.3 CRUD Produk Digital**
 - [ ] FR-PR-M01: Membuat produk digital baru (Moderator)

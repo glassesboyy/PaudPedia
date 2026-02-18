@@ -7,6 +7,7 @@ use App\Enums\CourseLevel;
 use App\Models\Mentor;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -182,7 +183,7 @@ class CourseForm
                     ->collapsible(),
 
                 Section::make('Modul & Konten Kursus')
-                    ->description('Kelola modul dan lesson kursus. Atur urutan dengan menggeser atau mengubah nomor urut.')
+                    ->description('Kelola modul, lesson, dan kuis kursus. Atur urutan dengan menggeser atau mengubah nomor urut.')
                     ->schema([
                         Repeater::make('modules')
                             ->label('Modul')
@@ -208,6 +209,7 @@ class CourseForm
                                     ->placeholder('Deskripsi singkat tentang modul ini...')
                                     ->helperText('Opsional: deskripsi isi modul'),
 
+                                // LESSONS REPEATER
                                 Repeater::make('lessons')
                                     ->label('Lesson')
                                     ->relationship('lessons')
@@ -216,7 +218,7 @@ class CourseForm
                                     ->collapsible()
                                     ->cloneable()
                                     ->itemLabel(fn (array $state): ?string =>
-                                        $state['title'] ?? 'Lesson Baru'
+                                        ($state['title'] ?? 'Lesson Baru') . ' (' . (ContentType::tryFrom($state['content_type'] ?? '')?->label() ?? 'Tipe belum dipilih') . ')'
                                     )
                                     ->schema([
                                         TextInput::make('title')
@@ -239,21 +241,41 @@ class CourseForm
                                             ->placeholder('Pilih tipe konten')
                                             ->helperText('Jenis konten lesson'),
 
-                                        TextInput::make('content_url')
-                                            ->label('URL Konten')
-                                            ->placeholder(fn ($get) => match ($get('content_type')) {
-                                                'video' => 'https://youtube.com/embed/xxxxx',
-                                                'pdf' => 'https://example.com/file.pdf',
-                                                default => 'Masukkan URL konten...',
-                                            })
-                                            ->helperText(fn ($get) => match ($get('content_type')) {
-                                                'video' => 'Masukkan URL YouTube embed atau URL video',
-                                                'pdf' => 'Masukkan URL file PDF',
-                                                'text' => 'Opsional: URL konten teks',
-                                                'quiz' => 'Opsional: URL kuis',
-                                                default => 'URL konten lesson',
-                                            })
-                                            ->visible(fn ($get) => in_array($get('content_type'), ['video', 'pdf', 'text', 'quiz'])),
+                                        // VIDEO: URL Input
+                                        TextInput::make('video_url')
+                                            ->label('URL Video')
+                                            ->url()
+                                            ->placeholder('https://youtube.com/embed/xxxxx atau https://youtu.be/xxxxx')
+                                            ->helperText('Masukkan URL YouTube embed atau URL video lainnya')
+                                            ->visible(fn ($get) => $get('content_type') === 'video')
+                                            ->required(fn ($get) => $get('content_type') === 'video'),
+
+                                        // PDF: File Upload
+                                        FileUpload::make('pdf_file')
+                                            ->label('File PDF')
+                                            ->acceptedFileTypes(['application/pdf'])
+                                            ->directory('courses/lessons/pdf')
+                                            ->maxSize(10240) // 10MB
+                                            ->downloadable()
+                                            ->previewable()
+                                            ->helperText('Upload file PDF (maksimal 10MB)')
+                                            ->visible(fn ($get) => $get('content_type') === 'pdf')
+                                            ->required(fn ($get) => $get('content_type') === 'pdf'),
+
+                                        // TEXT: Rich Text Editor
+                                        RichEditor::make('text_content')
+                                            ->label('Konten Teks')
+                                            ->toolbarButtons([
+                                                'bold', 'italic', 'underline', 'strike',
+                                                'h1', 'h2', 'h3', 'bulletList', 'orderedList'
+                                            ])
+                                            ->fileAttachmentsDisk('public')
+                                            ->fileAttachmentsDirectory('courses/lessons/attachments')
+                                            ->fileAttachmentsVisibility('public')
+                                            ->placeholder('Tulis konten lesson di sini...')
+                                            ->helperText('Gunakan toolbar untuk formatting teks dan upload gambar')
+                                            ->visible(fn ($get) => $get('content_type') === 'text')
+                                            ->required(fn ($get) => $get('content_type') === 'text'),
 
                                         TextInput::make('duration_minutes')
                                             ->label('Durasi (Menit)')
@@ -272,6 +294,116 @@ class CourseForm
                                             ->modalHeading('Hapus Lesson?')
                                             ->modalDescription('Lesson akan dihapus permanen.')
                                     ),
+
+                                // QUIZ SECTION (1 per module, optional)
+                                Section::make('Kuis Modul')
+                                    ->description('Opsional: tambahkan kuis untuk modul ini')
+                                    ->schema([
+                                        Toggle::make('has_quiz')
+                                            ->label('Aktifkan Kuis')
+                                            ->helperText('Centang untuk menambahkan kuis pada modul ini')
+                                            ->live()
+                                            ->default(false)
+                                            ->dehydrated(false)
+                                            ->afterStateHydrated(function ($state, $set, $record) {
+                                                if ($record && $record->quiz) {
+                                                    $set('has_quiz', true);
+                                                }
+                                            }),
+
+                                        Repeater::make('quiz')
+                                            ->label('')
+                                            ->relationship('quiz')
+                                            ->maxItems(1)
+                                            ->minItems(0)
+                                            ->visible(fn ($get) => $get('has_quiz'))
+                                            ->schema([
+                                                TextInput::make('title')
+                                                    ->label('Judul Kuis')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->placeholder('Masukkan judul kuis')
+                                                    ->helperText('Judul kuis untuk modul ini'),
+
+                                                Textarea::make('description')
+                                                    ->label('Deskripsi Kuis')
+                                                    ->rows(2)
+                                                    ->placeholder('Deskripsi singkat tentang kuis ini...')
+                                                    ->helperText('Opsional: deskripsi atau instruksi kuis'),
+
+                                                Toggle::make('is_active')
+                                                    ->label('Kuis Aktif')
+                                                    ->default(true)
+                                                    ->helperText('Kuis yang aktif dapat dikerjakan oleh peserta'),
+
+                                                // QUESTIONS REPEATER
+                                                Repeater::make('questions')
+                                                    ->label('Pertanyaan')
+                                                    ->relationship('questions')
+                                                    ->collapsible()
+                                                    ->minItems(1)
+                                                    ->itemLabel(fn (array $state): ?string =>
+                                                        Str::limit($state['question'] ?? 'Pertanyaan Baru', 50)
+                                                    )
+                                                    ->schema([
+                                                        Textarea::make('question')
+                                                            ->label('Pertanyaan')
+                                                            ->required()
+                                                            ->rows(2)
+                                                            ->placeholder('Tulis pertanyaan di sini...')
+                                                            ->helperText('Isi pertanyaan kuis'),
+
+                                                        // ANSWERS REPEATER
+                                                        Repeater::make('answers')
+                                                            ->label('Pilihan Jawaban')
+                                                            ->relationship('answers')
+                                                            ->minItems(2)
+                                                            ->maxItems(6)
+                                                            ->itemLabel(fn (array $state): ?string =>
+                                                                ($state['is_correct'] ?? false ? '✓ ' : '') . Str::limit($state['answer'] ?? 'Jawaban', 40)
+                                                            )
+                                                            ->schema([
+                                                                TextInput::make('answer')
+                                                                    ->label('Jawaban')
+                                                                    ->required()
+                                                                    ->maxLength(500)
+                                                                    ->placeholder('Tulis pilihan jawaban...')
+                                                                    ->helperText('Isi pilihan jawaban'),
+
+                                                                Toggle::make('is_correct')
+                                                                    ->label('Jawaban Benar')
+                                                                    ->helperText('Tandai sebagai jawaban yang benar')
+                                                                    ->inline(false)
+                                                                    ->default(false),
+                                                            ])
+                                                            ->columns(1)
+                                                            ->addActionLabel('Tambah Jawaban')
+                                                            ->deleteAction(
+                                                                fn ($action) => $action
+                                                                    ->requiresConfirmation()
+                                                                    ->modalHeading('Hapus Jawaban?')
+                                                            ),
+                                                    ])
+                                                    ->columns(1)
+                                                    ->addActionLabel('Tambah Pertanyaan')
+                                                    ->deleteAction(
+                                                        fn ($action) => $action
+                                                            ->requiresConfirmation()
+                                                            ->modalHeading('Hapus Pertanyaan?')
+                                                            ->modalDescription('Pertanyaan beserta semua pilihan jawaban akan dihapus.')
+                                                    ),
+                                            ])
+                                            ->columns(1)
+                                            ->addActionLabel('Buat Kuis')
+                                            ->deleteAction(
+                                                fn ($action) => $action
+                                                    ->requiresConfirmation()
+                                                    ->modalHeading('Hapus Kuis?')
+                                                    ->modalDescription('Kuis beserta semua pertanyaan dan jawaban akan dihapus permanen.')
+                                            ),
+                                    ])
+                                    ->collapsible()
+                                    ->collapsed(),
                             ])
                             ->columns(1)
                             ->defaultItems(0)
@@ -280,7 +412,7 @@ class CourseForm
                                 fn ($action) => $action
                                     ->requiresConfirmation()
                                     ->modalHeading('Hapus Modul?')
-                                    ->modalDescription('Modul beserta semua lesson di dalamnya akan dihapus permanen.')
+                                    ->modalDescription('Modul beserta semua lesson dan kuis di dalamnya akan dihapus permanen.')
                             ),
                     ])
                     ->columns(1)

@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('module_id')->constrained()->onDelete('cascade');
             $table->string('title');
-            $table->enum('content_type', ['video', 'pdf', 'quiz', 'text']);
-            $table->text('content_url')->nullable(); // YouTube embed URL or file URL
+            $table->enum('content_type', ['video', 'pdf', 'text']); // removed 'quiz'
+            $table->text('video_url')->nullable(); // untuk tipe video (YouTube embed URL)
+            $table->string('pdf_file')->nullable(); // untuk tipe pdf (file upload path)
+            $table->longText('text_content')->nullable(); // untuk tipe text (rich text editor)
             $table->integer('duration_minutes')->nullable();
             $table->integer('order')->default(0); // sequence
             $table->timestamps();

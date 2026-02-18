@@ -6,7 +6,6 @@ enum ContentType: string
 {
     case VIDEO = 'video';
     case PDF = 'pdf';
-    case QUIZ = 'quiz';
     case TEXT = 'text';
 
     /**
@@ -17,7 +16,6 @@ enum ContentType: string
         return match($this) {
             self::VIDEO => 'Video',
             self::PDF => 'Dokumen PDF',
-            self::QUIZ => 'Kuis',
             self::TEXT => 'Teks',
         };
     }
@@ -30,7 +28,6 @@ enum ContentType: string
         return match($this) {
             self::VIDEO => 'danger',
             self::PDF => 'warning',
-            self::QUIZ => 'success',
             self::TEXT => 'primary',
         };
     }
@@ -43,7 +40,6 @@ enum ContentType: string
         return match($this) {
             self::VIDEO => 'play-circle',
             self::PDF => 'file-text',
-            self::QUIZ => 'help-circle',
             self::TEXT => 'align-left',
         };
     }
@@ -53,7 +49,23 @@ enum ContentType: string
      */
     public function requiresUrl(): bool
     {
-        return in_array($this, [self::VIDEO, self::PDF]);
+        return $this === self::VIDEO;
+    }
+
+    /**
+     * Check if content requires file upload
+     */
+    public function requiresFileUpload(): bool
+    {
+        return $this === self::PDF;
+    }
+
+    /**
+     * Check if content requires rich text
+     */
+    public function requiresRichText(): bool
+    {
+        return $this === self::TEXT;
     }
 
     /**
@@ -64,7 +76,6 @@ enum ContentType: string
         return match($this) {
             self::VIDEO => ['mp4', 'webm', 'youtube'],
             self::PDF => ['pdf'],
-            self::QUIZ => [],
             self::TEXT => ['html', 'md'],
         };
     }
@@ -77,7 +88,6 @@ enum ContentType: string
         return match($this) {
             self::VIDEO => ['video/mp4', 'video/webm'],
             self::PDF => ['application/pdf'],
-            self::QUIZ => [],
             self::TEXT => ['text/html', 'text/markdown'],
         };
     }
