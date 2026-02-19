@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\OrderItemType;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
 use App\Models\Order;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CourseEnrollmentSeeder extends Seeder
@@ -17,7 +17,7 @@ class CourseEnrollmentSeeder extends Seeder
         // Get paid orders with course items
         $paidOrders = Order::where('status', 'paid')
             ->whereHas('items', function($query) {
-                $query->where('item_type', 'course');
+                $query->where('item_type', OrderItemType::COURSE);
             })
             ->with(['items', 'user'])
             ->get();
@@ -28,7 +28,7 @@ class CourseEnrollmentSeeder extends Seeder
 
         foreach ($paidOrders as $order) {
             foreach ($order->items as $item) {
-                if ($item->item_type !== 'course') {
+                if ($item->item_type !== OrderItemType::COURSE) {
                     continue;
                 }
 

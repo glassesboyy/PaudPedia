@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Lesson extends Model
 {
@@ -28,6 +29,30 @@ class Lesson extends Model
         'duration_minutes' => 'integer',
         'order' => 'integer',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old PDF file when pdf_file changes or lesson is deleted
+        static::updating(function (Lesson $lesson) {
+            if ($lesson->isDirty('pdf_file')) {
+                $oldPdfFile = $lesson->getOriginal('pdf_file');
+                if ($oldPdfFile && Storage::disk('public')->exists($oldPdfFile)) {
+                    Storage::disk('public')->delete($oldPdfFile);
+                }
+            }
+        });
+
+        static::deleting(function (Lesson $lesson) {
+            if ($lesson->pdf_file && Storage::disk('public')->exists($lesson->pdf_file)) {
+                Storage::disk('public')->delete($lesson->pdf_file);
+            }
+        });
+    }
 
     // Relationships
     public function module(): BelongsTo

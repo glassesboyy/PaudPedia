@@ -179,38 +179,43 @@ class CourseInfolist
                                 // Quiz Section
                                 Section::make('Quiz')
                                     ->schema([
-                                        TextEntry::make('quiz.title')
-                                            ->label('Judul Quiz')
-                                            ->weight(FontWeight::Bold),
-
-                                        TextEntry::make('quiz.description')
-                                            ->label('Deskripsi Quiz')
-                                            ->placeholder('Tidak ada deskripsi'),
-
-                                        RepeatableEntry::make('quiz.questions')
-                                            ->label('Pertanyaan')
+                                        RepeatableEntry::make('quiz')
+                                            ->label('')
                                             ->schema([
-                                                TextEntry::make('question')
-                                                    ->label('Pertanyaan')
-                                                    ->weight(FontWeight::Medium),
+                                                TextEntry::make('title')
+                                                    ->label('Judul Quiz')
+                                                    ->weight(FontWeight::Bold),
 
-                                                RepeatableEntry::make('answers')
-                                                    ->label('Pilihan Jawaban')
+                                                TextEntry::make('description')
+                                                    ->label('Deskripsi Quiz')
+                                                    ->placeholder('Tidak ada deskripsi'),
+
+                                                RepeatableEntry::make('questions')
+                                                    ->label('Pertanyaan')
                                                     ->schema([
-                                                        TextEntry::make('answer')
-                                                            ->label('')
-                                                            ->formatStateUsing(fn ($state, $record) =>
-                                                                $record->is_correct
-                                                                    ? "✓ {$state}"
-                                                                    : "○ {$state}"
-                                                            )
-                                                            ->color(fn ($record) => $record->is_correct ? 'success' : 'gray'),
+                                                        TextEntry::make('question')
+                                                            ->label('Pertanyaan')
+                                                            ->weight(FontWeight::Medium),
+
+                                                        RepeatableEntry::make('answers')
+                                                            ->label('Pilihan Jawaban')
+                                                            ->schema([
+                                                                TextEntry::make('answer')
+                                                                    ->label('')
+                                                                    ->formatStateUsing(fn ($state, $record) =>
+                                                                        $record->is_correct
+                                                                            ? "✓ {$state}"
+                                                                            : "○ {$state}"
+                                                                    )
+                                                                    ->color(fn ($record) => $record->is_correct ? 'success' : 'gray'),
+                                                            ])
+                                                            ->columns(1),
                                                     ])
                                                     ->columns(1),
                                             ])
                                             ->columns(1),
                                     ])
-                                    ->visible(fn ($record) => $record->quiz !== null)
+                                    ->visible(fn ($record) => $record->quiz->isNotEmpty())
                                     ->collapsible()
                                     ->collapsed(),
                             ])

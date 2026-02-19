@@ -16,12 +16,10 @@ return new class extends Migration
             $table->foreignId('module_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
             
             // Indexes
             $table->index('module_id');
-            $table->index('is_active');
         });
     }
 

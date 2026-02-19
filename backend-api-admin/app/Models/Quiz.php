@@ -15,11 +15,10 @@ class Quiz extends Model
         'module_id',
         'title',
         'description',
-        'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        //
     ];
 
     // Relationships
@@ -33,10 +32,9 @@ class Quiz extends Model
         return $this->hasMany(QuizQuestion::class);
     }
 
-    // Scopes
-    public function scopeActive($query)
+    public function attempts(): HasMany
     {
-        return $query->where('is_active', true);
+        return $this->hasMany(QuizAttempt::class);
     }
 
     // Helper Methods
@@ -67,5 +65,53 @@ class Quiz extends Model
             }
         }
         return true;
+    }
+
+    /**
+     * Get user's best attempt for this quiz
+     */
+    public function getUserBestAttempt(int $userId): ?QuizAttempt
+    {
+        return QuizAttempt::getBestAttempt($this->id, $userId);
+    }
+
+    /**
+     * Get user's latest attempt for this quiz
+     */
+    public function getUserLatestAttempt(int $userId): ?QuizAttempt
+    {
+        return QuizAttempt::getLatestAttempt($this->id, $userId);
+    }
+
+    /**
+     * Check if user has passed this quiz
+     */
+    public function hasUserPassed(int $userId): bool
+    {
+        return $this->attempts()
+            ->where('user_id', $userId)
+            ->where('is_passed', true)
+            ->exists();
+    }
+
+    /**
+     * Get attempt count for a user
+     */
+    public function getUserAttemptCount(int $userId): int
+    {
+        return QuizAttempt::countAttempts($this->id, $userId);
+    }
+
+    /**
+     * Start a new attempt for a user
+     */
+    public function startAttempt(int $userId, int $enrollmentId): QuizAttempt
+    {
+        return $this->attempts()->create([
+            'user_id' => $userId,
+            'enrollment_id' => $enrollmentId,
+            'total_questions' => $this->questions()->count(),
+            'started_at' => now(),
+        ]);
     }
 }

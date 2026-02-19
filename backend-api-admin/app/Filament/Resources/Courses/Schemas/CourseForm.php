@@ -238,8 +238,23 @@ class CourseForm
                                             )
                                             ->default(ContentType::VIDEO->value)
                                             ->live()
+                                            ->afterStateUpdated(function ($state, $set, $old) {
+                                                // Clear non-relevant content fields when type changes
+                                                if ($state !== $old) {
+                                                    match ($state) {
+                                                        'video' => $set('pdf_file', null) ?? $set('text_content', null),
+                                                        'pdf' => $set('video_url', null) ?? $set('text_content', null),
+                                                        'text' => $set('video_url', null) ?? $set('pdf_file', null),
+                                                        default => null,
+                                                    };
+                                                    // Clear all non-active fields explicitly
+                                                    if ($state !== 'video') $set('video_url', null);
+                                                    if ($state !== 'pdf') $set('pdf_file', null);
+                                                    if ($state !== 'text') $set('text_content', null);
+                                                }
+                                            })
                                             ->placeholder('Pilih tipe konten')
-                                            ->helperText('Jenis konten lesson'),
+                                            ->helperText('Jenis konten lesson (mengubah tipe akan menghapus konten sebelumnya)'),
 
                                         // VIDEO: URL Input
                                         TextInput::make('video_url')
@@ -254,7 +269,9 @@ class CourseForm
                                         FileUpload::make('pdf_file')
                                             ->label('File PDF')
                                             ->acceptedFileTypes(['application/pdf'])
+                                            ->disk('public')
                                             ->directory('courses/lessons/pdf')
+                                            ->visibility('public')
                                             ->maxSize(10240) // 10MB
                                             ->downloadable()
                                             ->previewable()
@@ -306,7 +323,7 @@ class CourseForm
                                             ->default(false)
                                             ->dehydrated(false)
                                             ->afterStateHydrated(function ($state, $set, $record) {
-                                                if ($record && $record->quiz) {
+                                                if ($record && $record->quiz->isNotEmpty()) {
                                                     $set('has_quiz', true);
                                                 }
                                             }),
@@ -331,11 +348,6 @@ class CourseForm
                                                     ->placeholder('Deskripsi singkat tentang kuis ini...')
                                                     ->helperText('Opsional: deskripsi atau instruksi kuis'),
 
-                                                Toggle::make('is_active')
-                                                    ->label('Kuis Aktif')
-                                                    ->default(true)
-                                                    ->helperText('Kuis yang aktif dapat dikerjakan oleh peserta'),
-
                                                 // QUESTIONS REPEATER
                                                 Repeater::make('questions')
                                                     ->label('Pertanyaan')
@@ -359,6 +371,7 @@ class CourseForm
                                                             ->relationship('answers')
                                                             ->minItems(2)
                                                             ->maxItems(6)
+                                                            ->live()
                                                             ->itemLabel(fn (array $state): ?string =>
                                                                 ($state['is_correct'] ?? false ? '✓ ' : '') . Str::limit($state['answer'] ?? 'Jawaban', 40)
                                                             )
@@ -372,9 +385,30 @@ class CourseForm
 
                                                                 Toggle::make('is_correct')
                                                                     ->label('Jawaban Benar')
-                                                                    ->helperText('Tandai sebagai jawaban yang benar')
+                                                                    ->helperText('Hanya satu jawaban yang dapat ditandai benar')
                                                                     ->inline(false)
-                                                                    ->default(false),
+                                                                    ->default(false)
+                                                                    ->live()
+                                                                    ->afterStateUpdated(function ($state, $set, $get, $component) {
+                                                                        // If this toggle is turned on, turn off all other toggles
+                                                                        if ($state === true) {
+                                                                            $statePath = $component->getStatePath();
+                                                                            // Get the answers path (parent of is_correct)
+                                                                            $answersPath = preg_replace('/\.[^.]+\.is_correct$/', '', $statePath);
+                                                                            $answers = $get('../../'); // Get all answers in this question
+                                                                            
+                                                                            if (is_array($answers)) {
+                                                                                foreach ($answers as $key => $answer) {
+                                                                                    // Get current item's key from the state path
+                                                                                    $currentKey = preg_match('/\.([^.]+)\.is_correct$/', $statePath, $matches) ? $matches[1] : null;
+                                                                                    
+                                                                                    if ($key !== $currentKey && ($answer['is_correct'] ?? false)) {
+                                                                                        $set("../../{$key}.is_correct", false);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }),
                                                             ])
                                                             ->columns(1)
                                                             ->addActionLabel('Tambah Jawaban')
@@ -382,7 +416,24 @@ class CourseForm
                                                                 fn ($action) => $action
                                                                     ->requiresConfirmation()
                                                                     ->modalHeading('Hapus Jawaban?')
-                                                            ),
+                                                            )
+                                                            ->rules([
+                                                                function () {
+                                                                    return function (string $attribute, $value, \Closure $fail) {
+                                                                        if (!is_array($value)) {
+                                                                            return;
+                                                                        }
+                                                                        
+                                                                        $correctCount = collect($value)->filter(fn ($answer) => $answer['is_correct'] ?? false)->count();
+                                                                        
+                                                                        if ($correctCount === 0) {
+                                                                            $fail('Setiap pertanyaan harus memiliki tepat satu jawaban yang benar.');
+                                                                        } elseif ($correctCount > 1) {
+                                                                            $fail('Hanya boleh ada satu jawaban benar per pertanyaan (single select).');
+                                                                        }
+                                                                    };
+                                                                },
+                                                            ]),
                                                     ])
                                                     ->columns(1)
                                                     ->addActionLabel('Tambah Pertanyaan')

@@ -109,6 +109,16 @@ class ArticlesTable
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('deleted_at')
+                    ->label('Dihapus')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->badge()
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->placeholder('-')
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('category_id')
@@ -143,7 +153,8 @@ class ArticlesTable
                         ->label('Lihat'),
                     
                     EditAction::make()
-                        ->label('Edit'),
+                        ->label('Edit')
+                        ->visible(fn (Article $record): bool => $record->deleted_at === null),
                     
                     Action::make('toggle_featured')
                         ->label(fn (Article $record) => $record->is_featured ? 'Hapus Featured' : 'Jadikan Featured')
@@ -160,7 +171,8 @@ class ArticlesTable
                                 ->title($record->is_featured ? 'Artikel menjadi Featured' : 'Artikel bukan Featured')
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (Article $record): bool => $record->deleted_at === null),
                     
                     Action::make('toggle_published')
                         ->label(fn (Article $record) => $record->is_published ? 'Unpublish' : 'Publish')
@@ -177,23 +189,27 @@ class ArticlesTable
                                 ->title($record->is_published ? 'Artikel Dipublikasikan' : 'Artikel Menjadi Draft')
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (Article $record): bool => $record->deleted_at === null),
                     
                     DeleteAction::make()
                         ->label('Hapus')
                         ->modalHeading('Hapus Artikel?')
                         ->modalDescription('Artikel akan dihapus sementara dan dapat dipulihkan nanti.')
-                        ->successNotificationTitle('Artikel berhasil dihapus'),
+                        ->successNotificationTitle('Artikel berhasil dihapus')
+                        ->visible(fn (Article $record): bool => $record->deleted_at === null),
                     
                     RestoreAction::make()
                         ->label('Pulihkan')
-                        ->successNotificationTitle('Artikel berhasil dipulihkan'),
+                        ->successNotificationTitle('Artikel berhasil dipulihkan')
+                        ->visible(fn (Article $record): bool => $record->deleted_at !== null),
                     
                     ForceDeleteAction::make()
                         ->label('Hapus Permanen')
                         ->modalHeading('Hapus Permanen?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
-                        ->successNotificationTitle('Artikel berhasil dihapus permanen'),
+                        ->successNotificationTitle('Artikel berhasil dihapus permanen')
+                        ->visible(fn (Article $record): bool => $record->deleted_at !== null),
                 ])
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->tooltip('Aksi'),
@@ -201,23 +217,26 @@ class ArticlesTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->label('Hapus yang Dipilih')
+                        ->label('Hapus Semua')
                         ->modalHeading('Hapus Artikel Terpilih?')
                         ->modalDescription('Artikel yang dipilih akan dihapus sementara.')
                         ->successNotificationTitle('Artikel berhasil dihapus'),
                     
                     RestoreBulkAction::make()
-                        ->label('Pulihkan yang Dipilih')
+                        ->label('Pulihkan Semua')
+                        ->modalHeading('Pulihkan Artikel Terpilih?')
+                        ->modalDescription('Artikel yang dipilih akan dipulihkan.')
                         ->successNotificationTitle('Artikel berhasil dipulihkan'),
                     
                     ForceDeleteBulkAction::make()
                         ->label('Hapus Permanen')
-                        ->modalHeading('Hapus Permanen?')
+                        ->modalHeading('Hapus Permanen Artikel Terpilih?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
                         ->successNotificationTitle('Artikel berhasil dihapus permanen'),
                 ]),
             ])
             ->defaultSort('published_at', 'desc')
+            ->recordClasses(fn (Article $record) => $record->deleted_at ? 'opacity-50 bg-gray-50 dark:bg-gray-900' : null)
             ->emptyStateHeading('Belum ada artikel')
             ->emptyStateDescription('Buat artikel digital pertama Anda untuk memulai.')
             ->emptyStateIcon('heroicon-o-document-text');

@@ -69,8 +69,8 @@ class WebinarPolicy
      */
     public function forceDelete(User $user, Webinar $webinar): bool
     {
-        // Hanya Admin yang dapat permanently delete
-        return $user->hasRole('admin');
+        // Admin dan Moderator dapat permanently delete
+        return $user->hasRole(['admin', 'moderator']);
     }
 
     /**

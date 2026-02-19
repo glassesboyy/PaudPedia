@@ -19,7 +19,6 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -107,6 +106,16 @@ class WebinarsTable
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('deleted_at')
+                    ->label('Dihapus')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->badge()
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->placeholder('-')
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('mentor_id')
@@ -145,7 +154,8 @@ class WebinarsTable
                         ->label('Lihat'),
                     
                     EditAction::make()
-                        ->label('Edit'),
+                        ->label('Edit')
+                        ->visible(fn (Webinar $record): bool => $record->deleted_at === null),
                     
                     Action::make('toggle_active')
                         ->label(fn (Webinar $record) => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
@@ -162,23 +172,27 @@ class WebinarsTable
                                 ->title($record->is_active ? 'Webinar Diaktifkan' : 'Webinar Dinonaktifkan')
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (Webinar $record): bool => $record->deleted_at === null),
                     
                     DeleteAction::make()
                         ->label('Hapus')
                         ->modalHeading('Hapus Webinar?')
                         ->modalDescription('Webinar akan dihapus sementara dan dapat dipulihkan nanti.')
-                        ->successNotificationTitle('Webinar berhasil dihapus'),
+                        ->successNotificationTitle('Webinar berhasil dihapus')
+                        ->visible(fn (Webinar $record): bool => $record->deleted_at === null),
                     
                     RestoreAction::make()
                         ->label('Pulihkan')
-                        ->successNotificationTitle('Webinar berhasil dipulihkan'),
+                        ->successNotificationTitle('Webinar berhasil dipulihkan')
+                        ->visible(fn (Webinar $record): bool => $record->deleted_at !== null),
                     
                     ForceDeleteAction::make()
                         ->label('Hapus Permanen')
                         ->modalHeading('Hapus Permanen?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
-                        ->successNotificationTitle('Webinar berhasil dihapus permanen'),
+                        ->successNotificationTitle('Webinar berhasil dihapus permanen')
+                        ->visible(fn (Webinar $record): bool => $record->deleted_at !== null),
                 ])
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->tooltip('Aksi'),
@@ -186,23 +200,26 @@ class WebinarsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->label('Hapus yang Dipilih')
+                        ->label('Hapus Semua')
                         ->modalHeading('Hapus Webinar Terpilih?')
                         ->modalDescription('Webinar yang dipilih akan dihapus sementara.')
                         ->successNotificationTitle('Webinar berhasil dihapus'),
                     
                     RestoreBulkAction::make()
-                        ->label('Pulihkan yang Dipilih')
+                        ->label('Pulihkan Semua')
+                        ->modalHeading('Pulihkan Webinar Terpilih?')
+                        ->modalDescription('Webinar yang dipilih akan dipulihkan.')
                         ->successNotificationTitle('Webinar berhasil dipulihkan'),
                     
                     ForceDeleteBulkAction::make()
-                        ->label('Hapus Permanen')
-                        ->modalHeading('Hapus Permanen?')
+                        ->label('Hapus Permanen Semua')
+                        ->modalHeading('Hapus Permanen Webinar Terpilih?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
                         ->successNotificationTitle('Webinar berhasil dihapus permanen'),
                 ]),
             ])
             ->defaultSort('scheduled_at', 'desc')
+            ->recordClasses(fn (Webinar $record) => $record->deleted_at ? 'opacity-50 bg-gray-50 dark:bg-gray-900' : null)
             ->emptyStateHeading('Belum ada Webinar')
             ->emptyStateDescription('Buat webinar pertama Anda untuk memulai.')
             ->emptyStateIcon('heroicon-o-video-camera');

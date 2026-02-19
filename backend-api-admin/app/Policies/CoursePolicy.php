@@ -69,8 +69,8 @@ class CoursePolicy
      */
     public function forceDelete(User $user, Course $course): bool
     {
-        // Hanya Admin yang dapat permanently delete
-        return $user->hasRole('admin', 'moderator');
+        // Admin dan Moderator dapat permanently delete
+        return $user->hasRole(['admin', 'moderator']);
     }
 
     /**

@@ -119,6 +119,16 @@ class CoursesTable
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('deleted_at')
+                    ->label('Dihapus')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->badge()
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->placeholder('-')
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('mentor_id')
@@ -158,7 +168,8 @@ class CoursesTable
                         ->label('Lihat'),
 
                     EditAction::make()
-                        ->label('Edit'),
+                        ->label('Edit')
+                        ->visible(fn (Course $record): bool => $record->deleted_at === null),
 
                     Action::make('toggle_publish')
                         ->label(fn (Course $record) => $record->is_published ? 'Unpublish' : 'Publish')
@@ -178,23 +189,27 @@ class CoursesTable
                                 ->title($record->is_published ? 'Kursus Dipublikasikan' : 'Kursus Di-unpublish')
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (Course $record): bool => $record->deleted_at === null),
 
                     DeleteAction::make()
                         ->label('Hapus')
                         ->modalHeading('Hapus Kursus?')
                         ->modalDescription('Kursus akan dihapus sementara dan dapat dipulihkan nanti.')
-                        ->successNotificationTitle('Kursus berhasil dihapus'),
+                        ->successNotificationTitle('Kursus berhasil dihapus')
+                        ->visible(fn (Course $record): bool => $record->deleted_at === null),
 
                     RestoreAction::make()
                         ->label('Pulihkan')
-                        ->successNotificationTitle('Kursus berhasil dipulihkan'),
+                        ->successNotificationTitle('Kursus berhasil dipulihkan')
+                        ->visible(fn (Course $record): bool => $record->deleted_at !== null),
 
                     ForceDeleteAction::make()
                         ->label('Hapus Permanen')
                         ->modalHeading('Hapus Permanen?')
                         ->modalDescription('Data kursus beserta semua modul dan lesson akan dihapus permanent dan tidak dapat dikembalikan!')
-                        ->successNotificationTitle('Kursus berhasil dihapus permanen'),
+                        ->successNotificationTitle('Kursus berhasil dihapus permanen')
+                        ->visible(fn (Course $record): bool => $record->deleted_at !== null),
                 ])
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->tooltip('Aksi'),
@@ -202,23 +217,26 @@ class CoursesTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->label('Hapus yang Dipilih')
+                        ->label('Hapus Semua')
                         ->modalHeading('Hapus Kursus Terpilih?')
                         ->modalDescription('Kursus yang dipilih akan dihapus sementara.')
                         ->successNotificationTitle('Kursus berhasil dihapus'),
 
                     RestoreBulkAction::make()
-                        ->label('Pulihkan yang Dipilih')
+                        ->label('Pulihkan Semua')
+                        ->modalHeading('Pulihkan Kursus Terpilih?')
+                        ->modalDescription('Kursus yang dipilih akan dipulihkan.')
                         ->successNotificationTitle('Kursus berhasil dipulihkan'),
 
                     ForceDeleteBulkAction::make()
-                        ->label('Hapus Permanen')
-                        ->modalHeading('Hapus Permanen?')
+                        ->label('Hapus Permanen Semua')
+                        ->modalHeading('Hapus Permanen Kursus Terpilih?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
                         ->successNotificationTitle('Kursus berhasil dihapus permanen'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
+            ->recordClasses(fn (Course $record) => $record->deleted_at ? 'opacity-50 bg-gray-50 dark:bg-gray-900' : null)
             ->emptyStateHeading('Belum ada Kursus')
             ->emptyStateDescription('Buat kursus pertama Anda untuk memulai.')
             ->emptyStateIcon('heroicon-o-academic-cap');

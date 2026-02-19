@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
             PromoCodeSeeder::class,
             OrderSeeder::class,
             CourseEnrollmentSeeder::class,
+            QuizAttemptSeeder::class,
             
             // Site settings
             SiteSettingSeeder::class,

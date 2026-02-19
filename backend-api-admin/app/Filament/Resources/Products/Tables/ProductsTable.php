@@ -93,6 +93,16 @@ class ProductsTable
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('deleted_at')
+                    ->label('Dihapus')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->badge()
+                    ->color('danger')
+                    ->icon('heroicon-o-trash')
+                    ->placeholder('-')
+                    ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('category_id')
@@ -115,7 +125,8 @@ class ProductsTable
                         ->label('Lihat'),
                     
                     EditAction::make()
-                        ->label('Edit'),
+                        ->label('Edit')
+                        ->visible(fn (Product $record): bool => $record->deleted_at === null),
                     
                     Action::make('toggle_active')
                         ->label(fn (Product $record) => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
@@ -132,23 +143,27 @@ class ProductsTable
                                 ->title($record->is_active ? 'Produk Diaktifkan' : 'Produk Dinonaktifkan')
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->visible(fn (Product $record): bool => $record->deleted_at === null),
                     
                     DeleteAction::make()
                         ->label('Hapus')
                         ->modalHeading('Hapus Produk?')
                         ->modalDescription('Produk akan dihapus sementara dan dapat dipulihkan nanti.')
-                        ->successNotificationTitle('Produk berhasil dihapus'),
+                        ->successNotificationTitle('Produk berhasil dihapus')
+                        ->visible(fn (Product $record): bool => $record->deleted_at === null),
                     
                     RestoreAction::make()
                         ->label('Pulihkan')
-                        ->successNotificationTitle('Produk berhasil dipulihkan'),
+                        ->successNotificationTitle('Produk berhasil dipulihkan')
+                        ->visible(fn (Product $record): bool => $record->deleted_at !== null),
                     
                     ForceDeleteAction::make()
                         ->label('Hapus Permanen')
                         ->modalHeading('Hapus Permanen?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
-                        ->successNotificationTitle('Produk berhasil dihapus permanen'),
+                        ->successNotificationTitle('Produk berhasil dihapus permanen')
+                        ->visible(fn (Product $record): bool => $record->deleted_at !== null),
                 ])
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->tooltip('Aksi'),
@@ -156,23 +171,26 @@ class ProductsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->label('Hapus yang Dipilih')
+                        ->label('Hapus Semua')
                         ->modalHeading('Hapus Produk Terpilih?')
                         ->modalDescription('Produk yang dipilih akan dihapus sementara.')
                         ->successNotificationTitle('Produk berhasil dihapus'),
                     
                     RestoreBulkAction::make()
-                        ->label('Pulihkan yang Dipilih')
+                        ->label('Pulihkan Semua')
+                        ->modalHeading('Pulihkan Produk Terpilih?')
+                        ->modalDescription('Produk yang dipilih akan dipulihkan.')
                         ->successNotificationTitle('Produk berhasil dipulihkan'),
                     
                     ForceDeleteBulkAction::make()
-                        ->label('Hapus Permanen')
-                        ->modalHeading('Hapus Permanen?')
+                        ->label('Hapus Permanen Semua')
+                        ->modalHeading('Hapus Permanen Produk Terpilih?')
                         ->modalDescription('Data akan dihapus permanent dan tidak dapat dikembalikan!')
                         ->successNotificationTitle('Produk berhasil dihapus permanen'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
+            ->recordClasses(fn (Product $record) => $record->deleted_at ? 'opacity-50 bg-gray-50 dark:bg-gray-900' : null)
             ->emptyStateHeading('Belum ada Produk')
             ->emptyStateDescription('Buat produk digital pertama Anda untuk memulai.')
             ->emptyStateIcon('heroicon-o-shopping-bag');

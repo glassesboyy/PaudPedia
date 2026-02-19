@@ -48,6 +48,22 @@ class ArticlePolicy
     }
 
     /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Article $article): bool
+    {
+        return $user->hasRole(['admin', 'moderator']);
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Article $article): bool
+    {
+        return $user->hasRole(['admin', 'moderator']);
+    }
+
+    /**
      * Determine whether the user can delete any models.
      */
     public function deleteAny(User $user): bool
