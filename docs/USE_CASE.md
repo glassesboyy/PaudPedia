@@ -285,8 +285,9 @@ Dashboard: Show school selector
 | UC-A-05 | View all orders | Lihat semua transaksi |
 | UC-A-06 | Manual enroll | Enroll user ke kursus secara manual (troubleshooting) |
 | UC-A-07 | Manual certificate | Generate certificate manual (troubleshooting) |
-| UC-A-08 | View sales analytics | Lihat statistik penjualan (webinar, course, product) |
-| UC-A-09 | Manage promo codes | Create/edit/delete kode promo |
+| UC-A-08 | View sales analytics | Lihat statistik penjualan (pendapatan, transaksi, dan lain lain) |
+| UC-A-09 | View platfrom analytics | Lihat statistik penjualan (total user, total kursus, dan lain lain) |
+| UC-A-10 | Manage promo codes | Create/edit/delete kode promo |
 
 **Key Differences vs Moderator:**
 - ✅ Full system access (users, schools, settings)

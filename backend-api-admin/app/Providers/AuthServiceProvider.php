@@ -23,6 +23,7 @@ use App\Policies\TestimonialPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WebinarPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -50,5 +51,10 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+
+        // Analytics dashboard gate - only admin can access
+        Gate::define('viewAnalytics', function (User $user) {
+            return $user->hasRole('admin');
+        });
     }
 }
