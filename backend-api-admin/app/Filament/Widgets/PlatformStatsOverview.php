@@ -2,6 +2,12 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\Articles\ArticleResource;
+use App\Filament\Resources\Courses\CourseResource;
+use App\Filament\Resources\Products\ProductResource;
+use App\Filament\Resources\Schools\SchoolResource;
+use App\Filament\Resources\Users\UserResource;
+use App\Filament\Resources\Webinars\WebinarResource;
 use App\Models\Article;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
@@ -99,45 +105,51 @@ class PlatformStatsOverview extends BaseWidget
 
         return [
             Stat::make('Total Pengguna', number_format($totalUsers))
+            ->descriptionIcon('heroicon-m-user-plus')
                 ->description('+' . number_format($newUsers) . ' pengguna baru')
-                ->descriptionIcon('heroicon-m-user-plus')
                 ->color('primary')
-                ->chart($userSparkline),
+                ->chart($userSparkline)
+                ->url(UserResource::getUrl('index')),
 
             Stat::make('Total Kursus', number_format($totalCourses))
-                ->description($publishedCourses . ' kursus dipublikasi')
                 ->descriptionIcon('heroicon-m-academic-cap')
-                ->color('info'),
+                ->description($publishedCourses . ' kursus dipublikasi')
+                ->color('info')
+                ->url(CourseResource::getUrl('index')),
 
             Stat::make('Total Enrollment', number_format($totalEnrollments))
-                ->description('+' . number_format($newEnrollments) . ' enrollment baru')
                 ->descriptionIcon('heroicon-m-clipboard-document-check')
+                ->description('+' . number_format($newEnrollments) . ' enrollment baru')
                 ->color('success')
                 ->chart($enrollmentSparkline),
 
             Stat::make('Total Webinar', number_format($totalWebinars))
-                ->description($upcomingWebinars . ' webinar mendatang')
                 ->descriptionIcon('heroicon-m-video-camera')
-                ->color('warning'),
+                ->description($upcomingWebinars . ' webinar mendatang')
+                ->color('warning')
+                ->url(WebinarResource::getUrl('index')),
 
             Stat::make('Total Produk', number_format($totalProducts))
-                ->description($activeProducts . ' produk aktif')
                 ->descriptionIcon('heroicon-m-shopping-bag')
-                ->color('info'),
+                ->description($activeProducts . ' produk aktif')
+                ->color('info')
+                ->url(ProductResource::getUrl('index')),
 
             Stat::make('Total Sekolah', number_format($totalSchools))
-                ->description(number_format($totalStudents) . ' siswa terdaftar')
                 ->descriptionIcon('heroicon-m-building-library')
-                ->color('gray'),
+                ->description(number_format($totalStudents) . ' siswa terdaftar')
+                ->color('gray')
+                ->url(SchoolResource::getUrl('index')),
 
             Stat::make('Total Artikel', number_format($totalArticles))
-                ->description($publishedArticles . ' artikel dipublikasi')
                 ->descriptionIcon('heroicon-m-newspaper')
-                ->color('info'),
+                ->description($publishedArticles . ' artikel dipublikasi')
+                ->color('info')
+                ->url(ArticleResource::getUrl('index')),
 
             Stat::make('Pertumbuhan User', $this->formatGrowth($userGrowth))
-                ->description('Dibandingkan periode sebelumnya')
                 ->descriptionIcon($userGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->description('Dibandingkan periode sebelumnya')
                 ->color($userGrowth >= 0 ? 'success' : 'danger'),
         ];
     }
