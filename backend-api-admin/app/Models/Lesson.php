@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ContentType;
+use App\Models\LessonProgress;
+use App\Models\Module;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Enums\Gender;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -43,6 +43,30 @@ class User extends Authenticatable
             'date_of_birth' => 'date',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old avatar when avatar_url changes or user is deleted
+        static::updating(function (User $user) {
+            if ($user->isDirty('avatar_url')) {
+                $oldAvatar = $user->getOriginal('avatar_url');
+                if ($oldAvatar && Storage::disk('public')->exists($oldAvatar)) {
+                    Storage::disk('public')->delete($oldAvatar);
+                }
+            }
+        });
+
+        static::deleting(function (User $user) {
+            if ($user->avatar_url && Storage::disk('public')->exists($user->avatar_url)) {
+                Storage::disk('public')->delete($user->avatar_url);
+            }
+        });
     }
 
     // Relationships

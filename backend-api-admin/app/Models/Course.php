@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Course extends Model
 {
@@ -35,6 +36,30 @@ class Course extends Model
         'duration_hours' => 'integer',
         'is_published' => 'boolean',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old thumbnail when thumbnail_url changes or course is deleted
+        static::updating(function (Course $course) {
+            if ($course->isDirty('thumbnail_url')) {
+                $oldThumbnail = $course->getOriginal('thumbnail_url');
+                if ($oldThumbnail && Storage::disk('public')->exists($oldThumbnail)) {
+                    Storage::disk('public')->delete($oldThumbnail);
+                }
+            }
+        });
+
+        static::deleting(function (Course $course) {
+            if ($course->thumbnail_url && Storage::disk('public')->exists($course->thumbnail_url)) {
+                Storage::disk('public')->delete($course->thumbnail_url);
+            }
+        });
+    }
 
     // Relationships
     public function mentor(): BelongsTo

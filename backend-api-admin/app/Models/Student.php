@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class Student extends Model
@@ -34,6 +35,30 @@ class Student extends Model
         'gender' => Gender::class,
         'status' => StudentStatus::class,
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old photo when photo_url changes or student is deleted
+        static::updating(function (Student $student) {
+            if ($student->isDirty('photo_url')) {
+                $oldPhoto = $student->getOriginal('photo_url');
+                if ($oldPhoto && Storage::disk('public')->exists($oldPhoto)) {
+                    Storage::disk('public')->delete($oldPhoto);
+                }
+            }
+        });
+
+        static::deleting(function (Student $student) {
+            if ($student->photo_url && Storage::disk('public')->exists($student->photo_url)) {
+                Storage::disk('public')->delete($student->photo_url);
+            }
+        });
+    }
 
     // Relationships
     public function school(): BelongsTo

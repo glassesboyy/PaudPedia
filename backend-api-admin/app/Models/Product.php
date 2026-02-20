@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -29,6 +30,45 @@ class Product extends Model
         'original_price' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old files when thumbnail_url or file_url changes or product is deleted
+        static::updating(function (Product $product) {
+            // Clean up old thumbnail (public disk)
+            if ($product->isDirty('thumbnail_url')) {
+                $oldThumbnail = $product->getOriginal('thumbnail_url');
+                if ($oldThumbnail && Storage::disk('public')->exists($oldThumbnail)) {
+                    Storage::disk('public')->delete($oldThumbnail);
+                }
+            }
+
+            // Clean up old file (local/private disk for downloadable content)
+            if ($product->isDirty('file_url')) {
+                $oldFile = $product->getOriginal('file_url');
+                if ($oldFile && Storage::disk('local')->exists($oldFile)) {
+                    Storage::disk('local')->delete($oldFile);
+                }
+            }
+        });
+
+        static::deleting(function (Product $product) {
+            // Delete thumbnail from public storage
+            if ($product->thumbnail_url && Storage::disk('public')->exists($product->thumbnail_url)) {
+                Storage::disk('public')->delete($product->thumbnail_url);
+            }
+
+            // Delete file from local/private storage
+            if ($product->file_url && Storage::disk('local')->exists($product->file_url)) {
+                Storage::disk('local')->delete($product->file_url);
+            }
+        });
+    }
 
     // Relationships
     public function category(): BelongsTo

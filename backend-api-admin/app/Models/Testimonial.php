@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Testimonial extends Model
 {
@@ -26,6 +27,30 @@ class Testimonial extends Model
         'is_featured' => 'boolean',
         'is_approved' => 'boolean',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old photo when photo_url changes or testimonial is deleted
+        static::updating(function (Testimonial $testimonial) {
+            if ($testimonial->isDirty('photo_url')) {
+                $oldPhoto = $testimonial->getOriginal('photo_url');
+                if ($oldPhoto && Storage::disk('public')->exists($oldPhoto)) {
+                    Storage::disk('public')->delete($oldPhoto);
+                }
+            }
+        });
+
+        static::deleting(function (Testimonial $testimonial) {
+            if ($testimonial->photo_url && Storage::disk('public')->exists($testimonial->photo_url)) {
+                Storage::disk('public')->delete($testimonial->photo_url);
+            }
+        });
+    }
 
     // Relationships
     public function user(): BelongsTo

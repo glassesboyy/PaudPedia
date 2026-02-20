@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Article extends Model
 {
@@ -33,6 +34,30 @@ class Article extends Model
         'is_published' => 'boolean',
         'published_at' => 'datetime',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old featured image when featured_image_url changes or article is deleted
+        static::updating(function (Article $article) {
+            if ($article->isDirty('featured_image_url')) {
+                $oldImage = $article->getOriginal('featured_image_url');
+                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                    Storage::disk('public')->delete($oldImage);
+                }
+            }
+        });
+
+        static::deleting(function (Article $article) {
+            if ($article->featured_image_url && Storage::disk('public')->exists($article->featured_image_url)) {
+                Storage::disk('public')->delete($article->featured_image_url);
+            }
+        });
+    }
 
     // Relationships
     public function category(): BelongsTo

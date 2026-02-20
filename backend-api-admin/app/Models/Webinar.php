@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Webinar extends Model
 {
@@ -37,6 +38,30 @@ class Webinar extends Model
         'max_participants' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clean up old thumbnail when thumbnail_url changes or webinar is deleted
+        static::updating(function (Webinar $webinar) {
+            if ($webinar->isDirty('thumbnail_url')) {
+                $oldThumbnail = $webinar->getOriginal('thumbnail_url');
+                if ($oldThumbnail && Storage::disk('public')->exists($oldThumbnail)) {
+                    Storage::disk('public')->delete($oldThumbnail);
+                }
+            }
+        });
+
+        static::deleting(function (Webinar $webinar) {
+            if ($webinar->thumbnail_url && Storage::disk('public')->exists($webinar->thumbnail_url)) {
+                Storage::disk('public')->delete($webinar->thumbnail_url);
+            }
+        });
+    }
 
     // Relationships
     public function mentor(): BelongsTo
