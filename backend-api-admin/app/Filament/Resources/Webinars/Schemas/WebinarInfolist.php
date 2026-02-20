@@ -20,6 +20,7 @@ class WebinarInfolist
                     ->schema([
                         ImageEntry::make('thumbnail_url')
                             ->label('Thumbnail')
+                            ->disk('public')
                             ->defaultImageUrl(url('/images/default-webinar.png')),
 
                         TextEntry::make('title')

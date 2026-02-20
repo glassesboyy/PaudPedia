@@ -26,6 +26,7 @@ class MentorsTable
             ->columns([
                 ImageColumn::make('photo_url')
                     ->label('Foto')
+                    ->disk('public')
                     ->imageHeight(50)
                     ->circular()
                     ->defaultImageUrl(url('/images/default-avatar.png')),

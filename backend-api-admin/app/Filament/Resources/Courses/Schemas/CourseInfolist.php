@@ -22,6 +22,7 @@ class CourseInfolist
                     ->schema([
                         ImageEntry::make('thumbnail_url')
                             ->label('Thumbnail')
+                            ->disk('public')
                             ->defaultImageUrl(url('/images/default-course.png')),
 
                         TextEntry::make('title')

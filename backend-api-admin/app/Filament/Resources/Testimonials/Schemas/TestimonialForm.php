@@ -44,6 +44,7 @@ class TestimonialForm
                             ->label('Foto Profil')
                             ->image()
                             ->disk('public')
+                            ->visibility('public')
                             ->directory('testimonials')
                             ->maxSize(2048)
                             ->imageEditor()

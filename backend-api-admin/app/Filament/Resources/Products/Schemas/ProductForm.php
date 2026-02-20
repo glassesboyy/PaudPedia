@@ -66,6 +66,7 @@ class ProductForm
                         FileUpload::make('file_url')
                             ->label('File Produk')
                             ->required()
+                            ->disk('local')
                             ->directory('products/files')
                             ->acceptedFileTypes([
                                 'application/pdf',
@@ -79,7 +80,7 @@ class ProductForm
                             ->maxSize(51200) // 50MB
                             ->downloadable()
                             ->openable()
-                            ->helperText('Format: PDF, ZIP, DOC, DOCX, PPT, PPTX. Maksimal 50MB'),
+                            ->helperText('Format: PDF, ZIP, DOC, DOCX, PPT, PPTX. Maksimal 50MB. File hanya dapat diakses oleh pembeli.'),
                     ])
                     ->columns(1)
                     ->collapsible(),
@@ -90,6 +91,8 @@ class ProductForm
                         FileUpload::make('thumbnail_url')
                             ->label('Thumbnail Produk')
                             ->image()
+                            ->disk('public')
+                            ->visibility('public')
                             ->directory('products/thumbnails')
                             ->imageEditor()
                             ->maxSize(2048)

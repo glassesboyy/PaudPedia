@@ -46,6 +46,8 @@ class MentorForm
                         FileUpload::make('photo_url')
                             ->label('Foto Profil')
                             ->image()
+                            ->disk('public')
+                            ->visibility('public')
                             ->directory('mentors/photos')
                             ->imageEditor()
                             ->maxSize(1024)

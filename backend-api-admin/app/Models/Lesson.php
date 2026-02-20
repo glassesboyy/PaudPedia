@@ -38,18 +38,19 @@ class Lesson extends Model
         parent::boot();
 
         // Clean up old PDF file when pdf_file changes or lesson is deleted
+        // Using 'local' disk because PDF files are stored privately for paid course content
         static::updating(function (Lesson $lesson) {
             if ($lesson->isDirty('pdf_file')) {
                 $oldPdfFile = $lesson->getOriginal('pdf_file');
-                if ($oldPdfFile && Storage::disk('public')->exists($oldPdfFile)) {
-                    Storage::disk('public')->delete($oldPdfFile);
+                if ($oldPdfFile && Storage::disk('local')->exists($oldPdfFile)) {
+                    Storage::disk('local')->delete($oldPdfFile);
                 }
             }
         });
 
         static::deleting(function (Lesson $lesson) {
-            if ($lesson->pdf_file && Storage::disk('public')->exists($lesson->pdf_file)) {
-                Storage::disk('public')->delete($lesson->pdf_file);
+            if ($lesson->pdf_file && Storage::disk('local')->exists($lesson->pdf_file)) {
+                Storage::disk('local')->delete($lesson->pdf_file);
             }
         });
     }

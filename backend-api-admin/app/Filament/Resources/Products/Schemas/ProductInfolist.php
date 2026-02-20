@@ -20,6 +20,7 @@ class ProductInfolist
                     ->schema([
                         ImageEntry::make('thumbnail_url')
                             ->label('Thumbnail')
+                            ->disk('public')
                             ->defaultImageUrl(url('/images/default-product.png')),
 
                         TextEntry::make('title')

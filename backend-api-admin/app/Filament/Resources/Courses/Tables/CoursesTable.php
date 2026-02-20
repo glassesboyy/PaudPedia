@@ -32,6 +32,7 @@ class CoursesTable
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('Thumbnail')
+                    ->disk('public')
                     ->imageHeight(150)
                     ->defaultImageUrl(url('/images/default-course.png')),
 

@@ -75,6 +75,8 @@ class CourseForm
                                 FileUpload::make('photo_url')
                                     ->label('Foto Profil')
                                     ->image()
+                                    ->disk('public')
+                                    ->visibility('public')
                                     ->directory('mentors/photos')
                                     ->imageEditor()
                                     ->maxSize(1024)
@@ -113,6 +115,8 @@ class CourseForm
                         FileUpload::make('thumbnail_url')
                             ->label('Thumbnail Kursus')
                             ->image()
+                            ->disk('public')
+                            ->visibility('public')
                             ->directory('courses/thumbnails')
                             ->imageEditor()
                             ->maxSize(2048)
@@ -266,31 +270,33 @@ class CourseForm
                                             ->required(fn ($get) => $get('content_type') === 'video'),
 
                                         // PDF: File Upload
+                                        // PRIVATE: Konten lesson adalah bagian dari kursus berbayar
+                                        // Menggunakan disk 'local' agar file hanya dapat diakses via signed URL
                                         FileUpload::make('pdf_file')
                                             ->label('File PDF')
                                             ->acceptedFileTypes(['application/pdf'])
-                                            ->disk('public')
+                                            ->disk('local')
                                             ->directory('courses/lessons/pdf')
-                                            ->visibility('public')
                                             ->maxSize(10240) // 10MB
                                             ->downloadable()
                                             ->previewable()
-                                            ->helperText('Upload file PDF (maksimal 10MB)')
+                                            ->helperText('Upload file PDF (maksimal 10MB). File hanya dapat diakses oleh peserta kursus.')
                                             ->visible(fn ($get) => $get('content_type') === 'pdf')
                                             ->required(fn ($get) => $get('content_type') === 'pdf'),
 
                                         // TEXT: Rich Text Editor
+                                        // PRIVATE: Attachment dalam konten lesson juga bagian dari kursus berbayar
+                                        // Menggunakan disk 'local' agar gambar/file hanya dapat diakses via signed URL
                                         RichEditor::make('text_content')
                                             ->label('Konten Teks')
                                             ->toolbarButtons([
                                                 'bold', 'italic', 'underline', 'strike',
                                                 'h1', 'h2', 'h3', 'bulletList', 'orderedList'
                                             ])
-                                            ->fileAttachmentsDisk('public')
+                                            ->fileAttachmentsDisk('local')
                                             ->fileAttachmentsDirectory('courses/lessons/attachments')
-                                            ->fileAttachmentsVisibility('public')
                                             ->placeholder('Tulis konten lesson di sini...')
-                                            ->helperText('Gunakan toolbar untuk formatting teks dan upload gambar')
+                                            ->helperText('Gunakan toolbar untuk formatting teks. Gambar yang diupload hanya dapat diakses oleh peserta kursus.')
                                             ->visible(fn ($get) => $get('content_type') === 'text')
                                             ->required(fn ($get) => $get('content_type') === 'text'),
 

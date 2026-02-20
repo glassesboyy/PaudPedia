@@ -32,6 +32,7 @@ class WebinarsTable
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('Thumbnail')
+                    ->disk('public')
                     ->imageHeight(150)
                     ->defaultImageUrl(url('/images/default-webinar.png')),
 

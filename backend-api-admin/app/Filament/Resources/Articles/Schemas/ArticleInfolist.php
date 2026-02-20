@@ -50,6 +50,7 @@ class ArticleInfolist
                     ->schema([
                         ImageEntry::make('featured_image_url')
                             ->label('Featured Image')
+                            ->disk('public')
                             ->columnSpanFull(),
 
                         TextEntry::make('excerpt')

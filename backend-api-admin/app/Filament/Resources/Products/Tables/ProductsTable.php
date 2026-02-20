@@ -31,6 +31,7 @@ class ProductsTable
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('Thumbnail')
+                    ->disk('public')
                     ->imageHeight(50)
                     ->defaultImageUrl(url('/images/default-product.png')),
 

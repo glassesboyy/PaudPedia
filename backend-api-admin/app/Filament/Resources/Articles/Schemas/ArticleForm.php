@@ -91,6 +91,8 @@ class ArticleForm
                         FileUpload::make('featured_image_url')
                             ->label('Gambar Utama')
                             ->image()
+                            ->disk('public')
+                            ->visibility('public')
                             ->directory('articles/images')
                             ->imageEditor()
                             ->maxSize(2048) // 2MB

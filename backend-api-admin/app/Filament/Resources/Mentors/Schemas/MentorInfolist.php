@@ -20,6 +20,7 @@ class MentorInfolist
                     ->schema([
                         ImageEntry::make('photo_url')
                             ->label('Foto Profil')
+                            ->disk('public')
                             ->defaultImageUrl(url('/images/default-avatar.png'))
                             ->circular(),
 
