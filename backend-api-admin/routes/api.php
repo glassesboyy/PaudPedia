@@ -27,8 +27,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     // Public routes (no authentication required)
     require __DIR__ . '/api/v1/public.php';
 
-    // Authenticated routes
+    // Auth routes (register, login, logout, password reset, etc.)
+    require __DIR__ . '/api/v1/auth.php';
+
+    // Authenticated routes (protected by Sanctum)
     // Route::middleware('auth:sanctum')->group(function () {
-    //     require __DIR__ . '/api/v1/auth.php';
+    //     require __DIR__ . '/api/v1/user.php';
     // });
 });
