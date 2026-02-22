@@ -171,6 +171,94 @@ class SiteSettingService
     }
 
     /**
+     * Public keys that are safe to expose via API
+     *
+     * @return array
+     */
+    protected function getPublicKeys(): array
+    {
+        return [
+            // Branding
+            'site_name',
+            'site_tagline',
+            'site_logo',
+            'site_favicon',
+
+            // Hero Section
+            'hero_title',
+            'hero_subtitle',
+            'hero_image',
+            'hero_cta_text',
+            'hero_cta_link',
+
+            // Contact Information
+            'contact_email',
+            'contact_phone',
+            'contact_whatsapp',
+            'contact_address',
+
+            // Social Media
+            'social_instagram',
+            'social_facebook',
+            'social_youtube',
+            'social_linkedin',
+            'social_twitter',
+            'social_tiktok',
+
+            // About
+            'about_title',
+            'about_description',
+            'about_vision',
+            'about_mission',
+
+            // Footer
+            'footer_copyright',
+            'footer_description',
+
+            // SEO (public)
+            'seo_title',
+            'seo_description',
+            'seo_keywords',
+            'meta_description',
+            'meta_keywords',
+        ];
+    }
+
+    /**
+     * Get all public site settings (safe to expose via API)
+     *
+     * @return array
+     */
+    public function getPublicSettings(): array
+    {
+        $allSettings = $this->getAllSettings();
+        $publicKeys = $this->getPublicKeys();
+
+        return array_filter(
+            $allSettings,
+            fn($key) => in_array($key, $publicKeys),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    /**
+     * Get specific public site setting by key
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getPublicSetting(string $key): mixed
+    {
+        $publicKeys = $this->getPublicKeys();
+
+        if (!in_array($key, $publicKeys)) {
+            return null;
+        }
+
+        return $this->getSetting($key);
+    }
+
+    /**
      * Seed default settings
      *
      * @return void

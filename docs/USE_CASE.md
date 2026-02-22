@@ -55,13 +55,14 @@ Platform ini memiliki **7 roles** dengan tanggung jawab berbeda:
 
 | ID | Use Case | Deskripsi |
 |----|----------|-----------|
-| UC-G-01 | View landing page | Lihat homepage dengan hero, features, stats, testimonials |
+| UC-G-01 | View landing page | Lihat homepage dengan hero, features, stats |
 | UC-G-02 | Browse artikel | Baca blog/artikel pendidikan |
 | UC-G-03 | View mentor profiles | Lihat profil mentor |
 | UC-G-04 | Browse marketplace | Lihat produk digital, webinar, kursus |
 | UC-G-05 | View product detail | Lihat detail produk/webinar/kursus |
 | UC-G-06 | Register | Daftar akun baru |
 | UC-G-07 | Login | Masuk dengan email/password |
+| UC-G-08 | Testimonial | Masuk dengan email/password |
 
 **Restrictions:**
 - ❌ Tidak bisa manage cart
