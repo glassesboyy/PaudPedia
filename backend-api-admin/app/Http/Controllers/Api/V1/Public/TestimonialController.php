@@ -15,6 +15,7 @@ class TestimonialController extends BaseController
     /**
      * Get list of approved testimonials with pagination.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -55,6 +56,7 @@ class TestimonialController extends BaseController
     /**
      * Get featured testimonials.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -87,10 +89,8 @@ class TestimonialController extends BaseController
     {
         $data = $request->validated();
         
-        // Associate with authenticated user if logged in
-        if (auth('sanctum')->check()) {
-            $data['user_id'] = auth('sanctum')->id();
-        }
+        // Associate with authenticated user
+        $data['user_id'] = $request->user()->id;
 
         // Set default values
         $data['is_approved'] = false;

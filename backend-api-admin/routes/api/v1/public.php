@@ -130,12 +130,11 @@ Route::prefix('articles')->name('articles.')->group(function () {
  * Testimonials
  * GET /api/v1/testimonials - Get list of testimonials (paginated)
  * GET /api/v1/testimonials/featured - Get featured testimonials
- * POST /api/v1/testimonials - Submit new testimonial
+ * Note: POST /api/v1/testimonials - Submit new testimonial (requires authentication, see auth routes)
  */
 Route::prefix('testimonials')->name('testimonials.')->group(function () {
     Route::get('/', [TestimonialController::class, 'index'])->name('index');
     Route::get('/featured', [TestimonialController::class, 'featured'])->name('featured');
-    Route::post('/', [TestimonialController::class, 'store'])->name('store');
 });
 
 /**

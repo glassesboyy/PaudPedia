@@ -15,6 +15,7 @@ class WebinarController extends BaseController
     /**
      * Get list of active webinars with pagination.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -90,6 +91,7 @@ class WebinarController extends BaseController
     /**
      * Get featured/upcoming webinars.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -114,6 +116,7 @@ class WebinarController extends BaseController
     /**
      * Get webinar detail by slug.
      *
+     * @unauthenticated
      * @param string $slug
      * @return JsonResponse
      */
@@ -138,6 +141,7 @@ class WebinarController extends BaseController
     /**
      * Get upcoming webinars.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */

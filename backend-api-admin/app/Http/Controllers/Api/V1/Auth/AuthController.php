@@ -26,6 +26,7 @@ class AuthController extends BaseController
      * 
      * FR-UA-01: Pendaftaran pengguna (email & password)
      * 
+     * @unauthenticated
      * @param RegisterRequest $request
      * @return JsonResponse
      */
@@ -45,6 +46,7 @@ class AuthController extends BaseController
      * 
      * FR-UA-02: Login pengguna (email & password)
      * 
+     * @unauthenticated
      * @param LoginRequest $request
      * @return JsonResponse
      */
@@ -103,6 +105,7 @@ class AuthController extends BaseController
      * 
      * FR-UA-03: Verifikasi email setelah registrasi
      * 
+     * @unauthenticated
      * @param Request $request
      * @param int $id
      * @param string $hash
@@ -151,6 +154,7 @@ class AuthController extends BaseController
      * 
      * FR-UA-04: Reset kata sandi (forgot password)
      * 
+     * @unauthenticated
      * @param ForgotPasswordRequest $request
      * @return JsonResponse
      */
@@ -170,6 +174,7 @@ class AuthController extends BaseController
      * 
      * FR-UA-04: Reset kata sandi (forgot password)
      * 
+     * @unauthenticated
      * @param ResetPasswordRequest $request
      * @return JsonResponse
      */

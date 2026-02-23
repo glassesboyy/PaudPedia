@@ -14,6 +14,7 @@ class CategoryController extends BaseController
     /**
      * Get all categories.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -40,6 +41,7 @@ class CategoryController extends BaseController
     /**
      * Get course categories.
      *
+     * @unauthenticated
      * @return JsonResponse
      */
     public function courses(): JsonResponse
@@ -58,6 +60,7 @@ class CategoryController extends BaseController
     /**
      * Get product categories.
      *
+     * @unauthenticated
      * @return JsonResponse
      */
     public function products(): JsonResponse
@@ -76,6 +79,7 @@ class CategoryController extends BaseController
     /**
      * Get article categories.
      *
+     * @unauthenticated
      * @return JsonResponse
      */
     public function articles(): JsonResponse

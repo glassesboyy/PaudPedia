@@ -15,6 +15,7 @@ class CourseController extends BaseController
     /**
      * Get list of published courses with pagination.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -90,6 +91,7 @@ class CourseController extends BaseController
     /**
      * Get featured courses.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -114,6 +116,7 @@ class CourseController extends BaseController
     /**
      * Get course detail by slug.
      *
+     * @unauthenticated
      * @param string $slug
      * @return JsonResponse
      */
@@ -148,6 +151,7 @@ class CourseController extends BaseController
     /**
      * Get courses by category slug.
      *
+     * @unauthenticated
      * @param string $categorySlug
      * @param Request $request
      * @return JsonResponse

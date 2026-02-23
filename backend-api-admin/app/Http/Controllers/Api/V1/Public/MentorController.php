@@ -15,6 +15,7 @@ class MentorController extends BaseController
     /**
      * Get list of active mentors with pagination.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -60,6 +61,7 @@ class MentorController extends BaseController
     /**
      * Get mentor detail by ID.
      *
+     * @unauthenticated
      * @param int $id
      * @return JsonResponse
      */
@@ -88,6 +90,7 @@ class MentorController extends BaseController
     /**
      * Get featured mentors.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */

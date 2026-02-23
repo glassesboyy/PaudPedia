@@ -15,6 +15,7 @@ class ProductController extends BaseController
     /**
      * Get list of active products with pagination.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -79,6 +80,7 @@ class ProductController extends BaseController
     /**
      * Get featured products.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -102,6 +104,7 @@ class ProductController extends BaseController
     /**
      * Get product detail by slug.
      *
+     * @unauthenticated
      * @param string $slug
      * @return JsonResponse
      */
@@ -126,6 +129,7 @@ class ProductController extends BaseController
     /**
      * Get products by category slug.
      *
+     * @unauthenticated
      * @param string $categorySlug
      * @param Request $request
      * @return JsonResponse

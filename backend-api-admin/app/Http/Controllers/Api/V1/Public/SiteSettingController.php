@@ -16,6 +16,7 @@ class SiteSettingController extends BaseController
     /**
      * Get all public site settings.
      * 
+     * @unauthenticated
      * @return JsonResponse
      */
     public function index(): JsonResponse
@@ -31,6 +32,7 @@ class SiteSettingController extends BaseController
     /**
      * Get specific site setting by key.
      * 
+     * @unauthenticated
      * @param string $key
      * @return JsonResponse
      */

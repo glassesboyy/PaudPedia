@@ -16,6 +16,7 @@ class ContactController extends BaseController
     /**
      * Get contact information.
      *
+     * @unauthenticated
      * @return JsonResponse
      */
     public function index(): JsonResponse

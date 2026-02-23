@@ -30,6 +30,7 @@ class LandingPageController extends BaseController
     /**
      * Get all landing page data in a single request.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -54,6 +55,7 @@ class LandingPageController extends BaseController
     /**
      * Get hero section data.
      *
+     * @unauthenticated
      * @return JsonResponse
      */
     public function hero(): JsonResponse
@@ -74,6 +76,7 @@ class LandingPageController extends BaseController
     /**
      * Get platform statistics.
      *
+     * @unauthenticated
      * @return JsonResponse
      */
     public function statistics(): JsonResponse

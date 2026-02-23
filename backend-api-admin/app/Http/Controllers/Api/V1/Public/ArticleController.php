@@ -15,6 +15,7 @@ class ArticleController extends BaseController
     /**
      * Get list of published articles with pagination.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -77,6 +78,7 @@ class ArticleController extends BaseController
     /**
      * Get featured articles.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -101,6 +103,7 @@ class ArticleController extends BaseController
     /**
      * Get popular articles.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -124,6 +127,7 @@ class ArticleController extends BaseController
     /**
      * Get recent articles.
      *
+     * @unauthenticated
      * @param Request $request
      * @return JsonResponse
      */
@@ -147,6 +151,7 @@ class ArticleController extends BaseController
     /**
      * Get article detail by slug.
      *
+     * @unauthenticated
      * @param string $slug
      * @return JsonResponse
      */
@@ -196,6 +201,7 @@ class ArticleController extends BaseController
     /**
      * Get articles by category slug.
      *
+     * @unauthenticated
      * @param string $categorySlug
      * @param Request $request
      * @return JsonResponse
@@ -222,6 +228,7 @@ class ArticleController extends BaseController
     /**
      * Get articles by tag.
      *
+     * @unauthenticated
      * @param string $tag
      * @param Request $request
      * @return JsonResponse
