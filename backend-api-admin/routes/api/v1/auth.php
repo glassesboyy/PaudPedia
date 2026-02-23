@@ -27,7 +27,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
 // Authenticated routes
 Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function () {
-    Route::get('/me', [AuthController::class, 'me'])->name('me');
+    Route::get('/me', [AuthController::class, 'me'])->name('me'); 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
     Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
