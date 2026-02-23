@@ -1,0 +1,14 @@
+/**
+ * Category Service
+ */
+import type { Category } from '~~/types'
+import { useApiFetch } from './api/client'
+import { API_ENDPOINTS } from './api/endpoints'
+import type { ApiResponse } from './api/types'
+
+export const categoryService = {
+  async getList(): Promise<ApiResponse<Category[]>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.CATEGORIES.LIST)
+  },
+}
