@@ -7,7 +7,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+  <div class="min-h-screen flex items-center justify-center bg-surface-muted px-4">
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <NuxtLink to="/" class="text-2xl font-bold text-primary-600">
@@ -15,7 +15,7 @@
         </NuxtLink>
       </div>
 
-      <div class="bg-white rounded-xl shadow-sm border p-6">
+      <div class="bg-surface rounded-xl shadow-card border border-border p-6">
         <slot />
       </div>
     </div>

@@ -15,6 +15,6 @@ useSeo({ title: 'Reset Password' })
   <div>
     <h2 class="text-2xl font-bold text-center mb-6">Reset Password</h2>
     <!-- TODO: ResetPasswordForm component -->
-    <p class="text-sm text-gray-500 text-center">Form reset password akan diimplementasikan pada tahap development.</p>
+    <p class="text-sm text-muted text-center">Form reset password akan diimplementasikan pada tahap development.</p>
   </div>
 </template>

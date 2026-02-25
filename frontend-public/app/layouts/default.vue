@@ -10,9 +10,11 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- TODO: <AppHeader /> -->
-    <header class="border-b bg-white">
-      <div class="container mx-auto px-4 py-4">
-        <span class="font-bold text-xl text-primary-600">PaudPedia</span>
+    <header class="border-b border-border bg-surface">
+      <div class="container py-3">
+        <NuxtLink to="/" class="text-2xl font-bold text-primary-600">
+          PaudPedia
+        </NuxtLink>
       </div>
     </header>
 
@@ -21,8 +23,8 @@
     </main>
 
     <!-- TODO: <AppFooter /> -->
-    <footer class="border-t bg-gray-50">
-      <div class="container mx-auto px-4 py-6 text-center text-sm text-gray-500">
+    <footer class="border-t border-border bg-surface-muted">
+      <div class="container py-6 text-center text-sm text-muted">
         &copy; {{ new Date().getFullYear() }} PaudPedia. All rights reserved.
       </div>
     </footer>

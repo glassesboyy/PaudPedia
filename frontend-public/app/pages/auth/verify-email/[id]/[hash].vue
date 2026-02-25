@@ -17,6 +17,6 @@ useSeo({ title: 'Verifikasi Email' })
 <template>
   <div>
     <h2 class="text-2xl font-bold text-center mb-6">Verifikasi Email</h2>
-    <p class="text-sm text-gray-500 text-center">Halaman verifikasi email akan diimplementasikan pada tahap development.</p>
+    <p class="text-sm text-muted text-center">Halaman verifikasi email akan diimplementasikan pada tahap development.</p>
   </div>
 </template>

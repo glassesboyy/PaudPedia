@@ -10,13 +10,13 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- TODO: <AppHeader /> -->
-    <header class="border-b bg-white">
-      <div class="container mx-auto px-4 py-4">
+    <header class="border-b border-border bg-surface">
+      <div class="container py-4">
         <span class="font-bold text-xl text-primary-600">PaudPedia</span>
       </div>
     </header>
 
-    <div class="flex-1 container mx-auto px-4 py-8">
+    <div class="flex-1 container py-8">
       <div class="flex gap-8">
         <!-- TODO: Sidebar navigation component -->
         <aside class="hidden lg:block w-64 shrink-0">

@@ -12,7 +12,7 @@ useSeo({ title: 'Checkout' })
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 max-w-3xl">
+  <div class="container py-8 max-w-3xl">
     <h1 class="text-3xl font-bold">Checkout</h1>
     <!-- TODO: CheckoutForm + PaymentMethods -->
   </div>

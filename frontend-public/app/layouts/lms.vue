@@ -8,9 +8,9 @@
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-100">
+  <div class="min-h-screen flex flex-col bg-surface-sunken">
     <!-- Slim top bar -->
-    <header class="border-b bg-white h-14 flex items-center px-4">
+    <header class="border-b border-border bg-surface h-14 flex items-center px-4">
       <NuxtLink to="/" class="font-bold text-primary-600">
         PaudPedia
       </NuxtLink>
@@ -21,3 +21,4 @@
     </main>
   </div>
 </template>
+

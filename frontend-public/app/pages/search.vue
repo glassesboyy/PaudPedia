@@ -10,7 +10,7 @@ useSeo({ title: query.value ? `Hasil Pencarian: ${query.value}` : 'Pencarian' })
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container py-8">
     <h1 class="text-3xl font-bold">
       {{ query ? `Hasil Pencarian: "${query}"` : 'Pencarian' }}
     </h1>

@@ -18,6 +18,6 @@ useSeo({ title: 'Belajar' })
 <template>
   <div>
     <!-- TODO: CoursePlayer component -->
-    <p class="p-8 text-gray-500">Lesson player akan diimplementasikan pada tahap development.</p>
+    <p class="p-8 text-muted">Lesson player akan diimplementasikan pada tahap development.</p>
   </div>
 </template>

@@ -8,8 +8,8 @@
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <header class="border-b bg-white">
-      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header class="border-b border-border bg-surface">
+      <div class="container py-4 flex items-center justify-between">
         <NuxtLink to="/" class="font-bold text-xl text-primary-600">
           PaudPedia
         </NuxtLink>

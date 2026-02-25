@@ -2,31 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Custom Base Styles ─────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   PaudPedia Design System — CSS Custom Properties
+   Single source of truth for all semantic color tokens.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── @font-face: Comic Relief (self-hosted) ───────────────
+   MUST be outside @layer — Tailwind's @layer base processing
+   can strip or reorder @font-face descriptors, preventing
+   the browser from registering the font.
+   ───────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Comic Relief';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../../public/fonts/ComicRelief-Regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+    U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Comic Relief';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../../public/fonts/ComicRelief-Regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Comic Relief';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../../public/fonts/ComicRelief-Bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+    U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Comic Relief';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../../public/fonts/ComicRelief-Bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @layer base {
+  :root {
+    /* ── Surface / Background ─────────────────────────────── */
+    --color-background:       255 255 255;   /* #ffffff — main page background */
+    --color-surface:          255 255 255;   /* #ffffff — cards, panels, headers */
+    --color-surface-muted:    249 250 251;   /* #f9fafb — subtle sections, footers (gray-50) */
+    --color-surface-sunken:   243 244 246;   /* #f3f4f6 — inset areas, LMS bg (gray-100) */
+
+    /* ── Text ─────────────────────────────────────────────── */
+    --color-foreground:       17  24  39;    /* #111827 — primary body text (gray-900) */
+    --color-heading:          31  41  55;    /* #1f2937 — headings (gray-800) */
+    --color-body:             75  85  99;    /* #4b5563 — secondary body text (gray-600) */
+    --color-muted:            107 114 128;   /* #6b7280 — hints, placeholders (gray-500) */
+    --color-on-primary:       255 255 255;   /* #ffffff — text on primary-colored bg */
+
+    /* ── Border ───────────────────────────────────────────── */
+    --color-border:           229 231 235;   /* #e5e7eb — default borders (gray-200) */
+    --color-border-muted:     243 244 246;   /* #f3f4f6 — subtle dividers (gray-100) */
+
+    /* ── Ring / Focus ─────────────────────────────────────── */
+    --color-ring:             59  130 246;   /* #3b82f6 — focus ring (primary-500) */
+  }
+
+  /* ── Global Base Styles ─────────────────────────────────── */
   body {
-    @apply antialiased text-gray-900 bg-white;
+    @apply antialiased font-sans;
+    color: rgb(var(--color-foreground));
+    background-color: rgb(var(--color-background));
   }
 }
 
-/* ── Custom Component Classes ───────────────────────────── */
+/* ── Component Classes ───────────────────────────────────── */
 @layer components {
-  /* Add shared component styles here */
+  /* Shared component styles will be added during feature development */
 }
 
-/* ── Custom Utility Classes ─────────────────────────────── */
-@layer utilities {
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
+/* line-clamp-* utilities are built-in since Tailwind v3.3 — no custom overrides needed */
