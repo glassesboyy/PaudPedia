@@ -1,61 +1,120 @@
 /**
- * Auth Store
+ * Auth Store (Composition API)
  *
- * Manages authentication state: current user, loading flag, and auth actions.
+ * Manages authentication state with Bearer token stored in a cookie.
+ * Uses useCookie('auth_token') for SSR-safe token persistence.
+ *
+ * Call `initialize()` to validate the token on app startup.
+ * Middleware should `await initialize()` before checking auth state.
  */
 import { defineStore } from 'pinia'
 import { authService } from '~~/services'
-import type { LoginCredentials, RegisterData, User } from '~~/types'
+import type { ApiResponse } from '~~/services/api/types'
+import type { LoginCredentials, LoginResponse, RegisterData, User } from '~~/types'
 
-interface AuthState {
-  user: User | null
-  isLoading: boolean
-}
+/** Deduplication promise — ensures initialize() only runs once. */
+let _initPromise: Promise<void> | null = null
 
-export const useAuthStore = defineStore('auth', {
-  state: (): AuthState => ({
-    user: null,
-    isLoading: true,
-  }),
+export const useAuthStore = defineStore('auth', () => {
+  // ── State ──────────────────────────────────────────────
+  const user = ref<User | null>(null)
+  const isLoading = ref(true)
+  const tokenCookie = useCookie('auth_token', {
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: '/',
+    sameSite: 'lax' as const,
+  })
 
-  getters: {
-    isAuthenticated: (state): boolean => !!state.user,
-    userName: (state): string => state.user?.name ?? 'Guest',
-  },
+  // ── Getters ────────────────────────────────────────────
+  const isAuthenticated = computed(() => !!user.value)
+  const isEmailVerified = computed(() => !!user.value?.email_verified_at)
+  const userName = computed(() => user.value?.name ?? 'Guest')
 
-  actions: {
-    async fetchUser() {
-      this.isLoading = true
-      try {
-        this.user = await authService.me()
-      } catch {
-        this.user = null
-      } finally {
-        this.isLoading = false
+  // ── Internal helpers ───────────────────────────────────
+  function setAuth(userData: User, token: string) {
+    user.value = userData
+    tokenCookie.value = token
+    isLoading.value = false
+  }
+
+  function clearAuth() {
+    user.value = null
+    tokenCookie.value = null
+    isLoading.value = false
+    _initPromise = null
+  }
+
+  // ── Actions ────────────────────────────────────────────
+
+  /**
+   * Validate existing token by fetching user profile.
+   * Safe to call multiple times — only the first call performs a network request.
+   */
+  function initialize(): Promise<void> {
+    if (_initPromise) return _initPromise
+
+    _initPromise = (async () => {
+      if (tokenCookie.value) {
+        try {
+          user.value = await authService.me()
+        } catch {
+          tokenCookie.value = null
+          user.value = null
+        }
+      } else {
+        user.value = null
       }
-    },
+      isLoading.value = false
+    })()
 
-    async login(credentials: LoginCredentials) {
-      await authService.csrfCookie()
-      const response = await authService.login(credentials)
-      this.user = response.data.user
-      return response.data.user
-    },
+    return _initPromise
+  }
 
-    async register(data: RegisterData) {
-      await authService.csrfCookie()
-      const response = await authService.register(data)
-      this.user = response.data.user
-      return response.data.user
-    },
+  async function login(credentials: LoginCredentials): Promise<ApiResponse<LoginResponse>> {
+    const response = await authService.login(credentials)
+    setAuth(response.data.user, response.data.token)
+    return response
+  }
 
-    async logout() {
+  async function register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
+    const response = await authService.register(data)
+    setAuth(response.data.user, response.data.token)
+    return response
+  }
+
+  async function logout() {
+    try {
       await authService.logout()
-      this.user = null
-      navigateTo('/auth/login')
-    },
-  },
+    } finally {
+      clearAuth()
+    }
+  }
 
+  async function fetchUser() {
+    try {
+      user.value = await authService.me()
+    } catch {
+      clearAuth()
+    }
+  }
+
+  return {
+    // State
+    user,
+    isLoading,
+    // Getters
+    isAuthenticated,
+    isEmailVerified,
+    userName,
+    // Actions
+    initialize,
+    login,
+    register,
+    logout,
+    fetchUser,
+    clearAuth,
+  }
+}, {
   persist: {
     pick: ['user'],
   },

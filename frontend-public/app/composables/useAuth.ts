@@ -1,4 +1,4 @@
-import { useAuthStore } from "~~/stores/auth"
+import { useAuthStore } from '~~/stores/auth'
 
 /**
  * useAuth Composable
@@ -9,14 +9,16 @@ import { useAuthStore } from "~~/stores/auth"
 export function useAuth() {
   const authStore = useAuthStore()
 
-  const isAuthenticated = computed(() => authStore.isAuthenticated)
-  const user = computed(() => authStore.user)
-  const isLoading = computed(() => authStore.isLoading)
-
   return {
-    user,
-    isAuthenticated,
-    isLoading,
+    // Reactive state
+    user: computed(() => authStore.user),
+    isAuthenticated: computed(() => authStore.isAuthenticated),
+    isEmailVerified: computed(() => authStore.isEmailVerified),
+    isLoading: computed(() => authStore.isLoading),
+    userName: computed(() => authStore.userName),
+
+    // Actions
+    initialize: authStore.initialize,
     login: authStore.login,
     register: authStore.register,
     logout: authStore.logout,

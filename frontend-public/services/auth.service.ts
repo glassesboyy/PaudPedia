@@ -2,22 +2,24 @@
  * Auth Service
  *
  * Handles authentication-related API calls.
+ * Uses Bearer token auth stored in auth_token cookie.
  */
-import type { LoginCredentials, RegisterData, User } from '~~/types'
+import type {
+    ChangePasswordData,
+    LoginCredentials,
+    LoginResponse,
+    RegisterData,
+    ResetPasswordData,
+    User,
+} from '~~/types'
 import { useApiFetch } from './api/client'
 import { API_ENDPOINTS } from './api/endpoints'
 import type { ApiResponse } from './api/types'
 
 export const authService = {
-  async csrfCookie(): Promise<void> {
-    const config = useRuntimeConfig()
-    await $fetch(API_ENDPOINTS.AUTH.CSRF_COOKIE, {
-      baseURL: (config.public.apiBase as string).replace('/api/v1', ''),
-      credentials: 'include',
-    })
-  },
+  // ── Core Auth ────────────────────────────────────────────
 
-  async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
+  async login(credentials: LoginCredentials): Promise<ApiResponse<LoginResponse>> {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.AUTH.LOGIN, {
       method: 'POST',
@@ -25,7 +27,7 @@ export const authService = {
     })
   },
 
-  async register(data: RegisterData): Promise<ApiResponse<{ user: User }>> {
+  async register(data: RegisterData): Promise<ApiResponse<LoginResponse>> {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.AUTH.REGISTER, {
       method: 'POST',
@@ -44,6 +46,8 @@ export const authService = {
     return response.data
   },
 
+  // ── Password ─────────────────────────────────────────────
+
   async forgotPassword(email: string): Promise<ApiResponse<null>> {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
@@ -52,11 +56,35 @@ export const authService = {
     })
   },
 
-  async resetPassword(data: { token: string; email: string; password: string; password_confirmation: string }): Promise<ApiResponse<null>> {
+  async resetPassword(data: ResetPasswordData): Promise<ApiResponse<null>> {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
       method: 'POST',
       body: data,
+    })
+  },
+
+  async changePassword(data: ChangePasswordData): Promise<ApiResponse<null>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
+      method: 'POST',
+      body: data,
+    })
+  },
+
+  // ── Email Verification ───────────────────────────────────
+
+  async verifyEmail(id: string, hash: string, query: Record<string, string>): Promise<ApiResponse<null>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.VERIFY_EMAIL(id, hash), {
+      params: query,
+    })
+  },
+
+  async resendVerificationEmail(): Promise<ApiResponse<null>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.RESEND_VERIFICATION, {
+      method: 'POST',
     })
   },
 }

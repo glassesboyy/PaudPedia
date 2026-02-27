@@ -1,12 +1,15 @@
 /**
  * UI Components (Atoms) Barrel Export
  *
- * Base/atomic components will be created during the feature development phase.
  * Components in this directory are auto-imported by Nuxt.
+ * This file serves as documentation for available atoms.
  *
- * Planned components:
- * - UButton.vue
- * - UInput.vue
+ * Available:
+ * - UButton.vue  — Button with variants, sizes, loading state
+ * - UInput.vue   — Input with label, error, password toggle
+ * - UAlert.vue   — Alert/feedback banner with variants
+ *
+ * Planned:
  * - UCard.vue
  * - UModal.vue
  * - UBadge.vue

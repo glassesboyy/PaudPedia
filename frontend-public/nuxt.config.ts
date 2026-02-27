@@ -14,6 +14,11 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
 
+  // ── Components ───────────────────────────────────────────
+  components: [
+    { path: '~/components', pathPrefix: false },
+  ],
+
   // ── Runtime Config ───────────────────────────────────────
   runtimeConfig: {
     public: {
@@ -58,6 +63,7 @@ export default defineNuxtConfig({
     '/mentors/**': { ssr: true },
 
     // CSR for user-specific pages
+    '/auth/**': { ssr: false },
     '/account/**': { ssr: false },
     '/learn/**': { ssr: false },
     '/checkout': { ssr: false },

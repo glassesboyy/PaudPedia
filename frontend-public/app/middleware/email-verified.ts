@@ -2,11 +2,18 @@
  * Email Verified Middleware
  *
  * Ensures the authenticated user has verified their email address.
+ * Must be placed AFTER the auth middleware in route definitions.
  */
-export default defineNuxtRouteMiddleware(() => {
-  const { user } = useAuth()
+import { useAuthStore } from '~~/stores/auth'
 
-  if (user.value && !user.value.email_verified_at) {
+export default defineNuxtRouteMiddleware(async () => {
+  const authStore = useAuthStore()
+
+  if (authStore.isLoading) {
+    await authStore.initialize()
+  }
+
+  if (authStore.user && !authStore.isEmailVerified) {
     return navigateTo('/auth/verify-email')
   }
 })

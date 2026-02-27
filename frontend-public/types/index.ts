@@ -9,7 +9,9 @@
 
 // ── API Types ────────────────────────────────────────────
 export type { Article, ArticleListParams } from './api/article'
-export type { LoginCredentials, RegisterData, User } from './api/auth'
+export type {
+    AuthTokenResponse, ChangePasswordData, ForgotPasswordData, LoginCredentials, LoginResponse, RegisterData, ResetPasswordData, User
+} from './api/auth'
 export type { Category, PaginationParams } from './api/common'
 export type { Course, CourseListParams, Lesson, Module } from './api/course'
 export type { Mentor, MentorListParams } from './api/mentor'

@@ -13,8 +13,7 @@ useSeo({ title: 'Lupa Password' })
 
 <template>
   <div>
-    <h2 class="text-2xl font-bold text-center mb-6">Lupa Password</h2>
-    <!-- TODO: ForgotPasswordForm component -->
-    <p class="text-sm text-muted text-center">Form lupa password akan diimplementasikan pada tahap development.</p>
+    <h2 class="text-2xl font-bold text-center text-heading mb-6">Lupa Password</h2>
+    <ForgotPasswordForm />
   </div>
 </template>

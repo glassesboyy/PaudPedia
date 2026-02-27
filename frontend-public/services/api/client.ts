@@ -3,44 +3,51 @@
  *
  * Provides a pre-configured `$fetch` instance with:
  * - Base URL from runtime config
- * - Sanctum CSRF cookie handling (SSR)
- * - Global error interceptors (401, 422)
+ * - Bearer token auth via auth_token cookie
+ * - Global error interceptors (401)
+ *
+ * The factory is SSR-safe: a fresh instance is created on every server
+ * request to avoid cross-request data leakage while the client reuses
+ * a singleton for the entire SPA session.
  */
 import type { FetchOptions } from 'ofetch'
 
 let _apiFetch: typeof $fetch | null = null
 
 /**
- * Returns the singleton API fetch instance.
+ * Returns the API fetch instance.
  * Must be called inside Nuxt context (plugin, composable, page, middleware).
  */
 export function useApiFetch() {
-  if (_apiFetch) return _apiFetch
+  // On the server, always create a fresh instance (no cross-request leaks).
+  // On the client, reuse the singleton.
+  if (import.meta.server || !_apiFetch) {
+    const config = useRuntimeConfig()
+    const token = useCookie('auth_token')
 
-  const config = useRuntimeConfig()
+    _apiFetch = $fetch.create({
+      baseURL: config.public.apiBase as string,
 
-  _apiFetch = $fetch.create({
-    baseURL: config.public.apiBase as string,
-    credentials: 'include', // Sanctum cookie-based auth (SSR)
-
-    onRequest({ options }) {
-      // Attach CSRF token for state-changing requests
-      const csrfToken = useCookie('XSRF-TOKEN')
-      if (csrfToken.value) {
+      onRequest({ options }) {
         const headers = new Headers(options.headers as HeadersInit)
-        headers.set('X-XSRF-TOKEN', csrfToken.value)
+        headers.set('Accept', 'application/json')
+
+        if (token.value) {
+          headers.set('Authorization', `Bearer ${token.value}`)
+        }
+
         options.headers = headers
-      }
-    },
+      },
 
-    onResponseError({ response }) {
-      // 401 → session expired, force logout
-      if (response.status === 401) {
-        // Will be handled by auth store once implemented
-        navigateTo('/auth/login')
-      }
-    },
-  } as FetchOptions)
+      onResponseError({ response }) {
+        // 401 → token expired / invalid — clear it silently.
+        // Auth middleware handles the redirect to login.
+        if (response.status === 401) {
+          token.value = null
+        }
+      },
+    } as FetchOptions)
+  }
 
-  return _apiFetch
+  return _apiFetch!
 }

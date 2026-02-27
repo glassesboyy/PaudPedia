@@ -1,3 +1,5 @@
+import { useUIStore } from "~~/stores/ui"
+
 /**
  * useToast Composable
  *

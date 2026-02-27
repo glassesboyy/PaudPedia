@@ -14,7 +14,9 @@ export const API_ENDPOINTS = {
     ME: '/auth/me',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
-    VERIFY_EMAIL: '/auth/verify-email',
+    VERIFY_EMAIL: (id: string, hash: string) => `/auth/email/verify/${id}/${hash}`,
+    RESEND_VERIFICATION: '/auth/email/verification-notification',
+    CHANGE_PASSWORD: '/auth/change-password',
     CSRF_COOKIE: '/sanctum/csrf-cookie',
   },
 

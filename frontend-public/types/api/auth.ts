@@ -24,3 +24,32 @@ export interface RegisterData {
   password: string
   password_confirmation: string
 }
+
+export interface ForgotPasswordData {
+  email: string
+}
+
+export interface ResetPasswordData {
+  token: string
+  email: string
+  password: string
+  password_confirmation: string
+}
+
+export interface ChangePasswordData {
+  current_password: string
+  password: string
+  password_confirmation: string
+}
+
+/** Response from login / register endpoints */
+export interface AuthTokenResponse {
+  user: User
+  token: string
+  token_type: string
+}
+
+/** Login-specific response includes email_verified flag */
+export interface LoginResponse extends AuthTokenResponse {
+  email_verified: boolean
+}

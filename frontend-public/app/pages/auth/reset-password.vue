@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Reset Password Page
- * Route: /auth/reset-password
+ * Route: /auth/reset-password?token=...&email=...
  */
 definePageMeta({
   layout: 'auth',
@@ -13,8 +13,7 @@ useSeo({ title: 'Reset Password' })
 
 <template>
   <div>
-    <h2 class="text-2xl font-bold text-center mb-6">Reset Password</h2>
-    <!-- TODO: ResetPasswordForm component -->
-    <p class="text-sm text-muted text-center">Form reset password akan diimplementasikan pada tahap development.</p>
+    <h2 class="text-2xl font-bold text-center text-heading mb-6">Reset Password</h2>
+    <ResetPasswordForm />
   </div>
 </template>
