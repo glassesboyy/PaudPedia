@@ -75,6 +75,14 @@ onUnmounted(() => {
 
     <div class="pt-2 space-y-2">
       <NuxtLink
+        v-if="isAuthenticated"
+        to="/"
+        class="block text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+      >
+        Kembali ke Beranda
+      </NuxtLink>
+      <NuxtLink
+        v-else
         to="/auth/login"
         class="block text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
       >

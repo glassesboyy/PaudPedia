@@ -63,7 +63,7 @@ onMounted(async () => {
       </div>
       <div>
         <h2 class="text-2xl font-bold text-heading">Email Terverifikasi!</h2>
-        <p class="mt-2 text-sm text-body">Email Anda berhasil diverifikasi. Anda sekarang bisa mengakses semua fitur.</p>
+        <p class="mt-2 mb-4 text-sm text-body">Email Anda berhasil diverifikasi. Anda sekarang bisa mengakses semua fitur.</p>
       </div>
       <NuxtLink to="/account">
         <UButton variant="primary" block>Ke Dashboard</UButton>
@@ -84,10 +84,10 @@ onMounted(async () => {
           <UButton variant="outline" block>Kirim Ulang Email Verifikasi</UButton>
         </NuxtLink>
         <NuxtLink
-          to="/auth/login"
+          to="/"
           class="block text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
         >
-          Kembali ke halaman masuk
+          Kembali ke Beranda
         </NuxtLink>
       </div>
     </template>

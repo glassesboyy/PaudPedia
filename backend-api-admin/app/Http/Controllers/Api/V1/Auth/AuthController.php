@@ -115,8 +115,11 @@ class AuthController extends BaseController
     {
         $user = User::findOrFail($id);
 
-        if (!$request->hasValidSignature()) {
-            return $this->error('Link verifikasi tidak valid atau sudah kadaluarsa.', 403);
+        // Validate expiration manually (more robust for SPA flows where
+        // the signed URL was generated for a different host/port).
+        $expires = (int) $request->query('expires', 0);
+        if ($expires && $expires < time()) {
+            return $this->error('Link verifikasi sudah kedaluwarsa.', 403);
         }
 
         $verified = $this->authService->verifyEmail($user, $hash);

@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -33,7 +34,16 @@ class AuthService
         $user->assignRole('user');
 
         // Fire registered event (triggers email verification)
-        event(new Registered($user));
+        // Wrapped in try-catch so SMTP failures never crash the registration response
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send verification email on registration', [
+                'user_id' => $user->id,
+                'email'   => $user->email,
+                'error'   => $e->getMessage(),
+            ]);
+        }
 
         // Create token for immediate use (optional, depends on business logic)
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -135,7 +145,17 @@ class AuthService
             return false; // Already verified
         }
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            Log::error('Failed to resend verification email', [
+                'user_id' => $user->id,
+                'email'   => $user->email,
+                'error'   => $e->getMessage(),
+            ]);
+
+            return false;
+        }
 
         return true;
     }
