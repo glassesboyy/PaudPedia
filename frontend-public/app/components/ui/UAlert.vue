@@ -31,7 +31,7 @@ const config = computed(() => variantConfig[props.variant])
   <div
     v-if="isVisible"
     role="alert"
-    :class="['rounded-lg border p-4 text-sm animate-fade-in', config.bg, config.border, config.text]"
+    :class="['rounded-lg border p-4 text-sm animate-fade-in my-2', config.bg, config.border, config.text]"
   >
     <div class="flex items-start gap-3">
       <Icon :name="config.icon" class="w-5 h-5 shrink-0 mt-0.5" />

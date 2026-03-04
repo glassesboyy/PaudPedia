@@ -6,6 +6,7 @@ use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Carbon;
@@ -30,6 +31,43 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // ── Password Reset: generate frontend URLs ────────────────
+        // Build the reset URL pointing to the frontend app so the
+        // notification email contains a link the SPA can handle.
+        ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
+            $frontendUrl = rtrim(Config::get('app.frontend_url', 'http://localhost:3000'), '/');
+
+            return sprintf(
+                '%s/auth/reset-password?token=%s&email=%s',
+                $frontendUrl,
+                $token,
+                urlencode($notifiable->getEmailForVerification()),
+            );
+        });
+
+        // ── Password Reset: customise the mail ─────────────────────
+        // NOTE: toMailUsing receives ($notifiable, $token), NOT the URL.
+        // We must build the reset URL ourselves here.
+        ResetPassword::toMailUsing(function (object $notifiable, string $token) {
+            $frontendUrl = rtrim(Config::get('app.frontend_url', 'http://localhost:3000'), '/');
+
+            $url = sprintf(
+                '%s/auth/reset-password?token=%s&email=%s',
+                $frontendUrl,
+                $token,
+                urlencode($notifiable->getEmailForVerification()),
+            );
+
+            return (new MailMessage)
+                ->subject('Reset Password — ' . Config::get('app.name'))
+                ->greeting('Halo ' . $notifiable->name . '!')
+                ->line('Anda menerima email ini karena kami menerima permintaan reset password untuk akun Anda.')
+                ->action('Reset Password', $url)
+                ->line('Link ini akan kedaluwarsa dalam 60 menit.')
+                ->line('Jika Anda tidak meminta reset password, abaikan email ini.')
+                ->salutation('Salam, Tim ' . Config::get('app.name'));
+        });
+
         // ── Email Verification: generate frontend URLs ─────────────
         // Build the verification URL pointing directly to the frontend app.
         // The frontend page /auth/verify-email/{id}/{hash} will then call the

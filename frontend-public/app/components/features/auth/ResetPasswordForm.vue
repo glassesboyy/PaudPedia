@@ -85,6 +85,7 @@ async function handleSubmit() {
         placeholder="nama@email.com"
         autocomplete="email"
         required
+        disabled
         :error="errors.email"
         @clear-error="clearFieldError('email')"
       />

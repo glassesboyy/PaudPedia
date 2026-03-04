@@ -169,6 +169,10 @@ class AuthController extends BaseController
             return $this->success(null, 'Link reset password telah dikirim ke email Anda.');
         }
 
+        if ($status === 'fail') {
+            return $this->error('Gagal mengirim email. Silakan coba lagi nanti.', 500);
+        }
+
         return $this->error('Gagal mengirim link reset password.', 400);
     }
 
