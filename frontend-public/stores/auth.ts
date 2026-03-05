@@ -98,6 +98,16 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * Update local user state with partial data.
+   * Used after profile update to avoid re-fetching.
+   */
+  function updateUser(userData: Partial<User>) {
+    if (user.value) {
+      user.value = { ...user.value, ...userData }
+    }
+  }
+
   return {
     // State
     user,
@@ -112,6 +122,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     fetchUser,
+    updateUser,
     clearAuth,
   }
 }, {

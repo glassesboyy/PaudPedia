@@ -5,12 +5,13 @@
  * Uses Bearer token auth stored in auth_token cookie.
  */
 import type {
-    ChangePasswordData,
-    LoginCredentials,
-    LoginResponse,
-    RegisterData,
-    ResetPasswordData,
-    User,
+  ChangePasswordData,
+  LoginCredentials,
+  LoginResponse,
+  RegisterData,
+  ResetPasswordData,
+  UpdateProfileData,
+  User,
 } from '~~/types'
 import { useApiFetch } from './api/client'
 import { API_ENDPOINTS } from './api/endpoints'
@@ -85,6 +86,38 @@ export const authService = {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.AUTH.RESEND_VERIFICATION, {
       method: 'POST',
+    })
+  },
+
+  // ── Profile ──────────────────────────────────────────────
+
+  async getProfile(): Promise<ApiResponse<User>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.PROFILE)
+  },
+
+  async updateProfile(data: UpdateProfileData): Promise<ApiResponse<User>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.PROFILE, {
+      method: 'PUT',
+      body: data,
+    })
+  },
+
+  async uploadAvatar(file: File): Promise<ApiResponse<User>> {
+    const apiFetch = useApiFetch()
+    const formData = new FormData()
+    formData.append('avatar', file)
+    return apiFetch(API_ENDPOINTS.AUTH.PROFILE_AVATAR, {
+      method: 'POST',
+      body: formData,
+    })
+  },
+
+  async removeAvatar(): Promise<ApiResponse<User>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.PROFILE_AVATAR, {
+      method: 'DELETE',
     })
   },
 }

@@ -18,6 +18,8 @@ export const API_ENDPOINTS = {
     RESEND_VERIFICATION: '/auth/email/verification-notification',
     CHANGE_PASSWORD: '/auth/change-password',
     CSRF_COOKIE: '/sanctum/csrf-cookie',
+    PROFILE: '/auth/profile',
+    PROFILE_AVATAR: '/auth/profile/avatar',
   },
 
   // ── Courses ────────────────────────────────────────────

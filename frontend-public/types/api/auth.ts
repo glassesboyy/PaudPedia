@@ -6,8 +6,13 @@ export interface User {
   id: number
   name: string
   email: string
+  phone?: string | null
   avatar_url?: string | null
+  gender?: 'male' | 'female' | null
+  date_of_birth?: string | null
+  address?: string | null
   email_verified_at?: string | null
+  is_active?: boolean
   created_at: string
   updated_at: string
 }
@@ -40,6 +45,15 @@ export interface ChangePasswordData {
   current_password: string
   password: string
   password_confirmation: string
+}
+
+/** Data for updating user profile (text fields only) */
+export interface UpdateProfileData {
+  name: string
+  phone?: string
+  gender?: string
+  date_of_birth?: string
+  address?: string
 }
 
 /** Response from login / register endpoints */
