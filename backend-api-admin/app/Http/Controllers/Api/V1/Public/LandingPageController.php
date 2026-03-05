@@ -65,7 +65,7 @@ class LandingPageController extends BaseController
         $heroData = [
             'title' => $settings['hero_title'] ?? $settings['site_name'] ?? 'PaudPedia',
             'subtitle' => $settings['hero_subtitle'] ?? $settings['site_tagline'] ?? null,
-            'image' => $settings['hero_image'] ? asset('storage/' . $settings['hero_image']) : null,
+            'image' => !empty($settings['hero_image']) ? asset('storage/' . $settings['hero_image']) : null,
             'cta_text' => $settings['hero_cta_text'] ?? 'Mulai Sekarang',
             'cta_link' => $settings['hero_cta_link'] ?? '/courses',
         ];
@@ -100,11 +100,11 @@ class LandingPageController extends BaseController
         return [
             'site_name' => $settings['site_name'] ?? 'PaudPedia',
             'site_tagline' => $settings['site_tagline'] ?? null,
-            'site_logo' => $settings['site_logo'] ? asset('storage/' . $settings['site_logo']) : null,
+            'site_logo' => !empty($settings['site_logo']) ? asset('storage/' . $settings['site_logo']) : null,
             'hero' => [
                 'title' => $settings['hero_title'] ?? null,
                 'subtitle' => $settings['hero_subtitle'] ?? null,
-                'image' => $settings['hero_image'] ? asset('storage/' . $settings['hero_image']) : null,
+                'image' => !empty($settings['hero_image']) ? asset('storage/' . $settings['hero_image']) : null,
                 'cta_text' => $settings['hero_cta_text'] ?? 'Mulai Sekarang',
                 'cta_link' => $settings['hero_cta_link'] ?? '/courses',
             ],

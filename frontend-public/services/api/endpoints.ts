@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   COURSES: {
     LIST: '/courses',
     DETAIL: (slug: string) => `/courses/${slug}`,
+    FEATURED: '/courses/featured',
     ENROLL: (id: number) => `/courses/${id}/enroll`,
     PROGRESS: (id: number) => `/courses/${id}/progress`,
   },
@@ -34,12 +35,14 @@ export const API_ENDPOINTS = {
   WEBINARS: {
     LIST: '/webinars',
     DETAIL: (slug: string) => `/webinars/${slug}`,
+    FEATURED: '/webinars/featured',
   },
 
   // ── Products ───────────────────────────────────────────
   PRODUCTS: {
     LIST: '/products',
     DETAIL: (slug: string) => `/products/${slug}`,
+    FEATURED: '/products/featured',
   },
 
   // ── Articles ───────────────────────────────────────────
@@ -69,6 +72,30 @@ export const API_ENDPOINTS = {
     LIST: '/orders',
     DETAIL: (id: number) => `/orders/${id}`,
     CREATE: '/orders',
+  },
+
+  // ── Landing ────────────────────────────────────────────
+  LANDING: {
+    INDEX: '/landing',
+    HERO: '/landing/hero',
+    STATISTICS: '/landing/statistics',
+  },
+
+  // ── Settings ───────────────────────────────────────────
+  SETTINGS: {
+    INDEX: '/settings',
+    SHOW: (key: string) => `/settings/${key}`,
+  },
+
+  // ── Contact ────────────────────────────────────────────
+  CONTACT: {
+    INDEX: '/contact',
+  },
+
+  // ── Testimonials ───────────────────────────────────────
+  TESTIMONIALS: {
+    LIST: '/testimonials',
+    FEATURED: '/testimonials/featured',
   },
 
   // ── Categories ─────────────────────────────────────────
