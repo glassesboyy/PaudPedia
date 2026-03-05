@@ -108,7 +108,8 @@ async function handleSubmit() {
   <div class="space-y-8">
     <!-- Avatar Section -->
     <div class="p-6 rounded-xl border border-border bg-surface shadow-soft">
-      <h3 class="text-sm font-semibold text-heading mb-4">Foto Profil</h3>
+      <h3 class="text-lg font-semibold text-heading mb-1">Foto Profil</h3>
+      <p class="text-xs text-muted mb-5">Unggah foto profil yang jelas untuk mempersonalisasi akun Anda.</p>
       <AvatarUpload
         :current-avatar-url="authStore.user?.avatar_url"
         :user-name="authStore.user?.name || ''"
@@ -118,7 +119,8 @@ async function handleSubmit() {
 
     <!-- Profile Form Section -->
     <div class="p-6 rounded-xl border border-border bg-surface shadow-soft">
-      <h3 class="text-sm font-semibold text-heading mb-5">Informasi Profil</h3>
+      <h3 class="text-lg font-semibold text-heading mb-1">Informasi Profil</h3>
+      <p class="text-xs text-muted mb-5">Perbarui informasi profil Anda untuk menjaga akun tetap terkini.</p>
 
       <form class="space-y-5" @submit.prevent="handleSubmit">
         <UAlert v-if="apiError" variant="error" dismissible>{{ apiError }}</UAlert>

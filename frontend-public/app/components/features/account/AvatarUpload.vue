@@ -115,30 +115,35 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:gap-5">
     <!-- Avatar display with hover overlay -->
-    <div class="relative group">
+    <div class="avatar-upload-wrapper relative group w-24 h-24">
       <UAvatar
         :src="displayUrl"
         :name="userName"
         size="xl"
+        class="w-full h-full"
       />
-      <!-- Upload overlay -->
+      <!-- Upload overlay — matches the avatar circle exactly -->
       <button
         type="button"
         :disabled="isUploading"
         class="
-          absolute inset-0 rounded-full flex items-center justify-center
+          absolute inset-0 w-full h-full rounded-full
+          flex items-center justify-center
           bg-black/40 opacity-0 group-hover:opacity-100
-          transition-opacity duration-200 cursor-pointer
+          transition-all duration-300 ease-smooth cursor-pointer
           disabled:cursor-not-allowed
         "
         @click="triggerFileSelect"
       >
-        <Icon name="lucide:camera" class="w-6 h-6 text-white" />
+        <div class="flex flex-col items-center gap-1">
+          <Icon name="lucide:camera" class="w-6 h-6 text-white drop-shadow-sm" />
+          <span class="text-[10px] font-medium text-white/90">Ubah Foto</span>
+        </div>
       </button>
       <!-- Loading spinner overlay -->
       <div
         v-if="isUploading"
-        class="absolute inset-0 rounded-full flex items-center justify-center bg-black/50"
+        class="absolute inset-0 w-full h-full rounded-full flex items-center justify-center bg-black/50"
       >
         <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -162,7 +167,7 @@ onUnmounted(() => {
         <UButton
           v-if="currentAvatarUrl"
           size="sm"
-          variant="ghost"
+          variant="danger"
           :loading="isRemoving"
           :disabled="isUploading || isRemoving"
           @click="handleRemove"
@@ -185,3 +190,9 @@ onUnmounted(() => {
     />
   </div>
 </template>
+
+<style scoped>
+.avatar-upload-wrapper {
+  border-radius: 9999px;
+}
+</style>

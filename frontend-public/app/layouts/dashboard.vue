@@ -1,19 +1,20 @@
 <script setup lang="ts">
+
+import { useUIStore } from '~~/stores/ui';
 /**
  * Dashboard Layout
  *
  * Layout for authenticated user account pages.
- * Provides a sidebar + main content area.
+ * Provides TheNavbar + sidebar + main content area.
  */
 const uiStore = useUIStore()
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="border-b border-border bg-surface sticky top-0 z-dropdown">
-      <div class="container py-4 flex items-center justify-between">
-        <NuxtLink to="/" class="font-bold text-xl text-primary-600">PaudPedia</NuxtLink>
+    <!-- Shared Navbar (no page nav links on dashboard) -->
+    <TheNavbar>
+      <template #actions>
         <!-- Mobile sidebar toggle -->
         <button
           type="button"
@@ -22,8 +23,8 @@ const uiStore = useUIStore()
         >
           <Icon name="lucide:menu" class="w-5 h-5" />
         </button>
-      </div>
-    </header>
+      </template>
+    </TheNavbar>
 
     <div class="flex-1 container py-8">
       <div class="flex gap-8">

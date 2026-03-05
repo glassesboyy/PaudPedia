@@ -57,44 +57,48 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <form class="space-y-5" @submit.prevent="handleSubmit">
-    <UAlert v-if="apiError" variant="error" dismissible>{{ apiError }}</UAlert>
+  <div class="p-6 rounded-xl border border-border bg-surface shadow-soft">
+    <h3 class="text-lg font-semibold text-heading mb-1">Ubah Password</h3>
+    <p class="text-xs text-muted mb-5">Pastikan akun Anda menggunakan password yang kuat dan unik.</p>
+    <form class="space-y-5" @submit.prevent="handleSubmit">
+      <UAlert v-if="apiError" variant="error" dismissible>{{ apiError }}</UAlert>
 
-    <UInput
-      v-model="form.current_password"
-      label="Password Saat Ini"
-      type="password"
-      placeholder="Masukkan password saat ini"
-      autocomplete="current-password"
-      required
-      :error="errors.current_password"
-      @clear-error="clearFieldError('current_password')"
-    />
+      <UInput
+        v-model="form.current_password"
+        label="Password Saat Ini"
+        type="password"
+        placeholder="Masukkan password saat ini"
+        autocomplete="current-password"
+        required
+        :error="errors.current_password"
+        @clear-error="clearFieldError('current_password')"
+      />
 
-    <UInput
-      v-model="form.password"
-      label="Password Baru"
-      type="password"
-      placeholder="Minimal 8 karakter"
-      autocomplete="new-password"
-      required
-      :error="errors.password"
-      @clear-error="clearFieldError('password')"
-    />
+      <UInput
+        v-model="form.password"
+        label="Password Baru"
+        type="password"
+        placeholder="Minimal 8 karakter"
+        autocomplete="new-password"
+        required
+        :error="errors.password"
+        @clear-error="clearFieldError('password')"
+      />
 
-    <UInput
-      v-model="form.password_confirmation"
-      label="Konfirmasi Password Baru"
-      type="password"
-      placeholder="Ulangi password baru"
-      autocomplete="new-password"
-      required
-      :error="errors.password_confirmation"
-      @clear-error="clearFieldError('password_confirmation')"
-    />
+      <UInput
+        v-model="form.password_confirmation"
+        label="Konfirmasi Password Baru"
+        type="password"
+        placeholder="Ulangi password baru"
+        autocomplete="new-password"
+        required
+        :error="errors.password_confirmation"
+        @clear-error="clearFieldError('password_confirmation')"
+      />
 
-    <UButton type="submit" :loading="isSubmitting" :disabled="isSubmitting">
-      Ubah Password
-    </UButton>
-  </form>
+      <UButton type="submit" :loading="isSubmitting" :disabled="isSubmitting">
+        Ubah Password
+      </UButton>
+    </form>
+  </div>
 </template>
