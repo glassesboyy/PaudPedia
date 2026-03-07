@@ -19,11 +19,14 @@ export type {
     ContactInfo, LandingPageData,
     PlatformStatistics, SiteSettings, SocialMedia
 } from './api/landing'
-export type { Mentor, MentorListParams } from './api/mentor'
+export type { FeaturedMentor, Mentor, MentorListParams } from './api/mentor'
 export type { Order, OrderItem, OrderListParams, OrderStatus } from './api/order'
 export type { Product, ProductListParams } from './api/product'
 export type { Testimonial } from './api/testimonial'
 export type { Webinar, WebinarListParams } from './api/webinar'
+
+// ── Component Types ──────────────────────────────────────
+export type { SidebarSection } from './components/sidebar'
 
 // ── Client Models ────────────────────────────────────────
 export type { CartItem } from './models/Cart'

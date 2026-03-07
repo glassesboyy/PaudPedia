@@ -4,7 +4,10 @@
  * Route: /faq
  *
  * FR-PP-09: FAQ accordion — Static content.
+ * Uses reusable PageHero, SidebarLayout, and ContactCta components.
  */
+import type { SidebarSection } from '~~/types'
+
 useSeo({
   title: 'Pertanyaan Umum (FAQ)',
   description: 'Temukan jawaban atas pertanyaan yang sering diajukan tentang PaudPedia.',
@@ -92,6 +95,16 @@ const faqCategories: FaqCategory[] = [
   },
 ]
 
+/** Map faqCategories → SidebarSection[] for SidebarLayout */
+const sidebarSections = computed<SidebarSection[]>(() =>
+  faqCategories.map((cat, idx) => ({
+    id: `faq-${idx}`,
+    icon: cat.icon,
+    title: cat.title,
+    subtitle: `${cat.items.length} pertanyaan`,
+  })),
+)
+
 const openItems = ref<Set<string>>(new Set())
 
 function toggleItem(key: string) {
@@ -102,84 +115,71 @@ function toggleItem(key: string) {
     openItems.value.add(key)
   }
 }
+
+/** Get FAQ items for a given section index */
+function getItems(index: number): FaqItem[] {
+  return faqCategories[index]?.items ?? []
+}
 </script>
 
 <template>
   <div>
-    <!-- Hero -->
-    <section class="bg-gradient-to-br from-primary-50 to-surface">
-      <div class="container py-14 sm:py-20 text-center">
-        <h1 class="text-3xl sm:text-4xl font-bold text-heading">Pertanyaan Umum (FAQ)</h1>
-        <p class="mt-4 text-base text-body max-w-2xl mx-auto leading-relaxed">
-          Temukan jawaban atas pertanyaan yang sering diajukan tentang PaudPedia.
-        </p>
-      </div>
-    </section>
+    <PageHero
+      badge="Pusat Bantuan"
+      badge-icon="lucide:message-circle-question"
+      title="Pertanyaan yang"
+      highlight="Sering Diajukan"
+      description="Temukan jawaban atas pertanyaan umum tentang PaudPedia. Tidak menemukan yang Anda cari? Jangan ragu untuk menghubungi kami."
+    />
 
-    <!-- FAQ Sections -->
-    <section class="bg-surface">
-      <div class="container py-14 sm:py-20">
-        <div class="max-w-3xl mx-auto space-y-10">
-          <div v-for="(category, catIdx) in faqCategories" :key="catIdx">
-            <!-- Category Header -->
-            <div class="flex items-center gap-3 mb-4">
-              <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary-100">
-                <Icon :name="category.icon" class="w-5 h-5 text-primary-600" />
-              </div>
-              <h2 class="text-lg font-semibold text-heading">{{ category.title }}</h2>
-            </div>
-
-            <!-- Accordion Items -->
-            <div class="space-y-3">
-              <div
-                v-for="(item, itemIdx) in category.items"
-                :key="itemIdx"
-                class="rounded-xl border border-border overflow-hidden transition-all"
-                :class="openItems.has(`${catIdx}-${itemIdx}`) ? 'bg-primary-50/50' : 'bg-surface'"
-              >
-                <button
-                  type="button"
-                  class="w-full flex items-center justify-between gap-4 p-4 text-left"
-                  @click="toggleItem(`${catIdx}-${itemIdx}`)"
+    <SidebarLayout :sections="sidebarSections" sidebar-label="Kategori">
+      <template #default="{ index }">
+        <div class="space-y-3">
+          <div
+            v-for="(item, itemIdx) in getItems(index)"
+            :key="`${index}-${itemIdx}`"
+            class="rounded-2xl border overflow-hidden transition-all duration-300"
+            :class="openItems.has(`${index}-${itemIdx}`) ? 'border-primary-200 bg-primary-50/30 shadow-sm' : 'border-border bg-surface hover:border-primary-100'"
+          >
+            <button
+              type="button"
+              class="w-full flex items-center justify-between gap-4 p-5 text-left group"
+              @click="toggleItem(`${index}-${itemIdx}`)"
+            >
+              <div class="flex items-center gap-3">
+                <span
+                  class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-semibold shrink-0 transition-colors"
+                  :class="openItems.has(`${index}-${itemIdx}`) ? 'bg-primary-100 text-primary-700' : 'bg-surface-muted text-muted group-hover:bg-primary-50 group-hover:text-primary-600'"
                 >
-                  <span class="text-sm font-medium text-heading">{{ item.question }}</span>
-                  <Icon
-                    name="lucide:chevron-down"
-                    class="w-5 h-5 text-muted shrink-0 transition-transform duration-200"
-                    :class="{ 'rotate-180': openItems.has(`${catIdx}-${itemIdx}`) }"
-                  />
-                </button>
-                <Transition
-                  enter-active-class="transition-all duration-200 ease-out"
-                  leave-active-class="transition-all duration-150 ease-in"
-                  enter-from-class="opacity-0 max-h-0"
-                  enter-to-class="opacity-100 max-h-40"
-                  leave-from-class="opacity-100 max-h-40"
-                  leave-to-class="opacity-0 max-h-0"
-                >
-                  <div v-if="openItems.has(`${catIdx}-${itemIdx}`)" class="overflow-hidden">
-                    <p class="px-4 pb-4 text-sm text-body leading-relaxed">{{ item.answer }}</p>
-                  </div>
-                </Transition>
+                  {{ itemIdx + 1 }}
+                </span>
+                <span class="text-sm font-medium text-heading">{{ item.question }}</span>
               </div>
-            </div>
+              <Icon
+                name="lucide:chevron-down"
+                class="w-5 h-5 text-muted shrink-0 transition-transform duration-300"
+                :class="{ 'rotate-180 text-primary-500': openItems.has(`${index}-${itemIdx}`) }"
+              />
+            </button>
+            <Transition
+              enter-active-class="transition-all duration-200 ease-out"
+              leave-active-class="transition-all duration-150 ease-in"
+              enter-from-class="opacity-0 max-h-0"
+              enter-to-class="opacity-100 max-h-40"
+              leave-from-class="opacity-100 max-h-40"
+              leave-to-class="opacity-0 max-h-0"
+            >
+              <div v-if="openItems.has(`${index}-${itemIdx}`)" class="overflow-hidden">
+                <div class="px-5 pb-5 pl-[3.75rem]">
+                  <p class="text-sm text-body leading-relaxed">{{ item.answer }}</p>
+                </div>
+              </div>
+            </Transition>
           </div>
         </div>
-      </div>
-    </section>
+      </template>
+    </SidebarLayout>
 
-    <!-- CTA -->
-    <section class="bg-surface-muted">
-      <div class="container py-10 sm:py-14 text-center">
-        <p class="text-sm text-body mb-4">Masih punya pertanyaan?</p>
-        <NuxtLink
-          to="/contact"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-500 text-white text-sm font-medium hover:bg-primary-600 transition-colors"
-        >
-          <Icon name="lucide:mail" class="w-4 h-4" />
-          Hubungi Kami
-        </NuxtLink>
-      </div>
-    </section>
+    <ContactCta />
   </div>
 </template>

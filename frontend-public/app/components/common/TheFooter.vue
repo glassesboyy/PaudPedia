@@ -73,7 +73,7 @@ const socialIcons: Record<string, string> = {
 
         <!-- Platform links -->
         <div>
-          <h3 class="text-sm font-semibold text-heading mb-4">Platform</h3>
+          <h3 class="text-md font-semibold text-heading mb-4">Platform</h3>
           <ul class="space-y-2.5">
             <li v-for="link in footerLinks.platform" :key="link.to">
               <NuxtLink
@@ -88,7 +88,7 @@ const socialIcons: Record<string, string> = {
 
         <!-- Company links -->
         <div>
-          <h3 class="text-sm font-semibold text-heading mb-4">Perusahaan</h3>
+          <h3 class="text-md font-semibold text-heading mb-4">Perusahaan</h3>
           <ul class="space-y-2.5">
             <li v-for="link in footerLinks.company" :key="link.to">
               <NuxtLink
@@ -111,7 +111,7 @@ const socialIcons: Record<string, string> = {
 
         <!-- Contact info -->
         <div v-if="siteSettings.contact.email || siteSettings.contact.phone || siteSettings.contact.address">
-          <h3 class="text-sm font-semibold text-heading mb-4">Hubungi Kami</h3>
+          <h3 class="text-md font-semibold text-heading mb-4">Hubungi Kami</h3>
           <ul class="space-y-3">
             <li v-if="siteSettings.contact.email" class="flex items-start gap-2.5">
               <Icon name="lucide:mail" class="w-4 h-4 text-muted shrink-0 mt-0.5" />
