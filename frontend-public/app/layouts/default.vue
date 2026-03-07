@@ -4,28 +4,14 @@
  *
  * Used for all public pages (home, courses, articles, etc.)
  * Provides header (via TheNavbar), main content area, and footer (TheFooter).
- * Footer contact/social data is fetched on first load and cached.
+ * Site settings are fetched via the siteSettings store.
  */
-import type { ContactInfo, FooterData, SocialMedia } from '~~/types'
+import { useSiteSettingsStore } from '~~/stores/siteSettings';
 
-const footerContact = ref<ContactInfo | null>(null)
-const footerSocial = ref<SocialMedia | null>(null)
-const footerData = ref<FooterData | null>(null)
+const siteSettings = useSiteSettingsStore()
 
-onMounted(async () => {
-  try {
-    const { landingService } = await import('~~/services')
-    const res = await landingService.getData()
-    if (res.success && res.data?.settings) {
-      const s = res.data.settings
-      footerContact.value = s.contact ?? null
-      footerSocial.value = s.social_media ?? null
-      footerData.value = s.footer ?? null
-    }
-  }
-  catch {
-    // Footer will render with static fallbacks
-  }
+onMounted(() => {
+  siteSettings.fetch()
 })
 </script>
 
@@ -37,10 +23,6 @@ onMounted(async () => {
       <slot />
     </main>
 
-    <TheFooter
-      :contact="footerContact"
-      :social="footerSocial"
-      :footer="footerData"
-    />
+    <TheFooter />
   </div>
 </template>

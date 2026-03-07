@@ -56,9 +56,6 @@ onMounted(async () => {
     <template v-else>
       <!-- FR-PP-01: Hero Section (with integrated stats) -->
       <HeroSection
-        :hero="landingData?.settings.hero ?? null"
-        :site-name="landingData?.settings.site_name"
-        :site-tagline="landingData?.settings.site_tagline"
         :stats="landingData?.statistics ?? null"
       />
 

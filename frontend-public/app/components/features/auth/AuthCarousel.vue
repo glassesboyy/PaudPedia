@@ -5,6 +5,9 @@
  * Uses design system tokens for all styling.
  * Images are sourced from public/assets/auth/.
  */
+import { useSiteSettingsStore } from '~~/stores/siteSettings'
+
+const siteSettings = useSiteSettingsStore()
 
 const slides = [
   {
@@ -78,9 +81,9 @@ onUnmounted(() => {
     <div class="absolute bottom-0 left-0 right-0 p-6">
       <!-- Branding tagline -->
       <div class="mb-4">
-        <h2 class="text-xl font-bold text-white">PaudPedia</h2>
+        <h2 class="text-xl font-bold text-white">{{ siteSettings.siteName }}</h2>
         <p class="mt-1 text-sm text-white/80">
-          Platform e-learning terdepan untuk pendidikan anak usia dini
+          {{ siteSettings.siteTagline }}
         </p>
       </div>
 

@@ -181,46 +181,22 @@ class SiteSettingService
             // Branding
             'site_name',
             'site_tagline',
-            'site_logo',
-            'site_favicon',
-
-            // Hero Section
-            'hero_title',
-            'hero_subtitle',
-            'hero_image',
-            'hero_cta_text',
-            'hero_cta_link',
+            'site_description',
 
             // Contact Information
             'contact_email',
             'contact_phone',
-            'contact_whatsapp',
             'contact_address',
 
             // Social Media
-            'social_instagram',
             'social_facebook',
-            'social_youtube',
-            'social_linkedin',
+            'social_instagram',
             'social_twitter',
+            'social_youtube',
             'social_tiktok',
-
-            // About
-            'about_title',
-            'about_description',
-            'about_vision',
-            'about_mission',
-
-            // Footer
-            'footer_copyright',
-            'footer_description',
-
-            // SEO (public)
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'meta_description',
-            'meta_keywords',
+            'social_linkedin',
+            'social_telegram',
+            'social_discord',
         ];
     }
 
@@ -268,15 +244,13 @@ class SiteSettingService
     {
         $defaults = [
             // Identitas Situs
-            'site_name' => ['value' => 'PAUD Pedia', 'type' => 'string', 'description' => 'Nama situs'],
-            'site_tagline' => ['value' => 'Platform Edukasi PAUD Terpadu', 'type' => 'string', 'description' => 'Tagline situs'],
-            'site_logo' => ['value' => null, 'type' => 'string', 'description' => 'Path logo situs'],
-            'site_favicon' => ['value' => null, 'type' => 'string', 'description' => 'Path favicon'],
+            'site_name' => ['value' => 'PaudPedia', 'type' => 'string', 'description' => 'Nama situs'],
+            'site_tagline' => ['value' => 'Platform Pendidikan Anak Usia Dini Terpadu', 'type' => 'string', 'description' => 'Tagline situs'],
+            'site_description' => ['value' => 'Platform e-learning dan marketplace untuk pendidikan anak usia dini (PAUD).', 'type' => 'string', 'description' => 'Deskripsi situs'],
 
             // Informasi Kontak
             'contact_email' => ['value' => 'info@paudpedia.com', 'type' => 'string', 'description' => 'Email kontak'],
             'contact_phone' => ['value' => null, 'type' => 'string', 'description' => 'Nomor telepon'],
-            'contact_whatsapp' => ['value' => null, 'type' => 'string', 'description' => 'Nomor WhatsApp'],
             'contact_address' => ['value' => null, 'type' => 'string', 'description' => 'Alamat lengkap'],
 
             // Media Sosial
@@ -284,21 +258,20 @@ class SiteSettingService
             'social_instagram' => ['value' => null, 'type' => 'string', 'description' => 'Link Instagram'],
             'social_twitter' => ['value' => null, 'type' => 'string', 'description' => 'Link Twitter/X'],
             'social_youtube' => ['value' => null, 'type' => 'string', 'description' => 'Link YouTube'],
-            'social_linkedin' => ['value' => null, 'type' => 'string', 'description' => 'Link LinkedIn'],
             'social_tiktok' => ['value' => null, 'type' => 'string', 'description' => 'Link TikTok'],
+            'social_linkedin' => ['value' => null, 'type' => 'string', 'description' => 'Link LinkedIn'],
+            'social_telegram' => ['value' => null, 'type' => 'string', 'description' => 'Link Telegram'],
+            'social_discord' => ['value' => null, 'type' => 'string', 'description' => 'Link Discord'],
 
-            // SEO
-            'meta_description' => ['value' => null, 'type' => 'string', 'description' => 'Meta description untuk SEO'],
-            'meta_keywords' => ['value' => null, 'type' => 'string', 'description' => 'Meta keywords untuk SEO'],
+            // Integrasi (private, not exposed via public API)
+            'midtrans_client_key' => ['value' => null, 'type' => 'string', 'description' => 'Midtrans Client Key'],
+            'midtrans_server_key' => ['value' => null, 'type' => 'string', 'description' => 'Midtrans Server Key'],
+            'midtrans_is_production' => ['value' => false, 'type' => 'boolean', 'description' => 'Midtrans Production Mode'],
 
-            // Integrasi
-            'google_analytics_id' => ['value' => null, 'type' => 'string', 'description' => 'Google Analytics ID'],
-            'google_tag_manager' => ['value' => null, 'type' => 'string', 'description' => 'Google Tag Manager script'],
-            'facebook_pixel' => ['value' => null, 'type' => 'string', 'description' => 'Facebook Pixel script'],
-
-            // Footer
-            'footer_about' => ['value' => null, 'type' => 'string', 'description' => 'Tentang kami di footer'],
-            'footer_copyright' => ['value' => '© 2026 PAUD Pedia. All rights reserved.', 'type' => 'string', 'description' => 'Teks copyright'],
+            // Paket Langganan (private, not exposed via public API)
+            'free_max_students' => ['value' => 30, 'type' => 'integer', 'description' => 'Maks siswa paket gratis'],
+            'free_max_teachers' => ['value' => 5, 'type' => 'integer', 'description' => 'Maks guru paket gratis'],
+            'pro_monthly_price' => ['value' => 150000, 'type' => 'integer', 'description' => 'Harga langganan pro per bulan'],
         ];
 
         DB::beginTransaction();

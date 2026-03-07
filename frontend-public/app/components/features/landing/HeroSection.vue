@@ -4,22 +4,20 @@
  *
  * Typography-driven layout with headline, tagline, description, CTA,
  * and integrated platform statistics.
- * Data comes from the landing API via props.
+ * Site name and tagline come from the siteSettings store.
  */
-import type { HeroData, PlatformStatistics } from '~~/types';
+import { useSiteSettingsStore } from '~~/stores/siteSettings';
+import type { PlatformStatistics } from '~~/types';
 
 interface Props {
-  hero: HeroData | null
-  siteName?: string
-  siteTagline?: string
   stats?: PlatformStatistics | null
 }
 
 withDefaults(defineProps<Props>(), {
-  siteName: 'PaudPedia',
-  siteTagline: 'Platform Pendidikan Anak Usia Dini Terpadu',
   stats: null,
 })
+
+const siteSettings = useSiteSettingsStore()
 
 const statItems = [
   { label: 'Pengguna', icon: 'lucide:users', key: 'total_users' as const },
@@ -44,7 +42,7 @@ function formatNumber(value: number | undefined): string {
         <!-- Tagline badge -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-100/60 border border-primary-200/50 mb-6 animate-fade-in">
           <Icon name="lucide:sparkles" class="w-4 h-4 text-primary-500" />
-          <span class="text-xs sm:text-sm font-medium text-primary-700">{{ siteTagline }}</span>
+          <span class="text-xs sm:text-sm font-medium text-primary-700">{{ siteSettings.siteTagline }}</span>
         </div>
 
         <!-- Headline -->
@@ -55,14 +53,14 @@ function formatNumber(value: number | undefined): string {
 
         <!-- Description -->
         <p class="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-body leading-relaxed max-w-2xl mx-auto animate-fade-in-up">
-          {{ hero?.subtitle || `${siteName} adalah platform terpadu untuk manajemen sekolah PAUD dan pengembangan profesional guru.` }}
+          {{ siteSettings.siteDescription }}
         </p>
 
         <!-- CTA Buttons -->
         <div class="mt-8 sm:mt-10 flex flex-wrap gap-4 justify-center animate-fade-in-up">
-          <NuxtLink :to="hero?.cta_link || '/courses'">
+          <NuxtLink to="/courses">
             <UButton variant="primary" size="lg" class="px-8">
-              {{ hero?.cta_text || 'Jelajahi Platform' }}
+              Jelajahi Platform
               <Icon name="lucide:arrow-right" class="w-4 h-4 ml-2" />
             </UButton>
           </NuxtLink>

@@ -6,11 +6,9 @@
 import type { SocialMedia } from './landing'
 
 export interface ContactPageInfo {
-  email: string
-  phone: string
-  whatsapp: string
-  whatsapp_link: string
-  address: string
+  email: string | null
+  phone: string | null
+  address: string | null
   social_media: SocialMedia
 }
 

@@ -26,15 +26,16 @@ class ContactController extends BaseController
         $contactInfo = [
             'email' => $settings['contact_email'] ?? null,
             'phone' => $settings['contact_phone'] ?? null,
-            'whatsapp' => $settings['contact_whatsapp'] ?? null,
             'address' => $settings['contact_address'] ?? null,
             'social_media' => [
-                'instagram' => $settings['social_instagram'] ?? null,
                 'facebook' => $settings['social_facebook'] ?? null,
-                'youtube' => $settings['social_youtube'] ?? null,
-                'linkedin' => $settings['social_linkedin'] ?? null,
+                'instagram' => $settings['social_instagram'] ?? null,
                 'twitter' => $settings['social_twitter'] ?? null,
+                'youtube' => $settings['social_youtube'] ?? null,
                 'tiktok' => $settings['social_tiktok'] ?? null,
+                'linkedin' => $settings['social_linkedin'] ?? null,
+                'telegram' => $settings['social_telegram'] ?? null,
+                'discord' => $settings['social_discord'] ?? null,
             ],
         ];
 

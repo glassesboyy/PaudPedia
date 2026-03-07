@@ -7,6 +7,13 @@
  *
  * Uses design system tokens exclusively.
  */
+import { useSiteSettingsStore } from '~~/stores/siteSettings';
+
+const siteSettings = useSiteSettingsStore()
+
+onMounted(() => {
+  siteSettings.fetch()
+})
 </script>
 
 <template>
@@ -21,7 +28,7 @@
       <!-- Top bar with logo + back link -->
       <div class="flex items-center justify-between p-4 sm:p-6">
         <NuxtLink to="/" class="text-xl font-bold text-primary-600">
-          PaudPedia
+          {{ siteSettings.siteName }}
         </NuxtLink>
         <NuxtLink
           to="/"

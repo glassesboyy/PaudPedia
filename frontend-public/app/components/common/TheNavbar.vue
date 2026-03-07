@@ -21,6 +21,8 @@ const props = withDefaults(defineProps<{
 })
 
 const { user, isAuthenticated, isLoading, userName, logout } = useAuth()
+import { useSiteSettingsStore } from '~~/stores/siteSettings';
+const siteSettings = useSiteSettingsStore()
 
 const isMobileMenuOpen = ref(false)
 const isProfileOpen = ref(false)
@@ -69,7 +71,7 @@ onUnmounted(() => {
     <div class="container py-3 flex items-center justify-between">
       <!-- Logo -->
       <NuxtLink to="/" class="text-2xl font-bold text-primary-600 shrink-0">
-        PaudPedia
+        {{ siteSettings.siteName }}
       </NuxtLink>
 
       <!-- Desktop nav links (only when showNav is true) -->

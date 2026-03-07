@@ -11,7 +11,7 @@ import type { ContactFormData, ContactPageInfo } from '~~/types'
 
 useSeo({
   title: 'Hubungi Kami',
-  description: 'Hubungi tim PaudPedia melalui form kontak, email, WhatsApp, atau telepon.',
+  description: 'Hubungi tim PaudPedia melalui form kontak, email, atau telepon.',
 })
 
 // ─── Contact Info ───
@@ -41,6 +41,17 @@ async function fetchContactInfo() {
 }
 
 onMounted(fetchContactInfo)
+
+const socialIcons: Record<string, string> = {
+  instagram: 'lucide:instagram',
+  facebook: 'lucide:facebook',
+  youtube: 'lucide:youtube',
+  linkedin: 'lucide:linkedin',
+  twitter: 'lucide:twitter',
+  tiktok: 'simple-icons:tiktok',
+  telegram: 'lucide:send',
+  discord: 'simple-icons:discord',
+}
 
 // ─── Contact Form (MailJS — frontend only) ───
 const form = reactive<ContactFormData>({
@@ -94,19 +105,13 @@ const infoCards = computed(() => {
       icon: 'lucide:mail',
       label: 'Email',
       value: contactInfo.value.email,
-      href: `mailto:${contactInfo.value.email}`,
+      href: contactInfo.value.email ? `mailto:${contactInfo.value.email}` : null,
     },
     {
       icon: 'lucide:phone',
       label: 'Telepon',
       value: contactInfo.value.phone,
-      href: `tel:${contactInfo.value.phone}`,
-    },
-    {
-      icon: 'lucide:message-circle',
-      label: 'WhatsApp',
-      value: contactInfo.value.whatsapp,
-      href: contactInfo.value.whatsapp_link,
+      href: contactInfo.value.phone ? `tel:${contactInfo.value.phone}` : null,
     },
     {
       icon: 'lucide:map-pin',
@@ -114,7 +119,7 @@ const infoCards = computed(() => {
       value: contactInfo.value.address,
       href: null,
     },
-  ]
+  ].filter(card => card.value)
 })
 </script>
 
@@ -175,49 +180,21 @@ const infoCards = computed(() => {
             </template>
 
             <!-- Social Media -->
-            <div v-if="contactInfo?.social_media" class="pt-4">
+            <div v-if="contactInfo?.social_media && Object.keys(contactInfo.social_media).length" class="pt-4">
               <p class="text-xs text-muted font-medium mb-3">Media Sosial</p>
-              <div class="flex gap-3">
-                <a
-                  v-if="contactInfo.social_media.instagram"
-                  :href="contactInfo.social_media.instagram"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="w-10 h-10 rounded-xl bg-surface-muted flex items-center justify-center hover:bg-primary-100 transition-colors"
-                  aria-label="Instagram"
-                >
-                  <Icon name="lucide:instagram" class="w-5 h-5 text-body" />
-                </a>
-                <a
-                  v-if="contactInfo.social_media.facebook"
-                  :href="contactInfo.social_media.facebook"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="w-10 h-10 rounded-xl bg-surface-muted flex items-center justify-center hover:bg-primary-100 transition-colors"
-                  aria-label="Facebook"
-                >
-                  <Icon name="lucide:facebook" class="w-5 h-5 text-body" />
-                </a>
-                <a
-                  v-if="contactInfo.social_media.youtube"
-                  :href="contactInfo.social_media.youtube"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="w-10 h-10 rounded-xl bg-surface-muted flex items-center justify-center hover:bg-primary-100 transition-colors"
-                  aria-label="YouTube"
-                >
-                  <Icon name="lucide:youtube" class="w-5 h-5 text-body" />
-                </a>
-                <a
-                  v-if="contactInfo.social_media.tiktok"
-                  :href="contactInfo.social_media.tiktok"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="w-10 h-10 rounded-xl bg-surface-muted flex items-center justify-center hover:bg-primary-100 transition-colors"
-                  aria-label="TikTok"
-                >
-                  <Icon name="lucide:music-2" class="w-5 h-5 text-body" />
-                </a>
+              <div class="flex flex-wrap gap-3">
+                <template v-for="(url, platform) in contactInfo.social_media" :key="platform">
+                  <a
+                    v-if="url"
+                    :href="url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="w-10 h-10 rounded-xl bg-surface-muted flex items-center justify-center hover:bg-primary-100 transition-colors"
+                    :aria-label="String(platform)"
+                  >
+                    <Icon :name="socialIcons[String(platform)] || 'lucide:link'" class="w-5 h-5 text-body" />
+                  </a>
+                </template>
               </div>
             </div>
           </div>

@@ -63,11 +63,8 @@ class LandingPageController extends BaseController
         $settings = $this->siteSettingService->getPublicSettings();
 
         $heroData = [
-            'title' => $settings['hero_title'] ?? $settings['site_name'] ?? 'PaudPedia',
-            'subtitle' => $settings['hero_subtitle'] ?? $settings['site_tagline'] ?? null,
-            'image' => !empty($settings['hero_image']) ? asset('storage/' . $settings['hero_image']) : null,
-            'cta_text' => $settings['hero_cta_text'] ?? 'Mulai Sekarang',
-            'cta_link' => $settings['hero_cta_link'] ?? '/courses',
+            'site_name' => $settings['site_name'] ?? 'PaudPedia',
+            'site_tagline' => $settings['site_tagline'] ?? null,
         ];
 
         return $this->success($heroData, 'Data hero section berhasil dimuat');
@@ -100,32 +97,22 @@ class LandingPageController extends BaseController
         return [
             'site_name' => $settings['site_name'] ?? 'PaudPedia',
             'site_tagline' => $settings['site_tagline'] ?? null,
-            'site_logo' => !empty($settings['site_logo']) ? asset('storage/' . $settings['site_logo']) : null,
-            'hero' => [
-                'title' => $settings['hero_title'] ?? null,
-                'subtitle' => $settings['hero_subtitle'] ?? null,
-                'image' => !empty($settings['hero_image']) ? asset('storage/' . $settings['hero_image']) : null,
-                'cta_text' => $settings['hero_cta_text'] ?? 'Mulai Sekarang',
-                'cta_link' => $settings['hero_cta_link'] ?? '/courses',
-            ],
+            'site_description' => $settings['site_description'] ?? null,
             'contact' => [
                 'email' => $settings['contact_email'] ?? null,
                 'phone' => $settings['contact_phone'] ?? null,
-                'whatsapp' => $settings['contact_whatsapp'] ?? null,
                 'address' => $settings['contact_address'] ?? null,
             ],
             'social_media' => array_filter([
-                'instagram' => $settings['social_instagram'] ?? null,
                 'facebook' => $settings['social_facebook'] ?? null,
-                'youtube' => $settings['social_youtube'] ?? null,
-                'linkedin' => $settings['social_linkedin'] ?? null,
+                'instagram' => $settings['social_instagram'] ?? null,
                 'twitter' => $settings['social_twitter'] ?? null,
+                'youtube' => $settings['social_youtube'] ?? null,
                 'tiktok' => $settings['social_tiktok'] ?? null,
+                'linkedin' => $settings['social_linkedin'] ?? null,
+                'telegram' => $settings['social_telegram'] ?? null,
+                'discord' => $settings['social_discord'] ?? null,
             ]),
-            'footer' => [
-                'copyright' => $settings['footer_copyright'] ?? '© ' . date('Y') . ' PaudPedia. All rights reserved.',
-                'description' => $settings['footer_description'] ?? null,
-            ],
         ];
     }
 

@@ -3,25 +3,12 @@
  * TheFooter — Global footer component.
  *
  * Displays navigation links, social media, contact info, and copyright.
- * Data comes from landing page API (settings) passed via props,
- * with static fallbacks for navigation links.
+ * Data comes from the siteSettings store (fetched from the landing API).
  * Uses design system tokens exclusively.
  */
-import type { ContactInfo, FooterData, SocialMedia } from '~~/types';
+import { useSiteSettingsStore } from '~~/stores/siteSettings';
 
-interface Props {
-  contact?: ContactInfo | null
-  social?: SocialMedia | null
-  footer?: FooterData | null
-}
-
-withDefaults(defineProps<Props>(), {
-  contact: null,
-  social: null,
-  footer: null,
-})
-
-const currentYear = new Date().getFullYear()
+const siteSettings = useSiteSettingsStore()
 
 const footerLinks = {
   platform: [
@@ -48,6 +35,8 @@ const socialIcons: Record<string, string> = {
   linkedin: 'lucide:linkedin',
   twitter: 'lucide:twitter',
   tiktok: 'simple-icons:tiktok',
+  telegram: 'lucide:send',
+  discord: 'simple-icons:discord',
 }
 </script>
 
@@ -59,15 +48,15 @@ const socialIcons: Record<string, string> = {
         <!-- Brand column -->
         <div class="sm:col-span-2 lg:col-span-1">
           <NuxtLink to="/" class="text-2xl font-bold text-primary-600">
-            PaudPedia
+            {{ siteSettings.siteName }}
           </NuxtLink>
           <p class="mt-3 text-sm text-body leading-relaxed max-w-xs">
-            {{ footer?.description || 'Platform e-learning dan marketplace untuk pendidikan anak usia dini (PAUD).' }}
+            {{ siteSettings.siteDescription }}
           </p>
 
           <!-- Social media -->
-          <div v-if="social" class="flex items-center gap-3 mt-5">
-            <template v-for="(url, platform) in social" :key="platform">
+          <div v-if="Object.keys(siteSettings.socialMedia).length" class="flex flex-wrap gap-3 mt-5">
+            <template v-for="(url, platform) in siteSettings.socialMedia" :key="platform">
               <a
                 v-if="url && socialIcons[platform]"
                 :href="url"
@@ -121,30 +110,30 @@ const socialIcons: Record<string, string> = {
         </div>
 
         <!-- Contact info -->
-        <div v-if="contact">
+        <div v-if="siteSettings.contact.email || siteSettings.contact.phone || siteSettings.contact.address">
           <h3 class="text-sm font-semibold text-heading mb-4">Hubungi Kami</h3>
           <ul class="space-y-3">
-            <li v-if="contact.email" class="flex items-start gap-2.5">
+            <li v-if="siteSettings.contact.email" class="flex items-start gap-2.5">
               <Icon name="lucide:mail" class="w-4 h-4 text-muted shrink-0 mt-0.5" />
               <a
-                :href="`mailto:${contact.email}`"
+                :href="`mailto:${siteSettings.contact.email}`"
                 class="text-sm text-body hover:text-primary-600 transition-colors duration-200 break-all"
               >
-                {{ contact.email }}
+                {{ siteSettings.contact.email }}
               </a>
             </li>
-            <li v-if="contact.phone" class="flex items-start gap-2.5">
+            <li v-if="siteSettings.contact.phone" class="flex items-start gap-2.5">
               <Icon name="lucide:phone" class="w-4 h-4 text-muted shrink-0 mt-0.5" />
               <a
-                :href="`tel:${contact.phone}`"
+                :href="`tel:${siteSettings.contact.phone}`"
                 class="text-sm text-body hover:text-primary-600 transition-colors duration-200"
               >
-                {{ contact.phone }}
+                {{ siteSettings.contact.phone }}
               </a>
             </li>
-            <li v-if="contact.address" class="flex items-start gap-2.5">
+            <li v-if="siteSettings.contact.address" class="flex items-start gap-2.5">
               <Icon name="lucide:map-pin" class="w-4 h-4 text-muted shrink-0 mt-0.5" />
-              <span class="text-sm text-body">{{ contact.address }}</span>
+              <span class="text-sm text-body">{{ siteSettings.contact.address }}</span>
             </li>
           </ul>
         </div>
@@ -153,7 +142,7 @@ const socialIcons: Record<string, string> = {
       <!-- Bottom bar -->
       <div class="mt-10 pt-6 border-t border-border">
         <p class="text-center text-xs text-muted">
-          {{ footer?.copyright || `© ${currentYear} PaudPedia. All rights reserved.` }}
+          {{ siteSettings.footerCopyright }}
         </p>
       </div>
     </div>
