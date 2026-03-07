@@ -35,7 +35,7 @@ function formatDate(dateStr: string): string {
 <template>
   <NuxtLink
     :to="`/webinars/${webinar.slug}`"
-    class="group flex flex-col rounded-2xl border border-border bg-surface overflow-hidden hover:shadow-card transition-all duration-300"
+    class="group flex flex-col rounded-2xl border border-border bg-surface overflow-hidden hover:shadow-medium hover:border-secondary-200 hover:-translate-y-1 transition-all duration-300"
   >
     <!-- Thumbnail -->
     <div class="relative aspect-video overflow-hidden bg-surface-sunken">
@@ -49,8 +49,11 @@ function formatDate(dateStr: string): string {
         <Icon name="lucide:video" class="w-10 h-10 text-muted" />
       </div>
       <!-- Live badge -->
-      <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-50 text-secondary-700">
-        Webinar
+      <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-500 text-white shadow-sm">
+        <span class="flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+          Webinar
+        </span>
       </span>
     </div>
 

@@ -54,17 +54,16 @@ onMounted(async () => {
 
     <!-- Content -->
     <template v-else>
-      <!-- FR-PP-01: Hero Section -->
+      <!-- FR-PP-01: Hero Section (with integrated stats) -->
       <HeroSection
         :hero="landingData?.settings.hero ?? null"
         :site-name="landingData?.settings.site_name"
+        :site-tagline="landingData?.settings.site_tagline"
+        :stats="landingData?.statistics ?? null"
       />
 
       <!-- FR-PP-01: Features Section (static) -->
       <FeaturesSection />
-
-      <!-- FR-PP-01: Statistics Section -->
-      <StatsSection :stats="landingData?.statistics ?? null" />
 
       <!-- FR-PP-02: Featured Courses -->
       <FeaturedCoursesSection

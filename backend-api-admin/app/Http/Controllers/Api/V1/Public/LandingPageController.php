@@ -174,7 +174,7 @@ class LandingPageController extends BaseController
     {
         $webinars = Webinar::query()
             ->active()
-            ->upcoming()
+            ->where('scheduled_at', '>', now()->subDays(30))
             ->with(['mentor'])
             ->orderBy('scheduled_at', 'asc')
             ->limit(4)

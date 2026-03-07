@@ -23,7 +23,7 @@ function formatPrice(price: number): string {
 <template>
   <NuxtLink
     :to="`/products/${product.slug}`"
-    class="group flex flex-col rounded-2xl border border-border bg-surface overflow-hidden hover:shadow-card transition-all duration-300"
+    class="group flex flex-col rounded-2xl border border-border bg-surface overflow-hidden hover:shadow-medium hover:border-primary-200 hover:-translate-y-1 transition-all duration-300"
   >
     <!-- Thumbnail -->
     <div class="relative aspect-video overflow-hidden bg-surface-sunken">

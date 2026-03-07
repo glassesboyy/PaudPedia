@@ -2,74 +2,99 @@
 /**
  * HeroSection — Landing page hero banner.
  *
- * Displays headline, subtitle, CTA button and hero image.
+ * Typography-driven layout with headline, tagline, description, CTA,
+ * and integrated platform statistics.
  * Data comes from the landing API via props.
  */
-import type { HeroData } from '~~/types';
+import type { HeroData, PlatformStatistics } from '~~/types';
 
 interface Props {
   hero: HeroData | null
   siteName?: string
+  siteTagline?: string
+  stats?: PlatformStatistics | null
 }
 
 withDefaults(defineProps<Props>(), {
   siteName: 'PaudPedia',
+  siteTagline: 'Platform Pendidikan Anak Usia Dini Terpadu',
+  stats: null,
 })
+
+const statItems = [
+  { label: 'Pengguna', icon: 'lucide:users', key: 'total_users' as const },
+  { label: 'Kursus', icon: 'lucide:book-open', key: 'total_courses' as const },
+  { label: 'Webinar', icon: 'lucide:video', key: 'total_webinars' as const },
+  { label: 'Artikel', icon: 'lucide:newspaper', key: 'total_articles' as const },
+]
+
+function formatNumber(value: number | undefined): string {
+  if (!value) return '0'
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k+`
+  }
+  return `${value}+`
+}
 </script>
 
 <template>
   <section class="relative overflow-hidden bg-gradient-to-br from-primary-50 via-surface to-secondary-50">
-    <div class="container py-16 sm:py-24">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-        <!-- Text content -->
-        <div class="text-center lg:text-left">
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-heading leading-tight">
-            {{ hero?.title || `Selamat Datang di ${siteName}` }}
-          </h1>
-          <p class="mt-4 sm:mt-6 text-base sm:text-lg text-body leading-relaxed max-w-lg mx-auto lg:mx-0">
-            {{ hero?.subtitle || 'Platform e-learning dan marketplace untuk pendidikan anak usia dini.' }}
-          </p>
-          <div class="mt-6 sm:mt-8 flex flex-wrap gap-3 justify-center lg:justify-start">
-            <NuxtLink :to="hero?.cta_link || '/courses'">
-              <UButton variant="primary" size="lg">
-                {{ hero?.cta_text || 'Mulai Belajar' }}
-              </UButton>
-            </NuxtLink>
-            <NuxtLink to="/about">
-              <UButton variant="outline" size="lg">
-                Pelajari Selengkapnya
-              </UButton>
-            </NuxtLink>
-          </div>
+    <div class="container py-20 sm:py-28 lg:py-32">
+      <div class="max-w-3xl mx-auto text-center">
+        <!-- Tagline badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-100/60 border border-primary-200/50 mb-6 animate-fade-in">
+          <Icon name="lucide:sparkles" class="w-4 h-4 text-primary-500" />
+          <span class="text-xs sm:text-sm font-medium text-primary-700">{{ siteTagline }}</span>
         </div>
 
-        <!-- Hero image -->
-        <div class="flex justify-center lg:justify-end">
-          <div class="relative w-full max-w-md lg:max-w-lg">
-            <img
-              v-if="hero?.image"
-              :src="hero.image"
-              :alt="hero?.title || 'PaudPedia'"
-              class="w-full h-auto rounded-3xl shadow-elevated object-cover"
-            />
-            <!-- Fallback decorative illustration -->
-            <div
-              v-else
-              class="w-full aspect-square rounded-3xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center shadow-elevated"
-            >
-              <div class="text-center px-8">
-                <Icon name="lucide:graduation-cap" class="w-20 h-20 text-primary-400 mx-auto" />
-                <p class="mt-4 text-lg font-semibold text-primary-600">{{ siteName }}</p>
-                <p class="mt-1 text-sm text-body">Pendidikan Anak Usia Dini</p>
-              </div>
-            </div>
+        <!-- Headline -->
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-heading leading-tight animate-fade-in-up">
+          Wujudkan Pendidikan Anak Usia Dini yang
+          <span class="text-primary-600"> Lebih Berkualitas</span>
+        </h1>
+
+        <!-- Description -->
+        <p class="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-body leading-relaxed max-w-2xl mx-auto animate-fade-in-up">
+          {{ hero?.subtitle || `${siteName} adalah platform terpadu untuk manajemen sekolah PAUD dan pengembangan profesional guru.` }}
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="mt-8 sm:mt-10 flex flex-wrap gap-4 justify-center animate-fade-in-up">
+          <NuxtLink :to="hero?.cta_link || '/courses'">
+            <UButton variant="primary" size="lg" class="px-8">
+              {{ hero?.cta_text || 'Jelajahi Platform' }}
+              <Icon name="lucide:arrow-right" class="w-4 h-4 ml-2" />
+            </UButton>
+          </NuxtLink>
+          <NuxtLink to="/about">
+            <UButton variant="outline" size="lg" class="px-8">
+              Pelajari Selengkapnya
+            </UButton>
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Stats row (integrated) -->
+      <div class="mt-16 sm:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto animate-fade-in-up">
+        <div
+          v-for="item in statItems"
+          :key="item.key"
+          class="group text-center p-5 sm:p-6 rounded-2xl bg-surface/80 backdrop-blur-sm border border-border shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all duration-300"
+        >
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-primary-50 mb-3 group-hover:scale-110 transition-transform duration-300">
+            <Icon :name="item.icon" class="w-5 h-5 text-primary-600" />
           </div>
+          <p class="text-2xl sm:text-3xl font-bold text-heading tracking-tight">
+            {{ stats ? formatNumber(stats[item.key]) : '—' }}
+          </p>
+          <p class="mt-1 text-xs sm:text-sm text-muted font-medium">{{ item.label }}</p>
         </div>
       </div>
     </div>
 
     <!-- Decorative elements -->
-    <div class="absolute top-10 left-10 w-20 h-20 rounded-full bg-primary-200/30 blur-xl" />
-    <div class="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-secondary-200/30 blur-xl" />
+    <div class="absolute top-1/4 left-[5%] w-24 h-24 rounded-full bg-primary-200/20 blur-2xl" />
+    <div class="absolute bottom-1/4 right-[5%] w-32 h-32 rounded-full bg-secondary-200/20 blur-2xl" />
+    <div class="absolute top-[60%] left-[50%] w-16 h-16 rounded-full bg-primary-300/10 blur-xl" />
   </section>
 </template>
