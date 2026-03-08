@@ -22,7 +22,7 @@ class ArticleResource extends JsonResource
             'featured_image_url' => $this->featured_image_url ? asset('storage/' . $this->featured_image_url) : null,
             'tags' => is_array($this->tags) ? $this->tags : (is_string($this->tags) && !empty($this->tags) ? array_map('trim', explode(',', $this->tags)) : []),
             'view_count' => $this->view_count ?? 0,
-            'reading_time' => $this->getReadingTime(),
+            'reading_time' => $this->reading_time ?? $this->computeReadingTime(),
             'is_featured' => $this->is_featured,
             'author' => $this->whenLoaded('author', function () {
                 return [
@@ -43,13 +43,14 @@ class ArticleResource extends JsonResource
     }
 
     /**
-     * Get excerpt from content.
+     * Get excerpt from content (fallback only when excerpt column is null AND content is loaded).
      *
      * @return string|null
      */
     protected function getExcerpt(): ?string
     {
-        if (!$this->content) {
+        // Only compute if content column was actually loaded (not excluded by listColumns)
+        if (!isset($this->attributes['content']) || !$this->content) {
             return null;
         }
 
@@ -58,19 +59,20 @@ class ArticleResource extends JsonResource
     }
 
     /**
-     * Calculate reading time in minutes.
+     * Calculate reading time in minutes (fallback when reading_time column is null).
      *
      * @return int
      */
-    protected function getReadingTime(): int
+    protected function computeReadingTime(): int
     {
-        if (!$this->content) {
+        // Only compute if content column was actually loaded
+        if (!isset($this->attributes['content']) || !$this->content) {
             return 1;
         }
 
         $plainText = strip_tags($this->content);
         $wordCount = str_word_count($plainText);
-        $readingTime = ceil($wordCount / 200); // Assuming 200 words per minute
+        $readingTime = ceil($wordCount / 200);
 
         return max(1, $readingTime);
     }

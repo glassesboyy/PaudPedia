@@ -22,6 +22,7 @@ class Article extends Model
         'featured_image_url',
         'tags',
         'view_count',
+        'reading_time',
         'is_featured',
         'is_published',
         'published_at',
@@ -41,6 +42,15 @@ class Article extends Model
     protected static function boot()
     {
         parent::boot();
+
+        // Auto-compute reading_time whenever content changes
+        static::saving(function (Article $article) {
+            if ($article->isDirty('content') && $article->content) {
+                $plainText = strip_tags($article->content);
+                $wordCount = str_word_count($plainText);
+                $article->reading_time = max(1, (int) ceil($wordCount / 200));
+            }
+        });
 
         // Clean up old featured image when featured_image_url changes or article is deleted
         static::updating(function (Article $article) {
@@ -95,6 +105,19 @@ class Article extends Model
     public function scopeRecent($query)
     {
         return $query->orderBy('published_at', 'desc');
+    }
+
+    /**
+     * Select only the columns needed for list/card views (excludes heavy content column).
+     */
+    public function scopeListColumns($query)
+    {
+        return $query->select([
+            'id', 'category_id', 'author_id', 'title', 'slug',
+            'excerpt', 'featured_image_url', 'tags', 'view_count',
+            'reading_time', 'is_featured', 'is_published', 'published_at',
+            'created_at', 'updated_at', 'deleted_at',
+        ]);
     }
 
     // Helper Methods

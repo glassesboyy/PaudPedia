@@ -6,6 +6,7 @@
  * FR-AR-P02: Read full article without login
  * FR-AR-P07: Related articles navigation
  */
+import DOMPurify from 'isomorphic-dompurify'
 import type { Article, ArticleDetail } from '~~/types'
 
 const route = useRoute()
@@ -98,6 +99,15 @@ function shareArticle() {
     navigator.clipboard.writeText(window.location.href)
   }
 }
+
+// ─── Sanitize HTML content ───
+const sanitizedContent = computed(() => {
+  if (!article.value?.content) return ''
+  return DOMPurify.sanitize(article.value.content, {
+    ADD_TAGS: ['iframe'],
+    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target'],
+  })
+})
 </script>
 
 <template>
@@ -240,10 +250,10 @@ function shareArticle() {
               />
             </div>
 
-            <!-- Content (HTML from backend) -->
+            <!-- Content (HTML from backend — sanitized) -->
             <div
               class="article-content"
-              v-html="article.content"
+              v-html="sanitizedContent"
             />
 
             <!-- Tags -->

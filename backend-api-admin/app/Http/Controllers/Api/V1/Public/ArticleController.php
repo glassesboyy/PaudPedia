@@ -9,6 +9,7 @@ use App\Http\Resources\Api\V1\Public\ArticleDetailResource;
 use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ArticleController extends BaseController
 {
@@ -22,6 +23,7 @@ class ArticleController extends BaseController
     public function index(Request $request): JsonResponse
     {
         $query = Article::query()
+            ->listColumns()
             ->published()
             ->with(['category', 'author']);
 
@@ -47,13 +49,12 @@ class ArticleController extends BaseController
             $query->featured();
         }
 
-        // Search by keyword
+        // Search by keyword — use fulltext on title+excerpt, skip content LIKE
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
+                $q->whereFullText(['title', 'excerpt'], $search)
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
@@ -77,6 +78,7 @@ class ArticleController extends BaseController
 
     /**
      * Get featured articles.
+     * Cached for 10 minutes since featured articles rarely change.
      *
      * @unauthenticated
      * @param Request $request
@@ -86,13 +88,16 @@ class ArticleController extends BaseController
     {
         $limit = min($request->get('limit', 5), 20);
 
-        $articles = Article::query()
-            ->published()
-            ->featured()
-            ->with(['category', 'author'])
-            ->recent()
-            ->limit($limit)
-            ->get();
+        $articles = Cache::remember("articles:featured:{$limit}", 600, function () use ($limit) {
+            return Article::query()
+                ->listColumns()
+                ->published()
+                ->featured()
+                ->with(['category', 'author'])
+                ->recent()
+                ->limit($limit)
+                ->get();
+        });
 
         return $this->success(
             ArticleResource::collection($articles),
@@ -102,6 +107,7 @@ class ArticleController extends BaseController
 
     /**
      * Get popular articles.
+     * Cached for 10 minutes since popularity rankings are stable short-term.
      *
      * @unauthenticated
      * @param Request $request
@@ -111,12 +117,15 @@ class ArticleController extends BaseController
     {
         $limit = min($request->get('limit', 5), 20);
 
-        $articles = Article::query()
-            ->published()
-            ->with(['category', 'author'])
-            ->popular()
-            ->limit($limit)
-            ->get();
+        $articles = Cache::remember("articles:popular:{$limit}", 600, function () use ($limit) {
+            return Article::query()
+                ->listColumns()
+                ->published()
+                ->with(['category', 'author'])
+                ->popular()
+                ->limit($limit)
+                ->get();
+        });
 
         return $this->success(
             ArticleResource::collection($articles),
@@ -126,6 +135,7 @@ class ArticleController extends BaseController
 
     /**
      * Get recent articles.
+     * Cached for 5 minutes.
      *
      * @unauthenticated
      * @param Request $request
@@ -135,12 +145,15 @@ class ArticleController extends BaseController
     {
         $limit = min($request->get('limit', 5), 20);
 
-        $articles = Article::query()
-            ->published()
-            ->with(['category', 'author'])
-            ->recent()
-            ->limit($limit)
-            ->get();
+        $articles = Cache::remember("articles:recent:{$limit}", 300, function () use ($limit) {
+            return Article::query()
+                ->listColumns()
+                ->published()
+                ->with(['category', 'author'])
+                ->recent()
+                ->limit($limit)
+                ->get();
+        });
 
         return $this->success(
             ArticleResource::collection($articles),
@@ -155,7 +168,7 @@ class ArticleController extends BaseController
      * @param string $slug
      * @return JsonResponse
      */
-    public function show(string $slug): JsonResponse
+    public function show(string $slug, Request $request): JsonResponse
     {
         $article = Article::query()
             ->published()
@@ -167,19 +180,25 @@ class ArticleController extends BaseController
             return $this->notFound('Artikel tidak ditemukan');
         }
 
-        // Increment view count
-        $article->incrementViewCount();
+        // Throttled view count — max 1 increment per IP per article per 10 minutes
+        $cacheKey = "article_view:{$article->id}:" . $request->ip();
+        if (!Cache::has($cacheKey)) {
+            $article->incrementViewCount();
+            Cache::put($cacheKey, true, 600); // 10 minutes
+        }
 
-        // Get related articles
+        // Get related articles — optimized single query with limited tag matching
         $relatedArticles = Article::query()
+            ->listColumns()
             ->published()
             ->where('id', '!=', $article->id)
             ->where(function ($query) use ($article) {
                 $query->where('category_id', $article->category_id);
-                
-                // Also get articles with similar tags
+
+                // Match articles sharing ANY tag (single query, max 5 tags)
                 if ($article->tags && is_array($article->tags)) {
-                    foreach ($article->tags as $tag) {
+                    $tagsToMatch = array_slice($article->tags, 0, 5);
+                    foreach ($tagsToMatch as $tag) {
                         $query->orWhereJsonContains('tags', $tag);
                     }
                 }
@@ -209,6 +228,7 @@ class ArticleController extends BaseController
     public function byCategory(string $categorySlug, Request $request): JsonResponse
     {
         $query = Article::query()
+            ->listColumns()
             ->published()
             ->whereHas('category', function ($q) use ($categorySlug) {
                 $q->where('slug', $categorySlug);
@@ -236,6 +256,7 @@ class ArticleController extends BaseController
     public function byTag(string $tag, Request $request): JsonResponse
     {
         $query = Article::query()
+            ->listColumns()
             ->published()
             ->byTag($tag)
             ->with(['category', 'author'])

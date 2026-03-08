@@ -73,13 +73,26 @@ async function fetchArticles() {
 }
 
 // ─── Watchers ───
+const router = useRouter()
+
+function syncQueryParams() {
+  const query: Record<string, string> = {}
+  if (searchQuery.value.trim()) query.search = searchQuery.value.trim()
+  if (selectedCategory.value) query.category = selectedCategory.value
+  if (selectedTag.value) query.tag = selectedTag.value
+  if (currentPage.value > 1) query.page = String(currentPage.value)
+  router.replace({ query })
+}
+
 function resetAndFetch() {
   currentPage.value = 1
+  syncQueryParams()
   fetchArticles()
 }
 
 function goToPage(page: number) {
   currentPage.value = page
+  syncQueryParams()
   fetchArticles()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -99,6 +112,7 @@ onMounted(() => {
   if (route.query.category) selectedCategory.value = route.query.category as string
   if (route.query.tag) selectedTag.value = route.query.tag as string
   if (route.query.search) searchQuery.value = route.query.search as string
+  if (route.query.page) currentPage.value = Number(route.query.page) || 1
 
   fetchCategories()
   fetchArticles()
