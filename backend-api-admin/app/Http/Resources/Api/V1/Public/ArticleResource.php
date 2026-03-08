@@ -20,7 +20,7 @@ class ArticleResource extends JsonResource
             'slug' => $this->slug,
             'excerpt' => $this->excerpt ?? $this->getExcerpt(),
             'featured_image_url' => $this->featured_image_url ? asset('storage/' . $this->featured_image_url) : null,
-            'tags' => $this->tags ?? [],
+            'tags' => is_array($this->tags) ? $this->tags : (is_string($this->tags) && !empty($this->tags) ? array_map('trim', explode(',', $this->tags)) : []),
             'view_count' => $this->view_count ?? 0,
             'reading_time' => $this->getReadingTime(),
             'is_featured' => $this->is_featured,

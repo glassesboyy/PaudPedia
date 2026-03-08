@@ -102,5 +102,6 @@ export const API_ENDPOINTS = {
   // ── Categories ─────────────────────────────────────────
   CATEGORIES: {
     LIST: '/categories',
+    ARTICLES: '/categories/articles',
   },
 } as const

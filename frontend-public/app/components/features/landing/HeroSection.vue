@@ -73,19 +73,34 @@ function formatNumber(value: number | undefined): string {
       </div>
 
       <!-- Stats row (integrated) -->
-      <div class="mt-16 sm:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto animate-fade-in-up">
-        <div
-          v-for="item in statItems"
-          :key="item.key"
-          class="group text-center p-5 sm:p-6 rounded-2xl bg-surface/80 backdrop-blur-sm border border-border shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all duration-300"
-        >
-          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-primary-50 mb-3 group-hover:scale-110 transition-transform duration-300">
-            <Icon :name="item.icon" class="w-5 h-5 text-primary-600" />
+      <div class="mt-14 sm:mt-16 max-w-4xl mx-auto animate-fade-in-up">
+        <!-- Divider -->
+        <div class="flex items-center gap-4 mb-10">
+          <div class="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span class="text-xs text-muted/60 uppercase tracking-widest font-medium">Statistik Platform</span>
+          <div class="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4">
+          <div
+            v-for="(item, index) in statItems"
+            :key="item.key"
+            class="group flex items-center justify-center gap-3 py-4 sm:py-0"
+            :class="[
+              index !== 0 ? 'border-l border-border/40' : '',
+              index < 2 ? 'border-b sm:border-b-0 border-border/40' : '',
+            ]"
+          >
+            <div class="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-100 group-hover:scale-110 transition-all duration-200">
+              <Icon :name="item.icon" class="w-4.5 h-4.5 text-primary-600" />
+            </div>
+            <div>
+              <p class="text-xl sm:text-2xl font-bold text-heading tracking-tight leading-none">
+                {{ stats ? formatNumber(stats[item.key]) : '—' }}
+              </p>
+              <p class="text-xs text-muted font-medium mt-0.5">{{ item.label }}</p>
+            </div>
           </div>
-          <p class="text-2xl sm:text-3xl font-bold text-heading tracking-tight">
-            {{ stats ? formatNumber(stats[item.key]) : '—' }}
-          </p>
-          <p class="mt-1 text-xs sm:text-sm text-muted font-medium">{{ item.label }}</p>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@
  */
 
 // ── API Types ────────────────────────────────────────────
-export type { Article, ArticleListParams } from './api/article'
+export type { Article, ArticleAuthor, ArticleDetail, ArticleListParams, ArticleShowData } from './api/article'
 export type {
     AuthTokenResponse, ChangePasswordData, ForgotPasswordData, LoginCredentials, LoginResponse, RegisterData, ResetPasswordData, UpdateProfileData, User
 } from './api/auth'
