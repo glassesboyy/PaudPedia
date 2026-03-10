@@ -56,7 +56,7 @@ export const API_ENDPOINTS = {
   // ── Mentors ────────────────────────────────────────────
   MENTORS: {
     LIST: '/mentors',
-    DETAIL: (slug: string) => `/mentors/${slug}`,
+    DETAIL: (id: number) => `/mentors/${id}`,
     FEATURED: '/mentors/featured',
   },
 

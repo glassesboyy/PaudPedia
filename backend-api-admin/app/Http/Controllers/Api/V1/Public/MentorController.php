@@ -72,7 +72,7 @@ class MentorController extends BaseController
             ->where('id', $id)
             ->with([
                 'courses' => fn($q) => $q->published()->with(['category'])->limit(6),
-                'webinars' => fn($q) => $q->active()->upcoming()->limit(6),
+                'webinars' => fn($q) => $q->active()->orderByRaw('scheduled_at > NOW() DESC')->orderBy('scheduled_at', 'asc')->limit(6),
             ])
             ->withCount(['courses' => fn($q) => $q->published(), 'webinars' => fn($q) => $q->active()])
             ->first();

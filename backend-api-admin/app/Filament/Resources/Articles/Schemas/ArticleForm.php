@@ -107,8 +107,7 @@ class ArticleForm
                         TagsInput::make('tags')
                             ->label('Tags')
                             ->placeholder('Ketik dan tekan Enter')
-                            ->helperText('Tags membantu kategorisasi dan pencarian artikel')
-                            ->separator(','),
+                            ->helperText('Tags membantu kategorisasi dan pencarian artikel'),
                     ])
                     ->columns(1)
                     ->collapsible(),

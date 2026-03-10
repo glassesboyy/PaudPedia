@@ -171,21 +171,13 @@ function selectTag(tag: string) {
 <template>
   <div>
     <!-- Hero -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-primary-50 via-surface to-secondary-50/30">
-      <div class="container py-14 sm:py-20 text-center relative z-10">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100/60 border border-primary-200/50 mb-5">
-          <Icon name="lucide:newspaper" class="w-3.5 h-3.5 text-primary-500" />
-          <span class="text-xs font-medium text-primary-700">Artikel & Edukasi</span>
-        </div>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-heading leading-tight">Artikel</h1>
-        <p class="mt-4 text-base sm:text-lg text-body max-w-2xl mx-auto leading-relaxed">
-          Baca artikel edukasi seputar pendidikan anak usia dini dari para ahli dan praktisi.
-        </p>
-      </div>
-      <!-- Decorative -->
-      <div class="absolute top-1/3 left-[8%] w-20 h-20 rounded-full bg-primary-200/15 blur-2xl" />
-      <div class="absolute bottom-1/4 right-[8%] w-28 h-28 rounded-full bg-secondary-200/15 blur-2xl" />
-    </section>
+    <PageHero
+      badge="Artikel"
+      badge-icon="lucide:newspaper"
+      title="Artikel & Edukasi"
+      description="Baca artikel edukasi seputar pendidikan anak usia dini dari para ahli dan praktisi."
+      variant="gradient"
+    />
 
     <!-- Filters -->
     <section class="bg-surface border-b border-border/50 sticky top-0 z-40">

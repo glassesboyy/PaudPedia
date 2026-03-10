@@ -19,7 +19,7 @@ export type {
     ContactInfo, LandingPageData,
     PlatformStatistics, SiteSettings, SocialMedia
 } from './api/landing'
-export type { FeaturedMentor, Mentor, MentorListParams } from './api/mentor'
+export type { FeaturedMentor, Mentor, MentorCourse, MentorDetail, MentorListParams, MentorWebinar } from './api/mentor'
 export type { Order, OrderItem, OrderListParams, OrderStatus } from './api/order'
 export type { Product, ProductListParams } from './api/product'
 export type { Testimonial } from './api/testimonial'

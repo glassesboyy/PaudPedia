@@ -13,7 +13,7 @@ defineProps<{
 </script>
 
 <template>
-  <section class="relative w-full bg-surface overflow-hidden">
+  <section class="relative w-full bg-surface-muted overflow-hidden">
     <!-- Decorative background -->
     <div class="absolute top-0 left-[10%] w-64 h-64 rounded-full bg-warning-50/30 -translate-y-1/3" />
     <div class="absolute bottom-0 right-[10%] w-56 h-56 rounded-full bg-primary-50/30 translate-y-1/3" />

@@ -33,6 +33,7 @@ const navItems = [
   { label: 'Webinar', to: '/webinars' },
   { label: 'Artikel', to: '/articles' },
   { label: 'Produk', to: '/products' },
+  { label: 'Mentor', to: '/mentors' },
 ]
 
 async function handleLogout() {

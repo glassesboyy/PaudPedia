@@ -80,6 +80,12 @@ onMounted(async () => {
         :products="landingData.featured_products"
       />
 
+      <!-- FR-PP-04: Featured Articles -->
+      <FeaturedArticlesSection
+        v-if="landingData?.latest_articles?.length"
+        :articles="landingData.latest_articles"
+      />
+
       <!-- FR-PP-03: Testimonials -->
       <TestimonialsSection
         v-if="landingData?.testimonials?.length"

@@ -16,6 +16,7 @@ const footerLinks = {
     { label: 'Webinar', to: '/webinars' },
     { label: 'Artikel', to: '/articles' },
     { label: 'Produk', to: '/products' },
+    { label: 'Mentor', to: '/mentors' },
   ],
   company: [
     { label: 'Tentang Kami', to: '/about' },

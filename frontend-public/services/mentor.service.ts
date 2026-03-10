@@ -1,7 +1,7 @@
 /**
  * Mentor Service
  */
-import type { FeaturedMentor, Mentor, MentorListParams } from '~~/types'
+import type { Mentor, MentorDetail, MentorListParams } from '~~/types'
 import { useApiFetch } from './api/client'
 import { API_ENDPOINTS } from './api/endpoints'
 import type { ApiResponse, PaginatedResponse } from './api/types'
@@ -12,12 +12,12 @@ export const mentorService = {
     return apiFetch(API_ENDPOINTS.MENTORS.LIST, { params })
   },
 
-  async getBySlug(slug: string): Promise<ApiResponse<Mentor>> {
+  async getById(id: number): Promise<ApiResponse<MentorDetail>> {
     const apiFetch = useApiFetch()
-    return apiFetch(API_ENDPOINTS.MENTORS.DETAIL(slug))
+    return apiFetch(API_ENDPOINTS.MENTORS.DETAIL(id))
   },
 
-  async getFeatured(): Promise<ApiResponse<FeaturedMentor[]>> {
+  async getFeatured(): Promise<ApiResponse<Mentor[]>> {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.MENTORS.FEATURED)
   },
