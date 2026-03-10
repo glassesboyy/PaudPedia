@@ -16,4 +16,9 @@ export const categoryService = {
     const apiFetch = useApiFetch()
     return apiFetch(API_ENDPOINTS.CATEGORIES.ARTICLES)
   },
+
+  async getProductCategories(): Promise<ApiResponse<Category[]>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.CATEGORIES.PRODUCTS)
+  },
 }

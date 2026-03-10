@@ -50,13 +50,26 @@ class ProductController extends BaseController
             $query->where('price', 0);
         }
 
-        // Search by keyword
+        // Filter by file type (extension derived from file_url)
+        if ($request->filled('file_type')) {
+            $fileType = strtolower($request->file_type);
+            $query->where('file_url', 'like', "%.{$fileType}");
+        }
+
+        // Search by keyword — use FULLTEXT when available, fallback to LIKE
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
+            try {
+                $query->whereRaw(
+                    'MATCH(title, description) AGAINST(? IN BOOLEAN MODE)',
+                    [$search . '*']
+                );
+            } catch (\Exception $e) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            }
         }
 
         // Sorting

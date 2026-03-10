@@ -103,5 +103,6 @@ export const API_ENDPOINTS = {
   CATEGORIES: {
     LIST: '/categories',
     ARTICLES: '/categories/articles',
+    PRODUCTS: '/categories/products',
   },
 } as const
