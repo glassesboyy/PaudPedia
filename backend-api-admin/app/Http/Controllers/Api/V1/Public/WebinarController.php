@@ -9,6 +9,7 @@ use App\Http\Resources\Api\V1\Public\WebinarDetailResource;
 use App\Models\Webinar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class WebinarController extends BaseController
 {
@@ -22,6 +23,7 @@ class WebinarController extends BaseController
     public function index(Request $request): JsonResponse
     {
         $query = Webinar::query()
+            ->listColumns()
             ->active()
             ->with(['mentor']);
 
@@ -48,12 +50,12 @@ class WebinarController extends BaseController
             $query->where('price', 0);
         }
 
-        // Search by keyword
+        // Search by keyword — FULLTEXT with LIKE fallback
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $q->whereFullText(['title', 'description'], $search)
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
@@ -99,13 +101,16 @@ class WebinarController extends BaseController
     {
         $limit = min($request->get('limit', 6), 20);
 
-        $webinars = Webinar::query()
-            ->active()
-            ->upcoming()
-            ->with(['mentor'])
-            ->orderBy('scheduled_at', 'asc')
-            ->limit($limit)
-            ->get();
+        $webinars = Cache::remember("webinars:featured:{$limit}", 600, function () use ($limit) {
+            return Webinar::query()
+                ->listColumns()
+                ->active()
+                ->upcoming()
+                ->with(['mentor'])
+                ->orderBy('scheduled_at', 'asc')
+                ->limit($limit)
+                ->get();
+        });
 
         return $this->success(
             WebinarResource::collection($webinars),
@@ -150,6 +155,7 @@ class WebinarController extends BaseController
         $perPage = min($request->get('per_page', 12), 50);
 
         $webinars = Webinar::query()
+            ->listColumns()
             ->active()
             ->upcoming()
             ->with(['mentor'])

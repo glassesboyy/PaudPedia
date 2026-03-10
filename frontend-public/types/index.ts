@@ -23,7 +23,7 @@ export type { FeaturedMentor, Mentor, MentorCourse, MentorDetail, MentorListPara
 export type { Order, OrderItem, OrderListParams, OrderStatus } from './api/order'
 export type { Product, ProductListParams } from './api/product'
 export type { Testimonial } from './api/testimonial'
-export type { Webinar, WebinarListParams } from './api/webinar'
+export type { Webinar, WebinarDetail, WebinarListParams, WebinarMentor, WebinarMentorDetail } from './api/webinar'
 
 // ── Component Types ──────────────────────────────────────
 export type { SidebarSection } from './components/sidebar'

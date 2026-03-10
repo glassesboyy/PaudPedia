@@ -90,6 +90,20 @@ class Webinar extends Model
         return $query->where('scheduled_at', '<=', now());
     }
 
+    /**
+     * Select only the columns needed for list views.
+     * Excludes sensitive Zoom credentials not needed in public listings.
+     */
+    public function scopeListColumns($query)
+    {
+        return $query->select([
+            'id', 'mentor_id', 'title', 'slug', 'description',
+            'thumbnail_url', 'price', 'original_price',
+            'scheduled_at', 'duration_minutes', 'max_participants',
+            'is_active', 'created_at', 'updated_at', 'deleted_at',
+        ]);
+    }
+
     // Helper Methods
     public function isUpcoming(): bool
     {

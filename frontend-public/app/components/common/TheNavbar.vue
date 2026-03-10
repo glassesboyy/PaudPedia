@@ -30,9 +30,9 @@ const profileRef = ref<HTMLElement | null>(null)
 
 const navItems = [
   { label: 'Kursus', to: '/courses' },
+  { label: 'Produk', to: '/products' },
   { label: 'Webinar', to: '/webinars' },
   { label: 'Artikel', to: '/articles' },
-  { label: 'Produk', to: '/products' },
   { label: 'Mentor', to: '/mentors' },
 ]
 
