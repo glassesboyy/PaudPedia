@@ -130,45 +130,7 @@ const activeSocials = computed(() => {
 <template>
   <div>
     <!-- Loading -->
-    <div v-if="loading" class="min-h-[60vh]">
-      <!-- Hero skeleton -->
-      <div class="bg-gradient-to-br from-primary-100/60 via-surface to-secondary-100/50">
-        <div class="container py-12 sm:py-16">
-          <div class="flex flex-col md:flex-row gap-8 items-center md:items-start animate-pulse">
-            <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-muted/15 shrink-0" />
-            <div class="flex-1 text-center md:text-left space-y-3 w-full">
-              <div class="h-4 w-24 bg-muted/10 rounded-full mx-auto md:mx-0" />
-              <div class="h-8 w-3/4 bg-muted/10 rounded mx-auto md:mx-0" />
-              <div class="h-5 w-1/2 bg-muted/10 rounded mx-auto md:mx-0" />
-              <div class="flex gap-2 justify-center md:justify-start">
-                <div class="h-6 w-24 bg-muted/10 rounded-full" />
-                <div class="h-6 w-20 bg-muted/10 rounded-full" />
-              </div>
-              <div class="flex gap-4 justify-center md:justify-start">
-                <div class="h-5 w-20 bg-muted/10 rounded" />
-                <div class="h-5 w-20 bg-muted/10 rounded" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Body skeleton -->
-      <div class="container py-10">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-pulse">
-          <div class="lg:col-span-2 space-y-4">
-            <div class="h-6 w-32 bg-muted/10 rounded" />
-            <div class="h-4 w-full bg-muted/10 rounded" />
-            <div class="h-4 w-full bg-muted/10 rounded" />
-            <div class="h-4 w-3/4 bg-muted/10 rounded" />
-          </div>
-          <div class="space-y-4">
-            <div class="h-6 w-32 bg-muted/10 rounded" />
-            <div class="h-10 w-full bg-muted/10 rounded-xl" />
-            <div class="h-10 w-full bg-muted/10 rounded-xl" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <SkeletonDetailContent v-if="loading" variant="profile" />
 
     <!-- Error -->
     <div v-else-if="error || !mentor" class="min-h-[60vh] flex items-center justify-center">

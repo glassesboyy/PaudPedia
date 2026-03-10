@@ -170,15 +170,7 @@ onMounted(fetchMentors)
         </div>
 
         <!-- Loading skeleton -->
-        <div v-if="mentorsLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div v-for="i in 3" :key="i" class="p-6 rounded-2xl border border-border bg-surface animate-pulse">
-            <div class="w-20 h-20 rounded-2xl bg-muted/20 mx-auto mb-4" />
-            <div class="h-4 w-28 bg-muted/20 rounded mx-auto mb-2" />
-            <div class="h-3 w-20 bg-muted/20 rounded mx-auto mb-3" />
-            <div class="h-3 w-full bg-muted/20 rounded mb-1" />
-            <div class="h-3 w-3/4 bg-muted/20 rounded mx-auto" />
-          </div>
-        </div>
+        <SkeletonCardGrid v-if="mentorsLoading" :count="3" :columns="3" variant="profile" class="max-w-4xl mx-auto" />
 
         <!-- Error state -->
         <div v-else-if="mentorsError" class="text-center py-8">

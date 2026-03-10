@@ -272,31 +272,7 @@ function selectTag(tag: string) {
     <section class="bg-surface">
       <div class="container py-10 sm:py-14">
         <!-- Loading -->
-        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="i in 6"
-            :key="i"
-            class="rounded-2xl border border-border bg-surface overflow-hidden animate-pulse"
-          >
-            <div class="aspect-[16/10] bg-muted/10" />
-            <div class="p-5 space-y-3">
-              <div class="flex gap-1.5">
-                <div class="h-4 w-14 bg-muted/10 rounded-full" />
-                <div class="h-4 w-12 bg-muted/10 rounded-full" />
-              </div>
-              <div class="h-5 w-3/4 bg-muted/10 rounded" />
-              <div class="h-4 w-full bg-muted/10 rounded" />
-              <div class="h-4 w-2/3 bg-muted/10 rounded" />
-              <div class="pt-3 border-t border-border/40 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-muted/10" />
-                  <div class="h-3 w-20 bg-muted/10 rounded" />
-                </div>
-                <div class="h-3 w-12 bg-muted/10 rounded" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <SkeletonCardGrid v-if="loading" :count="6" :columns="3" variant="article" />
 
         <!-- Error -->
         <div v-else-if="error" class="text-center py-20">

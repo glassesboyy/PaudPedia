@@ -276,13 +276,7 @@ const infoCards = computed(() => {
 
         <!-- Loading skeleton -->
         <template v-if="loading">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div v-for="i in 4" :key="i" class="p-5 rounded-2xl border border-border bg-surface animate-pulse">
-              <div class="w-11 h-11 rounded-xl bg-muted/20 mb-3" />
-              <div class="h-3 w-16 bg-muted/20 rounded mb-2" />
-              <div class="h-4 w-28 bg-muted/20 rounded" />
-            </div>
-          </div>
+          <SkeletonCardGrid :count="4" :columns="4" variant="simple" class="max-w-4xl mx-auto" />
         </template>
 
         <!-- Error state -->

@@ -202,27 +202,7 @@ function clearAllFilters() {
     <section class="bg-surface">
       <div class="container py-10 sm:py-14">
         <!-- Loading skeletons -->
-        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div
-            v-for="i in 8"
-            :key="i"
-            class="rounded-2xl border border-border bg-surface p-6 animate-pulse"
-          >
-            <div class="w-20 h-20 rounded-2xl bg-muted/10 mx-auto mb-4" />
-            <div class="h-4 w-2/3 bg-muted/10 rounded mx-auto mb-2" />
-            <div class="h-3 w-1/2 bg-muted/10 rounded mx-auto mb-3" />
-            <div class="flex justify-center gap-1.5 mb-3">
-              <div class="h-5 w-16 bg-muted/10 rounded-full" />
-              <div class="h-5 w-14 bg-muted/10 rounded-full" />
-            </div>
-            <div class="h-3 w-full bg-muted/10 rounded mb-1" />
-            <div class="h-3 w-3/4 bg-muted/10 rounded mx-auto mb-3" />
-            <div class="flex justify-center gap-4">
-              <div class="h-3 w-16 bg-muted/10 rounded" />
-              <div class="h-3 w-16 bg-muted/10 rounded" />
-            </div>
-          </div>
-        </div>
+        <SkeletonCardGrid v-if="loading" :count="8" :columns="4" variant="profile" />
 
         <!-- Error -->
         <div v-else-if="error" class="text-center py-20">

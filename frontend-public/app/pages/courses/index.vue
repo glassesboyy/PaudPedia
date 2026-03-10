@@ -180,20 +180,7 @@ function clearFilters() {
     <section class="bg-surface">
       <div class="container py-10 sm:py-14">
         <!-- Loading -->
-        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="i in 6"
-            :key="i"
-            class="rounded-2xl border border-border bg-surface overflow-hidden animate-pulse"
-          >
-            <div class="aspect-video bg-muted/10" />
-            <div class="p-4 space-y-3">
-              <div class="h-3 w-16 bg-muted/10 rounded" />
-              <div class="h-4 w-3/4 bg-muted/10 rounded" />
-              <div class="h-3 w-1/2 bg-muted/10 rounded" />
-            </div>
-          </div>
-        </div>
+        <SkeletonCardGrid v-if="loading" :count="6" :columns="3" variant="media" />
 
         <!-- Error -->
         <div v-else-if="error" class="text-center py-14">

@@ -113,30 +113,7 @@ const sanitizedContent = computed(() => {
 <template>
   <div>
     <!-- Loading State -->
-    <div v-if="loading" class="bg-surface">
-      <div class="container py-10">
-        <div class="max-w-3xl mx-auto animate-pulse">
-          <div class="h-4 w-32 bg-muted/10 rounded mb-6" />
-          <div class="h-8 w-3/4 bg-muted/10 rounded mb-4" />
-          <div class="h-6 w-1/2 bg-muted/10 rounded mb-8" />
-          <div class="flex items-center gap-3 mb-8">
-            <div class="w-10 h-10 rounded-full bg-muted/10" />
-            <div>
-              <div class="h-4 w-24 bg-muted/10 rounded mb-1" />
-              <div class="h-3 w-32 bg-muted/10 rounded" />
-            </div>
-          </div>
-          <div class="aspect-[2/1] rounded-2xl bg-muted/10 mb-8" />
-          <div class="space-y-4">
-            <div class="h-4 w-full bg-muted/10 rounded" />
-            <div class="h-4 w-full bg-muted/10 rounded" />
-            <div class="h-4 w-5/6 bg-muted/10 rounded" />
-            <div class="h-4 w-full bg-muted/10 rounded" />
-            <div class="h-4 w-3/4 bg-muted/10 rounded" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <SkeletonDetailContent v-if="loading" variant="article" />
 
     <!-- Error State -->
     <div v-else-if="error" class="bg-surface">
