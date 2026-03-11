@@ -278,18 +278,6 @@ const isHtmlDescription = computed(() => {
                     </div>
                   </div>
                 </div>
-
-                <!-- Actions -->
-                <div class="flex items-center gap-3">
-                  <button
-                    type="button"
-                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-border text-xs font-medium text-body hover:border-primary-300 hover:text-primary-600 transition-all"
-                    @click="shareProduct"
-                  >
-                    <Icon name="lucide:share-2" class="w-4 h-4" />
-                    Bagikan
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -299,7 +287,7 @@ const isHtmlDescription = computed(() => {
       <!-- Product Description -->
       <section class="bg-surface">
         <div class="container py-8 sm:py-12">
-          <div class="max-w-3xl mx-auto">
+          <div class="max-w-5xl mx-auto">
             <!-- Section heading -->
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-border/40">
               <div class="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">

@@ -56,20 +56,13 @@ class ProductController extends BaseController
             $query->where('file_url', 'like', "%.{$fileType}");
         }
 
-        // Search by keyword — use FULLTEXT when available, fallback to LIKE
+        // Search by keyword — FULLTEXT + LIKE fallback (same pattern as articles/webinars)
         if ($request->filled('search')) {
             $search = $request->search;
-            try {
-                $query->whereRaw(
-                    'MATCH(title, description) AGAINST(? IN BOOLEAN MODE)',
-                    [$search . '*']
-                );
-            } catch (\Exception $e) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                });
-            }
+            $query->where(function ($q) use ($search) {
+                $q->whereFullText(['title', 'description'], $search)
+                    ->orWhere('title', 'like', "%{$search}%");
+            });
         }
 
         // Sorting

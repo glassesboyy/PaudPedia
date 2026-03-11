@@ -56,12 +56,12 @@ class CourseController extends BaseController
             $query->where('price', 0);
         }
 
-        // Search by keyword
+        // Search by keyword (FULLTEXT with LIKE fallback)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $q->whereFullText(['title', 'description'], $search)
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 

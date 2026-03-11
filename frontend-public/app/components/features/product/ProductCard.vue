@@ -75,10 +75,17 @@ function formatPrice(price: number): string {
         <!-- File info -->
         <div class="flex items-center gap-2 text-xs text-muted min-w-0">
           <span
+            v-if="product.file_info?.type"
+            class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary-50 text-primary-600 font-semibold text-[10px] uppercase shrink-0"
+          >
+            <Icon name="lucide:file" class="w-3 h-3" />
+            {{ product.file_info.type }}
+          </span>
+          <span
             v-if="product.file_info?.size_formatted"
             class="inline-flex items-center gap-1 shrink-0"
           >
-            <Icon name="lucide:hard-drive" class="w-3.5 h-3.5" />
+            <Icon name="lucide:hard-drive" class="w-3 h-3" />
             {{ product.file_info.size_formatted }}
           </span>
         </div>
