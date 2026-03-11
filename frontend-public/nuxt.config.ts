@@ -25,6 +25,9 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api/v1',
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'PaudPedia',
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID || '',
+      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
+      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || '',
     },
   },
 
