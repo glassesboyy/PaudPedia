@@ -24,4 +24,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // Auth routes (register, login, logout, password reset, etc.)
     require __DIR__ . '/api/v1/auth.php';
+
+    // User dashboard routes (authenticated)
+    require __DIR__ . '/api/v1/user.php';
 });

@@ -16,6 +16,11 @@ export type { Category, PaginationParams } from './api/common'
 export type { ContactFormData, ContactPageInfo } from './api/contact'
 export type { Course, CourseDetail, CourseListParams, CourseMentor, CourseMentorDetail, Lesson, Module } from './api/course'
 export type {
+    Transaction, TransactionItem, UserCertificate, UserCourse,
+    UserCourseMentor, UserProduct, UserProductFileInfo,
+    UserWebinar, UserWebinarMentor
+} from './api/dashboard'
+export type {
     ContactInfo, LandingArticle, LandingCourse, LandingPageData, LandingProduct,
     LandingTestimonial, LandingWebinar,
     PlatformStatistics, SiteSettings, SocialMedia

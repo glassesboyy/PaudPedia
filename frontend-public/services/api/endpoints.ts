@@ -75,6 +75,17 @@ export const API_ENDPOINTS = {
     CREATE: '/orders',
   },
 
+  // ── User Dashboard ─────────────────────────────────────
+  USER: {
+    COURSES: '/user/courses',
+    PRODUCTS: '/user/products',
+    PRODUCT_DOWNLOAD: (id: number) => `/user/products/${id}/download`,
+    WEBINARS: '/user/webinars',
+    CERTIFICATES: '/user/certificates',
+    TRANSACTIONS: '/user/transactions',
+    TRANSACTION_DETAIL: (id: number) => `/user/transactions/${id}`,
+  },
+
   // ── Landing ────────────────────────────────────────────
   LANDING: {
     INDEX: '/landing',

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +32,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // ── Morph Map: maps short strings stored in order_items.item_type to models
+        Relation::morphMap([
+            'course'  => \App\Models\Course::class,
+            'product' => \App\Models\Product::class,
+            'webinar' => \App\Models\Webinar::class,
+        ]);
         // ── Password Reset: generate frontend URLs ────────────────
         // Build the reset URL pointing to the frontend app so the
         // notification email contains a link the SPA can handle.
