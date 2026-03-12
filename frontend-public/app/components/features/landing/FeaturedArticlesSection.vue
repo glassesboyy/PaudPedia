@@ -5,10 +5,10 @@
  * Receives article data via props from the parent landing page.
  * Uses design system tokens exclusively.
  */
-import type { Article } from '~~/types';
+import type { LandingArticle } from '~~/types';
 
 defineProps<{
-  articles: Article[]
+  articles: LandingArticle[]
 }>()
 </script>
 

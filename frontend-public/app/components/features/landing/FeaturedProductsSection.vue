@@ -5,10 +5,10 @@
  * Receives product data via props from the parent landing page.
  * Uses design system tokens exclusively.
  */
-import type { Product } from '~~/types';
+import type { LandingProduct } from '~~/types';
 
 defineProps<{
-  products: Product[]
+  products: LandingProduct[]
 }>()
 </script>
 

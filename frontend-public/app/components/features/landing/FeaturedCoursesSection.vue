@@ -5,10 +5,10 @@
  * Receives course data via props from the parent landing page.
  * Uses design system tokens exclusively.
  */
-import type { Course } from '~~/types';
+import type { LandingCourse } from '~~/types';
 
 defineProps<{
-  courses: Course[]
+  courses: LandingCourse[]
 }>()
 </script>
 

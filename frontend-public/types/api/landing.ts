@@ -1,13 +1,13 @@
 /**
  * Landing Page Types
  *
- * Matches the response structure from GET /api/v1/landing.
+ * Matches the optimized response structure from GET /api/v1/landing.
+ * Uses landing-specific types that contain only fields rendered on the landing page.
  */
-import type { Article } from './article'
-import type { Course } from './course'
-import type { Product } from './product'
-import type { Testimonial } from './testimonial'
-import type { Webinar } from './webinar'
+import type { Category } from './common'
+import type { CourseMentor } from './course'
+import type { ProductFileInfo } from './product'
+import type { WebinarMentor } from './webinar'
 
 export interface ContactInfo {
   email: string | null
@@ -34,22 +34,98 @@ export interface SiteSettings {
   social_media: SocialMedia
 }
 
+/** Only the 4 stats shown in HeroSection */
 export interface PlatformStatistics {
-  total_schools: number
   total_users: number
   total_courses: number
   total_webinars: number
-  total_products: number
   total_articles: number
-  total_enrollments: number
+}
+
+// ── Landing-specific item types ──────────────────────────
+// These contain only the fields returned by the landing endpoint.
+// The full Course/Webinar/etc. types remain for list & detail pages.
+
+export interface LandingCourse {
+  id: number
+  title: string
+  slug: string
+  description: string | null
+  thumbnail_url: string | null
+  price: number
+  original_price: number | null
+  has_discount: boolean
+  discount_percentage: number | null
+  level: 'beginner' | 'intermediate' | 'advanced' | null
+  level_label: string | null
+  duration_hours: number | null
+  modules_count: number
+  mentor: CourseMentor | null
+  category: Pick<Category, 'id' | 'name'> | null
+}
+
+export interface LandingWebinar {
+  id: number
+  title: string
+  slug: string
+  description: string | null
+  thumbnail_url: string | null
+  price: number
+  original_price: number | null
+  has_discount: boolean
+  discount_percentage: number | null
+  scheduled_date: string | null
+  scheduled_time: string | null
+  duration_minutes: number | null
+  max_participants: number | null
+  is_upcoming: boolean
+  mentor: WebinarMentor | null
+}
+
+export interface LandingProduct {
+  id: number
+  title: string
+  slug: string
+  description: string | null
+  thumbnail_url: string | null
+  price: number
+  original_price: number | null
+  has_discount: boolean
+  discount_percentage: number | null
+  file_info: ProductFileInfo | null
+  category: Pick<Category, 'id' | 'name'> | null
+}
+
+export interface LandingTestimonial {
+  id: number
+  name: string
+  title: string
+  content: string
+  rating: number
+  photo_url: string | null
+}
+
+export interface LandingArticle {
+  id: number
+  title: string
+  slug: string
+  excerpt: string
+  featured_image_url: string | null
+  tags: string[]
+  reading_time: number
+  is_featured: boolean
+  author: { id: number; name: string }
+  category: Pick<Category, 'id' | 'name'>
+  published_at: string
+  published_date: string
 }
 
 export interface LandingPageData {
   settings: SiteSettings
   statistics: PlatformStatistics
-  featured_courses: Course[]
-  featured_webinars: Webinar[]
-  featured_products: Product[]
-  testimonials: Testimonial[]
-  latest_articles: Article[]
+  featured_courses: LandingCourse[]
+  featured_webinars: LandingWebinar[]
+  featured_products: LandingProduct[]
+  testimonials: LandingTestimonial[]
+  latest_articles: LandingArticle[]
 }

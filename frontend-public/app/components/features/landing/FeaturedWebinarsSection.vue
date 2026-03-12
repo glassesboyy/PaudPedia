@@ -5,10 +5,10 @@
  * Receives webinar data via props from the parent landing page.
  * Uses design system tokens exclusively.
  */
-import type { Webinar } from '~~/types';
+import type { LandingWebinar } from '~~/types';
 
 defineProps<{
-  webinars: Webinar[]
+  webinars: LandingWebinar[]
 }>()
 </script>
 

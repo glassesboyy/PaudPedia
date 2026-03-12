@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Api\V1\Public;
 
 use App\Http\Controllers\Api\V1\BaseController;
-use App\Http\Resources\Api\V1\Public\ArticleResource;
-use App\Http\Resources\Api\V1\Public\CourseResource;
-use App\Http\Resources\Api\V1\Public\ProductResource;
-use App\Http\Resources\Api\V1\Public\TestimonialResource;
-use App\Http\Resources\Api\V1\Public\WebinarResource;
+use App\Http\Resources\Api\V1\Public\Landing\LandingArticleResource;
+use App\Http\Resources\Api\V1\Public\Landing\LandingCourseResource;
+use App\Http\Resources\Api\V1\Public\Landing\LandingProductResource;
+use App\Http\Resources\Api\V1\Public\Landing\LandingTestimonialResource;
+use App\Http\Resources\Api\V1\Public\Landing\LandingWebinarResource;
 use App\Models\Article;
 use App\Models\Course;
-use App\Models\CourseEnrollment;
 use App\Models\Product;
-use App\Models\School;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\Webinar;
@@ -124,13 +122,10 @@ class LandingPageController extends BaseController
     protected function getStatistics(): array
     {
         return [
-            'total_schools' => School::count(),
             'total_users' => User::count(),
             'total_courses' => Course::published()->count(),
             'total_webinars' => Webinar::active()->count(),
-            'total_products' => Product::active()->count(),
             'total_articles' => Article::published()->count(),
-            'total_enrollments' => CourseEnrollment::count(),
         ];
     }
 
@@ -149,7 +144,7 @@ class LandingPageController extends BaseController
             ->limit(6)
             ->get();
 
-        return CourseResource::collection($courses)->resolve();
+        return LandingCourseResource::collection($courses)->resolve();
     }
 
     /**
@@ -167,7 +162,7 @@ class LandingPageController extends BaseController
             ->limit(4)
             ->get();
 
-        return WebinarResource::collection($webinars)->resolve();
+        return LandingWebinarResource::collection($webinars)->resolve();
     }
 
     /**
@@ -184,7 +179,7 @@ class LandingPageController extends BaseController
             ->limit(6)
             ->get();
 
-        return ProductResource::collection($products)->resolve();
+        return LandingProductResource::collection($products)->resolve();
     }
 
     /**
@@ -203,7 +198,7 @@ class LandingPageController extends BaseController
             ->limit(6)
             ->get();
 
-        return TestimonialResource::collection($testimonials)->resolve();
+        return LandingTestimonialResource::collection($testimonials)->resolve();
     }
 
     /**
@@ -220,6 +215,6 @@ class LandingPageController extends BaseController
             ->limit(4)
             ->get();
 
-        return ArticleResource::collection($articles)->resolve();
+        return LandingArticleResource::collection($articles)->resolve();
     }
 }

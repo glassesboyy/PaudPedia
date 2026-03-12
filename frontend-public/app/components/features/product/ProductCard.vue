@@ -5,10 +5,10 @@
  * Displays thumbnail, title, category, file info, price with discount.
  * Uses design system tokens exclusively.
  */
-import type { Product } from '~~/types';
+import type { LandingProduct, Product } from '~~/types';
 
 defineProps<{
-  product: Product
+  product: Product | LandingProduct
 }>()
 
 function formatPrice(price: number): string {

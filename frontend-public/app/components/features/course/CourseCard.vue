@@ -5,10 +5,10 @@
  * Displays thumbnail, title, mentor, price, level, duration, and discount info.
  * Uses design system tokens exclusively.
  */
-import type { Course } from '~~/types';
+import type { Course, LandingCourse } from '~~/types';
 
 defineProps<{
-  course: Course
+  course: Course | LandingCourse
 }>()
 
 const levelLabels: Record<string, string> = {
@@ -77,6 +77,11 @@ function formatPrice(price: number): string {
       <h3 class="text-sm font-semibold text-heading line-clamp-2 mb-2 group-hover:text-primary-600 transition-colors leading-snug">
         {{ course.title }}
       </h3>
+
+      <!-- Description excerpt -->
+      <p v-if="course.description" class="text-xs text-body/70 line-clamp-2 mb-2 leading-relaxed">
+        {{ course.description }}
+      </p>
 
       <!-- Mentor -->
       <div v-if="course.mentor" class="flex items-center gap-2 mb-3">

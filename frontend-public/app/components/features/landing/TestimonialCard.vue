@@ -5,10 +5,10 @@
  * Shows rating stars, testimonial content, author name and title.
  * Uses design system tokens exclusively.
  */
-import type { Testimonial } from '~~/types';
+import type { LandingTestimonial } from '~~/types';
 
 defineProps<{
-  testimonial: Testimonial
+  testimonial: LandingTestimonial
 }>()
 </script>
 

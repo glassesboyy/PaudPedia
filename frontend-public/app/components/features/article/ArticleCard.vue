@@ -5,10 +5,10 @@
  * Displays featured image, category badge, title, excerpt, author, date, reading time.
  * Uses design system tokens exclusively.
  */
-import type { Article } from '~~/types';
+import type { Article, LandingArticle } from '~~/types';
 
 defineProps<{
-  article: Article
+  article: Article | LandingArticle
 }>()
 
 function formatDate(dateStr: string): string {

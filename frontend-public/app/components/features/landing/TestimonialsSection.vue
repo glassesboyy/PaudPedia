@@ -5,10 +5,10 @@
  * Receives testimonial data via props from the parent landing page.
  * Uses design system tokens exclusively.
  */
-import type { Testimonial } from '~~/types';
+import type { LandingTestimonial } from '~~/types';
 
 defineProps<{
-  testimonials: Testimonial[]
+  testimonials: LandingTestimonial[]
 }>()
 </script>
 

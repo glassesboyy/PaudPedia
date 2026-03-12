@@ -5,10 +5,10 @@
  * Displays thumbnail, title, mentor, date, time, duration, price, discount.
  * Uses design system tokens exclusively.
  */
-import type { Webinar } from '~~/types';
+import type { LandingWebinar, Webinar } from '~~/types';
 
 defineProps<{
-  webinar: Webinar
+  webinar: Webinar | LandingWebinar
 }>()
 
 function formatPrice(price: number): string {
