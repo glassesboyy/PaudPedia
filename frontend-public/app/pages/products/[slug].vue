@@ -12,6 +12,22 @@ import type { Product, ProductDetail } from '~~/types'
 const route = useRoute()
 const slug = route.params.slug as string
 
+// ─── Cart ───
+const { addToCart, hasItem } = useCart()
+const isInCart = computed(() => product.value ? hasItem(product.value.id, 'product') : false)
+
+function handleAddToCart() {
+  if (!product.value || isInCart.value) return
+  addToCart({
+    id: product.value.id,
+    type: 'product',
+    name: product.value.title,
+    slug: product.value.slug,
+    price: product.value.price,
+    thumbnail: product.value.thumbnail_url || '',
+  })
+}
+
 // ─── State ───
 const product = ref<ProductDetail | null>(null)
 const relatedProducts = ref<Product[]>([])
@@ -277,6 +293,30 @@ const isHtmlDescription = computed(() => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <!-- Add to cart button -->
+                <div v-if="product.price > 0" class="mt-6">
+                  <button
+                    type="button"
+                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                    :class="isInCart
+                      ? 'bg-success-50 text-success-700 border border-success-200 cursor-default'
+                      : 'bg-primary-600 text-white hover:bg-primary-700'"
+                    :disabled="isInCart"
+                    @click="handleAddToCart"
+                  >
+                    <Icon :name="isInCart ? 'lucide:check-circle' : 'lucide:shopping-cart'" class="w-4 h-4" />
+                    {{ isInCart ? 'Sudah di Keranjang' : 'Tambah ke Keranjang' }}
+                  </button>
+                  <NuxtLink
+                    v-if="isInCart"
+                    to="/cart"
+                    class="mt-2 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-xs font-medium text-body hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50/50 transition-all"
+                  >
+                    <Icon name="lucide:arrow-right" class="w-3.5 h-3.5" />
+                    Lihat Keranjang
+                  </NuxtLink>
                 </div>
               </div>
             </div>

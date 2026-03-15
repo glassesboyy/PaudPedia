@@ -62,10 +62,12 @@ export const API_ENDPOINTS = {
 
   // ── Cart ───────────────────────────────────────────────
   CART: {
-    GET: '/cart',
-    ADD: '/cart/items',
-    REMOVE: (itemId: number) => `/cart/items/${itemId}`,
-    VALIDATE_PROMO: '/cart/validate-promo',
+    VALIDATE_PROMO: '/user/cart/validate-promo',
+  },
+
+  // ── Checkout ──────────────────────────────────────────
+  CHECKOUT: {
+    CREATE: '/user/checkout',
   },
 
   // ── Orders ─────────────────────────────────────────────

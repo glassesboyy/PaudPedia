@@ -27,4 +27,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // User dashboard routes (authenticated)
     require __DIR__ . '/api/v1/user.php';
+
+    // Webhook routes (no authentication — called by payment gateway)
+    Route::prefix('webhooks')->name('webhooks.')->group(function () {
+        Route::post('/midtrans', [\App\Http\Controllers\Api\V1\Webhook\MidtransController::class, 'handle'])
+            ->name('midtrans');
+    });
 });

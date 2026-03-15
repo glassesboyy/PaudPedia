@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<{
 })
 
 const { user, isAuthenticated, isLoading, userName, logout } = useAuth()
+const { itemCount } = useCart()
 import { useSiteSettingsStore } from '~~/stores/siteSettings';
 const siteSettings = useSiteSettingsStore()
 
@@ -89,6 +90,20 @@ onUnmounted(() => {
 
       <!-- Right side -->
       <div class="flex items-center gap-2">
+        <!-- Cart icon -->
+        <NuxtLink
+          to="/cart"
+          class="relative p-2 text-body hover:text-foreground rounded-lg hover:bg-surface-muted transition-colors"
+        >
+          <Icon name="lucide:shopping-cart" class="w-5 h-5" />
+          <span
+            v-if="itemCount > 0"
+            class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-danger-500 text-white text-[10px] font-bold px-1"
+          >
+            {{ itemCount > 99 ? '99+' : itemCount }}
+          </span>
+        </NuxtLink>
+
         <!-- Desktop auth area -->
         <div class="hidden md:flex items-center gap-2">
           <!-- Loading skeleton -->

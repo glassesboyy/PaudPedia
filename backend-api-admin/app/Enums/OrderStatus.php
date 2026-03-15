@@ -48,6 +48,7 @@ enum OrderStatus: string
             self::PAID => 'check-circle',
             self::FAILED => 'x-circle',
             self::CANCELLED => 'slash-circle',
+            self::EXPIRED => 'calendar-x',
         };
     }
 
@@ -56,7 +57,7 @@ enum OrderStatus: string
      */
     public function isFinal(): bool
     {
-        return in_array($this, [self::PAID, self::FAILED, self::CANCELLED]);
+        return in_array($this, [self::PAID, self::FAILED, self::CANCELLED, self::EXPIRED]);
     }
 
     /**
@@ -89,10 +90,11 @@ enum OrderStatus: string
     public function nextStatuses(): array
     {
         return match($this) {
-            self::PENDING => [self::PAID, self::FAILED, self::CANCELLED],
+            self::PENDING => [self::PAID, self::FAILED, self::CANCELLED, self::EXPIRED],
             self::PAID => [],
             self::FAILED => [],
             self::CANCELLED => [],
+            self::EXPIRED => [],
         };
     }
 

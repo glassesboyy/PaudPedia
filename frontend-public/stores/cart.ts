@@ -26,10 +26,15 @@ export const useCartStore = defineStore('cart', {
       state.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
 
     total(): number {
-      return this.subtotal - this.discount
+      return Math.max(0, this.subtotal - this.discount)
     },
 
     isEmpty: (state): boolean => state.items.length === 0,
+
+    hasItem: (state) => {
+      return (itemId: number, itemType: string): boolean =>
+        state.items.some((i) => i.id === itemId && i.type === itemType)
+    },
   },
 
   actions: {
@@ -51,6 +56,27 @@ export const useCartStore = defineStore('cart', {
       if (index > -1) {
         this.items.splice(index, 1)
       }
+    },
+
+    updateQuantity(itemId: number, itemType: string, quantity: number) {
+      const item = this.items.find(
+        (i) => i.id === itemId && i.type === itemType,
+      )
+      if (item) {
+        if (quantity <= 0) {
+          this.removeItem(itemId, itemType)
+        } else {
+          item.quantity = quantity
+        }
+      }
+    },
+
+    setPromo(code: string | null) {
+      this.promoCode = code
+    },
+
+    setDiscount(amount: number) {
+      this.discount = amount
     },
 
     clearCart() {

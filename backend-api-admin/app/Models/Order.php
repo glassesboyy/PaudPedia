@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -106,18 +105,12 @@ class Order extends Model
 
     public function isExpired(): bool
     {
-        return $this->status === OrderStatus::EXPIRED || 
-               ($this->expired_at && $this->expired_at->isPast());
+        return $this->status === OrderStatus::EXPIRED;
     }
 
     public function markAsPaid(): void
     {
-        $this->status = OrderStatus::PAID;
-        $this->payment_status = PaymentStatus::PAID;
-        $this->paid_at = now();
-        $this->save();
-
-        // TODO: Process order (create enrollments, send notifications, etc.)
+        app(\App\Services\Api\OrderProcessingService::class)->processSuccessfulPayment($this);
     }
 
     public function markAsCancelled(): void

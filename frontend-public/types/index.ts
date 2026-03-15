@@ -26,7 +26,7 @@ export type {
     PlatformStatistics, SiteSettings, SocialMedia
 } from './api/landing'
 export type { FeaturedMentor, Mentor, MentorCourse, MentorDetail, MentorListParams, MentorWebinar } from './api/mentor'
-export type { Order, OrderItem, OrderListParams, OrderStatus } from './api/order'
+export type { Order, OrderItem, OrderListParams, OrderStatus, CheckoutResponse, CheckoutOrder, CheckoutOrderItem, PromoValidationResponse } from './api/order'
 export type { Product, ProductDetail, ProductFileInfo, ProductListParams } from './api/product'
 export type { Testimonial } from './api/testimonial'
 export type { Webinar, WebinarDetail, WebinarListParams, WebinarMentor, WebinarMentorDetail } from './api/webinar'

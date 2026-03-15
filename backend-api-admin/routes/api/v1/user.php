@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Auth\CartController;
+use App\Http\Controllers\Api\V1\Auth\CheckoutController;
 use App\Http\Controllers\Api\V1\Auth\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,4 +34,10 @@ Route::prefix('user')->name('user.')->middleware('auth:sanctum')->group(function
     // Transaction History (FR-UA-12)
     Route::get('/transactions', [UserDashboardController::class, 'transactions'])->name('transactions');
     Route::get('/transactions/{id}', [UserDashboardController::class, 'transactionDetail'])->name('transactions.show');
+
+    // Cart — Promo Code Validation (FR-EC-06)
+    Route::post('/cart/validate-promo', [CartController::class, 'validatePromo'])->name('cart.validate-promo');
+
+    // Checkout — Create Order + Midtrans Snap (FR-EC-05)
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout');
 });
