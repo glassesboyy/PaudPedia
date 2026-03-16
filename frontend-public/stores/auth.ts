@@ -87,6 +87,9 @@ export const useAuthStore = defineStore('auth', () => {
       await authService.logout()
     } finally {
       clearAuth()
+      // Clear cart data so next user doesn't inherit items
+      const { useCartStore } = await import('~~/stores/cart')
+      useCartStore().clearCart()
     }
   }
 

@@ -7,7 +7,6 @@ use App\Enums\OrderStatus;
 use App\Mail\OrderPaidMail;
 use App\Models\CourseEnrollment;
 use App\Models\Order;
-use App\Models\PromoCode;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -31,7 +30,9 @@ class OrderProcessingService
             $order->loadMissing('items');
 
             foreach ($order->items as $item) {
-                $type = OrderItemType::from($item->item_type);
+                $type = $item->item_type instanceof OrderItemType
+                    ? $item->item_type
+                    : OrderItemType::from($item->item_type);
 
                 if ($type->requiresEnrollment()) {
                     $this->createCourseEnrollment($order->user_id, $item->item_id);

@@ -2,6 +2,7 @@
 
 namespace App\Services\Api;
 
+use App\Enums\OrderItemType;
 use App\Models\Order;
 use Midtrans\Config;
 use Midtrans\Notification;
@@ -25,8 +26,12 @@ class MidtransService
         $order->loadMissing(['items', 'user']);
 
         $itemDetails = $order->items->map(function ($item) {
+            $type = $item->item_type instanceof OrderItemType
+                ? $item->item_type->value
+                : (string) $item->item_type;
+
             return [
-                'id'       => $item->item_type . '-' . $item->item_id,
+                'id'       => $type . '-' . $item->item_id,
                 'price'    => (int) $item->item_price,
                 'quantity' => $item->quantity,
                 'name'     => mb_substr($item->item_title, 0, 50),

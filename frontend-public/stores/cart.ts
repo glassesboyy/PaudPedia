@@ -2,6 +2,7 @@
  * Cart Store
  *
  * Client-side cart state. Persisted to localStorage.
+ * Cart data is scoped per user — switching accounts clears stale data.
  */
 import { defineStore } from 'pinia'
 import type { CartItem } from '~~/types'
@@ -10,6 +11,8 @@ interface CartState {
   items: CartItem[]
   promoCode: string | null
   discount: number
+  /** ID of the user who owns this cart. Used to prevent data leaking between accounts. */
+  ownerId: number | null
 }
 
 export const useCartStore = defineStore('cart', {
@@ -17,6 +20,7 @@ export const useCartStore = defineStore('cart', {
     items: [],
     promoCode: null,
     discount: 0,
+    ownerId: null,
   }),
 
   getters: {
@@ -38,6 +42,19 @@ export const useCartStore = defineStore('cart', {
   },
 
   actions: {
+    /**
+     * Ensure the cart belongs to the given user.
+     * If the stored ownerId differs, the cart is cleared first.
+     */
+    ensureOwner(userId: number) {
+      if (this.ownerId !== userId) {
+        this.items = []
+        this.promoCode = null
+        this.discount = 0
+        this.ownerId = userId
+      }
+    },
+
     addItem(item: Omit<CartItem, 'quantity'>) {
       const existing = this.items.find(
         (i) => i.id === item.id && i.type === item.type,
@@ -83,6 +100,7 @@ export const useCartStore = defineStore('cart', {
       this.items = []
       this.promoCode = null
       this.discount = 0
+      this.ownerId = null
     },
   },
 

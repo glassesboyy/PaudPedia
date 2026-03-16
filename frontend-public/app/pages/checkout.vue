@@ -38,13 +38,21 @@ onMounted(() => {
 async function handlePayment() {
   await processCheckout()
 }
+
+function formatPrice(price: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(price)
+}
 </script>
 
 <template>
-  <div class="bg-gradient-to-b from-surface to-primary-50/10 min-h-[60vh]">
-    <div class="container py-8 sm:py-10 max-w-4xl">
+  <div class="bg-gradient-to-b from-surface via-surface to-primary-50/10 min-h-[60vh]">
+    <div class="container py-8 sm:py-12 max-w-5xl">
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-xs text-muted mb-6">
+      <nav class="flex items-center gap-2 text-xs text-muted mb-8">
         <NuxtLink to="/" class="hover:text-primary-600 transition-colors">Beranda</NuxtLink>
         <Icon name="lucide:chevron-right" class="w-3 h-3" />
         <NuxtLink to="/cart" class="hover:text-primary-600 transition-colors">Keranjang</NuxtLink>
@@ -52,14 +60,34 @@ async function handlePayment() {
         <span class="text-primary-600 font-medium">Checkout</span>
       </nav>
 
-      <!-- Page header -->
-      <div class="flex items-center gap-3 mb-8">
-        <div class="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-          <Icon name="lucide:credit-card" class="w-5 h-5 text-primary-600" />
+      <!-- Page header with step indicator -->
+      <div class="flex items-center justify-between mb-8 pb-6 border-b border-border/50">
+        <div class="flex items-center gap-4">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <Icon name="lucide:credit-card" class="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-heading tracking-tight">Checkout</h1>
+            <p class="text-sm text-muted mt-0.5">Periksa pesanan Anda sebelum melakukan pembayaran</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-heading">Checkout</h1>
-          <p class="text-sm text-muted">Periksa pesanan Anda sebelum melakukan pembayaran</p>
+
+        <!-- Step indicator (desktop) -->
+        <div class="hidden sm:flex items-center gap-2 text-xs">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success-50 text-success-700 font-medium">
+            <Icon name="lucide:check" class="w-3.5 h-3.5" />
+            Keranjang
+          </span>
+          <Icon name="lucide:chevron-right" class="w-3.5 h-3.5 text-border" />
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-500 text-white font-semibold">
+            <span class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">2</span>
+            Checkout
+          </span>
+          <Icon name="lucide:chevron-right" class="w-3.5 h-3.5 text-border" />
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-muted text-muted font-medium">
+            <span class="w-4 h-4 rounded-full bg-border/50 flex items-center justify-center text-[10px]">3</span>
+            Pembayaran
+          </span>
         </div>
       </div>
 
@@ -89,57 +117,83 @@ async function handlePayment() {
 
         <!-- Right: Payment action (2/5 width) -->
         <div class="lg:col-span-2">
-          <div class="rounded-xl border border-border bg-surface p-5 sticky top-24">
-            <h3 class="text-base font-bold text-heading mb-4">Pembayaran</h3>
-
-            <!-- Payment info -->
-            <div class="space-y-3 mb-5">
-              <div class="flex items-center gap-2.5 p-3 rounded-lg bg-primary-50/50 border border-primary-100">
-                <Icon name="lucide:shield-check" class="w-5 h-5 text-primary-600 flex-shrink-0" />
-                <p class="text-xs text-body leading-relaxed">
-                  Pembayaran diproses secara aman melalui <strong class="text-heading">Midtrans</strong>.
-                  Anda dapat memilih metode pembayaran setelah mengklik tombol di bawah.
-                </p>
-              </div>
-
-              <div class="flex items-center gap-2.5 p-3 rounded-lg bg-surface-muted border border-border-muted">
-                <Icon name="lucide:info" class="w-5 h-5 text-muted flex-shrink-0" />
-                <p class="text-xs text-muted leading-relaxed">
-                  Akses konten akan diberikan secara otomatis setelah pembayaran berhasil.
-                </p>
-              </div>
+          <div class="rounded-2xl border border-border bg-surface shadow-sm sticky top-24 overflow-hidden">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-surface-muted/40 border-b border-border-muted">
+              <h3 class="text-sm font-bold text-heading uppercase tracking-wider flex items-center gap-2">
+                <Icon name="lucide:wallet" class="w-4 h-4 text-primary-500" />
+                Pembayaran
+              </h3>
             </div>
 
-            <!-- Error display -->
-            <UAlert
-              v-if="checkoutError"
-              variant="error"
-              :title="checkoutError"
-              dismissible
-              class="mb-4"
-            />
+            <div class="p-5">
+              <!-- Total highlight -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-primary-50/50 border border-primary-100 mb-5">
+                <span class="text-sm font-medium text-body">Total Bayar</span>
+                <span class="text-xl font-bold text-primary-600 tabular-nums">{{ formatPrice(total) }}</span>
+              </div>
 
-            <!-- Pay button -->
-            <UButton
-              variant="primary"
-              size="lg"
-              block
-              :loading="isProcessing"
-              :disabled="isEmpty || isProcessing"
-              @click="handlePayment"
-            >
-              <Icon v-if="!isProcessing" name="lucide:wallet" class="w-4 h-4 mr-2" />
-              {{ isProcessing ? 'Memproses...' : 'Bayar Sekarang' }}
-            </UButton>
+              <!-- Payment info -->
+              <div class="space-y-2.5 mb-5">
+                <div class="flex items-start gap-2.5 p-3 rounded-lg bg-surface-muted/50">
+                  <Icon name="lucide:shield-check" class="w-4 h-4 text-primary-500 flex-shrink-0 mt-0.5" />
+                  <p class="text-xs text-body leading-relaxed">
+                    Pembayaran aman via <strong class="text-heading">Midtrans</strong>. Pilih metode pembayaran setelah klik tombol di bawah.
+                  </p>
+                </div>
 
-            <!-- Back to cart -->
-            <div class="text-center mt-3">
-              <NuxtLink
-                to="/cart"
-                class="text-xs text-muted hover:text-primary-600 transition-colors"
+                <div class="flex items-start gap-2.5 p-3 rounded-lg bg-surface-muted/50">
+                  <Icon name="lucide:zap" class="w-4 h-4 text-warning-500 flex-shrink-0 mt-0.5" />
+                  <p class="text-xs text-muted leading-relaxed">
+                    Akses konten otomatis diberikan setelah pembayaran berhasil.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Error display -->
+              <div
+                v-if="checkoutError"
+                class="flex items-start gap-2 p-3 rounded-lg bg-danger-50 border border-danger-200 mb-4"
               >
-                Kembali ke keranjang
-              </NuxtLink>
+                <Icon name="lucide:alert-circle" class="w-4 h-4 text-danger-500 flex-shrink-0 mt-0.5" />
+                <p class="text-xs text-danger-700">{{ checkoutError }}</p>
+              </div>
+
+              <!-- Pay button -->
+              <UButton
+                variant="primary"
+                size="lg"
+                block
+                :loading="isProcessing"
+                :disabled="isEmpty || isProcessing"
+                @click="handlePayment"
+              >
+                <Icon v-if="!isProcessing" name="lucide:lock" class="w-4 h-4 mr-2" />
+                {{ isProcessing ? 'Memproses...' : 'Bayar Sekarang' }}
+              </UButton>
+
+              <!-- Back to cart -->
+              <div class="text-center mt-3">
+                <NuxtLink
+                  to="/cart"
+                  class="inline-flex items-center gap-1.5 text-xs text-muted hover:text-primary-600 transition-colors group"
+                >
+                  <Icon name="lucide:arrow-left" class="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" />
+                  Kembali ke keranjang
+                </NuxtLink>
+              </div>
+
+              <!-- Trust badges -->
+              <div class="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-border-muted">
+                <div class="flex items-center gap-1.5 text-muted">
+                  <Icon name="lucide:lock" class="w-3.5 h-3.5" />
+                  <span class="text-[11px]">SSL Aman</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-muted">
+                  <Icon name="lucide:shield-check" class="w-3.5 h-3.5" />
+                  <span class="text-[11px]">Midtrans</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

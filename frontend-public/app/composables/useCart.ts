@@ -3,16 +3,30 @@
  *
  * Wraps cart store with convenience methods, promo validation, and toast feedback.
  */
+import { useAuthStore } from '~~/stores/auth'
 import { useCartStore } from '~~/stores/cart'
 import type { CartItem } from '~~/types'
 
 export function useCart() {
   const cartStore = useCartStore()
+  const authStore = useAuthStore()
   const toast = useToast()
   const isValidatingPromo = ref(false)
   const promoError = ref<string | null>(null)
 
   function addToCart(item: Omit<CartItem, 'quantity'>) {
+    // Redirect to login if not authenticated
+    if (!authStore.isAuthenticated) {
+      toast.warning('Silakan masuk terlebih dahulu untuk menambahkan item ke keranjang')
+      navigateTo('/auth/login')
+      return
+    }
+
+    // Ensure cart belongs to the current user
+    if (authStore.user?.id) {
+      cartStore.ensureOwner(authStore.user.id)
+    }
+
     // Prevent duplicate for course/webinar (quantity always 1)
     if (
       (item.type === 'course' || item.type === 'webinar')

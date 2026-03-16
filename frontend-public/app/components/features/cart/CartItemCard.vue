@@ -4,7 +4,6 @@
  *
  * Shows thumbnail, name, type badge, price, quantity controls, and remove button.
  * Emits events for quantity changes and removal.
- * Uses design system tokens exclusively.
  */
 import type { CartItem } from '~~/types'
 
@@ -24,9 +23,9 @@ const typeLabels: Record<string, string> = {
 }
 
 const typeColors: Record<string, string> = {
-  course: 'bg-primary-50 text-primary-700',
-  webinar: 'bg-secondary-50 text-secondary-700',
-  product: 'bg-success-50 text-success-700',
+  course: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200/50',
+  webinar: 'bg-secondary-50 text-secondary-700 ring-1 ring-secondary-200/50',
+  product: 'bg-success-50 text-success-700 ring-1 ring-success-200/50',
 }
 
 const typeIcons: Record<string, string> = {
@@ -51,70 +50,71 @@ function formatPrice(price: number): string {
 </script>
 
 <template>
-  <div class="flex gap-4 p-4 rounded-xl border border-border bg-surface hover:border-primary-100 transition-colors">
+  <div class="group flex gap-4 p-4 sm:p-5 rounded-2xl border border-border bg-surface hover:border-primary-200 hover:shadow-sm transition-all duration-200">
     <!-- Thumbnail -->
     <NuxtLink :to="typeRoutes[item.type] + item.slug" class="flex-shrink-0">
-      <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-surface-sunken">
+      <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-surface-sunken ring-1 ring-black/5">
         <img
           v-if="item.thumbnail"
           :src="item.thumbnail"
           :alt="item.name"
-          class="w-full h-full object-cover"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
-        <div v-else class="w-full h-full flex items-center justify-center">
-          <Icon :name="typeIcons[item.type] || 'lucide:package'" class="w-8 h-8 text-muted/30" />
+        <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-sunken to-surface-muted">
+          <Icon :name="typeIcons[item.type] || 'lucide:package'" class="w-8 h-8 text-muted/25" />
         </div>
       </div>
     </NuxtLink>
 
     <!-- Info -->
     <div class="flex-1 min-w-0 flex flex-col">
-      <!-- Type badge + name -->
-      <div class="flex items-start gap-2 mb-1">
+      <!-- Type badge -->
+      <div class="mb-1.5">
         <span
-          :class="['inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide flex-shrink-0', typeColors[item.type] || 'bg-surface-muted text-body']"
+          :class="['inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide', typeColors[item.type] || 'bg-surface-muted text-body']"
         >
           <Icon :name="typeIcons[item.type] || 'lucide:package'" class="w-3 h-3" />
           {{ typeLabels[item.type] || item.type }}
         </span>
       </div>
 
+      <!-- Name -->
       <NuxtLink
         :to="typeRoutes[item.type] + item.slug"
-        class="text-sm font-semibold text-heading hover:text-primary-600 transition-colors line-clamp-2 leading-snug mb-2"
+        class="text-sm font-semibold text-heading hover:text-primary-600 transition-colors line-clamp-2 leading-snug mb-auto"
       >
         {{ item.name }}
       </NuxtLink>
 
       <!-- Bottom row: quantity + price -->
-      <div class="mt-auto flex items-center justify-between gap-3">
+      <div class="mt-3 flex items-center justify-between gap-3">
         <!-- Quantity controls (only for product type) -->
-        <div v-if="item.type === 'product'" class="flex items-center gap-1">
+        <div v-if="item.type === 'product'" class="flex items-center gap-0.5 bg-surface-muted rounded-lg p-0.5">
           <button
             type="button"
-            class="w-7 h-7 rounded-lg border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary-300 transition-colors"
+            class="w-7 h-7 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface transition-all"
             :disabled="item.quantity <= 1"
-            :class="item.quantity <= 1 && 'opacity-40 cursor-not-allowed'"
+            :class="item.quantity <= 1 && 'opacity-30 cursor-not-allowed'"
             @click="emit('updateQuantity', item.id, item.type, item.quantity - 1)"
           >
             <Icon name="lucide:minus" class="w-3.5 h-3.5" />
           </button>
-          <span class="w-8 text-center text-sm font-medium text-heading">{{ item.quantity }}</span>
+          <span class="w-8 text-center text-sm font-semibold text-heading tabular-nums">{{ item.quantity }}</span>
           <button
             type="button"
-            class="w-7 h-7 rounded-lg border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary-300 transition-colors"
+            class="w-7 h-7 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface transition-all"
             @click="emit('updateQuantity', item.id, item.type, item.quantity + 1)"
           >
             <Icon name="lucide:plus" class="w-3.5 h-3.5" />
           </button>
         </div>
-        <div v-else class="text-xs text-muted">
-          Qty: 1
+        <div v-else class="text-xs text-muted font-medium">
+          1 item
         </div>
 
         <!-- Price -->
-        <span class="text-sm font-bold text-primary-600 flex-shrink-0">
+        <span class="text-sm font-bold text-primary-600 flex-shrink-0 tabular-nums">
           {{ item.price === 0 ? 'Gratis' : formatPrice(item.price * item.quantity) }}
         </span>
       </div>
@@ -123,7 +123,7 @@ function formatPrice(price: number): string {
     <!-- Remove button -->
     <button
       type="button"
-      class="self-start p-1.5 rounded-lg text-muted hover:text-danger-600 hover:bg-danger-50 transition-colors flex-shrink-0"
+      class="self-start p-2 rounded-lg text-muted/50 hover:text-danger-600 hover:bg-danger-50 transition-all duration-200 flex-shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
       title="Hapus item"
       @click="emit('remove', item.id, item.type)"
     >
