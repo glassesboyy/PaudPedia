@@ -62,6 +62,11 @@ export const API_ENDPOINTS = {
 
   // ── Cart ───────────────────────────────────────────────
   CART: {
+    INDEX: '/user/cart',
+    ADD_ITEM: '/user/cart/items',
+    UPDATE_ITEM: '/user/cart/items',
+    REMOVE_ITEM: '/user/cart/items',
+    CLEAR: '/user/cart',
     VALIDATE_PROMO: '/user/cart/validate-promo',
   },
 

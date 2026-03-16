@@ -13,8 +13,9 @@ const route = useRoute()
 const slug = route.params.slug as string
 
 // ─── Cart ───
-const { addToCart, hasItem } = useCart()
+const { addToCart, hasItem, isAddingItem } = useCart()
 const isInCart = computed(() => course.value ? hasItem(course.value.id, 'course') : false)
+const isAdding = computed(() => course.value ? isAddingItem(course.value.id, 'course') : false)
 
 function handleAddToCart() {
   if (!course.value || isInCart.value) return
@@ -427,11 +428,12 @@ const isHtmlDescription = computed(() => {
                     :class="isInCart
                       ? 'bg-success-50 text-success-700 border border-success-200 cursor-default'
                       : 'bg-primary-600 text-white hover:bg-primary-700'"
-                    :disabled="isInCart"
+                    :disabled="isInCart || isAdding"
                     @click="handleAddToCart"
                   >
-                    <Icon :name="isInCart ? 'lucide:check-circle' : 'lucide:shopping-cart'" class="w-4 h-4" />
-                    {{ isInCart ? 'Sudah di Keranjang' : 'Tambah ke Keranjang' }}
+                    <Icon v-if="isAdding" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
+                    <Icon v-else :name="isInCart ? 'lucide:check-circle' : 'lucide:shopping-cart'" class="w-4 h-4" />
+                    {{ isAdding ? 'Menambahkan...' : isInCart ? 'Sudah di Keranjang' : 'Tambah ke Keranjang' }}
                   </button>
                   <NuxtLink
                     v-if="isInCart"

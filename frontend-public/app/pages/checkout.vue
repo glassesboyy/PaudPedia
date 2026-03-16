@@ -19,17 +19,23 @@ const {
   total,
   discount,
   isEmpty,
+  isLoading,
+  hasFetched,
   promoCode,
   isValidatingPromo,
   promoError,
   applyPromo,
   clearPromo,
+  fetchCart,
 } = useCart()
 
 const { isProcessing, checkoutError, processCheckout } = useCheckout()
 
-// Redirect to cart if empty
-onMounted(() => {
+// Wait for cart to be fetched before checking isEmpty
+onMounted(async () => {
+  if (!hasFetched.value) {
+    await fetchCart()
+  }
   if (isEmpty.value) {
     navigateTo('/cart')
   }
@@ -92,7 +98,12 @@ function formatPrice(price: number): string {
       </div>
 
       <!-- Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+      <div v-if="isLoading && !hasFetched" class="flex flex-col items-center justify-center py-20 gap-4">
+        <div class="w-10 h-10 border-3 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+        <p class="text-sm text-muted">Memuat data pesanan...</p>
+      </div>
+
+      <div v-else class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
         <!-- Left: Order summary + Promo (3/5 width) -->
         <div class="lg:col-span-3 space-y-5">
           <!-- Order summary -->

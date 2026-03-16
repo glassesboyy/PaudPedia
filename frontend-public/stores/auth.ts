@@ -11,6 +11,7 @@ import { defineStore } from 'pinia'
 import { authService } from '~~/services'
 import type { ApiResponse } from '~~/services/api/types'
 import type { LoginCredentials, LoginResponse, RegisterData, User } from '~~/types'
+import { useCartStore } from './cart'
 
 /** Deduplication promise — ensures initialize() only runs once. */
 let _initPromise: Promise<void> | null = null
@@ -87,9 +88,9 @@ export const useAuthStore = defineStore('auth', () => {
       await authService.logout()
     } finally {
       clearAuth()
-      // Clear cart data so next user doesn't inherit items
-      const { useCartStore } = await import('~~/stores/cart')
-      useCartStore().clearCart()
+      // Reset local cart state — server-side cart persists for when the user logs back in
+      const cartStore = useCartStore()
+      cartStore.resetLocal()
     }
   }
 

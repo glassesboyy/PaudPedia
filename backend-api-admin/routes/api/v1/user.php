@@ -35,6 +35,13 @@ Route::prefix('user')->name('user.')->middleware('auth:sanctum')->group(function
     Route::get('/transactions', [UserDashboardController::class, 'transactions'])->name('transactions');
     Route::get('/transactions/{id}', [UserDashboardController::class, 'transactionDetail'])->name('transactions.show');
 
+    // Cart (FR-EC-04)
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/items', [CartController::class, 'addItem'])->name('cart.add');
+    Route::put('/cart/items', [CartController::class, 'updateItem'])->name('cart.update');
+    Route::delete('/cart/items', [CartController::class, 'removeItem'])->name('cart.remove');
+    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+
     // Cart — Promo Code Validation (FR-EC-06)
     Route::post('/cart/validate-promo', [CartController::class, 'validatePromo'])->name('cart.validate-promo');
 

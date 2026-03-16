@@ -67,6 +67,16 @@ export function useCheckout() {
     }
   }
 
+  async function clearCartAfterPayment() {
+    try {
+      const { cartService } = await import('~~/services')
+      await cartService.clearCart()
+    } catch {
+      // Best-effort
+    }
+    cartStore.resetLocal()
+  }
+
   function openMidtransSnap(token: string) {
     if (!window.snap) {
       checkoutError.value = 'Payment gateway belum siap. Silakan muat ulang halaman.'
@@ -76,12 +86,12 @@ export function useCheckout() {
 
     window.snap.pay(token, {
       onSuccess: () => {
-        cartStore.clearCart()
+        clearCartAfterPayment()
         toast.success('Pembayaran berhasil!')
         navigateTo('/account/orders')
       },
       onPending: () => {
-        cartStore.clearCart()
+        clearCartAfterPayment()
         toast.info('Menunggu pembayaran...')
         navigateTo('/account/orders')
       },
