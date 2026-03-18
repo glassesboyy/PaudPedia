@@ -59,7 +59,7 @@ class CourseDetailResource extends JsonResource
                             return [
                                 'id' => $lesson->id,
                                 'title' => $lesson->title,
-                                'type' => $lesson->type,
+                                'type' => $lesson->content_type?->value,
                                 'duration_minutes' => $lesson->duration_minutes,
                                 'order' => $lesson->order,
                                 'is_preview' => $lesson->is_preview ?? false,

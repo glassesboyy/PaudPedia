@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Services\Lms\CertificateGeneratorService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
 
 class CourseEnrollment extends Model
 {
@@ -77,10 +79,27 @@ class CourseEnrollment extends Model
         // Auto-complete if 100%
         if ($this->progress_percentage >= 100 && !$this->isCompleted()) {
             $this->completed_at = now();
-            // TODO: Generate certificate
         }
 
         $this->save();
+
+        if ($this->progress_percentage >= 100 && empty($this->certificate_url)) {
+            try {
+                $this->loadMissing(['user', 'course']);
+
+                $path = app(CertificateGeneratorService::class)->generateForEnrollment($this);
+
+                if ($path) {
+                    $this->certificate_url = $path;
+                    $this->save();
+                }
+            } catch (\Throwable $e) {
+                Log::error('Failed generating certificate for enrollment', [
+                    'enrollment_id' => $this->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     public function getCompletedLessonsCountAttribute(): int

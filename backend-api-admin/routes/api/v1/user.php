@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Auth\CartController;
 use App\Http\Controllers\Api\V1\Auth\CheckoutController;
+use App\Http\Controllers\Api\V1\Auth\LmsController;
 use App\Http\Controllers\Api\V1\Auth\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,4 +48,17 @@ Route::prefix('user')->name('user.')->middleware('auth:sanctum')->group(function
 
     // Checkout — Create Order + Midtrans Snap (FR-EC-05)
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout');
+
+    // LMS Module
+    Route::prefix('/lms/courses/{courseSlug}')->name('lms.courses.')->group(function () {
+        Route::get('/', [LmsController::class, 'show'])->name('show');
+        Route::get('/progress', [LmsController::class, 'progress'])->name('progress');
+
+        Route::get('/lessons/{lesson}', [LmsController::class, 'lesson'])->name('lessons.show');
+        Route::post('/lessons/{lesson}/complete', [LmsController::class, 'markLessonComplete'])->name('lessons.complete');
+        Route::get('/lessons/{lesson}/pdf', [LmsController::class, 'lessonPdf'])->name('lessons.pdf');
+
+        Route::post('/certificate/generate', [LmsController::class, 'generateCertificate'])->name('certificate.generate');
+        Route::get('/certificate/download', [LmsController::class, 'downloadCertificate'])->name('certificate.download');
+    });
 });

@@ -93,6 +93,17 @@ export const API_ENDPOINTS = {
     TRANSACTION_DETAIL: (id: number) => `/user/transactions/${id}`,
   },
 
+  // ── LMS ───────────────────────────────────────────────
+  LMS: {
+    COURSE: (courseSlug: string) => `/user/lms/courses/${courseSlug}`,
+    PROGRESS: (courseSlug: string) => `/user/lms/courses/${courseSlug}/progress`,
+    LESSON: (courseSlug: string, lessonId: string | number) => `/user/lms/courses/${courseSlug}/lessons/${lessonId}`,
+    LESSON_COMPLETE: (courseSlug: string, lessonId: string | number) => `/user/lms/courses/${courseSlug}/lessons/${lessonId}/complete`,
+    LESSON_PDF: (courseSlug: string, lessonId: string | number) => `/user/lms/courses/${courseSlug}/lessons/${lessonId}/pdf`,
+    CERTIFICATE_GENERATE: (courseSlug: string) => `/user/lms/courses/${courseSlug}/certificate/generate`,
+    CERTIFICATE_DOWNLOAD: (courseSlug: string) => `/user/lms/courses/${courseSlug}/certificate/download`,
+  },
+
   // ── Landing ────────────────────────────────────────────
   LANDING: {
     INDEX: '/landing',
