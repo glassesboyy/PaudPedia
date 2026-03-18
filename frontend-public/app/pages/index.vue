@@ -33,7 +33,7 @@ onMounted(async () => {
 <template>
   <div>
     <!-- Loading state -->
-    <div v-if="isLoading" class="min-h-[60vh]">
+    <div v-if="isLoading" class="min-h-[60vh] flex items-center justify-center">
       <ULoading size="md" text="Memuat halaman..." />
     </div>
 
