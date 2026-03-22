@@ -33,6 +33,13 @@ export const lmsService = {
     })
   },
 
+  async downloadCertificateBlob(courseSlug: string): Promise<Blob> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.LMS.CERTIFICATE_DOWNLOAD(courseSlug), {
+      responseType: 'blob',
+    } as any)
+  },
+
   async getLessonPdfBlob(courseSlug: string, lessonId: string | number): Promise<Blob> {
     const apiFetch = useApiFetch()
 

@@ -111,7 +111,7 @@ class LmsController extends BaseController
         ], 'Detail materi berhasil dimuat');
     }
 
-    public function markLessonComplete(Request $request, string $courseSlug, Lesson $lesson): JsonResponse
+    public function markLessonComplete(Request $request, string $courseSlug, Lesson $lesson, CertificateGeneratorService $generator): JsonResponse
     {
         $enrollment = $this->resolveEnrollment($request, $courseSlug);
 
@@ -133,6 +133,14 @@ class LmsController extends BaseController
         }
 
         $enrollment->refresh();
+
+        // Auto-generate certificate when progress reaches 100%
+        if ((int) $enrollment->progress_percentage >= 100 && empty($enrollment->certificate_url)) {
+            $path = $generator->generateForEnrollment($enrollment->loadMissing(['user', 'course']));
+            $enrollment->certificate_url = $path;
+            $enrollment->save();
+            $enrollment->refresh();
+        }
 
         return $this->success([
             'lesson_id' => $lesson->id,
@@ -235,7 +243,12 @@ class LmsController extends BaseController
         }
 
         $fullPath = Storage::disk('public')->path($enrollment->certificate_url);
-        $filename = 'sertifikat-' . $enrollment->course->slug . '.pdf';
+
+        // User-friendly filename: "Sertifikat - Course Title.pdf"
+        $courseTitle = $enrollment->course?->title ?? 'Kursus';
+        $safeTitle = preg_replace('/[^\w\s\-]/u', '', $courseTitle);
+        $safeTitle = trim(preg_replace('/\s+/', ' ', $safeTitle));
+        $filename = 'Sertifikat - ' . mb_substr($safeTitle, 0, 80) . '.pdf';
 
         return response()->download($fullPath, $filename, [
             'Content-Type' => 'application/pdf',

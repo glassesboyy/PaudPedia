@@ -137,21 +137,14 @@ onBeforeUnmount(() => {
           </UButton>
 
           <UButton
-            v-if="store.isCourseCompleted"
-            variant="outline"
-            :loading="store.isGeneratingCertificate"
-            @click="store.generateCertificate()"
+            v-if="store.isCourseCompleted && store.certificateDownloadUrl"
+            variant="secondary"
+            :loading="store.isDownloadingCertificate"
+            @click="store.downloadCertificate()"
           >
-            <Icon name="lucide:award" class="w-4 h-4 mr-1.5" />
-            Generate Sertifikat
+            <Icon name="lucide:download" class="w-4 h-4 mr-1.5" />
+            Unduh Sertifikat
           </UButton>
-
-          <a v-if="store.certificateDownloadUrl" :href="store.certificateDownloadUrl" target="_blank" rel="noopener">
-            <UButton variant="secondary">
-              <Icon name="lucide:download" class="w-4 h-4 mr-1.5" />
-              Download Sertifikat
-            </UButton>
-          </a>
         </div>
       </div>
 

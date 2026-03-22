@@ -47,6 +47,13 @@ export const dashboardService = {
     return apiFetch(API_ENDPOINTS.USER.CERTIFICATES, { params })
   },
 
+  async downloadCertificate(courseSlug: string): Promise<Blob> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.LMS.CERTIFICATE_DOWNLOAD(courseSlug), {
+      responseType: 'blob',
+    } as any)
+  },
+
   // ── Transactions (FR-UA-12) ────────────────────────────
   async getTransactions(params?: Record<string, unknown>): Promise<PaginatedResponse<Transaction>> {
     const apiFetch = useApiFetch()

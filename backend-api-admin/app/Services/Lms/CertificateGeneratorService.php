@@ -21,7 +21,8 @@ class CertificateGeneratorService
 
         $pdf = Pdf::loadView('certificates.course', $payload)->setPaper('a4', 'landscape');
 
-        $path = 'certificates/courses/course-' . $enrollment->course_id . '-user-' . $enrollment->user_id . '.pdf';
+        $courseSlug = $enrollment->course?->slug ?? ('course-' . $enrollment->course_id);
+        $path = 'certificates/courses/' . $courseSlug . '-' . $enrollment->id . '.pdf';
 
         Storage::disk('public')->put($path, $pdf->output());
 

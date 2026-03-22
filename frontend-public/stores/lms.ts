@@ -12,7 +12,7 @@ export const useLmsStore = defineStore('lms', () => {
   const isLessonLoading = ref(false)
   const isPdfLoading = ref(false)
   const isMarkingComplete = ref(false)
-  const isGeneratingCertificate = ref(false)
+  const isDownloadingCertificate = ref(false)
 
   const courseError = ref('')
   const lessonError = ref('')
@@ -291,19 +291,24 @@ export const useLmsStore = defineStore('lms', () => {
     }
   }
 
-  async function generateCertificate() {
-    if (isGeneratingCertificate.value) return
-    isGeneratingCertificate.value = true
+  async function downloadCertificate() {
+    if (isDownloadingCertificate.value || !courseSlug.value) return
+    isDownloadingCertificate.value = true
 
     try {
-      const res = await lmsService.generateCertificate(courseSlug.value)
-      if (playerData.value) {
-        playerData.value.certificate = res.data
-      }
+      const blob = await lmsService.downloadCertificateBlob(courseSlug.value)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Sertifikat - ${playerData.value?.course.title || 'Kursus'}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
     } catch {
-      lessonError.value = 'Gagal menyiapkan sertifikat.'
+      lessonError.value = 'Gagal mengunduh sertifikat.'
     } finally {
-      isGeneratingCertificate.value = false
+      isDownloadingCertificate.value = false
     }
   }
 
@@ -335,7 +340,7 @@ export const useLmsStore = defineStore('lms', () => {
     isLessonLoading,
     isPdfLoading,
     isMarkingComplete,
-    isGeneratingCertificate,
+    isDownloadingCertificate,
     courseError,
     lessonError,
     pdfError,
@@ -370,7 +375,7 @@ export const useLmsStore = defineStore('lms', () => {
     loadLessonDetail,
     loadPdfBlob,
     markAsComplete,
-    generateCertificate,
+    downloadCertificate,
     revokePdfBlob,
     cleanup,
     $reset,

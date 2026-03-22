@@ -38,6 +38,29 @@ async function fetchCertificates(page = 1) {
   }
 }
 
+const downloadingCertId = ref<number | null>(null)
+
+async function handleDownload(cert: UserCertificate) {
+  if (!cert.course_slug || downloadingCertId.value) return
+  downloadingCertId.value = cert.id
+
+  try {
+    const blob = await dashboardService.downloadCertificate(cert.course_slug)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Sertifikat - ${cert.course_title || 'Kursus'}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch {
+    error.value = 'Gagal mengunduh sertifikat.'
+  } finally {
+    downloadingCertId.value = null
+  }
+}
+
 onMounted(() => fetchCertificates())
 </script>
 
@@ -153,17 +176,19 @@ onMounted(() => fetchCertificates())
                   Lihat
                 </UButton>
               </a>
-              <a
-                v-if="cert.download_url"
-                :href="cert.download_url"
-                download
-                class="flex-1"
-              >
-                <UButton variant="primary" size="sm" block>
+              <div v-if="cert.course_slug" class="flex-1">
+                <UButton
+                  variant="primary"
+                  size="sm"
+                  block
+                  :loading="downloadingCertId === cert.id"
+                  :disabled="!!downloadingCertId"
+                  @click="handleDownload(cert)"
+                >
                   <Icon name="lucide:download" class="w-3.5 h-3.5 mr-1.5" />
                   Unduh
                 </UButton>
-              </a>
+              </div>
             </div>
           </div>
         </div>
