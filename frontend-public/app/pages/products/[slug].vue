@@ -146,7 +146,7 @@ const isHtmlDescription = computed(() => {
 <template>
   <div>
     <!-- Loading State -->
-    <SkeletonDetailContent v-if="loading" variant="article" />
+    <SkeletonDetailContent v-if="loading" variant="product" />
 
     <!-- Error State -->
     <div v-else-if="error" class="bg-surface">

@@ -38,10 +38,26 @@ async function fetchProducts(page = 1) {
   }
 }
 
-function handleDownload(item: UserProduct) {
-  if (!item.product_id) return
-  const url = dashboardService.getProductDownloadUrl(item.product_id)
-  window.open(url, '_blank')
+const isDownloading = ref<number | null>(null)
+
+async function handleDownload(item: UserProduct) {
+  if (!item.product_id || isDownloading.value === item.product_id) return
+  isDownloading.value = item.product_id
+  try {
+    const blob = await dashboardService.downloadProduct(item.product_id)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = item.slug ? `${item.slug}.${item.file_info?.type || 'bin'}` : `product-${item.product_id}`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch {
+    error.value = 'Gagal mengunduh file produk.'
+  } finally {
+    isDownloading.value = null
+  }
 }
 
 function fileTypeColor(type: string | undefined): string {
@@ -178,6 +194,8 @@ onMounted(() => fetchProducts())
                 variant="primary"
                 size="sm"
                 block
+                :loading="isDownloading === item.product_id"
+                :disabled="isDownloading === item.product_id"
                 @click="handleDownload(item)"
               >
                 <Icon name="lucide:download" class="w-3.5 h-3.5 mr-1.5" />

@@ -28,9 +28,11 @@ export const dashboardService = {
     return apiFetch(API_ENDPOINTS.USER.PRODUCTS, { params })
   },
 
-  getProductDownloadUrl(productId: number): string {
-    const config = useRuntimeConfig()
-    return `${config.public.apiBase}${API_ENDPOINTS.USER.PRODUCT_DOWNLOAD(productId)}`
+  async downloadProduct(productId: number): Promise<Blob> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.USER.PRODUCT_DOWNLOAD(productId), {
+      responseType: 'blob',
+    } as any)
   },
 
   // ── My Webinars (FR-UA-10) ─────────────────────────────

@@ -37,8 +37,25 @@ class UserCourseResource extends JsonResource
             'total_lessons' => $totalLessons,
             'completed_lessons' => $completedLessons,
             'is_completed' => $this->isCompleted(),
+            'first_lesson_id' => $this->getFirstLessonId($course),
             'enrolled_at' => $this->enrolled_at?->toIso8601String(),
             'completed_at' => $this->completed_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * Get the first lesson ID from the course (by module order → lesson order).
+     */
+    private function getFirstLessonId(mixed $course): ?int
+    {
+        $firstModule = $course->modules()->orderBy('order')->first();
+
+        if (!$firstModule) {
+            return null;
+        }
+
+        $firstLesson = $firstModule->lessons()->orderBy('order')->first();
+
+        return $firstLesson?->id;
     }
 }

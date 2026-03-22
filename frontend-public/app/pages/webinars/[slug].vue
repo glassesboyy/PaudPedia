@@ -155,7 +155,7 @@ const statusConfig = computed(() => {
 <template>
   <div>
     <!-- Loading -->
-    <SkeletonDetailContent v-if="loading" variant="article" />
+    <SkeletonDetailContent v-if="loading" variant="webinar" />
 
     <!-- Error / Not Found -->
     <div v-else-if="error || !webinar" class="min-h-[60vh] flex items-center justify-center">

@@ -164,7 +164,7 @@ onMounted(() => fetchCourses())
         <NuxtLink
           v-for="item in filteredCourses"
           :key="item.id"
-          :to="`/courses/${item.slug}`"
+          :to="item.first_lesson_id ? `/learn/${item.slug}/${item.first_lesson_id}` : `/courses/${item.slug}`"
           class="group flex flex-col rounded-2xl border border-border bg-surface overflow-hidden hover:shadow-medium hover:border-primary-200 hover:-translate-y-0.5 transition-all duration-300"
         >
           <!-- Thumbnail -->

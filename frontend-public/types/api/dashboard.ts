@@ -24,6 +24,7 @@ export interface UserCourse {
   total_lessons: number
   completed_lessons: number
   is_completed: boolean
+  first_lesson_id: number | null
   enrolled_at: string
   completed_at: string | null
 }
