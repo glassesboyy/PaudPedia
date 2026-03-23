@@ -47,6 +47,24 @@ class LandingPageController extends BaseController
             ];
         });
 
+        $user = $request->user('sanctum');
+        if ($user) {
+            $enrolledCourseIds = \App\Models\CourseEnrollment::where('user_id', $user->id)
+                ->pluck('course_id')->toArray();
+            
+            $registeredWebinarIds = \App\Models\OrderItem::where('item_type', \App\Enums\OrderItemType::WEBINAR->value)
+                ->whereHas('order', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)->where('status', \App\Enums\OrderStatus::PAID->value);
+                })->pluck('item_id')->toArray();
+
+            foreach ($data['featured_courses'] as &$course) {
+                $course['is_owned'] = in_array($course['id'], $enrolledCourseIds);
+            }
+            foreach ($data['featured_webinars'] as &$webinar) {
+                $webinar['is_owned'] = in_array($webinar['id'], $registeredWebinarIds);
+            }
+        }
+
         return $this->success($data, 'Data landing page berhasil dimuat');
     }
 

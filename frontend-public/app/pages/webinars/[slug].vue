@@ -407,8 +407,20 @@ const statusConfig = computed(() => {
                   </template>
                 </div>
 
-                <!-- Add to cart button -->
-                <div v-if="webinar.price && webinar.price > 0" class="mt-4">
+                <!-- Action Buttons -->
+                <div v-if="webinar.is_owned" class="mt-4">
+                  <NuxtLink
+                    to="/account/webinars"
+                    class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-success-50 text-success-700 border border-success-200 hover:bg-success-100 transition-all shadow-sm"
+                  >
+                    <Icon name="lucide:calendar-check" class="w-4 h-4" />
+                    Ikuti Webinar
+                  </NuxtLink>
+                  <p class="text-[11px] text-center text-muted mt-2">
+                     Anda sudah terdaftar di webinar ini.
+                  </p>
+                </div>
+                <div v-else-if="webinar.price && webinar.price > 0" class="mt-4">
                   <button
                     type="button"
                     class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm"
@@ -515,7 +527,7 @@ const statusConfig = computed(() => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 /* Webinar description HTML content styles */
 .webinar-content :deep(h1),
 .webinar-content :deep(h2),

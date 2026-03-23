@@ -49,6 +49,7 @@ export interface Course {
   original_price: number | null
   has_discount: boolean
   discount_percentage: number | null
+  is_owned?: boolean
   level: 'beginner' | 'intermediate' | 'advanced' | null
   level_label: string | null
   duration_hours: number | null

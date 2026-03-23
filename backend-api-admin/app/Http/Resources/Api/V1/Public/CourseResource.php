@@ -14,12 +14,22 @@ class CourseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user('sanctum');
+        $isOwned = false;
+
+        if ($user) {
+            $isOwned = \App\Models\CourseEnrollment::where('user_id', $user->id)
+                ->where('course_id', $this->id)
+                ->exists();
+        }
+
         return [
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->excerpt ?? $this->getExcerpt(),
             'thumbnail_url' => $this->thumbnail_url ? asset('storage/' . $this->thumbnail_url) : null,
+            'is_owned' => $isOwned,
             'price' => (float) $this->price,
             'original_price' => $this->original_price ? (float) $this->original_price : null,
             'has_discount' => $this->hasDiscount(),

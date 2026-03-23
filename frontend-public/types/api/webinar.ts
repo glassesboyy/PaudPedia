@@ -32,6 +32,7 @@ export interface Webinar {
   original_price: number | null
   has_discount: boolean
   discount_percentage: number | null
+  is_owned?: boolean
   scheduled_at: string | null
   scheduled_date: string | null
   scheduled_time: string | null

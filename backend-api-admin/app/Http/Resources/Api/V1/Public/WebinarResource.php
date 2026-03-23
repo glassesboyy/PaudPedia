@@ -14,12 +14,26 @@ class WebinarResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user('sanctum');
+        $isOwned = false;
+
+        if ($user) {
+            $isOwned = \App\Models\OrderItem::where('item_type', \App\Enums\OrderItemType::WEBINAR->value)
+                ->where('item_id', $this->id)
+                ->whereHas('order', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->where('status', \App\Enums\OrderStatus::PAID->value);
+                })
+                ->exists();
+        }
+
         return [
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->getExcerpt(),
             'thumbnail_url' => $this->thumbnail_url ? asset('storage/' . $this->thumbnail_url) : null,
+            'is_owned' => $isOwned,
             'price' => (float) $this->price,
             'original_price' => $this->original_price ? (float) $this->original_price : null,
             'has_discount' => $this->hasDiscount(),

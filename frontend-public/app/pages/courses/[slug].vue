@@ -419,30 +419,44 @@ const isHtmlDescription = computed(() => {
                   </NuxtLink>
                 </div>
 
-                <!-- Add to cart button -->
-                <div class="mt-6">
-                  <button
-                    v-if="course.price > 0"
-                    type="button"
-                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-sm"
-                    :class="isInCart
-                      ? 'bg-success-50 text-success-700 border border-success-200 cursor-default'
-                      : 'bg-primary-600 text-white hover:bg-primary-700'"
-                    :disabled="isInCart || isAdding"
-                    @click="handleAddToCart"
-                  >
-                    <Icon v-if="isAdding" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
-                    <Icon v-else :name="isInCart ? 'lucide:check-circle' : 'lucide:shopping-cart'" class="w-4 h-4" />
-                    {{ isAdding ? 'Menambahkan...' : isInCart ? 'Sudah di Keranjang' : 'Tambah ke Keranjang' }}
-                  </button>
-                  <NuxtLink
-                    v-if="isInCart"
-                    to="/cart"
-                    class="mt-2 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-xs font-medium text-body hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50/50 transition-all"
-                  >
-                    <Icon name="lucide:arrow-right" class="w-3.5 h-3.5" />
-                    Lihat Keranjang
-                  </NuxtLink>
+                <!-- Action Buttons -->
+                <div class="mt-6 relative">
+                  <div v-if="course.is_owned" class="w-full">
+                    <NuxtLink
+                      :to="`/learn/${course.slug}`"
+                      class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-sm bg-success-50 text-success-700 border border-success-200 hover:bg-success-100"
+                    >
+                      <Icon name="lucide:play-circle" class="w-4 h-4" />
+                      Akses Kursus
+                    </NuxtLink>
+                    <p class="text-[11px] text-center text-muted mt-2">
+                       Anda sudah memiliki kursus ini.
+                    </p>
+                  </div>
+                  <div v-else>
+                    <button
+                      v-if="course.price > 0"
+                      type="button"
+                      class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                      :class="isInCart
+                        ? 'bg-success-50 text-success-700 border border-success-200 cursor-default'
+                        : 'bg-primary-600 text-white hover:bg-primary-700'"
+                      :disabled="isInCart || isAdding"
+                      @click="handleAddToCart"
+                    >
+                      <Icon v-if="isAdding" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
+                      <Icon v-else :name="isInCart ? 'lucide:check-circle' : 'lucide:shopping-cart'" class="w-4 h-4" />
+                      {{ isAdding ? 'Menambahkan...' : isInCart ? 'Sudah di Keranjang' : 'Tambah ke Keranjang' }}
+                    </button>
+                    <NuxtLink
+                      v-if="isInCart"
+                      to="/cart"
+                      class="mt-2 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-xs font-medium text-body hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50/50 transition-all"
+                    >
+                      <Icon name="lucide:arrow-right" class="w-3.5 h-3.5" />
+                      Lihat Keranjang
+                    </NuxtLink>
+                  </div>
                 </div>
               </div>
             </div>
