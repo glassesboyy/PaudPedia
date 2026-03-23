@@ -100,6 +100,8 @@ export const API_ENDPOINTS = {
     LESSON: (courseSlug: string, lessonId: string | number) => `/user/lms/courses/${courseSlug}/lessons/${lessonId}`,
     LESSON_COMPLETE: (courseSlug: string, lessonId: string | number) => `/user/lms/courses/${courseSlug}/lessons/${lessonId}/complete`,
     LESSON_PDF: (courseSlug: string, lessonId: string | number) => `/user/lms/courses/${courseSlug}/lessons/${lessonId}/pdf`,
+    QUIZ_SHOW: (courseSlug: string, quizId: string | number) => `/user/lms/courses/${courseSlug}/quizzes/${quizId}`,
+    QUIZ_SUBMIT: (courseSlug: string, quizId: string | number) => `/user/lms/courses/${courseSlug}/quizzes/${quizId}/submit`,
     CERTIFICATE_GENERATE: (courseSlug: string) => `/user/lms/courses/${courseSlug}/certificate/generate`,
     CERTIFICATE_DOWNLOAD: (courseSlug: string) => `/user/lms/courses/${courseSlug}/certificate/download`,
   },

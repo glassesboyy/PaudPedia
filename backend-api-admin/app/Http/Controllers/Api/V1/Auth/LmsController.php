@@ -27,6 +27,7 @@ class LmsController extends BaseController
             'course.modules.lessons' => function ($query) {
                 $query->orderBy('order');
             },
+            'course.modules.quiz',
             'lessonProgress',
         ]);
 
@@ -37,7 +38,8 @@ class LmsController extends BaseController
             ->where('is_completed', true)
             ->pluck('is_completed', 'lesson_id');
 
-        $modules = $enrollment->course->modules->map(function ($module) use ($completedByLessonId) {
+        $modules = $enrollment->course->modules->map(function ($module) use ($completedByLessonId, $request) {
+            $userId = $request->user()->id;
             return [
                 'id' => $module->id,
                 'title' => $module->title,
@@ -53,7 +55,18 @@ class LmsController extends BaseController
                         'order' => $lesson->order,
                         'is_completed' => (bool) ($completedByLessonId[$lesson->id] ?? false),
                     ];
-                })->values(),
+                })->concat($module->quiz->map(function ($quiz) use ($userId) {
+                    return [
+                        'id' => 'quiz-' . $quiz->id,
+                        'slug' => 'quiz-' . $quiz->id,
+                        'title' => $quiz->title,
+                        'type' => 'quiz',
+                        'duration_minutes' => 0,
+                        'order' => 9999, // Append quizzes to end of module
+                        'is_completed' => $quiz->hasUserPassed($userId),
+                        'quiz_id' => $quiz->id,
+                    ];
+                }))->sortBy('order')->values(),
             ];
         })->values();
 
@@ -210,7 +223,7 @@ class LmsController extends BaseController
         $enrollment->refresh();
 
         if ((int) $enrollment->progress_percentage < 100) {
-            return $this->error('Sertifikat hanya tersedia setelah progress mencapai 100%', 422);
+            return $this->error('Sertifikat belum tersedia. Pastikan Anda telah menyelesaikan 100% materi dan lulus pada semua Kuis yang ada.', 400);
         }
 
         if (empty($enrollment->certificate_url)) {

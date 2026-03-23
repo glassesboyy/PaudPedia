@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use Illuminate\Support\Facades\Log;
 
 class CourseEnrollment extends Model
@@ -76,14 +78,41 @@ class CourseEnrollment extends Model
 
         $this->progress_percentage = (int) round($percentage);
 
-        // Auto-complete if 100%
-        if ($this->progress_percentage >= 100 && !$this->isCompleted()) {
+        // Required Quiz Validation logic
+        $hasQuizzes = $this->course->modules()->has('quiz')->exists();
+        $allQuizzesPassed = true;
+
+        if ($hasQuizzes) {
+            $courseQuizIds = Quiz::whereHas('module', function ($query) {
+                $query->where('course_id', $this->course_id);
+            })->pluck('id');
+
+            $passedQuizCount = QuizAttempt::where('user_id', $this->user_id)
+                ->whereIn('quiz_id', $courseQuizIds)
+                ->where('is_passed', true)
+                ->count(); // Using count instead of distinct since we just need to verify they passed every quiz
+
+            // Since it's possible the user passed the same quiz multiple times, we need a better check
+            $passedUniqueQuizzes = QuizAttempt::where('user_id', $this->user_id)
+                ->whereIn('quiz_id', $courseQuizIds)
+                ->where('is_passed', true)
+                ->select('quiz_id')
+                ->distinct()
+                ->count('quiz_id');
+
+            if ($passedUniqueQuizzes < $courseQuizIds->count()) {
+                $allQuizzesPassed = false;
+            }
+        }
+
+        // Auto-complete if 100% and passed required quizzes
+        if ($this->progress_percentage >= 100 && $allQuizzesPassed && !$this->isCompleted()) {
             $this->completed_at = now();
         }
 
         $this->save();
 
-        if ($this->progress_percentage >= 100 && empty($this->certificate_url)) {
+        if ($this->progress_percentage >= 100 && $allQuizzesPassed && empty($this->certificate_url)) {
             try {
                 $this->loadMissing(['user', 'course']);
 

@@ -23,12 +23,15 @@ export function useApiFetch() {
   // On the client, reuse the singleton.
   if (import.meta.server || !_apiFetch) {
     const config = useRuntimeConfig()
-    const token = useCookie('auth_token')
 
     _apiFetch = $fetch.create({
       baseURL: config.public.apiBase as string,
 
       onRequest({ options }) {
+        // Read cookie inside the hook so we always get the latest value.
+        // Capturing useCookie outside would create a separate ref from the
+        // auth store (different options → different Vue ref in Nuxt 3).
+        const token = useCookie('auth_token')
         const headers = new Headers(options.headers as HeadersInit)
         headers.set('Accept', 'application/json')
 
@@ -43,6 +46,7 @@ export function useApiFetch() {
         // 401 → token expired / invalid — clear it silently.
         // Auth middleware handles the redirect to login.
         if (response.status === 401) {
+          const token = useCookie('auth_token')
           token.value = null
         }
       },

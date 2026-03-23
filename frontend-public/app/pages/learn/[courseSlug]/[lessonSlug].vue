@@ -84,33 +84,37 @@ onBeforeUnmount(() => {
         />
       </div>
 
-      <div v-else-if="store.lessonDetail?.type === 'pdf'" class="h-[72vh] min-h-[26rem] bg-surface-sunken">
-        <div v-if="store.isPdfLoading" class="h-full flex items-center justify-center">
+      <div v-else-if="store.lessonDetail?.type === 'pdf'" class="h-[72vh] min-h-[26rem] bg-surface-sunken relative overflow-hidden">
+        <div v-if="store.isPdfLoading" class="absolute inset-0 flex items-center justify-center z-10 bg-surface-sunken">
           <div class="text-center">
             <Icon name="lucide:loader-circle" class="w-7 h-7 text-primary-500 animate-spin mx-auto mb-2" />
             <p class="text-sm text-muted">Memuat dokumen PDF...</p>
           </div>
         </div>
 
-        <div v-else-if="store.pdfError" class="h-full flex items-center justify-center p-8 text-center">
-          <div>
+        <div v-else-if="store.pdfError" class="absolute inset-0 flex items-center justify-center p-8 text-center z-10 bg-surface-sunken">
+          <div class="bg-surface p-6 rounded-2xl shadow-sm border border-border">
             <Icon name="lucide:file-warning" class="w-8 h-8 text-warning-500 mx-auto mb-2" />
             <p class="text-sm text-muted mb-4">{{ store.pdfError }}</p>
             <UButton variant="outline" @click="store.loadPdfBlob(activeLessonSummary.id)">Muat ulang PDF</UButton>
           </div>
         </div>
 
-        <iframe
+        <PdfViewer
           v-else-if="store.pdfBlobUrl"
-          :src="store.pdfBlobUrl"
-          class="w-full h-full"
-          title="PDF Viewer"
+          :pdf-url="store.pdfBlobUrl"
         />
       </div>
 
       <div v-else-if="store.lessonDetail?.type === 'text'" class="p-6 md:p-8">
         <article class="prose prose-sm md:prose-base max-w-none text-body" v-html="store.textLessonHtml" />
       </div>
+
+      <QuizViewer
+        v-else-if="store.quizDetail"
+        :quiz="store.quizDetail"
+        @submitted="store.loadPlayerData({ quiet: true }).then(() => store.loadLessonDetail(route.params.lessonSlug as string, { forceRefresh: true, quiet: true }))"
+      />
 
       <div v-else class="p-8 text-center text-muted">
         Tipe materi belum didukung.
@@ -136,15 +140,23 @@ onBeforeUnmount(() => {
             {{ activeLessonSummary?.is_completed ? 'Sudah Selesai' : 'Tandai Selesai' }}
           </UButton>
 
-          <UButton
-            v-if="store.isCourseCompleted && store.certificateDownloadUrl"
-            variant="secondary"
-            :loading="store.isDownloadingCertificate"
-            @click="store.downloadCertificate()"
-          >
-            <Icon name="lucide:download" class="w-4 h-4 mr-1.5" />
-            Unduh Sertifikat
-          </UButton>
+          <UPopover v-if="store.isCourseCompleted" mode="hover">
+            <UButton
+              variant="secondary"
+              :loading="store.isDownloadingCertificate"
+              :disabled="!store.certificateDownloadUrl"
+              @click="store.downloadCertificate()"
+            >
+              <Icon name="lucide:download" class="w-4 h-4 mr-1.5" />
+              Unduh Sertifikat
+            </UButton>
+
+            <template #panel>
+              <div v-if="!store.certificateDownloadUrl" class="p-3 max-w-[200px] text-xs text-danger-600 font-medium text-center">
+                Selesaikan dan raih nilai lulus (min 70) pada semua kuis terlebih dahulu untuk membuka sertifikat.
+              </div>
+            </template>
+          </UPopover>
         </div>
       </div>
 

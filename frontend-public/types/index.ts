@@ -27,7 +27,8 @@ export type {
 } from './api/landing'
 export type {
     LmsCertificateResponse, LmsCoursePlayerData, LmsLessonDetail,
-    LmsLessonSummary, LmsMarkCompleteResponse, LmsModule, LmsProgress
+    LmsLessonSummary, LmsMarkCompleteResponse, LmsModule, LmsProgress,
+    LmsQuizDetail, LmsQuizSubmitResponse
 } from './api/lms'
 export type { FeaturedMentor, Mentor, MentorCourse, MentorDetail, MentorListParams, MentorWebinar } from './api/mentor'
 export type { CheckoutOrder, CheckoutOrderItem, CheckoutResponse, Order, OrderItem, OrderListParams, OrderStatus, PromoValidationResponse } from './api/order'

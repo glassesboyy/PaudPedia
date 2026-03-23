@@ -69,3 +69,53 @@ export interface LmsCertificateResponse {
   available: boolean
   download_url: string | null
 }
+
+export interface LmsQuizAnswer {
+  id: number
+  quiz_question_id: number
+  answer: string
+}
+
+export interface LmsQuizQuestion {
+  id: number
+  quiz_id: number
+  question: string
+  answers: LmsQuizAnswer[]
+}
+
+export interface LmsQuizAttemptAnswer {
+  question_id: number
+  selected_answer_id: number
+  is_correct: boolean
+  correct_answer_id: number | null
+}
+
+export interface LmsQuizDetail {
+  id: string
+  slug: string
+  quiz_id: number
+  title: string
+  description: string | null
+  type: 'quiz'
+  questions: LmsQuizQuestion[]
+  total_questions: number
+  best_score: number | null
+  latest_score: number | null
+  is_passed: boolean
+  attempt_count: number
+  latest_attempt?: {
+    id: number
+    score: number
+    is_passed: boolean
+    answers: LmsQuizAttemptAnswer[]
+  } | null
+}
+
+export interface LmsQuizSubmitResponse {
+  attempt_id: number
+  score: number
+  is_passed: boolean
+  correct_answers: number
+  total_questions: number
+  passing_score: number
+}

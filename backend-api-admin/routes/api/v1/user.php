@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Auth\CartController;
 use App\Http\Controllers\Api\V1\Auth\CheckoutController;
 use App\Http\Controllers\Api\V1\Auth\LmsController;
+use App\Http\Controllers\Api\V1\Auth\LmsQuizController;
 use App\Http\Controllers\Api\V1\Auth\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +58,9 @@ Route::prefix('user')->name('user.')->middleware('auth:sanctum')->group(function
         Route::get('/lessons/{lesson}', [LmsController::class, 'lesson'])->name('lessons.show');
         Route::post('/lessons/{lesson}/complete', [LmsController::class, 'markLessonComplete'])->name('lessons.complete');
         Route::get('/lessons/{lesson}/pdf', [LmsController::class, 'lessonPdf'])->name('lessons.pdf');
+
+        Route::get('/quizzes/{quiz}', [LmsQuizController::class, 'show'])->name('quizzes.show');
+        Route::post('/quizzes/{quiz}/submit', [LmsQuizController::class, 'submit'])->name('quizzes.submit');
 
         Route::post('/certificate/generate', [LmsController::class, 'generateCertificate'])->name('certificate.generate');
         Route::get('/certificate/download', [LmsController::class, 'downloadCertificate'])->name('certificate.download');

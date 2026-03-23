@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import DOMPurify from 'isomorphic-dompurify'
 import { lmsService } from '~~/services'
-import type { LmsCoursePlayerData, LmsLessonDetail, LmsLessonSummary } from '~~/types'
+import type { LmsCoursePlayerData, LmsLessonDetail, LmsLessonSummary, LmsQuizDetail } from '~~/types'
 
 export const useLmsStore = defineStore('lms', () => {
   // ─── State ────────────────────────────────────────────────
   const playerData = ref<LmsCoursePlayerData | null>(null)
   const lessonDetail = shallowRef<LmsLessonDetail | null>(null)
+  const quizDetail = shallowRef<LmsQuizDetail | null>(null)
 
   const isCourseLoading = ref(true)
   const isLessonLoading = ref(false)
@@ -35,12 +36,14 @@ export const useLmsStore = defineStore('lms', () => {
     video: 'lucide:play-circle',
     pdf: 'lucide:file-text',
     text: 'lucide:file-pen-line',
+    quiz: 'lucide:help-circle',
   }
 
   const lessonTypeLabel: Record<string, string> = {
     video: 'Video',
     pdf: 'PDF',
     text: 'Artikel',
+    quiz: 'Kuis Evaluasi',
   }
 
   // ─── Getters ──────────────────────────────────────────────
@@ -184,52 +187,78 @@ export const useLmsStore = defineStore('lms', () => {
     }
   }
 
-  async function loadLessonDetail(lessonSlug: string) {
+  async function loadLessonDetail(lessonSlug: string, options: { quiet?: boolean, forceRefresh?: boolean } = {}) {
     lessonError.value = ''
-    const lessonId = Number(lessonSlug)
+    
+    const isQuiz = lessonSlug.startsWith('quiz-')
+    const entityId = isQuiz ? Number(lessonSlug.replace('quiz-', '')) : Number(lessonSlug)
 
-    // Check cache first
-    const cached = lessonCache.get(lessonSlug)
-    if (cached) {
-      lessonDetail.value = cached
-
-      if (cached.type === 'pdf') {
-        await loadPdfBlob(lessonId)
-      } else {
+    // Check cache first ONLY if not forcing refresh
+    if (!options.forceRefresh) {
+      const cached = lessonCache.get(lessonSlug)
+      if (cached) {
+      if (isQuiz) {
+        quizDetail.value = cached as unknown as LmsQuizDetail
+        lessonDetail.value = null
         revokePdfBlob()
+      } else {
+        lessonDetail.value = cached as LmsLessonDetail
+        quizDetail.value = null
+
+        if (cached.type === 'pdf') {
+          await loadPdfBlob(entityId)
+        } else {
+          revokePdfBlob()
+        }
       }
 
       setLastLesson(lessonSlug)
       expandModuleContainingLesson(lessonSlug)
       schedulePrefetch(lessonSlug)
       return
+      }
     }
 
-    isLessonLoading.value = true
+    if (!options.quiet) {
+      isLessonLoading.value = true
+    }
 
     try {
-      const res = await lmsService.getLessonDetail(courseSlug.value, lessonId)
-      lessonDetail.value = res.data
-      lessonCache.set(lessonSlug, res.data)
-
-      if (res.data.type === 'pdf') {
-        await loadPdfBlob(lessonId)
-      } else {
+      if (isQuiz) {
+        const res = await lmsService.getQuizDetail(courseSlug.value, entityId)
+        quizDetail.value = res.data
+        lessonDetail.value = null
+        lessonCache.set(lessonSlug, res.data as any)
         revokePdfBlob()
+      } else {
+        const res = await lmsService.getLessonDetail(courseSlug.value, entityId)
+        lessonDetail.value = res.data
+        quizDetail.value = null
+        lessonCache.set(lessonSlug, res.data as any)
+
+        if (res.data.type === 'pdf') {
+          await loadPdfBlob(entityId)
+        } else {
+          revokePdfBlob()
+        }
       }
 
       setLastLesson(lessonSlug)
       expandModuleContainingLesson(lessonSlug)
       schedulePrefetch(lessonSlug)
     } catch {
-      lessonError.value = 'Gagal memuat detail materi.'
+      lessonError.value = 'Gagal memuat detail materi/kuis.'
     } finally {
-      isLessonLoading.value = false
+      if (!options.quiet) {
+        isLessonLoading.value = false
+      }
     }
   }
 
-  async function loadPlayerData() {
-    isCourseLoading.value = true
+  async function loadPlayerData(options: { quiet?: boolean } = {}) {
+    if (!options.quiet) {
+      isCourseLoading.value = true
+    }
     courseError.value = ''
 
     try {
@@ -243,7 +272,9 @@ export const useLmsStore = defineStore('lms', () => {
     } catch {
       courseError.value = 'Gagal memuat data kursus LMS.'
     } finally {
-      isCourseLoading.value = false
+      if (!options.quiet) {
+        isCourseLoading.value = false
+      }
     }
   }
 
@@ -258,8 +289,13 @@ export const useLmsStore = defineStore('lms', () => {
       if (!next || lessonCache.has(next.slug)) return
 
       try {
-        const res = await lmsService.getLessonDetail(courseSlug.value, Number(next.slug))
-        lessonCache.set(next.slug, res.data)
+        if (next.slug.startsWith('quiz-')) {
+          const res = await lmsService.getQuizDetail(courseSlug.value, next.slug.replace('quiz-', ''))
+          lessonCache.set(next.slug, res.data as any)
+        } else {
+          const res = await lmsService.getLessonDetail(courseSlug.value, Number(next.slug))
+          lessonCache.set(next.slug, res.data as any)
+        }
       } catch {
         // Non-critical
       }
@@ -322,6 +358,7 @@ export const useLmsStore = defineStore('lms', () => {
     cleanup()
     playerData.value = null
     lessonDetail.value = null
+    quizDetail.value = null
     isCourseLoading.value = true
     isLessonLoading.value = false
     courseError.value = ''
@@ -336,6 +373,7 @@ export const useLmsStore = defineStore('lms', () => {
     // State
     playerData,
     lessonDetail,
+    quizDetail,
     isCourseLoading,
     isLessonLoading,
     isPdfLoading,

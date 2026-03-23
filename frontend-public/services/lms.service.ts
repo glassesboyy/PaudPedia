@@ -1,4 +1,8 @@
-import type { LmsCertificateResponse, LmsCoursePlayerData, LmsLessonDetail, LmsMarkCompleteResponse, LmsProgress } from '~~/types'
+import type { 
+  LmsCertificateResponse, LmsCoursePlayerData, LmsLessonDetail, 
+  LmsMarkCompleteResponse, LmsProgress, 
+  LmsQuizDetail, LmsQuizSubmitResponse 
+} from '~~/types'
 import { useApiFetch } from './api/client'
 import { API_ENDPOINTS } from './api/endpoints'
 import type { ApiResponse } from './api/types'
@@ -46,5 +50,18 @@ export const lmsService = {
     return apiFetch(API_ENDPOINTS.LMS.LESSON_PDF(courseSlug, lessonId), {
       responseType: 'blob',
     } as any)
+  },
+
+  async getQuizDetail(courseSlug: string, quizId: string | number): Promise<ApiResponse<LmsQuizDetail>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.LMS.QUIZ_SHOW(courseSlug, quizId))
+  },
+
+  async submitQuiz(courseSlug: string, quizId: string | number, payload: { answers: { question_id: number, answer_id: number }[] }): Promise<ApiResponse<LmsQuizSubmitResponse>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.LMS.QUIZ_SUBMIT(courseSlug, quizId), {
+      method: 'POST',
+      body: payload
+    })
   },
 }
