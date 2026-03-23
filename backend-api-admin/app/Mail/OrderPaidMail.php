@@ -26,7 +26,7 @@ class OrderPaidMail extends Mailable
 
     public function content(): Content
     {
-        $this->order->loadMissing(['items', 'user']);
+        $this->order->loadMissing(['items.item', 'user']);
 
         $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
 

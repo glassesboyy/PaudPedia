@@ -90,20 +90,116 @@
 
                             {{-- Access Info --}}
                             <div style="background-color:#eff6ff; border-radius:8px; padding:20px; margin-bottom:24px;">
-                                <p style="margin:0 0 12px; color:#1e40af; font-size:14px; font-weight:600;">
+                                <p style="margin:0 0 16px; color:#1e40af; font-size:14px; font-weight:600;">
                                     Akses Produk Anda:
                                 </p>
-                                <ul style="margin:0; padding:0 0 0 20px; color:#374151; font-size:13px; line-height:1.8;">
-                                    @foreach ($order->items as $item)
-                                        @if ($item->item_type->value === 'course')
-                                            <li><strong>{{ $item->item_title }}</strong> — Akses kursus di halaman <a href="{{ $frontendUrl }}/account/courses" style="color:#2563eb;">Kursus Saya</a></li>
-                                        @elseif ($item->item_type->value === 'webinar')
-                                            <li><strong>{{ $item->item_title }}</strong> — Lihat detail & link Zoom di <a href="{{ $frontendUrl }}/account/webinars" style="color:#2563eb;">Webinar Saya</a></li>
-                                        @elseif ($item->item_type->value === 'product')
-                                            <li><strong>{{ $item->item_title }}</strong> — Download di <a href="{{ $frontendUrl }}/account/products" style="color:#2563eb;">Produk Saya</a></li>
-                                        @endif
-                                    @endforeach
-                                </ul>
+
+                                @foreach ($order->items as $item)
+                                    @php
+                                        $itemModel = $item->item;
+                                        $type = $item->item_type instanceof \App\Enums\OrderItemType
+                                            ? $item->item_type->value
+                                            : $item->item_type;
+                                    @endphp
+
+                                    @if ($type === 'course' && $itemModel)
+                                        {{-- ── Course Card ───────────── --}}
+                                        <div style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:16px; margin-bottom:12px;">
+                                            <p style="margin:0 0 4px; font-size:11px; font-weight:600; color:#2563eb; text-transform:uppercase; letter-spacing:0.5px;">
+                                                📚 Kursus
+                                            </p>
+                                            <p style="margin:0 0 10px; font-size:14px; font-weight:600; color:#1e293b;">
+                                                {{ $item->item_title }}
+                                            </p>
+                                            <table cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ $frontendUrl }}/learn/{{ $itemModel->slug }}"
+                                                           style="display:inline-block; padding:10px 20px; background-color:#2563eb; color:#ffffff; text-decoration:none; border-radius:6px; font-size:13px; font-weight:600;">
+                                                            Mulai Belajar →
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+
+                                    @elseif ($type === 'webinar' && $itemModel)
+                                        {{-- ── Webinar Card ──────────── --}}
+                                        <div style="background:#ffffff; border:1px solid #fce7f3; border-radius:8px; padding:16px; margin-bottom:12px;">
+                                            <p style="margin:0 0 4px; font-size:11px; font-weight:600; color:#db2777; text-transform:uppercase; letter-spacing:0.5px;">
+                                                🎥 Webinar
+                                            </p>
+                                            <p style="margin:0 0 10px; font-size:14px; font-weight:600; color:#1e293b;">
+                                                {{ $item->item_title }}
+                                            </p>
+
+                                            @if ($itemModel->event_date)
+                                                <p style="margin:0 0 8px; font-size:13px; color:#6b7280;">
+                                                    📅 {{ \Carbon\Carbon::parse($itemModel->event_date)->translatedFormat('l, d F Y \\p\\u\\k\\u\\l H:i') }} WIB
+                                                </p>
+                                            @endif
+
+                                            @if ($itemModel->zoom_link)
+                                                <table cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+                                                    <tr>
+                                                        <td>
+                                                            <a href="{{ $itemModel->zoom_link }}"
+                                                               style="display:inline-block; padding:10px 20px; background-color:#db2777; color:#ffffff; text-decoration:none; border-radius:6px; font-size:13px; font-weight:600;">
+                                                                Join Zoom Meeting →
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            @endif
+
+                                            @if ($itemModel->zoom_meeting_id || $itemModel->zoom_passcode)
+                                                <div style="background:#fdf2f8; border-radius:6px; padding:10px 14px; font-size:12px; color:#6b7280;">
+                                                    @if ($itemModel->zoom_meeting_id)
+                                                        <strong>Meeting ID:</strong> {{ $itemModel->zoom_meeting_id }}<br>
+                                                    @endif
+                                                    @if ($itemModel->zoom_passcode)
+                                                        <strong>Passcode:</strong> {{ $itemModel->zoom_passcode }}
+                                                    @endif
+                                                </div>
+                                            @endif
+
+                                            @if (!$itemModel->zoom_link)
+                                                <p style="margin:6px 0 0; font-size:12px; color:#9ca3af;">
+                                                    Link Zoom akan tersedia di halaman <a href="{{ $frontendUrl }}/account/webinars" style="color:#db2777;">Webinar Saya</a>
+                                                </p>
+                                            @endif
+                                        </div>
+
+                                    @elseif ($type === 'product' && $itemModel)
+                                        {{-- ── Product Card ──────────── --}}
+                                        <div style="background:#ffffff; border:1px solid #d1fae5; border-radius:8px; padding:16px; margin-bottom:12px;">
+                                            <p style="margin:0 0 4px; font-size:11px; font-weight:600; color:#059669; text-transform:uppercase; letter-spacing:0.5px;">
+                                                📦 Produk Digital
+                                            </p>
+                                            <p style="margin:0 0 10px; font-size:14px; font-weight:600; color:#1e293b;">
+                                                {{ $item->item_title }}
+                                            </p>
+                                            <table cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ $frontendUrl }}/account/products"
+                                                           style="display:inline-block; padding:10px 20px; background-color:#059669; color:#ffffff; text-decoration:none; border-radius:6px; font-size:13px; font-weight:600;">
+                                                            Download Produk →
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+
+                                    @else
+                                        {{-- ── Fallback ──────────────── --}}
+                                        <div style="background:#ffffff; border:1px solid #e5e7eb; border-radius:8px; padding:16px; margin-bottom:12px;">
+                                            <p style="margin:0; font-size:14px; color:#374151;">
+                                                <strong>{{ $item->item_title }}</strong> — {{ $item->item_type instanceof \App\Enums\OrderItemType ? $item->item_type->label() : $type }}
+                                            </p>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
 
                             {{-- CTA --}}
