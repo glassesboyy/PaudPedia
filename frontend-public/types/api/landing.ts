@@ -94,6 +94,7 @@ export interface LandingProduct {
   original_price: number | null
   has_discount: boolean
   discount_percentage: number | null
+  is_owned?: boolean
   file_info: ProductFileInfo | null
   category: Pick<Category, 'id' | 'name'> | null
 }

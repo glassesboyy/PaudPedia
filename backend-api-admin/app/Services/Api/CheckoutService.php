@@ -137,9 +137,9 @@ class CheckoutService
                 ]);
             }
 
-            // Check for duplicate purchases (courses and webinars should only be purchased once)
-            if ($type === OrderItemType::COURSE || $type === OrderItemType::WEBINAR) {
-                $quantity = 1; // Force quantity to 1 for course/webinar
+            // Check for duplicate purchases (courses, webinars, and digital products should only be purchased once)
+            if ($type === OrderItemType::COURSE || $type === OrderItemType::WEBINAR || $type === OrderItemType::PRODUCT) {
+                $quantity = 1; // Force quantity to 1 for digital items
 
                 $alreadyPurchased = OrderItem::where('item_type', $type->value)
                     ->where('item_id', $model->id)

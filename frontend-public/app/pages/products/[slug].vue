@@ -296,8 +296,22 @@ const isHtmlDescription = computed(() => {
                   </div>
                 </div>
 
+                <!-- Owned UI -->
+                <div v-if="product.is_owned" class="mt-6">
+                  <NuxtLink
+                    to="/account/products"
+                    class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-success-600 text-white text-sm font-semibold hover:bg-success-700 transition-all shadow-sm"
+                  >
+                    <Icon name="lucide:download" class="w-4 h-4" />
+                    Akses Produk
+                  </NuxtLink>
+                  <p class="text-[11px] text-center text-muted mt-2">
+                     Anda sudah memiliki produk ini.
+                  </p>
+                </div>
+
                 <!-- Add to cart button -->
-                <div v-if="product.price > 0" class="mt-6">
+                <div v-else-if="product.price > 0" class="mt-6">
                   <button
                     type="button"
                     class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-sm"

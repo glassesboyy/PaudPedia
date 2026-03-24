@@ -57,11 +57,19 @@ class LandingPageController extends BaseController
                     $q->where('user_id', $user->id)->where('status', \App\Enums\OrderStatus::PAID->value);
                 })->pluck('item_id')->toArray();
 
+            $ownedProductIds = \App\Models\OrderItem::where('item_type', \App\Enums\OrderItemType::PRODUCT->value)
+                ->whereHas('order', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)->where('status', \App\Enums\OrderStatus::PAID->value);
+                })->pluck('item_id')->toArray();
+
             foreach ($data['featured_courses'] as &$course) {
                 $course['is_owned'] = in_array($course['id'], $enrolledCourseIds);
             }
             foreach ($data['featured_webinars'] as &$webinar) {
                 $webinar['is_owned'] = in_array($webinar['id'], $registeredWebinarIds);
+            }
+            foreach ($data['featured_products'] as &$product) {
+                $product['is_owned'] = in_array($product['id'], $ownedProductIds);
             }
         }
 

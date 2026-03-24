@@ -53,6 +53,15 @@ function formatPrice(price: number): string {
       >
         -{{ product.discount_percentage }}%
       </span>
+
+      <!-- Owned Badge -->
+      <span
+        v-if="product.is_owned"
+        class="absolute bottom-3 left-3 px-2 py-0.5 rounded-lg text-[11px] font-bold bg-success-500 text-white shadow-sm flex items-center gap-1"
+      >
+        <Icon name="lucide:check-circle" class="w-3 h-3" />
+        Dimiliki
+      </span>
     </div>
 
     <!-- Content -->
