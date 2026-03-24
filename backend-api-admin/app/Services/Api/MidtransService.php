@@ -19,9 +19,10 @@ class MidtransService
     }
 
     /**
-     * Create a Midtrans Snap token for the given order.
+     * Create a Midtrans Snap transaction for the given order.
+     * Returns an array containing the snap token and the redirect URL.
      */
-    public function createSnapToken(Order $order): string
+    public function createSnapTransaction(Order $order): array
     {
         $order->loadMissing(['items', 'user']);
 
@@ -59,9 +60,17 @@ class MidtransService
                 'email'      => $order->user->email,
                 'phone'      => $order->user->phone ?? '',
             ],
+            'callbacks' => [
+                'finish' => rtrim(config('app.frontend_url', 'http://localhost:3000'), '/') . '/payment/finish'
+            ]
         ];
 
-        return Snap::getSnapToken($params);
+        $snap = Snap::createTransaction($params);
+
+        return [
+            'token' => $snap->token,
+            'redirect_url' => $snap->redirect_url,
+        ];
     }
 
     /**

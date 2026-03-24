@@ -24,6 +24,7 @@ class UserTransactionResource extends JsonResource
             'discount_amount' => (float) $this->discount_amount,
             'final_amount' => (float) $this->final_amount,
             'payment_method' => $this->payment_method,
+            'payment_url' => $this->payment_url,
             'items' => $this->whenLoaded('items', function () {
                 return $this->items->map(fn($item) => [
                     'id' => $item->id,

@@ -91,15 +91,19 @@ class CheckoutService
                 $promo->incrementUsage();
             }
 
-            // 7. Generate Midtrans snap token
+            // 7. Generate Midtrans snap transaction
             $order->load('items');
-            $snapToken = $this->midtransService->createSnapToken($order);
+            $snapData = $this->midtransService->createSnapTransaction($order);
+            
+            // 8. Save snapshot of payment URL
+            $order->payment_url = $snapData['redirect_url'];
+            $order->save();
 
             DB::commit();
 
             return [
                 'order'      => $order->load('items'),
-                'snap_token' => $snapToken,
+                'snap_token' => $snapData['token'],
             ];
         } catch (\Exception $e) {
             DB::rollBack();

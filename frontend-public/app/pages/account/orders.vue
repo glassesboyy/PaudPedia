@@ -100,6 +100,10 @@ function openDetail(tx: Transaction) {
   showDetail.value = true
 }
 
+function openPaymentUrl(url: string | null | undefined) {
+  if (url) window.open(url, '_blank')
+}
+
 onMounted(() => fetchTransactions())
 </script>
 
@@ -384,17 +388,37 @@ onMounted(() => fetchTransactions())
                   </div>
                 </div>
 
-                <!-- Payment info -->
-                <div v-if="selectedTx.payment_method || selectedTx.paid_at">
+                <!-- Payment Action (Pending) -->
+                <div v-if="selectedTx.status === 'pending'" class="rounded-xl border border-warning-200 bg-warning-50/50 p-6 text-center shadow-sm">
+                  <div class="w-12 h-12 bg-warning-100 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Icon name="lucide:clock" class="w-6 h-6" />
+                  </div>
+                  <h3 class="text-lg font-bold text-heading mb-1.5 text-center">Menunggu Pembayaran</h3>
+                  <p class="text-xs text-body mb-5 leading-relaxed max-w-sm mx-auto">
+                    Selesaikan tagihan Anda melalui portal pembayaran resmi Midtrans untuk mendapatkan akses materi secara instan.
+                  </p>
+                  <UButton
+                    v-if="selectedTx.payment_url"
+                    @click="openPaymentUrl(selectedTx.payment_url)"
+                    size="lg"
+                    class="justify-center bg-primary-600 hover:bg-primary-700 text-white font-bold w-full transition-all shadow-sm"
+                  >
+                    Selesaikan Pembayaran
+                    <Icon name="lucide:external-link" class="w-4 h-4 ml-1.5 opacity-90" />
+                  </UButton>
+                </div>
+
+                <!-- Payment info (Paid / Cancelled / Expired) -->
+                <div v-else-if="selectedTx.payment_method || selectedTx.paid_at">
                   <h3 class="text-xs font-semibold text-muted uppercase tracking-wider mb-2.5">Pembayaran</h3>
                   <div class="space-y-2 text-sm">
                     <div v-if="selectedTx.payment_method" class="flex items-center gap-2 text-body">
                       <Icon name="lucide:credit-card" class="w-4 h-4 text-muted" />
-                      <span>{{ selectedTx.payment_method }}</span>
+                      <span class="uppercase font-medium">{{ selectedTx.payment_method }}</span>
                     </div>
                     <div v-if="selectedTx.paid_at" class="flex items-center gap-2 text-body">
                       <Icon name="lucide:check-circle" class="w-4 h-4 text-success-500" />
-                      <span>Dibayar {{ selectedTx.paid_at }}</span>
+                      <span>Dibayar {{ new Date(selectedTx.paid_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) + ' WIB' }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-body">
                       <Icon name="lucide:calendar" class="w-4 h-4 text-muted" />

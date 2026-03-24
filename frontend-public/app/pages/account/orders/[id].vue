@@ -17,9 +17,13 @@ definePageMeta({
 const route = useRoute()
 const orderId = Number(route.params.id)
 
-const order = ref<Transaction | null>(null)
+const order = ref<any>(null)
 const isLoading = ref(true)
 const error = ref(false)
+
+function openPaymentUrl(url: string | null | undefined) {
+  if (url) window.open(url, '_blank')
+}
 
 async function fetchOrder() {
   isLoading.value = true
@@ -248,20 +252,43 @@ function accessRoute(type: string): string {
         </div>
       </div>
 
-      <!-- Payment info card -->
-      <div v-if="order.payment_method || order.paid_at" class="rounded-2xl border border-border bg-surface p-6 mb-4">
+      <!-- Option B: Direct Proxy Payment Info (Pending) -->
+      <div v-if="order.status === 'pending'" class="rounded-2xl border border-warning-200 bg-warning-50/30 p-8 md:p-10 mb-4 text-center shadow-sm">
+        <div class="w-16 h-16 bg-warning-100 text-warning-600 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+          <Icon name="lucide:clock" class="w-8 h-8" />
+        </div>
+        <h2 class="text-2xl font-bold text-heading mb-3">
+          Menunggu Pembayaran
+        </h2>
+        <p class="text-sm text-body mb-8 max-w-md mx-auto leading-relaxed">
+          Silakan selesaikan tagihan Anda melalui portal pembayaran resmi Midtrans untuk mendapatkan akses materi secara instan.
+        </p>
+
+        <UButton
+          v-if="order.payment_url"
+          @click="openPaymentUrl(order.payment_url)"
+          size="lg"
+          class="justify-center bg-primary-600 hover:bg-primary-700 text-white font-bold transition-all shadow-md hover:shadow-lg w-full sm:w-auto px-10 py-3.5 rounded-xl border border-primary-700/50"
+        >
+          Selesaikan Pembayaran Anda
+          <Icon name="lucide:external-link" class="w-5 h-5 ml-2.5 opacity-90" />
+        </UButton>
+      </div>
+
+      <!-- Payment info card (Paid / Expired / Cancelled) -->
+      <div v-else-if="order.payment_method || order.paid_at" class="rounded-2xl border border-border bg-surface p-6 mb-4">
         <h2 class="text-sm font-semibold text-heading mb-4 flex items-center gap-2">
           <Icon name="lucide:credit-card" class="w-4 h-4 text-primary-500" />
-          Informasi Pembayaran
+          Informasi Transaksi Biasa
         </h2>
         <div class="space-y-2.5 text-sm">
           <div v-if="order.payment_method" class="flex items-center gap-2.5 text-body">
             <Icon name="lucide:credit-card" class="w-4 h-4 text-muted" />
-            <span>Metode: <strong class="text-heading">{{ order.payment_method }}</strong></span>
+            <span>Metode: <strong class="text-heading uppercase">{{ order.payment_method }}</strong></span>
           </div>
           <div v-if="order.paid_at" class="flex items-center gap-2.5 text-body">
             <Icon name="lucide:check-circle" class="w-4 h-4 text-success-500" />
-            <span>Dibayar pada: <strong class="text-heading">{{ order.paid_at }}</strong></span>
+            <span>Dibayar pada: <strong class="text-heading">{{ new Date(order.paid_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) + ' WIB' }}</strong></span>
           </div>
           <div class="flex items-center gap-2.5 text-body">
             <Icon name="lucide:calendar" class="w-4 h-4 text-muted" />

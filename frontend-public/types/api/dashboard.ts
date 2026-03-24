@@ -103,6 +103,7 @@ export interface Transaction {
   discount_amount: number
   final_amount: number
   payment_method: string | null
+  payment_url?: string | null
   items: TransactionItem[]
   paid_at: string | null
   created_at: string
