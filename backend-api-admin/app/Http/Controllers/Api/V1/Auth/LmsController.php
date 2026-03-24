@@ -145,10 +145,12 @@ class LmsController extends BaseController
             $progress->markAsCompleted();
         }
 
+        // Must run updateProgress to refresh progress counts and Quiz completions
+        $enrollment->updateProgress();
         $enrollment->refresh();
 
-        // Auto-generate certificate when progress reaches 100%
-        if ((int) $enrollment->progress_percentage >= 100 && empty($enrollment->certificate_url)) {
+        // Auto-generate certificate when fully completed (100% + Quizzes passed)
+        if ($enrollment->isCompleted() && empty($enrollment->certificate_url)) {
             $path = $generator->generateForEnrollment($enrollment->loadMissing(['user', 'course']));
             $enrollment->certificate_url = $path;
             $enrollment->save();
@@ -222,7 +224,7 @@ class LmsController extends BaseController
         $enrollment->updateProgress();
         $enrollment->refresh();
 
-        if ((int) $enrollment->progress_percentage < 100) {
+        if (!$enrollment->isCompleted()) {
             return $this->error('Sertifikat belum tersedia. Pastikan Anda telah menyelesaikan 100% materi dan lulus pada semua Kuis yang ada.', 400);
         }
 

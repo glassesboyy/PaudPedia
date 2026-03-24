@@ -136,7 +136,7 @@
 <div class="frame">
     <div class="inner">
         <div class="brand">PaudPedia</div>
-        <div class="title">Sertifikat Kelulusan</div>
+        <div class="title">Sertifikat Kelulusan Kontol Ayam</div>
         <div class="line"></div>
 
         <div class="sub">Dengan ini menyatakan bahwa</div>
@@ -149,7 +149,7 @@
 
         <!-- SVG BADGE (FIXED) -->
         <div class="badge">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="70" height="70">
                 <circle cx="50" cy="50" r="45"
                         stroke="#b8860b"
                         stroke-width="3"

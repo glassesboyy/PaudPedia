@@ -56,7 +56,7 @@ function formatPrice(price: number): string {
 
 <template>
   <div class="bg-gradient-to-b from-surface via-surface to-primary-50/10 min-h-[60vh]">
-    <div class="container py-8 sm:py-12 max-w-5xl">
+    <div class="container py-8 sm:py-12"> 
       <!-- Breadcrumb -->
       <nav class="flex items-center gap-2 text-xs text-muted mb-8">
         <NuxtLink to="/" class="hover:text-primary-600 transition-colors">Beranda</NuxtLink>

@@ -17,10 +17,12 @@ const activeLessonSummary = computed(() => store.getActiveLessonSummary(activeLe
 const activeLessonIndex = computed(() => store.getActiveLessonIndex(activeLessonSlug.value))
 const prevLesson = computed(() => store.getPrevLesson(activeLessonSlug.value))
 const nextLesson = computed(() => store.getNextLesson(activeLessonSlug.value))
+const hasQuizzes = computed(() => store.flatLessons.some(l => l.type === 'quiz'))
 
 // Load lesson detail on mount + on slug change
 async function loadCurrentLesson() {
   if (!activeLessonSlug.value || !store.playerData) return
+  if (activeLessonSlug.value === 'completed') return
   await store.loadLessonDetail(activeLessonSlug.value)
 }
 
@@ -33,7 +35,45 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-if="activeLessonSummary" class="max-w-5xl mx-auto p-4 md:p-6 lg:p-8 space-y-4">
+  <!-- Congratulation UI -->
+  <div v-if="activeLessonSlug === 'completed'" class="max-w-4xl mx-auto rounded-2xl border border-border bg-surface p-8 sm:p-12 text-center m-8 sm:mt-16 shadow-sm">
+    <div class="w-24 h-24 bg-success-50 text-success-500 rounded-full flex items-center justify-center mx-auto mb-6">
+      <Icon name="lucide:award" class="w-14 h-14" />
+    </div>
+    <h2 class="text-3xl font-bold text-heading mb-3">Selamat! Anda Telah Menyelesaikan Semua Materi</h2>
+    <p class="text-md text-body mb-8 leading-relaxed">
+      Anda telah berhasil menyerap dengan tuntas seluruh kurikulum materi pada kursus ini. Terus semangat belajar dan kembangkan ilmu Anda!
+    </p>
+
+    <div v-if="hasQuizzes" class="bg-warning-50 border border-warning-200 rounded-xl p-4 mb-8 text-left flex items-start gap-3">
+      <Icon name="lucide:alert-triangle" class="w-5 h-5 text-warning-600 shrink-0 mt-0.5" />
+      <div>
+        <h4 class="text-sm font-semibold text-warning-800 mb-1">Penting: Persyaratan Sertifikat</h4>
+        <p class="text-xs text-warning-700 leading-relaxed">
+          Kursus ini memuat <strong>Kuis Evaluasi</strong>. Untuk menerbitkan Sertifikat Kelulusan yang sah di Dashboard, Anda wajib menyelesaikan kuis tersebut dengan predikat <strong>LULUS (skor pencapaian 70+)</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <NuxtLink
+        to="/account/certificates"
+        class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+      >
+        <Icon name="lucide:award" class="w-4 h-4" />
+        Sertifikat Saya
+      </NuxtLink>
+      <NuxtLink
+        to="/account/courses"
+        class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl border border-border text-sm font-semibold text-body hover:bg-surface-sunken hover:text-heading transition-colors"
+      >
+        <Icon name="lucide:book-open" class="w-4 h-4" />
+        Kembali ke Beranda Belajar
+      </NuxtLink>
+    </div>
+  </div>
+
+  <div v-else-if="activeLessonSummary" class="max-w-5xl mx-auto p-4 md:p-6 lg:p-8 space-y-4">
     <!-- Lesson header -->
     <header class="rounded-2xl border border-border bg-surface px-5 py-4">
       <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -47,9 +87,6 @@ onBeforeUnmount(() => {
         >
           <Icon name="lucide:check" class="w-3.5 h-3.5" />
           Selesai
-        </span>
-        <span v-if="store.flatLessons.length > 0" class="text-[11px] text-muted ml-auto">
-          {{ activeLessonIndex + 1 }} / {{ store.flatLessons.length }}
         </span>
       </div>
 
@@ -131,6 +168,7 @@ onBeforeUnmount(() => {
 
         <div class="flex flex-wrap gap-2">
           <UButton
+            v-if="activeLessonSummary?.type !== 'quiz'"
             variant="primary"
             :disabled="!activeLessonSummary || activeLessonSummary.is_completed || store.isMarkingComplete"
             :loading="store.isMarkingComplete"
@@ -139,24 +177,6 @@ onBeforeUnmount(() => {
             <Icon name="lucide:check-circle-2" class="w-4 h-4 mr-1.5" />
             {{ activeLessonSummary?.is_completed ? 'Sudah Selesai' : 'Tandai Selesai' }}
           </UButton>
-
-          <UPopover v-if="store.isCourseCompleted" mode="hover">
-            <UButton
-              variant="secondary"
-              :loading="store.isDownloadingCertificate"
-              :disabled="!store.certificateDownloadUrl"
-              @click="store.downloadCertificate()"
-            >
-              <Icon name="lucide:download" class="w-4 h-4 mr-1.5" />
-              Unduh Sertifikat
-            </UButton>
-
-            <template #panel>
-              <div v-if="!store.certificateDownloadUrl" class="p-3 max-w-[200px] text-xs text-danger-600 font-medium text-center">
-                Selesaikan dan raih nilai lulus (min 70) pada semua kuis terlebih dahulu untuk membuka sertifikat.
-              </div>
-            </template>
-          </UPopover>
         </div>
       </div>
 
@@ -175,16 +195,30 @@ onBeforeUnmount(() => {
         </NuxtLink>
 
         <NuxtLink
-          :to="nextLesson ? `/learn/${store.courseSlug}/${nextLesson.slug}` : undefined"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all"
-          :class="nextLesson
-            ? 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm'
-            : 'text-muted/40 pointer-events-none'"
+          v-if="nextLesson"
+          :to="`/learn/${store.courseSlug}/${nextLesson.slug}`"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all bg-primary-500 text-white hover:bg-primary-600 shadow-sm"
         >
-          <span class="hidden sm:inline truncate max-w-[10rem]">{{ nextLesson?.title || 'Next' }}</span>
+          <span class="hidden sm:inline truncate max-w-[10rem]">{{ nextLesson.title || 'Next' }}</span>
           <span class="sm:hidden">Next</span>
           <Icon name="lucide:chevron-right" class="w-3.5 h-3.5" />
         </NuxtLink>
+        
+        <NuxtLink
+          v-else-if="store.playerData?.progress.progress_percentage === 100 || activeLessonSummary?.is_completed"
+          :to="`/learn/${store.courseSlug}/completed`"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all bg-success-500 text-white hover:bg-success-600 shadow-sm"
+        >
+          <span>Selesaikan Kursus</span>
+          <Icon name="lucide:flag" class="w-3.5 h-3.5" />
+        </NuxtLink>
+        <span
+          v-else
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium bg-muted/10 text-muted/40 pointer-events-none"
+        >
+          Selesaikan Kursus
+          <Icon name="lucide:flag" class="w-3.5 h-3.5" />
+        </span>
       </div>
     </footer>
   </div>
