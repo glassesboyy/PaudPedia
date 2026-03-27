@@ -5,6 +5,7 @@ export interface User {
   name: string
   email: string
   avatar: string | null
+  email_verified_at: string | null
   roles?: string[]
   school_memberships?: SchoolMembership[]
 }

@@ -77,6 +77,15 @@ const plans = [
     highlighted: true,
   },
 ]
+
+import { useAuth } from '~~/app/composables/useAuth'
+import { useAuthStore } from '~~/stores/auth'
+
+const { isAuthenticated } = useAuth()
+const authStore = useAuthStore()
+const hasSchoolAccess = computed(() => authStore.hasSchoolAccess)
+const siakadUrl = computed(() => authStore.siakadUrl)
+const tokenCookie = useCookie('auth_token')
 </script>
 
 <template>
@@ -101,12 +110,22 @@ const plans = [
           </p>
 
           <div class="mt-10 flex flex-wrap gap-4 justify-center">
-            <NuxtLink to="/auth/register?type=school">
-              <UButton variant="secondary" size="lg" class="px-8 shadow-strong">
-                Daftarkan Sekolah Anda
-                <Icon name="lucide:arrow-right" class="w-4 h-4 ml-2" />
-              </UButton>
-            </NuxtLink>
+            <template v-if="hasSchoolAccess">
+              <a :href="`${siakadUrl}/auth/token?token=${tokenCookie}`">
+                <UButton variant="secondary" size="lg" class="px-8 shadow-strong">
+                  Buka Dashboard SIAKAD
+                  <Icon name="lucide:external-link" class="w-4 h-4 ml-2" />
+                </UButton>
+              </a>
+            </template>
+            <template v-else>
+              <NuxtLink :to="isAuthenticated ? '/auth/register?type=school' : '/auth/register?type=school'">
+                <UButton variant="secondary" size="lg" class="px-8 shadow-strong">
+                  Daftarkan Sekolah Anda
+                  <Icon name="lucide:arrow-right" class="w-4 h-4 ml-2" />
+                </UButton>
+              </NuxtLink>
+            </template>
             <a href="#pricing">
               <UButton variant="ghost" size="lg" class="!text-white hover:!bg-white/10 px-8">
                 Lihat Harga

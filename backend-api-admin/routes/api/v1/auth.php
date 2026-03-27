@@ -28,13 +28,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
 });
 
 // Authenticated routes
-Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function () {
+Route::prefix('auth')->name('auth.')->middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me'); 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
-    Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
     
     // School registration (authenticated upgrade)
     Route::post('/schools/register', [AuthController::class, 'registerSchoolUpgrade'])->name('schools.register');
@@ -46,8 +43,15 @@ Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function
     Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
 });
 
+// Resend verification email (requires auth but NOT verified!)
+Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function () {
+    Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+});
+
 // Other authenticated routes (outside auth prefix)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // School memberships
     Route::get('/my-memberships', [\App\Http\Controllers\Api\V1\School\SchoolController::class, 'myMemberships'])
         ->name('my-memberships');

@@ -48,6 +48,8 @@ class AuthService
             ]);
         }
 
+        $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
@@ -176,6 +178,9 @@ class AuthService
         if (!$user->is_active) {
             return ['error' => 'inactive'];
         }
+
+        // Load memberships for initial state
+        $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
 
         // Create new token
         $token = $user->createToken('auth_token')->plainTextToken;

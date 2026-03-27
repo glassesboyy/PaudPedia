@@ -25,16 +25,31 @@ export const authGuard: NavigationGuardWithThis<undefined> = async (
 
   const isAuthenticated = authStore.isAuthenticated
 
-  // Protected route — redirect to login
-  if (to.matched.some((r) => r.meta.requiresAuth) && !isAuthenticated) {
-    return {
-      name: 'Login',
-      query: { redirect: to.fullPath },
+  // Protected route — redirect to login or verification
+  if (to.matched.some((r) => r.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      return {
+        name: 'Login',
+        query: { redirect: to.fullPath },
+      }
+    }
+
+    // User is authenticated, but check if email is verified
+    if (authStore.user && !authStore.user.email_verified_at) {
+      const publicUrl = import.meta.env.VITE_PUBLIC_URL || 'http://localhost:3000'
+      window.location.href = `${publicUrl}/auth/verify-email`
+      return false
     }
   }
 
   // Guest-only route — redirect to school selector
   if (to.meta.guest && isAuthenticated) {
+    if (authStore.user && !authStore.user.email_verified_at) {
+        // Unverified users should not see guess routes either if they are 'logged in' but restricted
+        const publicUrl = import.meta.env.VITE_PUBLIC_URL || 'http://localhost:3000'
+        window.location.href = `${publicUrl}/auth/verify-email`
+        return false
+    }
     return { name: 'SelectSchool' }
   }
 

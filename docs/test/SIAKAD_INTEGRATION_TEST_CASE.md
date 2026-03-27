@@ -17,9 +17,8 @@ Fokus pada proses masuk (login) dan perpindahan sesi antar domain.
 - **Expected Result:**
   - Aplikasi SIAKAD berhasil memvalidasi token secara otomatis.
   - User langsung diarahkan ke Dashboard SIAKAD atau halaman Pilih Sekolah tanpa diminta login ulang.
-- **Actual Result:** 
-- **Status:** 
-
+- **Actual Result:** Berhasil login di Public, namun link "Dashboard SIAKAD" sempat tidak muncul di Navbar (Sudah diperbaiki dengan menambahkan eager loading memberships di backend).
+- **Status:** PASS (After Fix)
 ### TC-AUTH-02: Direct Login on SIAKAD
 - **Tujuan:** Memastikan login langsung di aplikasi SIAKAD berfungsi.
 - **Preconditions:** User memiliki akun 'Sekolah' (Headmaster).
@@ -64,9 +63,8 @@ Fokus pada pembuatan akun baru melalui Frontend Public.
   - Akun user dibuat dengan role `user` dan `headmaster`.
   - Data sekolah tersimpan di database.
   - User otomatis diarahkan ke Dashboard SIAKAD setelah proses login otomatis berhasil.
-- **Actual Result:** 
-- **Status:** 
-
+- **Actual Result:** Berhasil mendaftar, redirect ke SIAKAD lancar, dan landed di Dashboard dengan role Kepala Sekolah.
+- **Status:** PASS
 ---
 
 ## 3. Upgrade Account Flow
@@ -110,9 +108,8 @@ Fokus pada validasi sistem terhadap data tidak valid.
 - **Expected Result:**
   - Muncul pesan error "Data profil user gagal diverifikasi".
   - Redirect otomatis ke halaman login setelah 2-3 detik.
-- **Actual Result:** 
-- **Status:** 
-
+- **Actual Result:** Redirect ke login berhasil, namun pesan error di UI kurang terlihat jelas (Sudah diperbaiki).
+- **Status:** PASS
 ---
 
 ## Detail Teknis Terkait

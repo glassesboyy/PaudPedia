@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('user')->name('user.')->middleware('auth:sanctum')->group(function () {
+Route::prefix('user')->name('user.')->middleware(['auth:sanctum', 'verified'])->group(function () {
 
     // My Courses (FR-UA-08)
     Route::get('/courses', [UserDashboardController::class, 'courses'])->name('courses');

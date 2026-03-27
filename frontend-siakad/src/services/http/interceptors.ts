@@ -44,7 +44,12 @@ export function setupInterceptors(instance: AxiosInstance) {
           break
 
         case 403:
-          // Forbidden: wrong school or role
+          // Forbidden: wrong school or role or email not verified
+          if ((error.response.data as any)?.error_code === 'EMAIL_NOT_VERIFIED') {
+            const publicUrl = import.meta.env.VITE_PUBLIC_URL || 'http://localhost:3000'
+            window.location.href = `${publicUrl}/auth/verify-email`
+            break
+          }
           showToast('Anda tidak memiliki akses')
           break
 
