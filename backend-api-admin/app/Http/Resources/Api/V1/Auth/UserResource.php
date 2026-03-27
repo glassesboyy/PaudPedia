@@ -28,6 +28,21 @@ class UserResource extends JsonResource
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name');
             }),
+            'school_memberships' => $this->whenLoaded('schoolMemberships', function () {
+                return $this->schoolMemberships->map(function ($membership) {
+                    return [
+                        'id' => $membership->id,
+                        'school_id' => $membership->school_id,
+                        'role_type' => $membership->role_type,
+                        'is_active' => $membership->is_active,
+                        'school' => [
+                            'id' => $membership->school->id,
+                            'name' => $membership->school->name,
+                            'npsn' => $membership->school->npsn,
+                        ]
+                    ];
+                });
+            }),
             'created_at' => $this->created_at->toISOString(),
         ];
     }

@@ -1,3 +1,118 @@
-﻿@tailwind base;
+/* ── Google Fonts ──────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── CSS Custom Properties ────────────────────────────── */
+@import './variables.css';
+
+/* ── Tailwind Layers ──────────────────────────────────── */
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ════════════════════════════════════════════════════════
+   BASE LAYER — Global resets & typography defaults
+   ════════════════════════════════════════════════════════ */
+@layer base {
+
+  *,
+  *::before,
+  *::after {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-body font-sans leading-relaxed;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold text-heading tracking-tight;
+  }
+
+  h1 {
+    @apply text-3xl sm:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl;
+  }
+
+  h4 {
+    @apply text-lg sm:text-xl;
+  }
+
+  a {
+    @apply text-primary-600 hover:text-primary-700 transition-colors;
+  }
+
+  ::selection {
+    @apply bg-primary-100 text-primary-900;
+  }
+
+  /* Focus-visible ring for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   COMPONENT LAYER — Reusable utility classes
+   ════════════════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Input Field ───────────────────────────────────── */
+  .input-field {
+    @apply w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted transition-all duration-200 hover:border-primary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-surface-muted;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:border-danger-500 focus:ring-danger-500/20;
+  }
+
+  /* ── Label ─────────────────────────────────────────── */
+  .label {
+    @apply block text-sm font-medium text-heading mb-1.5;
+  }
+
+  /* ── Card ──────────────────────────────────────────── */
+  .card {
+    @apply bg-surface rounded-xl border border-border-muted shadow-card;
+  }
+
+  .card-body {
+    @apply p-5 sm:p-6;
+  }
+
+  .card-header {
+    @apply px-5 sm:px-6 py-4 border-b border-border-muted;
+  }
+
+  .card-footer {
+    @apply px-5 sm:px-6 py-4 border-t border-border-muted;
+  }
+
+  /* ── Section container ─────────────────────────────── */
+  .section {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  /* ── Gradient text ─────────────────────────────────── */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent;
+  }
+}

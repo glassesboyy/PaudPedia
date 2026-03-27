@@ -23,6 +23,51 @@ export const registerSchema = z
     path: ['password_confirmation'],
   })
 
+// ── Register School (guest — user + school) ──────────────
+export const registerSchoolSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, 'Nama wajib diisi')
+      .min(3, 'Nama minimal 3 karakter')
+      .max(100, 'Nama maksimal 100 karakter'),
+    email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),
+    password: z.string().min(1, 'Password wajib diisi').min(8, 'Password minimal 8 karakter'),
+    password_confirmation: z.string().min(1, 'Konfirmasi password wajib diisi'),
+    school_name: z
+      .string()
+      .min(1, 'Nama sekolah wajib diisi')
+      .min(3, 'Nama sekolah minimal 3 karakter'),
+    school_npsn: z
+      .string()
+      .min(1, 'NPSN wajib diisi')
+      .regex(/^\d{8}$/, 'NPSN harus 8 digit angka'),
+    school_address: z
+      .string()
+      .min(1, 'Alamat sekolah wajib diisi')
+      .min(10, 'Alamat minimal 10 karakter'),
+  })
+  .refine((d) => d.password === d.password_confirmation, {
+    message: 'Konfirmasi password tidak cocok',
+    path: ['password_confirmation'],
+  })
+
+// ── Register School (authenticated user upgrade) ─────────
+export const registerSchoolUpgradeSchema = z.object({
+  school_name: z
+    .string()
+    .min(1, 'Nama sekolah wajib diisi')
+    .min(3, 'Nama sekolah minimal 3 karakter'),
+  school_npsn: z
+    .string()
+    .min(1, 'NPSN wajib diisi')
+    .regex(/^\d{8}$/, 'NPSN harus 8 digit angka'),
+  school_address: z
+    .string()
+    .min(1, 'Alamat sekolah wajib diisi')
+    .min(10, 'Alamat minimal 10 karakter'),
+})
+
 // ── Forgot Password ──────────────────────────────────────
 export const forgotPasswordSchema = z.object({
   email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),

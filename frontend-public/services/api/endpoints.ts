@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
+    REGISTER_SCHOOL: '/auth/register-school',
     LOGOUT: '/auth/logout',
     ME: '/auth/me',
     FORGOT_PASSWORD: '/auth/forgot-password',
@@ -20,6 +21,11 @@ export const API_ENDPOINTS = {
     CSRF_COOKIE: '/sanctum/csrf-cookie',
     PROFILE: '/auth/profile',
     PROFILE_AVATAR: '/auth/profile/avatar',
+  },
+
+  // ── Schools ──────────────────────────────────────────────
+  SCHOOLS: {
+    REGISTER: '/schools/register',
   },
 
   // ── Courses ────────────────────────────────────────────

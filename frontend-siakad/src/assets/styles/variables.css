@@ -1,1 +1,31 @@
-﻿/* TODO: Define CSS custom properties */
+/*
+ * PaudPedia SIAKAD — CSS Custom Properties
+ *
+ * These define the neutral semantic palette consumed by tailwind.config.ts
+ * via the withOpacity() helper. Values are raw RGB channels (no function wrapper).
+ *
+ * To add dark mode later, duplicate inside @media (prefers-color-scheme: dark)
+ * or use a `.dark` class strategy.
+ */
+
+:root {
+  /* ── Background & Surface ────────────────────────────── */
+  --color-background:     248 250 252;   /* slate-50  — page bg */
+  --color-surface:        255 255 255;   /* white    — cards, modals */
+  --color-surface-muted:  241 245 249;   /* slate-100 — muted panels */
+  --color-surface-sunken: 226 232 240;   /* slate-200 — inset areas */
+
+  /* ── Text ────────────────────────────────────────────── */
+  --color-foreground:     15 23 42;      /* slate-900 — primary text */
+  --color-heading:        15 23 42;      /* slate-900 — headings */
+  --color-body:           51 65 85;      /* slate-600 — body text */
+  --color-muted:          100 116 139;   /* slate-500 — secondary text */
+  --color-on-primary:     255 255 255;   /* white    — text on primary bg */
+
+  /* ── Borders ─────────────────────────────────────────── */
+  --color-border:         203 213 225;   /* slate-300 — default borders */
+  --color-border-muted:   226 232 240;   /* slate-200 — subtle borders */
+
+  /* ── Focus Ring ──────────────────────────────────────── */
+  --color-ring:           37 99 235;     /* primary-600 — focus ring */
+}

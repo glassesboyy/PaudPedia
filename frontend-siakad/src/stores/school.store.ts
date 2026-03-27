@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { authService } from '@/features/auth/services/auth.service'
 import type { School, SchoolMembership } from '@/types'
 
 interface SchoolState {
@@ -24,6 +25,7 @@ export const useSchoolStore = defineStore('school', {
       return membership?.role_type ?? null
     },
     isPro: (state) => state.currentSchool?.subscription_plan === 'pro',
+    hasMultipleSchools: (state) => state.memberships.length > 1,
     isHeadmaster(): boolean {
       return this.currentRole === 'headmaster'
     },
@@ -36,10 +38,47 @@ export const useSchoolStore = defineStore('school', {
   },
 
   actions: {
-    // TODO: Implement fetchMemberships, selectSchool actions
+    /**
+     * Fetch all school memberships for the current user.
+     */
+    async fetchMemberships() {
+      this.isLoading = true
+      try {
+        const response = await authService.fetchMemberships()
+        this.memberships = response.data
+
+        // Auto-restore last selected school if still valid
+        if (this.currentSchool) {
+          const stillValid = this.memberships.some(
+            (m) => m.school_id === this.currentSchool?.id,
+          )
+          if (!stillValid) {
+            this.currentSchool = null
+          }
+        }
+      } catch {
+        this.memberships = []
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * Select a school to work with.
+     */
+    selectSchool(schoolId: number) {
+      const membership = this.memberships.find((m) => m.school_id === schoolId)
+      if (membership) {
+        this.currentSchool = membership.school
+      }
+    },
+
+    /**
+     * Clear current school context.
+     */
     clearSchool() {
       this.currentSchool = null
-      localStorage.removeItem('currentSchoolId')
+      this.memberships = []
     },
   },
 

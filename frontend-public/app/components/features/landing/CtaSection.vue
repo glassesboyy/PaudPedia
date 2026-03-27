@@ -38,13 +38,13 @@ const benefits = [
 
           <!-- CTA Buttons -->
           <div class="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
-            <NuxtLink to="/auth/register">
+            <NuxtLink to="/auth/register?type=school">
               <UButton variant="secondary" size="lg" class="px-8 shadow-strong">
                 Daftarkan Sekolah Anda
                 <Icon name="lucide:arrow-right" class="w-4 h-4 ml-2" />
               </UButton>
             </NuxtLink>
-            <NuxtLink to="/about">
+            <NuxtLink to="/siakad">
               <UButton variant="ghost" size="lg" class="!text-white hover:!bg-white/10 px-8">
                 Pelajari Lebih Lanjut
               </UButton>

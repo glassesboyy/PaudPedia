@@ -5,6 +5,8 @@ export interface User {
   name: string
   email: string
   avatar: string | null
+  roles?: string[]
+  school_memberships?: SchoolMembership[]
 }
 
 export interface School {

@@ -9,6 +9,8 @@ import type {
   LoginCredentials,
   LoginResponse,
   RegisterData,
+  RegisterSchoolData,
+  RegisterSchoolUpgradeData,
   ResetPasswordData,
   UpdateProfileData,
   User,
@@ -36,6 +38,22 @@ export const authService = {
     })
   },
 
+  async registerSchool(data: RegisterSchoolData): Promise<ApiResponse<LoginResponse>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.AUTH.REGISTER_SCHOOL, {
+      method: 'POST',
+      body: data,
+    })
+  },
+
+  async registerSchoolUpgrade(data: RegisterSchoolUpgradeData): Promise<ApiResponse<LoginResponse>> {
+    const apiFetch = useApiFetch()
+    return apiFetch(API_ENDPOINTS.SCHOOLS.REGISTER, {
+      method: 'POST',
+      body: data,
+    })
+  },
+
   async logout(): Promise<void> {
     const apiFetch = useApiFetch()
     await apiFetch(API_ENDPOINTS.AUTH.LOGOUT, { method: 'POST' })
@@ -43,8 +61,8 @@ export const authService = {
 
   async me(): Promise<User> {
     const apiFetch = useApiFetch()
-    const response = await apiFetch<ApiResponse<User>>(API_ENDPOINTS.AUTH.ME)
-    return response.data
+    const response = await apiFetch<ApiResponse<{ user: User }>>(API_ENDPOINTS.AUTH.ME)
+    return response.data.user
   },
 
   // ── Password ─────────────────────────────────────────────

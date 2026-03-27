@@ -10,7 +10,7 @@
 import { defineStore } from 'pinia'
 import { authService } from '~~/services'
 import type { ApiResponse } from '~~/services/api/types'
-import type { LoginCredentials, LoginResponse, RegisterData, User } from '~~/types'
+import type { LoginCredentials, LoginResponse, RegisterData, RegisterSchoolData, User } from '~~/types'
 import { useCartStore } from './cart'
 
 /** Deduplication promise — ensures initialize() only runs once. */
@@ -30,6 +30,13 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value)
   const isEmailVerified = computed(() => !!user.value?.email_verified_at)
   const userName = computed(() => user.value?.name ?? 'Guest')
+  const hasSchoolAccess = computed(() => {
+    return (user.value?.school_memberships?.length ?? 0) > 0
+  })
+  const siakadUrl = computed(() => {
+    const config = useRuntimeConfig()
+    return (config.public as Record<string, string>).siakadUrl || 'http://localhost:5173'
+  })
 
   // ── Internal helpers ───────────────────────────────────
   function setAuth(userData: User, token: string) {
@@ -83,6 +90,12 @@ export const useAuthStore = defineStore('auth', () => {
     return response
   }
 
+  async function registerSchool(data: RegisterSchoolData): Promise<ApiResponse<LoginResponse>> {
+    const response = await authService.registerSchool(data)
+    setAuth(response.data.user, response.data.token)
+    return response
+  }
+
   async function logout() {
     try {
       await authService.logout()
@@ -120,10 +133,13 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isEmailVerified,
     userName,
+    hasSchoolAccess,
+    siakadUrl,
     // Actions
     initialize,
     login,
     register,
+    registerSchool,
     logout,
     fetchUser,
     updateUser,

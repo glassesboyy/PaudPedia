@@ -23,7 +23,13 @@ const props = withDefaults(defineProps<{
 const { user, isAuthenticated, isLoading, userName, logout } = useAuth()
 const { itemCount } = useCart()
 import { useSiteSettingsStore } from '~~/stores/siteSettings';
+import { useAuthStore } from '~~/stores/auth';
 const siteSettings = useSiteSettingsStore()
+const authStore = useAuthStore()
+
+const hasSchoolAccess = computed(() => authStore.hasSchoolAccess)
+const siakadUrl = computed(() => authStore.siakadUrl)
+const tokenCookie = useCookie('auth_token')
 
 const isMobileMenuOpen = ref(false)
 const isProfileOpen = ref(false)
@@ -35,6 +41,7 @@ const navItems = [
   { label: 'Webinar', to: '/webinars' },
   { label: 'Artikel', to: '/articles' },
   { label: 'Mentor', to: '/mentors' },
+  { label: 'Siakad', to: '/siakad' },
 ]
 
 async function handleLogout() {
@@ -183,6 +190,15 @@ onUnmounted(() => {
                       <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
                       <span>Dashboard</span>
                     </NuxtLink>
+                    <a
+                      v-if="hasSchoolAccess"
+                      :href="`${siakadUrl}/auth/token?token=${tokenCookie}`"
+                      class="flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 font-medium hover:bg-primary-50 transition-colors duration-200"
+                      @click="closeProfile"
+                    >
+                      <Icon name="lucide:school" class="w-4 h-4" />
+                      <span>Dashboard SIAKAD</span>
+                    </a>
                     <NuxtLink
                       to="/account/settings"
                       class="flex items-center gap-3 px-4 py-2.5 text-sm text-body hover:bg-surface-muted transition-colors duration-200"
@@ -279,6 +295,14 @@ onUnmounted(() => {
                 <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
                 Dashboard
               </NuxtLink>
+              <a
+                v-if="hasSchoolAccess"
+                :href="`${siakadUrl}/auth/token?token=${tokenCookie}`"
+                class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              >
+                <Icon name="lucide:school" class="w-4 h-4" />
+                Dashboard SIAKAD
+              </a>
               <NuxtLink
                 to="/account/settings"
                 class="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-body hover:text-foreground rounded-lg hover:bg-surface-muted transition-colors"

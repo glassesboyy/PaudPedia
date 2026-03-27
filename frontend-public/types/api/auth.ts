@@ -13,8 +13,22 @@ export interface User {
   address?: string | null
   email_verified_at?: string | null
   is_active?: boolean
+  school_memberships?: SchoolMembership[]
   created_at: string
   updated_at: string
+}
+
+export interface SchoolMembership {
+  id: number
+  school_id: number
+  user_id: number
+  role_type: 'headmaster' | 'teacher' | 'parent'
+  is_active: boolean
+  school: {
+    id: number
+    name: string
+    npsn: string
+  }
 }
 
 export interface LoginCredentials {
@@ -28,6 +42,24 @@ export interface RegisterData {
   email: string
   password: string
   password_confirmation: string
+}
+
+/** Register as school (guest — creates user + school + headmaster role) */
+export interface RegisterSchoolData {
+  name: string
+  email: string
+  password: string
+  password_confirmation: string
+  school_name: string
+  school_npsn: string
+  school_address: string
+}
+
+/** Register school for existing authenticated user (upgrade to headmaster) */
+export interface RegisterSchoolUpgradeData {
+  school_name: string
+  school_npsn: string
+  school_address: string
 }
 
 export interface ForgotPasswordData {

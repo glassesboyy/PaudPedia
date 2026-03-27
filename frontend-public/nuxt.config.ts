@@ -25,6 +25,7 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api/v1',
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'PaudPedia',
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      siakadUrl: process.env.NUXT_PUBLIC_SIAKAD_URL || 'http://localhost:5173',
       midtransClientKey: process.env.NUXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
       midtransIsProduction: process.env.NUXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true',
       emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID || '',

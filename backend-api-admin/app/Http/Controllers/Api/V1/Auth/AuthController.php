@@ -7,6 +7,8 @@ use App\Http\Requests\Api\V1\Auth\ChangePasswordRequest;
 use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
+use App\Http\Requests\Api\V1\Auth\RegisterSchoolRequest;
+use App\Http\Requests\Api\V1\Auth\RegisterSchoolUpgradeRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
 use App\Http\Resources\Api\V1\Auth\UserResource;
 use App\Models\User;
@@ -39,6 +41,43 @@ class AuthController extends BaseController
             'token' => $result['token'],
             'token_type' => $result['token_type'],
         ], 'Registrasi berhasil. Silakan cek email untuk verifikasi.');
+    }
+
+    /**
+     * Register a new user and a school.
+     * 
+     * @unauthenticated
+     * @param RegisterSchoolRequest $request
+     * @return JsonResponse
+     */
+    public function registerSchool(RegisterSchoolRequest $request): JsonResponse
+    {
+        $result = $this->authService->registerSchool($request->validated());
+
+        return $this->created([
+            'user' => new UserResource($result['user']),
+            'token' => $result['token'],
+            'token_type' => $result['token_type'],
+            'school_id' => $result['school_id'],
+        ], 'Registrasi sekolah berhasil. Silakan cek email untuk verifikasi.');
+    }
+
+    /**
+     * Register a school for authenticated user.
+     * 
+     * @param RegisterSchoolUpgradeRequest $request
+     * @return JsonResponse
+     */
+    public function registerSchoolUpgrade(RegisterSchoolUpgradeRequest $request): JsonResponse
+    {
+        $result = $this->authService->registerSchoolUpgrade($request->user(), $request->validated());
+
+        return $this->created([
+            'user' => new UserResource($result['user']),
+            'token' => $result['token'],
+            'token_type' => $result['token_type'],
+            'school_id' => $result['school_id'],
+        ], 'Sekolah berhasil didaftarkan.');
     }
 
     /**
@@ -97,7 +136,9 @@ class AuthController extends BaseController
     {
         $user = $this->authService->getAuthenticatedUser($request->user());
 
-        return $this->success(new UserResource($user), 'Data user berhasil diambil.');
+        return $this->success([
+            'user' => new UserResource($user)
+        ], 'Data user berhasil diambil.');
     }
 
     /**

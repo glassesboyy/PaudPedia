@@ -1,35 +1,52 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { authGuard } from './guards/auth.guard'
+import { schoolGuard } from './guards/school.guard'
+import { roleGuard } from './guards/role.guard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior: () => ({ top: 0 }),
   routes: [
-    // Auth routes (public)
+    // ── Auth routes (using AuthLayout) ──────────────────
     {
-      path: '/login',
-      name: 'Login',
-      component: () => import('@/features/auth/views/LoginView.vue'),
-      meta: { guest: true },
-    },
-    {
-      path: '/register',
-      name: 'RegisterSchool',
-      component: () => import('@/features/auth/views/RegisterSchoolView.vue'),
-      meta: { guest: true },
-    },
-    {
-      path: '/forgot-password',
-      name: 'ForgotPassword',
-      component: () => import('@/features/auth/views/ForgotPasswordView.vue'),
-      meta: { guest: true },
-    },
-    {
-      path: '/reset-password',
-      name: 'ResetPassword',
-      component: () => import('@/features/auth/views/ResetPasswordView.vue'),
-      meta: { guest: true },
+      path: '/',
+      component: () => import('@/app/layouts/AuthLayout.vue'),
+      children: [
+        {
+          path: '',
+          redirect: '/login',
+        },
+        {
+          path: 'login',
+          name: 'Login',
+          component: () => import('@/features/auth/views/LoginView.vue'),
+          meta: { guest: true },
+        },
+        {
+          path: 'forgot-password',
+          name: 'ForgotPassword',
+          component: () => import('@/features/auth/views/ForgotPasswordView.vue'),
+          meta: { guest: true },
+        },
+        {
+          path: 'reset-password',
+          name: 'ResetPassword',
+          component: () => import('@/features/auth/views/ResetPasswordView.vue'),
+          meta: { guest: true },
+        },
+      ],
     },
 
-    // School selection (after login, before dashboard)
+    // ── Token callback (cross-domain auth from Frontend Public) ─
+    {
+      path: '/auth/token',
+      name: 'TokenCallback',
+      component: () => import('@/features/auth/views/TokenCallbackView.vue'),
+    },
+
+
+
+    // ── School selection (after login, before dashboard) ─
     {
       path: '/select-school',
       name: 'SelectSchool',
@@ -37,7 +54,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
 
-    // Dashboard routes (role-based, nested under DashboardLayout)
+    // ── Dashboard routes (role-based, nested under DashboardLayout) ─
     {
       path: '/',
       component: () => import('@/app/layouts/DashboardLayout.vue'),
@@ -196,10 +213,23 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: {
-        template: '<div class="flex items-center justify-center h-screen"><h1 class="text-2xl">404 — Halaman tidak ditemukan</h1></div>',
+        template: `
+          <div class="flex flex-col items-center justify-center min-h-screen bg-background gap-4">
+            <h1 class="text-6xl font-bold text-primary-600">404</h1>
+            <p class="text-lg text-body">Halaman tidak ditemukan</p>
+            <a href="/login" class="text-sm font-medium text-primary-600 hover:text-primary-700 mt-2">
+              ← Kembali ke Login
+            </a>
+          </div>
+        `,
       },
     },
   ],
 })
+
+// ── Global Navigation Guards ────────────────────────────
+router.beforeEach(authGuard)
+router.beforeEach(schoolGuard)
+router.beforeEach(roleGuard)
 
 export default router

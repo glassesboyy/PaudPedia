@@ -3,13 +3,18 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Models\School;
+use App\Models\SchoolMember;
+use App\Enums\RoleType;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AuthService
 {
@@ -24,7 +29,7 @@ class AuthService
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => $data['password'],
             'phone' => $data['phone'] ?? null,
             'is_active' => true,
         ]);
@@ -33,7 +38,6 @@ class AuthService
         $user->assignRole('user');
 
         // Fire registered event (triggers email verification)
-        // Wrapped in try-catch so SMTP failures never crash the registration response
         try {
             event(new Registered($user));
         } catch (\Throwable $e) {
@@ -44,7 +48,6 @@ class AuthService
             ]);
         }
 
-        // Create token for immediate use (optional, depends on business logic)
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
@@ -52,6 +55,108 @@ class AuthService
             'token' => $token,
             'token_type' => 'Bearer',
         ];
+    }
+
+    /**
+     * Register a new user and a new school (Headmaster onboarding).
+     *
+     * @param array $data
+     * @return array
+     */
+    public function registerSchool(array $data): array
+    {
+        return DB::transaction(function () use ($data) {
+            // 1. Create User
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'is_active' => true,
+            ]);
+
+            // Assign roles
+            $user->assignRole(['user', 'headmaster']);
+
+            // 2. Create School
+            $school = School::create([
+                'name' => $data['school_name'],
+                'npsn' => $data['school_npsn'],
+                'address' => $data['school_address'],
+                'is_active' => true,
+            ]);
+
+            // 3. Create School Membership (Headmaster)
+            SchoolMember::create([
+                'school_id' => $school->id,
+                'user_id' => $user->id,
+                'role_type' => RoleType::HEADMASTER,
+                'is_active' => true,
+                'joined_at' => Carbon::now(),
+            ]);
+
+            try {
+                event(new Registered($user));
+            } catch (\Throwable $e) {
+                Log::error('Failed to send verification email on school registration', [
+                    'user_id' => $user->id,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
+
+            $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return [
+                'user' => $user,
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'school_id' => $school->id,
+            ];
+        });
+    }
+
+    /**
+     * Register a new school for an existing authenticated user.
+     *
+     * @param User $user
+     * @param array $data
+     * @return School
+     */
+    public function registerSchoolUpgrade(User $user, array $data): array
+    {
+        return DB::transaction(function () use ($user, $data) {
+            // 1. Create School
+            $school = School::create([
+                'name' => $data['school_name'],
+                'npsn' => $data['school_npsn'],
+                'address' => $data['school_address'],
+                'is_active' => true,
+            ]);
+
+            // 2. Create School Membership (Headmaster)
+            SchoolMember::create([
+                'school_id' => $school->id,
+                'user_id' => $user->id,
+                'role_type' => RoleType::HEADMASTER,
+                'is_active' => true,
+                'joined_at' => Carbon::now(),
+            ]);
+
+            // 3. Assign role to user
+            $user->assignRole('headmaster');
+
+            // 4. Return user and new token for consistency
+            $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return [
+                'user' => $user,
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'school_id' => $school->id,
+            ];
+        });
     }
 
     /**
@@ -241,6 +346,9 @@ class AuthService
      */
     public function getAuthenticatedUser(User $user): User
     {
-        return $user->load(['roles:id,name']);
+        return $user->load([
+            'roles:id,name',
+            'schoolMemberships.school:id,name,npsn'
+        ]);
     }
 }

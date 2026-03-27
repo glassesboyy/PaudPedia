@@ -10,7 +10,9 @@
 // ── API Types ────────────────────────────────────────────
 export type { Article, ArticleAuthor, ArticleDetail, ArticleListParams, ArticleShowData } from './api/article'
 export type {
-    AuthTokenResponse, ChangePasswordData, ForgotPasswordData, LoginCredentials, LoginResponse, RegisterData, ResetPasswordData, UpdateProfileData, User
+    AuthTokenResponse, ChangePasswordData, ForgotPasswordData, LoginCredentials, LoginResponse,
+    RegisterData, RegisterSchoolData, RegisterSchoolUpgradeData, ResetPasswordData,
+    SchoolMembership, UpdateProfileData, User
 } from './api/auth'
 export type { Category, PaginationParams } from './api/common'
 export type { ContactFormData, ContactPageInfo } from './api/contact'

@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:3000',  // Frontend Public (Next/Nuxt)
-        'http://localhost:3001',  // Frontend SIAKAD (React/Vue)
+        'http://localhost:5173',  // Frontend SIAKAD (React/Vue)
     ],
 
     'allowed_origins_patterns' => [],
