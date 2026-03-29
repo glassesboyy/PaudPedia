@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Public\TestimonialController;
+use App\Http\Controllers\Api\V1\School\SchoolController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,9 +34,6 @@ Route::prefix('auth')->name('auth.')->middleware(['auth:sanctum', 'verified'])->
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
     
-    // School registration (authenticated upgrade)
-    Route::post('/schools/register', [AuthController::class, 'registerSchoolUpgrade'])->name('schools.register');
-
     // Profile management (FR-UA-06)
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -52,8 +50,11 @@ Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function
 
 // Other authenticated routes (outside auth prefix)
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    // School registration (authenticated upgrade)
+    Route::post('/schools/register', [AuthController::class, 'registerSchoolUpgrade'])->name('schools.register');
+
     // School memberships
-    Route::get('/my-memberships', [\App\Http\Controllers\Api\V1\School\SchoolController::class, 'myMemberships'])
+    Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])
         ->name('my-memberships');
 
     // Testimonials - Submit testimonial (requires authentication)

@@ -29,7 +29,8 @@ Fokus pada proses masuk (login) dan perpindahan sesi antar domain.
 - **Expected Result:**
   - Login berhasil dan user diarahkan ke Dashboard SIAKAD.
 - **Actual Result:** 
-- **Status:** 
+  - Login berhasil dan user diarahkan ke Dashboard SIAKAD.
+- **Status:** PASS
 
 ---
 
@@ -49,7 +50,10 @@ Fokus pada pembuatan akun baru melalui Frontend Public.
   - User diarahkan ke halaman verifikasi email atau dashboard public.
   - Menu "Dashboard SIAKAD" TIDAK muncul di navbar.
 - **Actual Result:** 
-- **Status:** 
+  - Akun berhasil dibuat (role: `user`).
+  - User diarahkan ke halaman verifikasi email atau dashboard public.
+  - Menu "Dashboard SIAKAD" TIDAK muncul di navbar.
+- **Status:** PASS 
 
 ### TC-REG-02: Registrasi Sekolah Baru (Guest)
 - **Tujuan:** Pendaftaran user baru sekaligus mendaftarkan sekolah (onboarding Headmaster).
@@ -82,8 +86,8 @@ Fokus pada user yang sudah punya akun namun ingin mendaftarkan sekolahnya.
   - User mendapatkan role tambahan `headmaster`.
   - Terbentuk data `School` dan `SchoolMember`.
   - User diarahkan ke SIAKAD dan mendapatkan akses dashboard.
-- **Actual Result:** 
-- **Status:** 
+- **Actual Result:** Upgrade berhasil untuk user existing (Surya). Form otomatis mengenali user dan hanya meminta data sekolah. Setelah submit, user berhasil diarahkan ke dashboard SIAKAD dengan role Kepala Sekolah.
+- **Status:** PASS
 
 ---
 
@@ -97,8 +101,8 @@ Fokus pada validasi sistem terhadap data tidak valid.
   1. Coba buka langsung URL `http://localhost:5173/dashboard`.
 - **Expected Result:**
   - User otomatis dilempar kembali ke halaman login SIAKAD atau Landing Page Public dengan pesan "Akses ditolak".
-- **Actual Result:** 
-- **Status:** 
+- **Actual Result:** User biasa tanpa role sekolah yang mencoba akses langsung `http://localhost:5173/dashboard` berhasil diblokir. API mengembalikan `403 Forbidden` dan dashboard gagal dimuat (Tampilan Blank/Access Denied).
+- **Status:** PASS
 
 ### TC-ERR-02: Token Tidak Valid / Expired
 - **Tujuan:** Memastikan sistem menangani token rusak atau kadaluarsa saat perpindahan domain.
@@ -116,7 +120,7 @@ Fokus pada validasi sistem terhadap data tidak valid.
 
 ### Endpoint API Utama
 - `POST /api/v1/auth/register-school`: Pendaftaran sekolah baru (Guest).
-- `POST /api/v1/auth/schools/register`: Upgrade akun ke sekolah (Authenticated).
+- `POST /api/v1/schools/register`: Upgrade akun ke sekolah (Authenticated).
 - `GET /api/v1/auth/me`: Verifikasi profil & sinkronisasi sesi.
 - `GET /api/v1/my-memberships`: Mengambil daftar sekolah yang diakses user.
 

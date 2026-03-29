@@ -7,14 +7,12 @@
  */
 definePageMeta({
   layout: 'auth',
-  middleware: ['guest'],
 })
 
-useSeo({ title: 'Daftar' })
-
+const { isAuthenticated } = useAuth()
 const route = useRoute()
 const activeTab = ref<'user' | 'school'>(
-  route.query.type === 'school' ? 'school' : 'user'
+  route.query.type === 'school' || isAuthenticated.value ? 'school' : 'user'
 )
 
 // Keep tab in sync with URL
