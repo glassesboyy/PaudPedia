@@ -199,14 +199,17 @@ class School extends Model
         );
     }
 
-    protected function logoUrl(): Attribute
+    // Helper Methods
+    public function getLogoUrl(): string
     {
-        return Attribute::make(
-            get: fn($value) => $value ? asset('storage/' . $value) : null,
-        );
+        if ($this->logo_url && \Storage::disk('public')->exists($this->logo_url)) {
+            return asset('storage/' . $this->logo_url);
+        }
+
+        // Return default icon if not found
+        return asset('images/default-school.png');
     }
 
-    // Helper Methods
     public function isPro(): bool
     {
         return $this->subscription_plan === SubscriptionPlan::PRO;

@@ -78,7 +78,7 @@ export const useSchoolStore = defineStore('school', {
      */
     clearSchool() {
       this.currentSchool = null
-      this.memberships = []
+      // memberships = [] // REMOVED: keep memberships for the selection screen
     },
   },
 

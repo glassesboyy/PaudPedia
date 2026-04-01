@@ -21,6 +21,9 @@ export interface InputProps {
   disabled?: boolean
   required?: boolean
   id?: string
+  minlength?: number
+  maxlength?: number
+  pattern?: string
 }
 
 const props = withDefaults(defineProps<InputProps>(), {
@@ -64,6 +67,9 @@ function onInput(event: Event) {
         :placeholder="placeholder"
         :disabled="disabled"
         :required="required"
+        :minlength="minlength"
+        :maxlength="maxlength"
+        :pattern="pattern"
         :class="[
           'input-field',
           error ? 'input-error' : '',

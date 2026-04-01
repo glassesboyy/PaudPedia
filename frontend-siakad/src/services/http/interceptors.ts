@@ -54,8 +54,8 @@ export function setupInterceptors(instance: AxiosInstance) {
           break
 
         case 422:
-          // Validation errors: extract and return for form use
-          return Promise.reject(error.response.data?.errors ?? error.response.data)
+          // Leave formatting 422 validation errors to the components
+          return Promise.reject(error)
 
         case 500:
           showToast('Terjadi kesalahan pada server. Coba lagi nanti.')

@@ -85,12 +85,13 @@ async function handleLogin() {
       // Multiple schools — show selector
       router.push({ name: 'SelectSchool' })
     }
-  } catch (err: unknown) {
+  } catch (err: any) {
     // Handle validation errors from API
-    if (err && typeof err === 'object' && err !== null && 'email' in err) {
-      const validationErrors = err as Record<string, string[]>
-      for (const [key, messages] of Object.entries(validationErrors)) {
-        errors.value[key] = messages[0] || 'Invalid input'
+    const apiErrors = err.response?.data?.errors
+    
+    if (apiErrors) {
+      for (const [key, messages] of Object.entries(apiErrors)) {
+        errors.value[key] = (messages as string[])[0] || 'Invalid input'
       }
     } else {
       generalError.value = 'Email atau password salah. Silakan coba lagi.'

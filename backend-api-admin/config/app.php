@@ -53,7 +53,8 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
-    'frontend_url' => env('FRONTEND_PUBLIC_URL', 'http://localhost:3000'),
+    'public_url' => env('FRONTEND_PUBLIC_URL', 'http://localhost:3000'),
+    'siakad_url' => env('FRONTEND_SIAKAD_URL', 'http://localhost:5173'),
 
     /*
     |--------------------------------------------------------------------------

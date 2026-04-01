@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Public\TestimonialController;
 use App\Http\Controllers\Api\V1\School\SchoolController;
+use App\Http\Controllers\Api\V1\School\TeacherController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,15 @@ Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // School registration (authenticated upgrade)
     Route::post('/schools/register', [AuthController::class, 'registerSchoolUpgrade'])->name('schools.register');
+
+    // School profile management
+    Route::get('/schools/{id}', [SchoolController::class, 'show'])->name('schools.show');
+    Route::put('/schools/{id}', [SchoolController::class, 'update'])->name('schools.update');
+
+    // Teacher management
+    Route::get('/schools/{id}/teachers', [TeacherController::class, 'index'])->name('teachers.index');
+    Route::post('/schools/{id}/teachers', [TeacherController::class, 'store'])->name('teachers.store');
+    Route::delete('/schools/{id}/teachers/{teacherId}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
 
     // School memberships
     Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])

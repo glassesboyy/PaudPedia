@@ -3,7 +3,7 @@
  * SchoolSelectorLayout — Shown after login when a user has memberships.
  * Allows user to pick which school to access or to register a new one.
  */
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useSchoolStore } from '@/stores/school.store'
@@ -14,6 +14,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const schoolStore = useSchoolStore()
 
+const isLoggingOut = ref(false)
 const memberships = computed(() => schoolStore.memberships)
 const isLoading = computed(() => schoolStore.isLoading)
 
@@ -24,9 +25,9 @@ const roleLabels: Record<string, string> = {
 }
 
 const roleColors: Record<string, string> = {
-  headmaster: 'bg-primary-100 text-primary-700',
-  teacher: 'bg-success-100 text-success-700',
-  parent: 'bg-secondary-100 text-secondary-700',
+  headmaster: 'bg-primary-50 text-primary-700 ring-1 ring-primary-600/10',
+  teacher: 'bg-slate-50 text-slate-700 ring-1 ring-slate-200',
+  parent: 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10',
 }
 
 function selectSchool(schoolId: number) {
@@ -34,9 +35,14 @@ function selectSchool(schoolId: number) {
   router.push({ name: 'Dashboard' })
 }
 
-function handleLogout() {
-  authStore.logout()
-  router.push({ name: 'Login' })
+async function handleLogout() {
+  isLoggingOut.value = true
+  try {
+    await authStore.logout()
+    router.push({ name: 'Login' })
+  } finally {
+    isLoggingOut.value = false
+  }
 }
 
 onMounted(async () => {
@@ -44,95 +50,94 @@ onMounted(async () => {
     await schoolStore.fetchMemberships()
   }
 
-  // Auto-select if only 1 school
-  if (memberships.value.length === 1 && memberships.value[0]) {
-    selectSchool(memberships.value[0].school_id)
-  }
+  // NOTE: Auto-selection removed to allow users to reach this screen 
+  // via "Switch School" and see the "Register New School" link.
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-background flex items-center justify-center p-6">
-    <div class="w-full max-w-lg animate-fade-in-up">
+  <div class="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
+    <!-- Subtle Background Assets -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 40px 40px;"></div>
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-600/5 rounded-full blur-3xl -mr-64 -mt-64"></div>
+    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-200/50 rounded-full blur-3xl -ml-64 -mb-64"></div>
+
+    <div class="w-full max-w-lg animate-fade-in-up relative z-10">
       <!-- Header -->
-      <div class="text-center mb-8">
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mx-auto mb-4 shadow-medium">
-          <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
+      <div class="text-center mb-10">
+        <div class="w-20 h-20 rounded-[2rem] bg-white shadow-xl shadow-primary-600/10 flex items-center justify-center mx-auto mb-8 border border-slate-100 group">
+          <div class="w-14 h-14 rounded-2xl bg-primary-600 flex items-center justify-center transition-transform group-hover:scale-110">
+            <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
         </div>
-        <h1 class="text-2xl font-bold text-heading">Pilih Sekolah</h1>
-        <p class="mt-2 text-body">
-          Halo, <span class="font-medium text-heading">{{ authStore.userName }}</span>! Pilih sekolah yang ingin Anda akses.
+        <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Pilih Unit Sekolah</h1>
+        <p class="text-lg text-slate-500 font-medium">
+          Halo, <span class="text-primary-600 underline decoration-primary-200 underline-offset-4">{{ authStore.userName }}</span>! Silahkan pilih unit sekolah yang terdaftar pada akun Anda dibawah ini!.
         </p>
       </div>
 
       <!-- Loading state -->
-      <div v-if="isLoading" class="space-y-3">
-        <div v-for="i in 2" :key="i" class="h-20 rounded-xl bg-surface-muted animate-pulse" />
+      <div v-if="isLoading" class="space-y-4">
+        <div v-for="i in 3" :key="i" class="h-24 rounded-2xl bg-white border border-slate-100 shadow-sm animate-pulse" />
       </div>
 
       <!-- Empty state -->
-      <BaseCard v-else-if="memberships.length === 0" class="text-center">
-        <div class="py-6">
-          <svg class="w-12 h-12 text-muted mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <h3 class="text-lg font-semibold text-heading mb-2">Belum Ada Sekolah</h3>
-          <p class="text-sm text-body mb-6">
-            Anda belum terdaftar di sekolah manapun. Daftarkan sekolah Anda untuk mulai menggunakan SIAKAD.
+      <BaseCard v-else-if="memberships.length === 0" class="text-center p-2 border-none shadow-2xl shadow-slate-200/50 rounded-3xl">
+        <div>
+          <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-black text-slate-900 mb-3">Unit Sekolah Tidak Ditemukan!</h3>
+          <p class="text-slate-500 font-medium mb-6 leading-relaxed">
+            Akun Anda belum terdaftar pada sekolah manapun di sistem SIAKAD. Silakan hubungi admin sekolah terkait atau pusat bantuan.
           </p>
-          <RouterLink to="/register">
-            <BaseButton variant="primary">Daftarkan Sekolah</BaseButton>
-          </RouterLink>
+          <BaseButton
+            variant="primary"
+            size="lg"
+            class="w-full"
+            :loading="isLoggingOut"
+            @click="handleLogout"
+          >
+            Gunakan Akun Lain
+          </BaseButton>
         </div>
       </BaseCard>
 
       <!-- School list -->
-      <div v-else class="space-y-3">
+      <div v-else class="space-y-4">
+        <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">Daftar Unit Tersedia</div>
         <button
           v-for="membership in memberships"
           :key="membership.school_id"
-          class="w-full text-left card p-4 hover:border-primary-300 hover:shadow-medium transition-all duration-200 group cursor-pointer"
+          class="w-full text-left bg-white p-5 rounded-2xl border border-slate-100 hover:border-primary-400 hover:shadow-xl hover:shadow-primary-600/5 transition-all duration-300 group relative overflow-hidden"
           @click="selectSchool(membership.school_id)"
         >
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-5 relative z-10">
             <!-- School avatar -->
-            <div class="w-12 h-12 rounded-xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center flex-shrink-0 transition-colors">
-              <span class="text-lg font-bold text-primary-600">
+            <div class="w-14 h-14 rounded-xl bg-slate-50 group-hover:bg-primary-50 flex items-center justify-center flex-shrink-0 transition-colors border border-slate-100">
+              <span class="text-xl font-black text-slate-400 group-hover:text-primary-600">
                 {{ membership.school?.name?.charAt(0) || 'S' }}
               </span>
             </div>
 
             <!-- Info -->
             <div class="flex-1 min-w-0">
-              <h3 class="text-sm font-semibold text-heading truncate group-hover:text-primary-600 transition-colors">
+              <h3 class="text-base font-black text-slate-900 truncate group-hover:text-primary-600 transition-colors tracking-tight">
                 {{ membership.school?.name }}
               </h3>
-              <p class="text-xs text-muted mt-0.5">NPSN: {{ membership.school?.npsn }}</p>
+              <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">NPSN: {{ membership.school?.npsn }}</p>
             </div>
 
             <!-- Role badge -->
-            <span :class="['text-xs font-medium px-2.5 py-1 rounded-full', roleColors[membership.role_type]]">
+            <span :class="['text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-sm', roleColors[membership.role_type]]">
               {{ roleLabels[membership.role_type] || membership.role_type }}
             </span>
-
-            <!-- Arrow -->
-            <svg class="w-4 h-4 text-muted group-hover:text-primary-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
           </div>
         </button>
-      </div>
-
-      <!-- Footer actions -->
-      <div class="mt-8 flex items-center justify-between">
-        <button class="text-sm text-muted hover:text-danger-600 transition-colors" @click="handleLogout">
-          Keluar
-        </button>
-        <RouterLink to="/register" class="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
-          + Daftarkan Sekolah Baru
-        </RouterLink>
       </div>
     </div>
   </div>

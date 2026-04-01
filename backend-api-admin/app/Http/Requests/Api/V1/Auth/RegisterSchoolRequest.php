@@ -30,7 +30,7 @@ class RegisterSchoolRequest extends FormRequest
             
             // School Data
             'school_name' => ['required', 'string', 'min:3', 'max:255'],
-            'school_npsn' => ['required', 'string', 'digits:8', 'unique:schools,npsn'],
+            'school_npsn' => ['required', 'numeric', 'digits:8', 'unique:schools,npsn'],
             'school_address' => ['required', 'string', 'min:10'],
         ];
     }
@@ -54,7 +54,8 @@ class RegisterSchoolRequest extends FormRequest
             'school_name.required' => 'Nama sekolah wajib diisi.',
             'school_name.min' => 'Nama sekolah minimal 3 karakter.',
             'school_npsn.required' => 'NPSN wajib diisi.',
-            'school_npsn.digits' => 'NPSN harus 8 digit angka.',
+            'school_npsn.numeric' => 'NPSN harus berupa angka.',
+            'school_npsn.digits' => 'NPSN harus tepat 8 digit.',
             'school_npsn.unique' => 'NPSN sudah terdaftar.',
             'school_address.required' => 'Alamat sekolah wajib diisi.',
             'school_address.min' => 'Alamat minimal 10 karakter.',

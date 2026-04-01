@@ -9,12 +9,12 @@ const router = createRouter({
   routes: [
     // ── Auth routes (using AuthLayout) ──────────────────
     {
-      path: '/',
+      path: '/auth',
       component: () => import('@/app/layouts/AuthLayout.vue'),
       children: [
         {
           path: '',
-          redirect: '/login',
+          redirect: '/auth/login',
         },
         {
           path: 'login',
@@ -44,8 +44,6 @@ const router = createRouter({
       component: () => import('@/features/auth/views/TokenCallbackView.vue'),
     },
 
-
-
     // ── School selection (after login, before dashboard) ─
     {
       path: '/select-school',
@@ -63,7 +61,7 @@ const router = createRouter({
         {
           path: '',
           name: 'Dashboard',
-          component: () => import('@/features/dashboard/views/HeadmasterDashboard.vue'),
+          component: () => import('@/features/dashboard/views/DashboardView.vue'),
         },
 
         // School Management
@@ -206,6 +204,16 @@ const router = createRouter({
           meta: { roles: ['parent'] },
         },
       ],
+    },
+
+    // ── Global redirects for legacy paths ──────────────────
+    {
+      path: '/login',
+      redirect: '/auth/login',
+    },
+    {
+      path: '/register',
+      redirect: '/auth/register',
     },
 
     // 404

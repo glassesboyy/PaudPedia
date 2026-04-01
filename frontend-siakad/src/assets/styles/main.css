@@ -13,6 +13,23 @@
    BASE LAYER — Global resets & typography defaults
    ════════════════════════════════════════════════════════ */
 @layer base {
+  :root {
+    /* Shad-cn compatible tokens (mapped from semantic tokens) */
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --card:       var(--color-surface);
+    --card-foreground: var(--color-heading);
+    --popover:    var(--color-surface);
+    --popover-foreground: var(--color-heading);
+    --primary-foreground: 255 255 255;
+    --secondary-foreground: 17 24 39;
+    --muted-foreground: var(--color-muted);
+    --accent-foreground: 17 24 39;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: var(--color-border);
+    --input:  var(--color-border);
+  }
 
   *,
   *::before,
@@ -27,46 +44,27 @@
   }
 
   body {
-    @apply bg-background text-body font-sans leading-relaxed;
+    @apply bg-background text-body font-sans;
     min-height: 100dvh;
+    color: rgb(var(--color-foreground));
+    background-color: rgb(var(--color-background));
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-semibold text-heading tracking-tight;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-heading tracking-tight;
   }
 
-  h1 {
-    @apply text-3xl sm:text-4xl;
-  }
-
-  h2 {
-    @apply text-2xl sm:text-3xl;
-  }
-
-  h3 {
-    @apply text-xl sm:text-2xl;
-  }
-
-  h4 {
-    @apply text-lg sm:text-xl;
-  }
+  h1 { @apply text-3xl sm:text-4xl; }
+  h2 { @apply text-2xl sm:text-3xl; }
+  h3 { @apply text-xl sm:text-2xl; }
 
   a {
-    @apply text-primary-600 hover:text-primary-700 transition-colors;
+    @apply text-primary-600 hover:text-primary-700 transition-colors duration-200;
   }
 
-  ::selection {
-    @apply bg-primary-100 text-primary-900;
-  }
-
-  /* Focus-visible ring for accessibility */
+  /* Focus rings */
   :focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-background;
   }
 }
 
@@ -75,44 +73,67 @@
    ════════════════════════════════════════════════════════ */
 @layer components {
 
+  /* ── Card ──────────────────────────────────────────── */
+  .card {
+    @apply bg-surface rounded-xl border border-border shadow-sm transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:shadow-md hover:border-slate-300;
+  }
+
+  .card-body {
+    @apply p-6 lg:p-8;
+  }
+
   /* ── Input Field ───────────────────────────────────── */
   .input-field {
-    @apply w-full rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted transition-all duration-200 hover:border-primary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-surface-muted;
+    @apply w-full rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-foreground 
+           placeholder:text-slate-400 transition-all duration-200 
+           hover:border-slate-300 
+           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10 focus:outline-none 
+           disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-surface-muted;
   }
 
   .input-error {
-    @apply border-danger-500 focus:border-danger-500 focus:ring-danger-500/20;
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500/10;
   }
 
   /* ── Label ─────────────────────────────────────────── */
   .label {
-    @apply block text-sm font-medium text-heading mb-1.5;
+    @apply block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-0.5;
   }
 
-  /* ── Card ──────────────────────────────────────────── */
-  .card {
-    @apply bg-surface rounded-xl border border-border-muted shadow-card;
+  /* ── Buttons ───────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2.5 
+           text-sm font-bold transition-all duration-200 
+           active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  .card-body {
-    @apply p-5 sm:p-6;
+  .btn-primary {
+    @apply bg-primary-600 text-white shadow-sm hover:bg-primary-700;
   }
 
-  .card-header {
-    @apply px-5 sm:px-6 py-4 border-b border-border-muted;
+  .btn-secondary {
+    @apply bg-white text-slate-800 border border-border shadow-sm hover:bg-slate-50;
   }
 
-  .card-footer {
-    @apply px-5 sm:px-6 py-4 border-t border-border-muted;
+  .btn-ghost {
+    @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900;
   }
 
-  /* ── Section container ─────────────────────────────── */
-  .section {
-    @apply py-16 sm:py-20 lg:py-24;
+  /* ── Dashboard Shell ───────────────────────────────── */
+  .dashboard-container {
+    @apply min-h-screen bg-slate-50 text-slate-700;
   }
 
-  /* ── Gradient text ─────────────────────────────────── */
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent;
+  .dashboard-content {
+    @apply p-6 lg:p-10 max-w-[1440px] mx-auto;
+  }
+
+  /* ── Status badges ─────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ring-1 ring-inset;
   }
 }
