@@ -146,9 +146,7 @@ async function handleSubmit() {
               />
             </div>
             <div class="absolute -right-2 -bottom-2 w-9 h-9 bg-primary-600 text-white rounded-xl flex items-center justify-center shadow-lg border-4 border-white pointer-events-none group-hover:scale-110 transition-transform">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              </svg>
+              <Icon name="lucide:camera" class="w-4 h-4" />
             </div>
           </div>
 
@@ -176,12 +174,8 @@ async function handleSubmit() {
               ]"
             >
               <div :class="['w-6 h-6 rounded-lg flex items-center justify-center', message.type === 'success' ? 'bg-emerald-200/50' : 'bg-red-200/50']">
-                <svg v-if="message.type === 'success'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
-                <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <Icon v-if="message.type === 'success'" name="lucide:check" stroke-width="3" class="w-4 h-4" />
+                <Icon v-else name="lucide:x" stroke-width="3" class="w-4 h-4" />
               </div>
               {{ message.text }}
             </div>

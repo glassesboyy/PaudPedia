@@ -132,9 +132,7 @@ async function handleLogin() {
         required
       >
         <template #prepend>
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-          </svg>
+          <Icon name="lucide:mail" class="w-5 h-5 text-slate-400" />
         </template>
       </BaseInput>
 
@@ -147,9 +145,7 @@ async function handleLogin() {
         required
       >
         <template #prepend>
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-          </svg>
+          <Icon name="lucide:lock" class="w-5 h-5 text-slate-400" />
         </template>
       </BaseInput>
 
@@ -192,9 +188,7 @@ async function handleLogin() {
         class="font-medium text-primary-600 hover:text-primary-700"
       >
         Daftar di PaudPedia.com
-        <svg class="w-3.5 h-3.5 inline-block -mt-0.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
+        <Icon name="lucide:external-link" class="w-3.5 h-3.5 inline-block -mt-0.5 ml-0.5" />
       </a>
     </p>
   </div>

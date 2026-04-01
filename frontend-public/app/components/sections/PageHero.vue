@@ -70,6 +70,7 @@ withDefaults(defineProps<Props>(), {
       <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(var(--color-primary-300),.3),transparent)]" />
 
       <!-- Wave decoration at bottom -->
+      <!-- SVG Decorative Background - Do not refactor to Icon component -->
       <svg class="absolute bottom-0 left-0 w-full h-16 text-surface" viewBox="0 0 1440 64" fill="none" preserveAspectRatio="none">
         <path d="M0 32C240 0 480 64 720 32C960 0 1200 64 1440 32V64H0V32Z" fill="currentColor" />
       </svg>
@@ -103,6 +104,7 @@ withDefaults(defineProps<Props>(), {
       />
 
       <!-- Corner geometric accents -->
+      <!-- SVG Decorative Background - Do not refactor to Icon component -->
       <svg class="absolute top-0 left-0 w-40 h-40 text-primary-200/30" viewBox="0 0 160 160" fill="none">
         <circle cx="0" cy="0" r="120" stroke="currentColor" stroke-width="1.5" />
         <circle cx="0" cy="0" r="80" stroke="currentColor" stroke-width="1" />

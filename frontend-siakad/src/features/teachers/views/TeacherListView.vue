@@ -63,9 +63,7 @@ function formatDate(dateString: string) {
       </div>
       <BaseButton @click="router.push({ name: 'TeacherCreate' })">
         <template #prepend>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
+          <Icon name="lucide:plus" class="w-4 h-4" />
         </template>
         Tambah Guru Baru
       </BaseButton>
@@ -97,9 +95,7 @@ function formatDate(dateString: string) {
               <td colspan="5" class="px-8 py-20 text-center">
                 <div class="flex flex-col items-center gap-4 max-w-xs mx-auto">
                   <div class="w-20 h-20 bg-surface-muted rounded-2xl flex items-center justify-center text-muted border-2 border-dashed border-border">
-                    <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                      <Icon name="lucide:graduation-cap" class="w-10 h-10" stroke-width="1.5" />
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading">Belum ada Guru</p>
@@ -153,18 +149,14 @@ function formatDate(dateString: string) {
                     class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50"
                     title="Edit (Coming Soon)"
                   >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
+                      <Icon name="lucide:pencil" class="w-4 h-4" />
                   </button>
                   <button 
                     class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50"
                     @click="handleDelete(teacher)"
                     title="Hapus Guru"
                   >
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                      <Icon name="lucide:trash-2" class="w-4 h-4" />
                   </button>
                 </div>
               </td>

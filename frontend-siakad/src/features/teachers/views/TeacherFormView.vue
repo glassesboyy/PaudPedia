@@ -82,9 +82,7 @@ async function handleSubmit() {
       @click="router.back()" 
       class="flex items-center gap-2 text-sm text-muted hover:text-primary-600 transition-colors mb-4 focus:outline-none"
     >
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-      </svg>
+      <Icon name="lucide:arrow-left" class="w-4 h-4" />
       Kembali ke Daftar Guru
     </button>
 
@@ -96,9 +94,7 @@ async function handleSubmit() {
     <!-- Success View -->
     <BaseCard v-if="isSuccess" class="p-8 text-center animate-fade-in space-y-6">
       <div class="w-20 h-20 bg-success-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-success-100">
-        <svg class="w-10 h-10 text-success-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
+        <Icon name="lucide:check" class="w-10 h-10 text-success-600" />
       </div>
       <div>
         <h2 class="text-xl font-bold text-heading mb-2">Pendaftaran Berhasil!</h2>
@@ -135,9 +131,7 @@ async function handleSubmit() {
             :error="fieldErrors.name"
           >
             <template #prepend>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+              <Icon name="lucide:user" class="w-4 h-4" />
             </template>
           </BaseInput>
 
@@ -151,9 +145,7 @@ async function handleSubmit() {
             :error="fieldErrors.email"
           >
             <template #prepend>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z" />
-              </svg>
+              <Icon name="lucide:mail" class="w-4 h-4" />
             </template>
           </BaseInput>
 
@@ -168,9 +160,7 @@ async function handleSubmit() {
             @input="form.nip = form.nip.replace(/[^0-9]/g, '')"
           >
             <template #prepend>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <Icon name="lucide:id-card" class="w-4 h-4" />
             </template>
           </BaseInput>
 
@@ -185,9 +175,7 @@ async function handleSubmit() {
             @input="form.phone = form.phone.replace(/[^0-9]/g, '')"
           >
             <template #prepend>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
+              <Icon name="lucide:phone" class="w-4 h-4" />
             </template>
           </BaseInput>
 
@@ -200,9 +188,7 @@ async function handleSubmit() {
               :error="fieldErrors.specialization"
             >
               <template #prepend>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+                <Icon name="lucide:book-open" class="w-4 h-4" />
               </template>
             </BaseInput>
           </div>

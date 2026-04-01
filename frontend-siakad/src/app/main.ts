@@ -4,10 +4,14 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
 import router from './router'
+import BaseIcon from '@/components/ui/Icon/Icon.vue'
 
 import '@/assets/styles/main.css'
 
 const app = createApp(App)
+
+// Global component registration
+app.component('Icon', BaseIcon)
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

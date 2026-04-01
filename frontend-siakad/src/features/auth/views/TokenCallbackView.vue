@@ -74,9 +74,7 @@ onMounted(async () => {
     <!-- Error state -->
     <template v-else>
       <div class="w-12 h-12 rounded-full bg-danger-50 flex items-center justify-center">
-        <svg class="w-6 h-6 text-danger-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <Icon name="lucide:x" class="w-6 h-6 text-danger-500" stroke-width="2" />
       </div>
       <p class="text-sm text-danger-600 font-medium">{{ error }}</p>
       <p class="text-xs text-muted">Mengalihkan ke halaman login...</p>

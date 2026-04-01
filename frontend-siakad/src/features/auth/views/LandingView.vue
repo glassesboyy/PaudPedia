@@ -7,7 +7,7 @@
  *   2. Features — 4 benefit cards
  *   3. CTA — encourage school registration
  */
-import BaseButton from '@/components/ui/Button/BaseButton.vue'
+import BaseButton from '@/components/ui/Button/Button.vue'
 
 const features = [
   {
@@ -33,10 +33,10 @@ const features = [
 ]
 
 const featureIcons: Record<string, string> = {
-  school: 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z',
-  calendar: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-  chart: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
-  shield: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  school: 'lucide:users',
+  calendar: 'lucide:calendar-check',
+  chart: 'lucide:line-chart',
+  shield: 'lucide:shield-check',
 }
 </script>
 
@@ -74,18 +74,14 @@ const featureIcons: Record<string, string> = {
           <div class="mt-10 flex flex-wrap items-center justify-center gap-4 animate-fade-in-up">
             <RouterLink to="/login">
               <BaseButton variant="primary" size="lg">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
+                <Icon name="lucide:log-in" class="w-5 h-5" />
                 Masuk ke SIAKAD
               </BaseButton>
             </RouterLink>
             <a href="https://paudpedia.com/auth/register" target="_blank">
               <BaseButton variant="outline" size="lg">
                 Daftarkan Sekolah
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
+                <Icon name="lucide:building" class="w-4 h-4" />
               </BaseButton>
             </a>
           </div>
@@ -116,9 +112,7 @@ const featureIcons: Record<string, string> = {
           >
             <!-- Icon -->
             <div class="w-12 h-12 rounded-xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center mb-4 transition-colors duration-300">
-              <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" :d="featureIcons[feature.icon]" />
-              </svg>
+              <Icon :name="featureIcons[feature.icon]" class="w-6 h-6 text-primary-600" />
             </div>
 
             <h3 class="text-base font-semibold text-heading mb-2">{{ feature.title }}</h3>
@@ -148,9 +142,7 @@ const featureIcons: Record<string, string> = {
             <a href="https://paudpedia.com/auth/register" target="_blank">
               <BaseButton variant="secondary" size="lg" class="shadow-strong">
                 Daftar Akun Gratis
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                <Icon name="lucide:arrow-right" class="w-4 h-4" />
               </BaseButton>
             </a>
             <RouterLink to="/login">

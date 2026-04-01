@@ -38,9 +38,7 @@ import { RouterView } from 'vue-router'
               'Data aman & terenkripsi',
             ]" :key="feature" class="flex items-center gap-3">
               <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <svg class="w-3.5 h-3.5 text-secondary-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Icon name="lucide:check" stroke-width="3" class="w-3.5 h-3.5 text-secondary-300" />
               </div>
               <span class="text-primary-100 text-sm">{{ feature }}</span>
             </div>
@@ -65,9 +63,7 @@ import { RouterView } from 'vue-router'
         <!-- Mobile logo (visible only on small screens) -->
         <div class="lg:hidden flex items-center justify-center gap-2.5 mb-8">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-sm">
-            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
+            <Icon name="lucide:school" class="w-6 h-6 text-white" />
           </div>
           <div>
             <span class="text-xl font-bold text-heading">PaudPedia</span>

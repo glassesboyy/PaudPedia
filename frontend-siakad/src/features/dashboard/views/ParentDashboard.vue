@@ -18,9 +18,7 @@ const schoolStore = useSchoolStore()
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
       <BaseCard class="p-8 text-center flex flex-col items-center justify-center gap-4 bg-primary-100/10 border-primary-200 border-dashed">
-        <svg class="w-20 h-20 text-primary-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Icon name="lucide:smile" stroke-width="1" class="w-20 h-20 text-primary-200" />
         <div>
           <h3 class="text-xl font-bold text-heading">Monitoring Perkembangan Anak</h3>
           <p class="text-muted mt-2">Lihat capaian harian, rapor bulanan, dan jadwal sekolah secara langsung.</p>
