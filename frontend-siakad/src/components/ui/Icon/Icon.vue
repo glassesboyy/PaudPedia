@@ -9,5 +9,5 @@ defineProps<IconProps>()
 </script>
 
 <template>
-  <IconifyIcon :icon="name" />
+  <IconifyIcon :icon="name" v-bind="$attrs" />
 </template>

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Public\TestimonialController;
 use App\Http\Controllers\Api\V1\School\SchoolController;
 use App\Http\Controllers\Api\V1\School\TeacherController;
+use App\Http\Controllers\Api\V1\School\ClassRoomController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,6 +63,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/schools/{id}/teachers', [TeacherController::class, 'index'])->name('teachers.index');
     Route::post('/schools/{id}/teachers', [TeacherController::class, 'store'])->name('teachers.store');
     Route::delete('/schools/{id}/teachers/{teacherId}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
+
+    // Class management
+    Route::get('/schools/{id}/classes', [ClassRoomController::class, 'index'])->name('classes.index');
+    Route::post('/schools/{id}/classes', [ClassRoomController::class, 'store'])->name('classes.store');
+    Route::get('/schools/{id}/classes/{classId}', [ClassRoomController::class, 'show'])->name('classes.show');
+    Route::put('/schools/{id}/classes/{classId}', [ClassRoomController::class, 'update'])->name('classes.update');
+    Route::delete('/schools/{id}/classes/{classId}', [ClassRoomController::class, 'destroy'])->name('classes.destroy');
 
     // School memberships
     Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])

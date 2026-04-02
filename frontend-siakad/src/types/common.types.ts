@@ -46,3 +46,15 @@ export interface Teacher {
   is_active: boolean
   joined_at: string
 }
+
+export interface ClassRoom {
+  id: number
+  school_id: number
+  homeroom_teacher_id: number | null
+  homeroom_teacher_name: string | null
+  name: string
+  level: string | null
+  capacity: number | null
+  current_students: number
+  academic_year: string | null
+}

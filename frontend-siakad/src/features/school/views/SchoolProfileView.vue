@@ -1,35 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useSchoolStore } from '@/stores/school.store'
 import { schoolService } from '@/features/school/services/school.service'
 import BaseButton from '@/components/ui/Button/Button.vue'
-import BaseInput from '@/components/ui/Input/Input.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 
+const router = useRouter()
 const schoolStore = useSchoolStore()
 
-const isLoading = ref(false)
-const isSaving = ref(false)
-const message = ref({ type: '', text: '' })
-const logoPreview = ref<string | null>(null)
-const logoFile = ref<File | null>(null)
-
-const form = reactive({
-  name: '',
-  npsn: '',
-  address: '',
-  phone: '',
-  email: '',
-})
-
-const fieldErrors = reactive<Record<string, string>>({
-  name: '',
-  npsn: '',
-  address: '',
-  phone: '',
-  email: '',
-  logo: '',
-})
+const isLoading = ref(true)
+const school = ref<any>(null)
+const error = ref('')
 
 onMounted(async () => {
   if (schoolStore.currentSchoolId) {
@@ -41,206 +23,146 @@ async function fetchSchoolProfile() {
   isLoading.value = true
   try {
     const response = await schoolService.getProfile(schoolStore.currentSchoolId!)
-    const school = response.data
-    form.name = school.name
-    form.npsn = school.npsn
-    form.address = school.address
-    form.phone = school.phone || ''
-    form.email = school.email || ''
-    logoPreview.value = school.logo_url || null
-  } catch (error: any) {
-    message.value = { type: 'error', text: 'Gagal mengambil data profil sekolah.' }
+    school.value = response.data
+  } catch (err: any) {
+    error.value = 'Gagal mengambil data profil sekolah.'
   } finally {
     isLoading.value = false
-  }
-}
-
-function handleLogoChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files[0]) {
-    const file = target.files[0]
-    logoFile.value = file
-    logoPreview.value = URL.createObjectURL(file)
-    fieldErrors.logo = ''
-  }
-}
-
-async function handleSubmit() {
-  isSaving.value = true
-  message.value = { type: '', text: '' }
-  // Reset field errors
-  Object.keys(fieldErrors).forEach(key => fieldErrors[key] = '')
-
-  try {
-    const formData = new FormData()
-    formData.append('name', form.name)
-    formData.append('npsn', form.npsn)
-    formData.append('address', form.address)
-    formData.append('phone', form.phone)
-    formData.append('email', form.email)
-    formData.append('_method', 'PUT') // For Laravel spoofing if needed
-    if (logoFile.value) {
-      formData.append('logo', logoFile.value)
-    }
-
-    await schoolService.updateProfile(schoolStore.currentSchoolId!, formData)
-    
-    // Refresh school info in store
-    await schoolStore.fetchMemberships()
-    
-    message.value = { type: 'success', text: 'Profil sekolah berhasil diperbarui.' }
-  } catch (error: any) {
-    const apiErrors = error.response?.data?.errors
-    const backendMessage = error.response?.data?.message
-
-    if (apiErrors) {
-      Object.keys(apiErrors).forEach(key => {
-        if (fieldErrors.hasOwnProperty(key)) {
-          fieldErrors[key] = apiErrors[key][0]
-        }
-      })
-      message.value = { 
-        type: 'error', 
-        text: 'Gagal memperbarui profil sekolah. Periksa kembali data yang diinput.' 
-      }
-    } else {
-      message.value = { 
-        type: 'error', 
-        text: backendMessage || 'Terjadi kesalahan. Silakan coba lagi.' 
-      }
-    }
-  } finally {
-    isSaving.value = false
   }
 }
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto animate-fade-in">
-    <div class="mb-8 flex justify-between items-end">
-      <div>
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Profil Sekolah</h1>
-        <p class="text-slate-500 font-medium">Kelola identitas dan informasi kontak lembaga Anda</p>
+  <div class="max-w-4xl mx-auto animate-fade-in space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button 
+          @click="router.push({ name: 'Dashboard' })"
+          class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors"
+        >
+          <Icon name="lucide:arrow-left" class="w-5 h-5" />
+        </button>
+        <div>
+          <h1 class="text-2xl font-bold text-heading">Profil Sekolah</h1>
+          <p class="text-sm text-muted italic">Informasi identitas dan rincian kontak lembaga Anda</p>
+        </div>
       </div>
+      <BaseButton 
+        variant="primary" 
+        @click="router.push({ name: 'SchoolSettings' })"
+        class="shadow-lg shadow-primary-500/20"
+      >
+        <template #prepend><Icon name="lucide:edit-3" class="w-4 h-4" /></template>
+        Edit Data Sekolah
+      </BaseButton>
     </div>
 
-    <div v-if="isLoading" class="flex justify-center py-20">
-      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
-    </div>
+    <!-- Error State -->
+    <BaseCard v-if="error" class="p-12 text-center flex flex-col items-center gap-4">
+      <Icon name="lucide:alert-circle" class="w-12 h-12 text-danger-500" />
+      <p class="text-lg font-bold text-slate-900">{{ error }}</p>
+      <BaseButton variant="outline" @click="fetchSchoolProfile">Coba Lagi</BaseButton>
+    </BaseCard>
 
-    <BaseCard v-else class="p-0 border-none shadow-sm overflow-hidden">
-      <form @submit.prevent="handleSubmit">
-        <!-- Profile Header Area -->
+    <!-- Loading State: Skeletons (Match Settings Layout) -->
+    <div v-else-if="isLoading" class="space-y-6 animate-fade-in">
+      <BaseCard class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
         <div class="p-8 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row items-center gap-8">
-          <div class="relative group">
-            <div class="w-32 h-32 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:border-primary-400 group-hover:shadow-xl group-hover:shadow-primary-900/10">
-              <img v-if="logoPreview" :src="logoPreview" class="w-full h-full object-cover" />
-              <div v-else class="text-center p-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight">Belum Ada Logo</p>
-              </div>
-              <input 
-                type="file" 
-                class="absolute inset-0 opacity-0 cursor-pointer z-10" 
-                accept="image/*"
-                @change="handleLogoChange" 
-              />
-            </div>
-            <div class="absolute -right-2 -bottom-2 w-9 h-9 bg-primary-600 text-white rounded-xl flex items-center justify-center shadow-lg border-4 border-white pointer-events-none group-hover:scale-110 transition-transform">
-              <Icon name="lucide:camera" class="w-4 h-4" />
-            </div>
-          </div>
-
-          <div class="text-center sm:text-left">
-            <h2 class="text-xl font-black text-slate-900 leading-none mb-2">{{ form.name || 'Nama Sekolah' }}</h2>
-            <p class="text-sm font-bold text-slate-400 mb-4">NPSN: {{ form.npsn || '-' }}</p>
-            <div 
-              v-if="fieldErrors.logo" 
-              class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100"
-            >
-              {{ fieldErrors.logo }}
-            </div>
-            <p v-else class="text-xs text-slate-400 font-medium italic">Klik foto untuk mengganti logo sekolah (Format: JPG, PNG, Max 2MB)</p>
-          </div>
+           <Skeleton width="8rem" height="8rem" class="rounded-2xl shrink-0" />
+           <div class="space-y-3 w-full">
+             <Skeleton width="40%" height="1.5rem" />
+             <Skeleton width="60%" height="1rem" />
+           </div>
         </div>
-
         <div class="p-8 space-y-8">
-          <!-- Success/Error Message -->
-          <transition name="fade">
-            <div 
-              v-if="message.text" 
-              :class="[
-                'p-4 rounded-xl text-sm font-bold flex items-center gap-3 border',
-                message.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-red-50 text-red-800 border-red-100'
-              ]"
-            >
-              <div :class="['w-6 h-6 rounded-lg flex items-center justify-center', message.type === 'success' ? 'bg-emerald-200/50' : 'bg-red-200/50']">
-                <Icon v-if="message.type === 'success'" name="lucide:check" stroke-width="3" class="w-4 h-4" />
-                <Icon v-else name="lucide:x" stroke-width="3" class="w-4 h-4" />
-              </div>
-              {{ message.text }}
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div class="space-y-2"><Skeleton width="30%" height="1rem" /><Skeleton height="3rem" /></div>
+             <div class="space-y-2"><Skeleton width="30%" height="1rem" /><Skeleton height="3rem" /></div>
+           </div>
+           <div class="space-y-2"><Skeleton width="20%" height="1rem" /><Skeleton height="3rem" /></div>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div class="space-y-2"><Skeleton width="30%" height="1rem" /><Skeleton height="3rem" /></div>
+             <div class="space-y-2"><Skeleton width="30%" height="1rem" /><Skeleton height="3rem" /></div>
+           </div>
+        </div>
+      </BaseCard>
+    </div>
+
+    <!-- Profile View Content (Match Settings Layout) -->
+    <BaseCard v-else-if="school" class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
+        <!-- Logo Area -->
+        <div class="p-8 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row items-center gap-8">
+          <div class="w-32 h-32 rounded-2xl bg-white border-2 border-slate-200 p-2 overflow-hidden shadow-sm">
+            <img v-if="school.logo_url" :src="school.logo_url" class="w-full h-full object-contain" />
+            <div v-else class="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300">
+              <Icon name="lucide:building" class="w-12 h-12 opacity-30" />
             </div>
-          </transition>
+          </div>
 
-          <div class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <BaseInput
-                v-model="form.name"
-                label="Nama Sekolah"
-                placeholder="Masukkan nama sekolah"
-                required
-                :error="fieldErrors.name"
-              />
-              <BaseInput
-                v-model="form.npsn"
-                label="NPSN"
-                placeholder="8 Digit NPSN (Angka)"
-                required
-                :maxlength="8"
-                :error="fieldErrors.npsn"
-                @input="form.npsn = form.npsn.replace(/[^0-9]/g, '')"
-              />
-            </div>
-
-            <BaseInput
-              v-model="form.address"
-              label="Alamat Lengkap"
-              placeholder="Masukkan alamat sekolah"
-              required
-              :error="fieldErrors.address"
-            />
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <BaseInput
-                v-model="form.phone"
-                label="Nomor Telepon Sekolah"
-                placeholder="Contoh: 021XXXXXXXX"
-                type="tel"
-                :error="fieldErrors.phone"
-                @input="form.phone = form.phone.replace(/[^0-9]/g, '')"
-              />
-              <BaseInput
-                v-model="form.email"
-                label="Email Sekolah"
-                placeholder="Contoh: info@sekolah.sch.id"
-                type="email"
-                :error="fieldErrors.email"
-              />
-            </div>
-
-            <div class="pt-6 flex justify-end border-t border-slate-100">
-              <BaseButton
-                type="submit"
-                variant="primary"
-                size="lg"
-                :loading="isSaving"
-                class="min-w-[160px]"
-              >
-                Simpan Perubahan
-              </BaseButton>
+          <div class="text-center sm:text-left space-y-1">
+            <h3 class="text-2xl font-black text-heading leading-tight">{{ school.name }}</h3>
+            <p class="text-sm font-bold text-primary-600 uppercase tracking-widest">NPSN: {{ school.npsn }}</p>
+            <div class="flex items-center justify-center sm:justify-start gap-2 pt-2">
+              <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-2">
+                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                 Aktif & Terverifikasi
+              </span>
             </div>
           </div>
         </div>
-      </form>
+
+        <div class="p-8 space-y-10">
+          <div class="space-y-8">
+            <!-- Row 1: Identification -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+              <div class="space-y-1.5">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Icon name="lucide:building" class="w-3 h-3" />
+                  Nama Resmi Lembaga
+                </p>
+                <p class="text-base font-bold text-slate-800">{{ school.name }}</p>
+              </div>
+              
+              <div class="space-y-1.5">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Icon name="lucide:hash" class="w-3 h-3" />
+                  Nomor Pokok Sekolah Nasional
+                </p>
+                <p class="text-base font-bold text-slate-800">{{ school.npsn }}</p>
+              </div>
+            </div>
+
+            <!-- Row 2: Address (Full Row) -->
+            <div class="space-y-1.5 pt-4 border-t border-slate-100/50">
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <Icon name="lucide:map-pin" class="w-3 h-3" />
+                Alamat Lengkap
+              </p>
+              <p class="text-base font-bold text-slate-800 leading-relaxed">{{ school.address }}</p>
+            </div>
+
+            <!-- Row 3: Contact -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 pt-4 border-t border-slate-100/50">
+              <div class="space-y-1.5">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Icon name="lucide:phone" class="w-3 h-3" />
+                  Nomor Telepon
+                </p>
+                <p class="text-base font-bold text-slate-800">{{ school.phone || 'Belum terdaftar' }}</p>
+              </div>
+              
+              <div class="space-y-1.5">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Icon name="lucide:mail" class="w-3 h-3" />
+                  Alamat Email (Resmi)
+                </p>
+                <p v-if="school.email" class="text-base font-bold text-primary-600">{{ school.email }}</p>
+                <p v-else class="text-base font-bold text-slate-400 italic">Belum terdaftar</p>
+              </div>
+            </div>
+          </div>
+        </div>
     </BaseCard>
   </div>
 </template>

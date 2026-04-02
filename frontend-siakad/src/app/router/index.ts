@@ -72,6 +72,12 @@ const router = createRouter({
           meta: { roles: ['headmaster'] },
         },
         {
+          path: 'school/settings',
+          name: 'SchoolSettings',
+          component: () => import('@/features/school/views/SchoolSettingsView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+        {
           path: 'school/subscription',
           name: 'Subscription',
           component: () => import('@/features/school/views/SubscriptionView.vue'),
@@ -92,9 +98,9 @@ const router = createRouter({
           meta: { roles: ['headmaster'] },
         },
         {
-          path: 'classes/:id',
-          name: 'ClassDetail',
-          component: () => import('@/features/classes/views/ClassDetailView.vue'),
+          path: 'classes/:id/edit',
+          name: 'ClassEdit',
+          component: () => import('@/features/classes/views/ClassFormView.vue'),
           meta: { roles: ['headmaster'] },
         },
 

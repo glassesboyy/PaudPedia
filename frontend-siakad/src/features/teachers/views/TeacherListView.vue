@@ -83,12 +83,10 @@ function formatDate(dateString: string) {
             </tr>
           </thead>
           <tbody class="divide-y divide-border/50 bg-white">
+            <!-- Loading State -->
             <tr v-if="isLoading">
-              <td colspan="5" class="px-8 py-20 text-center text-muted">
-                <div class="flex flex-col items-center gap-3">
-                  <div class="animate-spin rounded-full h-10 w-10 border-4 border-primary-100 border-b-primary-600"></div>
-                  <span class="text-sm font-bold animate-pulse">Sinkronisasi data guru...</span>
-                </div>
+              <td colspan="5" class="px-8 py-20 text-center">
+                <Loader text="Memuat data guru..." minHeight="300px" />
               </td>
             </tr>
             <tr v-else-if="teachers.length === 0">
@@ -144,13 +142,6 @@ function formatDate(dateString: string) {
                 {{ formatDate(teacher.joined_at) }}
               </td>
               <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-2">
-                  <button 
-                    class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50"
-                    title="Edit (Coming Soon)"
-                  >
-                      <Icon name="lucide:pencil" class="w-4 h-4" />
-                  </button>
                   <button 
                     class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50"
                     @click="handleDelete(teacher)"
@@ -158,7 +149,6 @@ function formatDate(dateString: string) {
                   >
                       <Icon name="lucide:trash-2" class="w-4 h-4" />
                   </button>
-                </div>
               </td>
             </tr>
           </tbody>

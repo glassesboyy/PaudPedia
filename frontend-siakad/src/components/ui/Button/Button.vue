@@ -71,9 +71,16 @@ const sizeClasses: Record<string, string> = {
     <Icon
       v-if="loading"
       name="lucide:loader-2"
-      class="animate-spin -ml-0.5 h-4 w-4"
+      class="animate-spin h-4 w-4 shrink-0"
     />
 
+    <!-- Prepend slot -->
+    <slot name="prepend" v-if="!loading" />
+
+    <!-- Content -->
     <slot />
+
+    <!-- Append slot -->
+    <slot name="append" />
   </button>
 </template>
