@@ -77,18 +77,18 @@ async function handleSubmit() {
 
 <template>
   <div class="max-w-3xl mx-auto">
-    <!-- Back button -->
-    <button 
-      @click="router.back()" 
-      class="flex items-center gap-2 text-sm text-muted hover:text-primary-600 transition-colors mb-4 focus:outline-none"
-    >
-      <Icon name="lucide:arrow-left" class="w-4 h-4" />
-      Kembali ke Daftar Guru
-    </button>
-
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-heading">Tambah Guru Baru</h1>
-      <p class="text-muted">Masukkan data guru untuk didaftarkan ke sekolah Anda</p>
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+      <button 
+        @click="router.push({ name: 'TeacherList' })" 
+        class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors focus:outline-none"
+      >
+        <Icon name="lucide:arrow-left" class="w-5 h-5" />
+      </button>
+      <div>
+        <h1 class="text-2xl font-bold text-heading">Tambah Guru Baru</h1>
+        <p class="text-sm text-muted">Daftarkan tenaga pendidik baru ke dalam sistem</p>
+      </div>
     </div>
 
     <!-- Success View -->
@@ -122,32 +122,35 @@ async function handleSubmit() {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <BaseInput
-            v-model="form.name"
-            label="Nama Lengkap"
-            placeholder="Contoh: Budi Santoso, S.Pd"
-            required
-            :disabled="isSaving"
-            :error="fieldErrors.name"
-          >
-            <template #prepend>
-              <Icon name="lucide:user" class="w-4 h-4" />
-            </template>
-          </BaseInput>
+          <div class="md:col-span-2 space-y-6">
+            <BaseInput
+              v-model="form.name"
+              label="Nama Lengkap"
+              placeholder="Contoh: Budi Santoso, S.Pd"
+              required
+              :disabled="isSaving"
+              :error="fieldErrors.name"
+            >
+              <template #prepend>
+                <Icon name="lucide:user" class="w-4 h-4" />
+              </template>
+            </BaseInput>
 
-          <BaseInput
-            v-model="form.email"
-            label="Alamat Email"
-            type="email"
-            placeholder="Contoh: budi@email.com"
-            required
-            :disabled="isSaving"
-            :error="fieldErrors.email"
-          >
-            <template #prepend>
-              <Icon name="lucide:mail" class="w-4 h-4" />
-            </template>
-          </BaseInput>
+            <BaseInput
+              v-model="form.email"
+              label="Alamat Email"
+              type="email"
+              placeholder="Contoh: budi@email.com"
+              required
+              :disabled="isSaving"
+              :error="fieldErrors.email"
+              helper="Email ini akan digunakan sebagai akun login guru untuk mengakses SIAKAD."
+            >
+              <template #prepend>
+                <Icon name="lucide:mail" class="w-4 h-4" />
+              </template>
+            </BaseInput>
+          </div>
 
           <BaseInput
             v-model="form.nip"

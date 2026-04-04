@@ -7,6 +7,7 @@ import router from './router'
 import BaseIcon from '@/components/ui/Icon/Icon.vue'
 import BaseSkeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import BaseLoader from '@/components/ui/Loader/Loader.vue'
+import BaseConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 
 import '@/assets/styles/main.css'
 
@@ -16,6 +17,7 @@ const app = createApp(App)
 app.component('Icon', BaseIcon)
 app.component('Skeleton', BaseSkeleton)
 app.component('Loader', BaseLoader)
+app.component('ConfirmModal', BaseConfirmModal)
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

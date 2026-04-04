@@ -26,6 +26,13 @@ export const teacherService = {
   },
 
   /**
+   * Get specific teacher detail.
+   */
+  async getTeacher(schoolId: number, teacherId: number): Promise<ApiResponse<Teacher>> {
+    return http.get(ENDPOINTS.TEACHERS.DETAIL(schoolId, teacherId))
+  },
+
+  /**
    * Remove a teacher from a school.
    */
   async deleteTeacher(schoolId: number, teacherId: number): Promise<ApiResponse<null>> {

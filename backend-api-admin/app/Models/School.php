@@ -36,6 +36,7 @@ class School extends Model
         'total_students',
         'total_teachers',
         'total_classes',
+        'total_parents',
         'headmaster_name',
         'headmaster_email',
         'headmaster_phone',
@@ -119,24 +120,28 @@ class School extends Model
     protected function totalStudents(): Attribute
     {
         return Attribute::make(
-            // 🔒 Count hanya siswa yang school_id = $this->id
-            get: fn () => $this->students()->where('school_id', $this->id)->count(),
+            get: fn () => $this->students()->count(),
         );
     }
 
     protected function totalTeachers(): Attribute
     {
         return Attribute::make(
-            // 🔒 Count hanya guru yang school_id = $this->id
-            get: fn () => $this->teachers()->where('school_id', $this->id)->count(),
+            get: fn () => $this->teachers()->count(),
         );
     }
 
     protected function totalClasses(): Attribute
     {
         return Attribute::make(
-            // 🔒 Count hanya kelas yang school_id = $this->id
-            get: fn () => $this->classes()->where('school_id', $this->id)->count(),
+            get: fn () => $this->classes()->count(),
+        );
+    }
+
+    protected function totalParents(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->parentProfiles()->count(),
         );
     }
 

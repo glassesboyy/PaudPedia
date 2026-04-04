@@ -33,9 +33,9 @@ class TeacherController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        // Allow Headmasters to see teacher list
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Akses ditolak. Anda bukan pengelola sekolah ini.', 403);
+        // Allow Headmasters and Teachers to see teacher list
+        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+            return $this->error('Akses ditolak. Anda bukan pengelola atau pengajar sekolah ini.', 403);
         }
 
         $teachers = Teacher::where('school_id', $schoolId)
@@ -52,6 +52,32 @@ class TeacherController extends BaseController
                 'total' => $teachers->total(),
             ]
         ], 'Data guru berhasil diambil.');
+    }
+
+    /**
+     * Get specific teacher details.
+     *
+     * @param Request $request
+     * @param int $schoolId
+     * @param int $teacherId
+     * @return JsonResponse
+     */
+    public function show(Request $request, int $schoolId, int $teacherId): JsonResponse
+    {
+        $membership = $request->user()->schoolMemberships()
+            ->where('school_id', $schoolId)
+            ->first();
+
+        // Allow Headmasters and Teachers to see teacher list
+        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+            return $this->error('Akses ditolak. Anda bukan pengelola atau pengajar sekolah ini.', 403);
+        }
+
+        $teacher = Teacher::where('school_id', $schoolId)
+            ->with(['user', 'homeroomClasses'])
+            ->findOrFail($teacherId);
+
+        return $this->success(new TeacherResource($teacher), 'Data guru berhasil diambil.');
     }
 
     /**

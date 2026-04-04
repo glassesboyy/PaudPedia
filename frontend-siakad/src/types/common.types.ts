@@ -25,6 +25,7 @@ export interface School {
   total_students: number
   total_teachers: number
   total_classes: number
+  total_parents: number
 }
 
 export interface SchoolMembership {
@@ -57,4 +58,40 @@ export interface ClassRoom {
   capacity: number | null
   current_students: number
   academic_year: string | null
+}
+
+export interface ParentProfile {
+  id: number
+  school_id: number
+  user_id: number
+  email: string
+  father_name: string | null
+  mother_name: string | null
+  phone: string
+  father_occupation: string | null
+  mother_occupation: string | null
+  address: string | null
+  children_count?: number
+  children?: Student[]
+  created_at: string
+  updated_at: string
+}
+
+export interface Student {
+  id: number
+  school_id: number
+  class_id: number | null
+  parent_profile_id: number
+  name: string
+  nisn: string | null
+  birth_date: string
+  gender: string
+  address: string | null
+  photo_url: string | null
+  enrollment_date: string | null
+  status: string
+  parent?: ParentProfile
+  class?: ClassRoom
+  created_at: string
+  updated_at: string
 }

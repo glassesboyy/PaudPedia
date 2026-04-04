@@ -18,6 +18,7 @@ export interface InputProps {
   type?: string
   placeholder?: string
   error?: string
+  helper?: string
   disabled?: boolean
   required?: boolean
   id?: string
@@ -31,6 +32,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   type: 'text',
   placeholder: '',
   error: '',
+  helper: '',
   disabled: false,
   required: false,
 })
@@ -85,8 +87,11 @@ function onInput(event: Event) {
       </div>
     </div>
 
-    <p v-if="error" class="mt-1.5 text-xs text-danger-600">
+    <p v-if="error" class="mt-1.5 text-xs text-danger-600 font-bold">
       {{ error }}
+    </p>
+    <p v-else-if="helper" class="mt-1.5 text-xs text-muted leading-relaxed">
+      {{ helper }}
     </p>
   </div>
 </template>

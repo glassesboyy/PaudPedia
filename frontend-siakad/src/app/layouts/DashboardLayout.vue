@@ -6,7 +6,7 @@
  * This is a minimal working implementation that can be extended later
  * with full sidebar navigation, notifications, etc.
  */
-import { ref, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { useSchoolStore } from '@/stores/school.store'
@@ -47,16 +47,19 @@ function switchSchool() {
 
 const navItems = computed(() => {
   const role = schoolStore.currentRole
-  const items = [
-    { name: 'Dashboard', icon: 'dashboard', to: '/', roles: ['headmaster', 'teacher', 'parent'] },
-    { name: 'Kelas', icon: 'class', to: '/classes', roles: ['headmaster'] },
-    { name: 'Guru', icon: 'teacher', to: '/teachers', roles: ['headmaster'] },
-    { name: 'Siswa', icon: 'student', to: '/students', roles: ['headmaster', 'teacher'] },
-    { name: 'Orang Tua', icon: 'parent', to: '/parents', roles: ['headmaster'] },
-    { name: 'Absensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
-    { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'] },
-    { name: 'Pengaturan Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'] },
-  ]
+    const items = [
+      { name: 'Dashboard', icon: 'dashboard', to: '/', roles: ['headmaster', 'teacher', 'parent'] },
+      { name: 'Kelas', icon: 'class', to: '/classes', roles: ['headmaster'] },
+      { name: 'Daftar Kelas', icon: 'class', to: '/classes', roles: ['teacher'] },
+      { name: 'Guru', icon: 'teacher', to: '/teachers', roles: ['headmaster'] },
+      { name: 'Siswa', icon: 'student', to: '/students', roles: ['headmaster'] },
+      { name: 'Data Siswa', icon: 'student', to: '/students', roles: ['teacher'] },
+      { name: 'Orang Tua', icon: 'parent', to: '/parents', roles: ['headmaster'] },
+      { name: 'Data Orang Tua', icon: 'parent', to: '/parents', roles: ['teacher'] },
+      { name: 'Absensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
+      { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'] },
+      { name: 'Pengaturan Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'] },
+    ]
   return items.filter((item) => item.roles.includes(role ?? ''))
 })
 

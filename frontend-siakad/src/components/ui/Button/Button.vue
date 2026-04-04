@@ -43,7 +43,7 @@ const variantClasses: Record<string, string> = {
   ghost:
     'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-95',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 active:scale-95 shadow-sm',
+    'bg-danger-600 text-white hover:bg-danger-700 active:scale-95 shadow-sm',
 }
 
 const sizeClasses: Record<string, string> = {

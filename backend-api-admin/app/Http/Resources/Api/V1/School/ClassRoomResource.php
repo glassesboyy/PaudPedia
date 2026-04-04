@@ -24,6 +24,7 @@ class ClassRoomResource extends JsonResource
             'capacity' => $this->capacity,
             'current_students' => $this->getCurrentStudentCount(), // live calc
             'academic_year' => $this->academic_year,
+            'students' => StudentResource::collection($this->whenLoaded('students')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

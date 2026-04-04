@@ -89,7 +89,13 @@ const router = createRouter({
           path: 'classes',
           name: 'ClassList',
           component: () => import('@/features/classes/views/ClassListView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'teacher'] },
+        },
+        {
+          path: 'classes/:id',
+          name: 'ClassDetail',
+          component: () => import('@/features/classes/views/ClassDetailView.vue'),
+          meta: { roles: ['headmaster', 'teacher'] },
         },
         {
           path: 'classes/create',
@@ -112,6 +118,12 @@ const router = createRouter({
           meta: { roles: ['headmaster'] },
         },
         {
+          path: 'teachers/:id',
+          name: 'TeacherDetail',
+          component: () => import('@/features/teachers/views/TeacherDetailView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+        {
           path: 'teachers/create',
           name: 'TeacherCreate',
           component: () => import('@/features/teachers/views/TeacherFormView.vue'),
@@ -123,11 +135,23 @@ const router = createRouter({
           path: 'parents',
           name: 'ParentList',
           component: () => import('@/features/parents/views/ParentListView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'teacher'] },
         },
         {
           path: 'parents/create',
           name: 'ParentCreate',
+          component: () => import('@/features/parents/views/ParentFormView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+        {
+          path: 'parents/:id',
+          name: 'ParentDetail',
+          component: () => import('@/features/parents/views/ParentDetailView.vue'),
+          meta: { roles: ['headmaster', 'teacher'] },
+        },
+        {
+          path: 'parents/:id/edit',
+          name: 'ParentEdit',
           component: () => import('@/features/parents/views/ParentFormView.vue'),
           meta: { roles: ['headmaster'] },
         },
@@ -150,6 +174,12 @@ const router = createRouter({
           name: 'StudentDetail',
           component: () => import('@/features/students/views/StudentDetailView.vue'),
           meta: { roles: ['headmaster', 'teacher'] },
+        },
+        {
+          path: 'students/:id/edit',
+          name: 'StudentEdit',
+          component: () => import('@/features/students/views/StudentFormView.vue'),
+          meta: { roles: ['headmaster'] },
         },
 
         // Attendance

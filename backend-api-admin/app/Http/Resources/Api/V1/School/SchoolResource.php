@@ -29,6 +29,7 @@ class SchoolResource extends JsonResource
             'total_students' => $this->total_students,
             'total_teachers' => $this->total_teachers,
             'total_classes' => $this->total_classes,
+            'total_parents' => $this->total_parents,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

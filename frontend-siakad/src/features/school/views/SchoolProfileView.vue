@@ -45,7 +45,7 @@ async function fetchSchoolProfile() {
         </button>
         <div>
           <h1 class="text-2xl font-bold text-heading">Profil Sekolah</h1>
-          <p class="text-sm text-muted italic">Informasi identitas dan rincian kontak lembaga Anda</p>
+          <p class="text-sm text-muted">Informasi identitas dan rincian kontak lembaga Anda</p>
         </div>
       </div>
       <BaseButton 

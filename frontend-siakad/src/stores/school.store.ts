@@ -49,10 +49,12 @@ export const useSchoolStore = defineStore('school', {
 
         // Auto-restore last selected school if still valid
         if (this.currentSchool) {
-          const stillValid = this.memberships.some(
+          const freshMembership = this.memberships.find(
             (m) => m.school_id === this.currentSchool?.id,
           )
-          if (!stillValid) {
+          if (freshMembership) {
+            this.currentSchool = freshMembership.school
+          } else {
             this.currentSchool = null
           }
         }

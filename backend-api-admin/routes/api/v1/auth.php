@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\V1\Public\TestimonialController;
 use App\Http\Controllers\Api\V1\School\SchoolController;
 use App\Http\Controllers\Api\V1\School\TeacherController;
 use App\Http\Controllers\Api\V1\School\ClassRoomController;
+use App\Http\Controllers\Api\V1\School\ParentProfileController;
+use App\Http\Controllers\Api\V1\School\StudentController;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +65,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Teacher management
     Route::get('/schools/{id}/teachers', [TeacherController::class, 'index'])->name('teachers.index');
     Route::post('/schools/{id}/teachers', [TeacherController::class, 'store'])->name('teachers.store');
+    Route::get('/schools/{id}/teachers/{teacherId}', [TeacherController::class, 'show'])->name('teachers.show');
     Route::delete('/schools/{id}/teachers/{teacherId}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
 
     // Class management
@@ -70,6 +74,20 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/schools/{id}/classes/{classId}', [ClassRoomController::class, 'show'])->name('classes.show');
     Route::put('/schools/{id}/classes/{classId}', [ClassRoomController::class, 'update'])->name('classes.update');
     Route::delete('/schools/{id}/classes/{classId}', [ClassRoomController::class, 'destroy'])->name('classes.destroy');
+
+    // Parent management
+    Route::get('/schools/{id}/parents', [ParentProfileController::class, 'index'])->name('parents.index');
+    Route::post('/schools/{id}/parents', [ParentProfileController::class, 'store'])->name('parents.store');
+    Route::get('/schools/{id}/parents/{parentId}', [ParentProfileController::class, 'show'])->name('parents.show');
+    Route::put('/schools/{id}/parents/{parentId}', [ParentProfileController::class, 'update'])->name('parents.update');
+    Route::delete('/schools/{id}/parents/{parentId}', [ParentProfileController::class, 'destroy'])->name('parents.destroy');
+
+    // Student management
+    Route::get('/schools/{id}/students', [StudentController::class, 'index'])->name('students.index');
+    Route::post('/schools/{id}/students', [StudentController::class, 'store'])->name('students.store');
+    Route::get('/schools/{id}/students/{studentId}', [StudentController::class, 'show'])->name('students.show');
+    Route::put('/schools/{id}/students/{studentId}', [StudentController::class, 'update'])->name('students.update');
+    Route::delete('/schools/{id}/students/{studentId}', [StudentController::class, 'destroy'])->name('students.destroy');
 
     // School memberships
     Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useSchoolStore } from '@/stores/school.store'
 import BaseCard from '@/components/ui/Card/Card.vue'
@@ -6,13 +7,20 @@ import BaseCard from '@/components/ui/Card/Card.vue'
 const authStore = useAuthStore()
 const schoolStore = useSchoolStore()
 
-const stats = [
+const stats = computed(() => [
   { 
     name: 'Siswa', 
     value: schoolStore.currentSchool?.total_students || 0, 
     icon: 'student', 
     color: 'bg-indigo-50 text-indigo-600 border-indigo-100',
     to: '/students'
+  },
+  { 
+    name: 'Orang Tua', 
+    value: schoolStore.currentSchool?.total_parents || 0, 
+    icon: 'parent', 
+    color: 'bg-rose-50 text-rose-600 border-rose-100',
+    to: '/parents'
   },
   { 
     name: 'Guru', 
@@ -28,12 +36,13 @@ const stats = [
     color: 'bg-amber-50 text-amber-600 border-amber-100',
     to: '/classes'
   },
-]
+])
 
 const icons: Record<string, string> = {
   student: 'lucide:backpack',
+  parent: 'lucide:users-2',
   teacher: 'lucide:graduation-cap',
-  class: 'lucide:users',
+  class: 'lucide:school',
 }
 </script>
 
@@ -52,7 +61,7 @@ const icons: Record<string, string> = {
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <RouterLink 
         v-for="stat in stats" 
         :key="stat.name" 
@@ -84,18 +93,36 @@ const icons: Record<string, string> = {
       <!-- Quick Actions -->
       <div class="lg:col-span-2 space-y-5">
         <h2 class="text-lg font-bold text-heading">Aksi Cepat</h2>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <RouterLink to="/students/create" class="dashboard-action group">
+            <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
+              <Icon name="lucide:user-plus" class="w-5 h-5" stroke-width="2" />
+            </div>
+            <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Siswa</span>
+          </RouterLink>
           <RouterLink to="/teachers/create" class="dashboard-action group">
             <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-              <Icon name="lucide:plus" class="w-5 h-5" stroke-width="2" />
+              <Icon name="lucide:graduation-cap" class="w-5 h-5" stroke-width="2" />
             </div>
-            <span class="group-hover:text-primary-600 transition-colors font-bold">Tambah Guru</span>
+            <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Guru</span>
+          </RouterLink>
+          <RouterLink to="/parents/create" class="dashboard-action group">
+            <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
+              <Icon name="lucide:heart-handshake" class="w-5 h-5" stroke-width="2" />
+            </div>
+            <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Wali</span>
+          </RouterLink>
+          <RouterLink to="/classes/create" class="dashboard-action group">
+            <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
+              <Icon name="lucide:door-open" class="w-5 h-5" stroke-width="2" />
+            </div>
+            <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Kelas</span>
           </RouterLink>
           <RouterLink to="/school/profile" class="dashboard-action group">
             <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-              <Icon name="lucide:building" class="w-5 h-5" stroke-width="2" />
+              <Icon name="lucide:settings" class="w-5 h-5" stroke-width="2" />
             </div>
-            <span class="group-hover:text-primary-600 transition-colors font-bold">Profil Sekolah</span>
+            <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Setting</span>
           </RouterLink>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { ENDPOINTS } from '@/services/http/endpoints'
 import type { ApiResponse, PaginatedResponse, ClassRoom } from '@/types'
 
 export const classService = {
-  getClasses(schoolId: number, params?: { page?: number; per_page?: number }): Promise<PaginatedResponse<ClassRoom>> {
+  getClasses(schoolId: number, params?: any): Promise<PaginatedResponse<ClassRoom>> {
     return api.get(ENDPOINTS.CLASSES.LIST(schoolId), { params })
   },
 

@@ -30,3 +30,14 @@ export enum ClassLevel {
   TPA = 'TPA',
   SPS = 'SPS',
 }
+
+export enum Gender {
+  MALE = 'male',
+  FEMALE = 'female',
+}
+
+export enum StudentStatus {
+  ACTIVE = 'active',
+  GRADUATED = 'graduated',
+  TRANSFERRED = 'transferred',
+}
