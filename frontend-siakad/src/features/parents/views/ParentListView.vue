@@ -171,8 +171,8 @@ function getParentDisplayName(p: ParentProfile): string {
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading text-center">Belum ada Orang Tua</p>
-                    <p class="text-sm text-muted" v-if="isHeadmaster">Mulai tambahkan data peserta didik ke sistem.</p>
-                    <p class="text-sm text-muted" v-else>Belum ada data siswa yang terdaftar di sekolah.</p>
+                    <p class="text-sm text-muted" v-if="isHeadmaster">Mulai tambahkan data orang tua siswa ke sistem.</p>
+                    <p class="text-sm text-muted" v-else>Belum ada data orang tua yang terdaftar di sekolah.</p>
                   </div>
                   <BaseButton v-if="isHeadmaster" variant="primary" size="md" class="mt-2 w-full" @click="router.push({ name: 'ParentCreate' })">
                     Tambah Orang Tua Pertama

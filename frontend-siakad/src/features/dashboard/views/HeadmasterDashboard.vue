@@ -3,9 +3,13 @@ import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useSchoolStore } from '@/stores/school.store'
 import BaseCard from '@/components/ui/Card/Card.vue'
+import { usePageCopy } from '@/utils/copy-helper'
 
 const authStore = useAuthStore()
 const schoolStore = useSchoolStore()
+const { getCopy } = usePageCopy()
+
+const copy = computed(() => getCopy('dashboard'))
 
 const stats = computed(() => [
   { 
@@ -52,7 +56,7 @@ const icons: Record<string, string> = {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <h1 class="text-3xl font-black text-slate-900 tracking-tight">Halo, {{ authStore.userName }} 👋</h1>
-        <p class="text-slate-500 font-medium">Selamat datang di panel manajemen {{ schoolStore.currentSchool?.name }}</p>
+        <p class="text-slate-500 font-medium">{{ copy.subtitle }}</p>
       </div>
       <div v-if="schoolStore.isPro" class="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-black border border-amber-200 shadow-sm shadow-amber-900/5 uppercase tracking-widest">
         <Icon name="lucide:star" fill="currentColor" class="w-4 h-4" />

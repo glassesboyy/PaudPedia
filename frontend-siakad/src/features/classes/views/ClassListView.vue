@@ -91,8 +91,8 @@ async function executeDelete() {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-heading">Daftar Kelas</h1>
-        <p class="text-muted">Kelola data ruangan kelas dan wali kelas di sekolah Anda</p>
+        <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
+        <p class="text-muted">{{ copy.subtitle }}</p>
       </div>
       <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'ClassCreate' })">
         <template #prepend>

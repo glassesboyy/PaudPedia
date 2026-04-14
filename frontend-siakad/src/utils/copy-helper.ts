@@ -16,8 +16,14 @@ export function usePageCopy() {
       case 'class':
         if (role === 'headmaster') {
           return {
-            title: 'Kelola Kelas',
+            title: 'Manajemen Kelas',
             subtitle: 'Kelola data ruangan kelas dan wali kelas di sekolah Anda'
+          }
+        }
+        if (role === 'teacher') {
+          return {
+            title: 'Daftar Kelas',
+            subtitle: 'Lihat daftar kelas yang Anda ampu beserta detailnya'
           }
         }
         return {
@@ -80,8 +86,14 @@ export function usePageCopy() {
             subtitle: 'Pantau aktivitas dan data akademik buah hati Anda'
           }
         }
+        if (role === 'teacher') {
+          return {
+            title: 'Portal Guru',
+            subtitle: 'Ringkasan kelas dan aktivitas pengajaran Anda'
+          }
+        }
         return {
-          title: 'Dashboard',
+          title: 'Panel Manajemen',
           subtitle: 'Ringkasan informasi dan aktivitas di sekolah Anda'
         }
 

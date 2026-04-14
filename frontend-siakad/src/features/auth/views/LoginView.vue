@@ -149,13 +149,6 @@ async function handleLogin() {
         </template>
       </BaseInput>
 
-      <!-- Forgot password link -->
-      <div class="flex justify-end">
-        <RouterLink to="/forgot-password" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-          Lupa password?
-        </RouterLink>
-      </div>
-
       <!-- Submit button -->
       <BaseButton
         type="submit"
@@ -169,18 +162,8 @@ async function handleLogin() {
       </BaseButton>
     </form>
 
-    <!-- Divider -->
-    <div class="relative my-8">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-border-muted" />
-      </div>
-      <div class="relative flex justify-center text-sm">
-        <span class="px-3 bg-background text-muted">Belum punya akun?</span>
-      </div>
-    </div>
-
     <!-- Register on public -->
-    <p class="text-center text-sm text-body">
+    <p class="text-center text-sm text-body text-muted my-8">
       Belum punya akun sekolah?
       <a
         :href="`${publicUrl}/auth/register?type=school`"

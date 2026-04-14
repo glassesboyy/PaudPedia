@@ -369,7 +369,6 @@ async function handleSubmit() {
               <Icon name="lucide:loader-2" class="w-4 h-4 animate-spin" />
             </template>
             <template #prepend v-else>
-              <Icon name="lucide:save" class="w-4 h-4" />
             </template>
             {{ isSubmitting ? 'Menyimpan...' : 'Simpan Kelas' }}
           </BaseButton>

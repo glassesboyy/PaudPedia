@@ -100,10 +100,19 @@ async function fetchMyChildren() {
           </RouterLink>
         </div>
         
-        <div v-if="isLoadingChildren" class="space-y-4">
-          <BaseCard v-for="i in 2" :key="i" class="p-6 animate-pulse bg-slate-50 border-none h-24 flex items-center gap-6 rounded-[1.5rem] shadow-sm">
+        <div v-if="isLoadingChildren" class="grid grid-cols-1 gap-4">
+          <BaseCard v-for="i in 2" :key="i" class="p-4 border-none shadow-lg shadow-primary-900/5 rounded-[1.5rem] bg-white flex items-center gap-6 h-[96px]">
             <Skeleton width="4rem" height="4rem" class="rounded-2xl shrink-0" />
-            <div class="flex-1 space-y-3"><Skeleton width="40%" height="1.25rem" /><Skeleton width="20%" height="0.75rem" /></div>
+            <div class="flex-1 space-y-3">
+              <div class="flex items-center gap-2">
+                <Skeleton width="45%" height="1.5rem" class="rounded-lg" />
+                <Skeleton width="60px" height="1.25rem" class="rounded-lg" />
+              </div>
+              <div class="flex gap-4">
+                <Skeleton width="100px" height="1rem" />
+                <Skeleton width="100px" height="1rem" />
+              </div>
+            </div>
           </BaseCard>
         </div>
         
@@ -120,7 +129,7 @@ async function fetchMyChildren() {
             v-for="child in myChildren" 
             :key="child.id" 
             class="p-4 border-none shadow-lg shadow-primary-900/5 hover:shadow-xl hover:shadow-primary-900/10 cursor-pointer group transition-all duration-300 rounded-[1.5rem] bg-white border border-transparent hover:border-primary-100"
-            @click="router.push({ name: 'StudentDetail', params: { id: child.id } })"
+            @click="router.push({ name: 'ChildDetail', params: { id: child.id } })"
           >
             <div class="flex items-center gap-6">
               <!-- Visual -->
