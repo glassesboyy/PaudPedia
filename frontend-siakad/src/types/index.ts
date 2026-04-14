@@ -1,3 +1,5 @@
 export * from './enums'
 export * from './api.types'
 export * from './common.types'
+export * from './attendance.types'
+export * from './assessment.types'

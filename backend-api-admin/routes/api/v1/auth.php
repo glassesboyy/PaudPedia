@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\V1\School\TeacherController;
 use App\Http\Controllers\Api\V1\School\ClassRoomController;
 use App\Http\Controllers\Api\V1\School\ParentProfileController;
 use App\Http\Controllers\Api\V1\School\StudentController;
+use App\Http\Controllers\Api\V1\School\AttendanceController;
+use App\Http\Controllers\Api\V1\School\AssessmentController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -88,6 +90,16 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/schools/{id}/students/{studentId}', [StudentController::class, 'show'])->name('students.show');
     Route::put('/schools/{id}/students/{studentId}', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/schools/{id}/students/{studentId}', [StudentController::class, 'destroy'])->name('students.destroy');
+
+    // Attendance management
+    Route::get('/schools/{id}/classes/{classId}/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/schools/{id}/classes/{classId}/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/schools/{id}/students/{studentId}/attendance/summary', [AttendanceController::class, 'studentSummary'])->name('attendance.summary');
+
+    // Assessment management
+    Route::get('/schools/{id}/classes/{classId}/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
+    Route::post('/schools/{id}/classes/{classId}/assessments', [AssessmentController::class, 'store'])->name('assessments.store');
+    Route::get('/schools/{id}/students/{studentId}/assessments/history', [AssessmentController::class, 'studentHistory'])->name('assessments.history');
 
     // School memberships
     Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])

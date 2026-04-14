@@ -3,7 +3,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSchoolStore } from '@/stores/school.store'
 import { studentService } from '@/features/students/services/student.service'
+import { attendanceService } from '@/features/attendance/services/attendance.service'
+import { assessmentService } from '@/features/assessments/services/assessment.service'
 import type { Student } from '@/types'
+import type { StudentAttendanceSummaryResponse } from '@/types/attendance.types'
+import type { StudentAssessmentHistoryResponse } from '@/types/assessment.types'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
@@ -18,6 +22,8 @@ const copy = computed(() => getCopy('student'))
 const studentId = computed(() => Number(route.params.id))
 const isLoading = ref(true)
 const student = ref<Student | null>(null)
+const attendanceData = ref<StudentAttendanceSummaryResponse | null>(null)
+const assessmentData = ref<StudentAssessmentHistoryResponse | null>(null)
 const error = ref('')
 
 const statusLabels: Record<string, string> = {
@@ -46,6 +52,20 @@ async function fetchStudent() {
   try {
     const response = await studentService.getStudent(schoolStore.currentSchoolId!, studentId.value)
     student.value = response.data
+
+    try {
+      const [attRes, assRes] = await Promise.all([
+        attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, { 
+          month: new Date().getMonth() + 1, 
+          year: new Date().getFullYear() 
+        }),
+        assessmentService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value)
+      ])
+      attendanceData.value = (attRes as any)
+      assessmentData.value = (assRes as any)
+    } catch (e) {
+      console.error('Failed fetching extra data', e)
+    }
   } catch {
     error.value = 'Gagal mengambil data anak.'
   } finally {
@@ -174,6 +194,68 @@ function formatDate(date: string | null): string {
             <div class="space-y-1.5 md:col-span-2">
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Icon name="lucide:map-pin" class="w-3 h-3" /> Alamat Domisili</p>
               <p class="text-base font-bold text-slate-800">{{ student.address || 'Belum terdata' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance Data -->
+        <div class="space-y-6" v-if="attendanceData">
+          <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
+            <Icon name="lucide:calendar-check" class="w-5 h-5 text-primary-600" /> Rekap Kehadiran Bulan Ini
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+              <p class="text-xs font-bold text-slate-500 uppercase">Hadir</p>
+              <p class="text-2xl font-black text-emerald-600 mt-1">{{ attendanceData.summary.present }}</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+              <p class="text-xs font-bold text-slate-500 uppercase">Sakit</p>
+              <p class="text-2xl font-black text-amber-500 mt-1">{{ attendanceData.summary.sick }}</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+              <p class="text-xs font-bold text-slate-500 uppercase">Izin</p>
+              <p class="text-2xl font-black text-blue-500 mt-1">{{ attendanceData.summary.permission }}</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+              <p class="text-xs font-bold text-slate-500 uppercase">Alfa</p>
+              <p class="text-2xl font-black text-rose-500 mt-1">{{ attendanceData.summary.absent }}</p>
+            </div>
+            <div class="p-4 rounded-xl bg-primary-50 border border-primary-100 text-center">
+              <p class="text-xs font-bold text-primary-700 uppercase">Persentase</p>
+              <p class="text-2xl font-black text-primary-700 mt-1">{{ attendanceData.summary.percentage }}%</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assessment Data -->
+        <div class="space-y-6" v-if="assessmentData && assessmentData.history.length > 0">
+          <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
+            <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-primary-600" /> Pencapaian Perkembangan
+          </h3>
+          
+          <div v-for="group in assessmentData.history" :key="group.academic_year + group.semester" class="space-y-4">
+            <h4 class="text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg inline-block">
+              {{ group.academic_year }} - {{ group.semester_label }}
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-for="item in group.items" :key="item.id" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
+                <div class="flex justify-between items-start gap-4">
+                  <p class="font-bold text-slate-800 leading-tight">{{ item.aspect }}</p>
+                  <span class="px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider shrink-0" 
+                    :class="{
+                      'bg-rose-100 text-rose-700': item.scale === 'BB',
+                      'bg-amber-100 text-amber-700': item.scale === 'MB',
+                      'bg-emerald-100 text-emerald-700': item.scale === 'BSH',
+                      'bg-primary-100 text-primary-700': item.scale === 'BSB'
+                    }">
+                    {{ item.scale }}
+                  </span>
+                </div>
+                <p class="text-xs font-semibold text-slate-500">{{ item.description }}</p>
+                <div v-if="item.notes" class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-sm text-slate-600 italic">
+                  "{{ item.notes }}"
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -14,10 +14,7 @@ class Attendance extends Model
     protected $table = 'attendance';
 
     protected $fillable = [
-        'school_id',
         'student_id',
-        'class_id',
-        'teacher_id',
         'date',
         'status',
         'notes',

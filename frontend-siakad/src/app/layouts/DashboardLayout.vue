@@ -57,6 +57,7 @@ const navItems = computed(() => {
       { name: 'Orang Tua', icon: 'parent', to: '/parents', roles: ['headmaster'] },
       { name: 'Data Orang Tua', icon: 'parent', to: '/parents', roles: ['teacher'] },
       { name: 'Absensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
+      { name: 'Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'] },
       { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'] },
       { name: 'Pengaturan Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'] },
     ]
@@ -71,6 +72,7 @@ const navIcons: Record<string, string> = {
   parent: 'lucide:shield',
   attendance: 'lucide:calendar-check',
   child: 'lucide:baby',
+  assessment: 'lucide:bar-chart-2',
   school: 'lucide:settings',
 }
 </script>

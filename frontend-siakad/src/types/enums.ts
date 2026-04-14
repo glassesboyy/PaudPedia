@@ -10,10 +10,10 @@ export enum SubscriptionPlan {
 }
 
 export enum AttendanceStatus {
-  HADIR = 'hadir',
-  SAKIT = 'sakit',
-  IZIN = 'izin',
-  ALPHA = 'alpha',
+  PRESENT = 'present',
+  SICK = 'sick',
+  PERMISSION = 'permission',
+  ABSENT = 'absent',
 }
 
 export enum PAUDScale {

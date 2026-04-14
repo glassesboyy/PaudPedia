@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\School;
+
+use App\Http\Controllers\Controller;
+use App\Models\Attendance;
+use App\Models\ClassRoom;
+use App\Models\School;
+use App\Models\Student;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use Illuminate\Validation\Rules\Enum;
+use App\Enums\AttendanceStatus;
+
+class AttendanceController extends Controller
+{
+    /**
+     * Get attendance list for a specific class and date
+     */
+    public function index(Request $request, $id, $classId)
+    {
+        $school = School::findOrFail($id);
+        
+        $membership = $request->user()->schoolMemberships()
+            ->where('school_id', $school->id)
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Akses ditolak.'], 403);
+        }
+
+        $class = ClassRoom::where('school_id', $school->id)
+            ->where('id', $classId)
+            ->firstOrFail();
+
+        // Get date, default to today
+        $date = $request->get('date', date('Y-m-d'));
+
+        // Get students in this class
+        $students = Student::where('class_id', $class->id)
+            ->where('school_id', $school->id)
+            ->where('status', \App\Enums\StudentStatus::ACTIVE) // active students only
+            ->orderBy('name')
+            ->get();
+
+        // Get attendances for these students on the specific date
+        $attendances = Attendance::whereIn('student_id', $students->pluck('id'))
+            ->whereDate('date', $date)
+            ->get()
+            ->keyBy('student_id');
+
+        // Merge student data with attendance data
+        $result = $students->map(function ($student) use ($attendances, $date) {
+            $attendance = $attendances->get($student->id);
+            return [
+                'student_id' => $student->id,
+                'name' => $student->name,
+                'nisn' => $student->nisn,
+                'status' => $attendance ? $attendance->status->value : null,
+                'notes' => $attendance ? $attendance->notes : null,
+                'attendance_id' => $attendance ? $attendance->id : null,
+                'date' => $date
+            ];
+        });
+
+        return response()->json([
+            'data' => $result,
+            'date' => $date,
+            'class' => [
+                'id' => $class->id,
+                'name' => $class->name
+            ]
+        ]);
+    }
+
+    /**
+     * Bulk store or update attendance for a class
+     */
+    public function store(Request $request, $id, $classId)
+    {
+        $school = School::findOrFail($id);
+        
+        $membership = $request->user()->schoolMemberships()
+            ->where('school_id', $school->id)
+            ->first();
+
+        if (!$membership || !$membership->isTeacher()) {
+            return response()->json(['message' => 'Hanya guru yang dapat mengisi absensi.'], 403);
+        }
+
+        $class = ClassRoom::where('school_id', $school->id)
+            ->where('id', $classId)
+            ->firstOrFail();
+
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+            'attendances' => 'required|array',
+            'attendances.*.student_id' => 'required|exists:students,id',
+            'attendances.*.status' => ['required', new Enum(AttendanceStatus::class)],
+            'attendances.*.notes' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $date = $request->date;
+        $attendancesData = $request->attendances;
+        
+        // Find teacher id for this class (the currenlty logged in teacher)
+        $teacher = $membership->isTeacher() ? $request->user()->teacherProfile : null;
+        $teacherId = $teacher ? $teacher->id : $class->homeroom_teacher_id;
+
+        $savedAttendances = [];
+
+        foreach ($attendancesData as $data) {
+            // Verify student belongs to this class
+            $student = Student::where('id', $data['student_id'])
+                ->where('class_id', $class->id)
+                ->first();
+
+            if (!$student) continue;
+
+            $attendance = Attendance::updateOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'date' => $date,
+                ],
+                [
+                    'status' => $data['status'],
+                    'notes' => $data['notes'] ?? null,
+                ]
+            );
+
+            $savedAttendances[] = $attendance;
+        }
+
+        return response()->json([
+            'message' => 'Absensi berhasil disimpan.',
+            'count' => count($savedAttendances)
+        ]);
+    }
+
+    /**
+     * Get attendance summary for a student (for parent and teacher)
+     */
+    public function studentSummary(Request $request, $id, $studentId)
+    {
+        $school = School::findOrFail($id);
+        
+        $user = $request->user();
+        if ($user->hasRole('parent')) {
+            $parentProfile = $user->parentProfile;
+            if (!$parentProfile) {
+                return response()->json(['message' => 'Akses ditolak.'], 403);
+            }
+            $student = Student::where('id', $studentId)
+                ->where('parent_profile_id', $parentProfile->id)
+                ->firstOrFail();
+        } else {
+            // Must be staff
+            $membership = $user->schoolMemberships()
+                ->where('school_id', $school->id)
+                ->first();
+
+            if (!$membership) {
+                return response()->json(['message' => 'Akses ditolak.'], 403);
+            }
+            $student = Student::where('id', $studentId)
+                ->where('school_id', $school->id)
+                ->firstOrFail();
+        }
+
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        $query = Attendance::where('student_id', $student->id);
+
+        if ($month && $year) {
+            $query->whereMonth('date', $month)->whereYear('date', $year);
+        }
+
+        $history = $query->orderBy('date', 'desc')->get();
+        
+        $totalDays = $history->count();
+        $presentDays = $history->where('status', AttendanceStatus::PRESENT)->count();
+        $sickDays = $history->where('status', AttendanceStatus::SICK)->count();
+        $permissionDays = $history->where('status', AttendanceStatus::PERMISSION)->count();
+        $absentDays = $history->where('status', AttendanceStatus::ABSENT)->count();
+
+        $percentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0;
+
+        return response()->json([
+            'summary' => [
+                'total_recorded_days' => $totalDays,
+                'present' => $presentDays,
+                'sick' => $sickDays,
+                'permission' => $permissionDays,
+                'absent' => $absentDays,
+                'percentage' => $percentage
+            ],
+            'history' => $history->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'date' => $item->date->format('Y-m-d'),
+                    'status' => $item->status->value,
+                    'status_label' => $item->status->label(),
+                    'notes' => $item->notes
+                ];
+            })
+        ]);
+    }
+}
