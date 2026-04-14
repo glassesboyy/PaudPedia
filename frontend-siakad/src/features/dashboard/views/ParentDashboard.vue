@@ -101,17 +101,9 @@ async function fetchMyChildren() {
         </div>
         
         <div v-if="isLoadingChildren" class="grid grid-cols-1 gap-4">
-          <BaseCard v-for="i in 2" :key="i" class="p-4 border-none shadow-lg shadow-primary-900/5 rounded-[1.5rem] bg-white flex items-center gap-6 h-[96px]">
-            <Skeleton width="4rem" height="4rem" class="rounded-2xl shrink-0" />
-            <div class="flex-1 space-y-3">
-              <div class="flex items-center gap-2">
-                <Skeleton width="45%" height="1.5rem" class="rounded-lg" />
-                <Skeleton width="60px" height="1.25rem" class="rounded-lg" />
-              </div>
-              <div class="flex gap-4">
-                <Skeleton width="100px" height="1rem" />
-                <Skeleton width="100px" height="1rem" />
-              </div>
+          <BaseCard v-for="i in 2" :key="i" class="p-6 border-none shadow-lg shadow-primary-900/5 rounded-[1.5rem] bg-white flex items-center gap-6">
+            <div class="flex-1 space-y-2">
+            <Skeleton width="3rem" height="3rem" class="rounded-2xl shrink-0" />
             </div>
           </BaseCard>
         </div>

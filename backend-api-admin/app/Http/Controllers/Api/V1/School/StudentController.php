@@ -130,7 +130,7 @@ class StudentController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher() && !$membership->isParent())) {
             return $this->error('Akses ditolak.', 403);
         }
 
@@ -141,6 +141,11 @@ class StudentController extends BaseController
 
         if (!$student) {
             return $this->notFound('Data siswa tidak ditemukan.');
+        }
+
+        // Parent validation: Can only view their own children
+        if ($membership->isParent() && $student->parent && $student->parent->user_id !== $request->user()->id) {
+            return $this->error('Akses ditolak. Anda hanya dapat melihat data anak Anda sendiri.', 403);
         }
 
         return $this->success(new StudentResource($student), 'Detail siswa berhasil diambil.');

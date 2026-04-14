@@ -89,7 +89,7 @@ async function fetchMyChildren() {
         v-for="child in myChildren" 
         :key="child.id" 
         class="p-6 border-none shadow-xl shadow-primary-900/5 hover:shadow-2xl hover:shadow-primary-900/10 cursor-pointer group transition-all relative overflow-hidden flex flex-col justify-between"
-        @click="router.push({ name: 'StudentDetail', params: { id: child.id } })"
+        @click="router.push({ name: 'ChildDetail', params: { id: child.id } })"
       >
         <!-- Background Decoration -->
         <div class="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">

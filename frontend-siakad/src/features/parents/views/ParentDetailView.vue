@@ -88,11 +88,22 @@ function getParentDisplayName(p: ParentProfile): string {
     </div>
 
     <!-- Error -->
-    <BaseCard v-else-if="error" class="p-12 text-center flex flex-col items-center gap-4">
-      <Icon name="lucide:alert-circle" class="w-12 h-12 text-danger-500" />
-      <p class="text-lg font-bold text-slate-900">{{ error }}</p>
-      <BaseButton variant="outline" @click="fetchParent">Coba Lagi</BaseButton>
-    </BaseCard>
+    <div v-else-if="error" class="animate-fade-in py-12 px-6 text-center bg-white border border-slate-100 rounded-[2.5rem] shadow-xl shadow-primary-900/5 max-w-lg mx-auto">
+      <div class="w-20 h-20 bg-rose-50 rounded-3xl flex items-center justify-center text-rose-500 mx-auto mb-6 border border-rose-100 shadow-sm">
+        <Icon name="lucide:alert-circle" class="w-10 h-10" />
+      </div>
+      <h3 class="text-xl font-black text-heading mb-2">Terjadi Kesalahan</h3>
+      <p class="text-sm text-slate-500 font-medium mb-8 leading-relaxed">
+        {{ error }}<br>Silakan periksa koneksi internet Anda atau hubungi admin jika masalah berlanjut.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <BaseButton variant="primary" @click="fetchParent" class="px-8">
+          <template #prepend><Icon name="lucide:refresh-cw" class="w-4 h-4" /></template>
+          Coba Lagi
+        </BaseButton>
+        <BaseButton variant="outline" @click="router.push({ name: 'ParentList' })">Kembali</BaseButton>
+      </div>
+    </div>
 
     <!-- Detail Content -->
     <BaseCard v-else-if="parent" class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
