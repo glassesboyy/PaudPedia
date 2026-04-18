@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSchoolStore } from '@/stores/school.store'
 import { studentService } from '@/features/students/services/student.service'
@@ -26,6 +26,12 @@ const attendanceData = ref<StudentAttendanceSummaryResponse | null>(null)
 const assessmentData = ref<StudentAssessmentHistoryResponse | null>(null)
 const error = ref('')
 
+const activeTab = ref('profile')
+const attendanceFilter = ref('month') // 'week', 'month', 'all'
+const assessmentSemesterFilter = ref('all') // '1', '2', 'all'
+const isAttendanceLoading = ref(false)
+const isAssessmentLoading = ref(false)
+
 const statusLabels: Record<string, string> = {
   active: 'Aktif',
   graduated: 'Lulus',
@@ -47,6 +53,39 @@ onMounted(async () => {
   }
 })
 
+watch(attendanceFilter, () => {
+  fetchAttendance()
+})
+
+watch(assessmentSemesterFilter, () => {
+  // Simulate loading for better UX consistency
+  isAssessmentLoading.value = true
+  setTimeout(() => {
+    isAssessmentLoading.value = false
+  }, 400)
+})
+
+async function fetchAttendance() {
+  if (!schoolStore.currentSchoolId || !studentId.value) return
+  
+  isAttendanceLoading.value = true
+  const params: any = {}
+  if (attendanceFilter.value === 'month' || attendanceFilter.value === 'week') {
+    params.month = new Date().getMonth() + 1
+    params.year = new Date().getFullYear()
+  }
+  // For 'all', we leave params empty
+  
+  try {
+    const res = await attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, params)
+    attendanceData.value = (res as any)
+  } catch (e) {
+    console.error('Failed fetching attendance', e)
+  } finally {
+    isAttendanceLoading.value = false
+  }
+}
+
 async function fetchStudent() {
   isLoading.value = true
   try {
@@ -54,6 +93,7 @@ async function fetchStudent() {
     student.value = response.data
 
     try {
+      isAttendanceLoading.value = true
       const [attRes, assRes] = await Promise.all([
         attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, { 
           month: new Date().getMonth() + 1, 
@@ -65,6 +105,8 @@ async function fetchStudent() {
       assessmentData.value = (assRes as any)
     } catch (e) {
       console.error('Failed fetching extra data', e)
+    } finally {
+      isAttendanceLoading.value = false
     }
   } catch {
     error.value = 'Gagal mengambil data anak.'
@@ -77,6 +119,50 @@ function formatDate(date: string | null): string {
   if (!date) return '-'
   return new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 }
+
+const filteredAssessmentHistory = computed(() => {
+  if (!assessmentData.value) return []
+  if (assessmentSemesterFilter.value === 'all') return assessmentData.value.history
+  return assessmentData.value.history.filter(group => group.semester === assessmentSemesterFilter.value)
+})
+
+const attendanceFilterLabel = computed(() => {
+  if (attendanceFilter.value === 'week') return 'Minggu Ini'
+  if (attendanceFilter.value === 'month') return 'Bulan Ini'
+  return 'Keseluruhan'
+})
+
+const computedAttendanceSummary = computed(() => {
+  if (!attendanceData.value) return null
+  
+  let history = attendanceData.value.history
+  
+  if (attendanceFilter.value === 'week') {
+    const now = new Date()
+    const startOfWeek = new Date(now)
+    // Find the nearest Sunday
+    startOfWeek.setDate(now.getDate() - now.getDay())
+    startOfWeek.setHours(0, 0, 0, 0)
+
+    history = history.filter(h => {
+      const hDate = new Date(h.date)
+      hDate.setHours(0,0,0,0)
+      return hDate >= startOfWeek
+    })
+  }
+  
+  const stats = {
+    present: history.filter(h => h.status === 'present').length,
+    sick: history.filter(h => h.status === 'sick').length,
+    permission: history.filter(h => h.status === 'permission').length,
+    absent: history.filter(h => h.status === 'absent').length,
+    total: history.length
+  }
+  
+  const percentage = stats.total > 0 ? ((stats.present / stats.total) * 100).toFixed(1) : '0'
+  
+  return { ...stats, percentage }
+})
 </script>
 
 <template>
@@ -159,10 +245,23 @@ function formatDate(date: string | null): string {
           </div>
         </div>
       </div>
+      
+      <!-- Tabs Navigation -->
+      <div class="flex items-center gap-1 p-2 bg-slate-100 rounded-2xl mx-8 mt-4 border border-slate-200">
+        <button 
+          v-for="tab in [{id: 'profile', label: 'Profil', icon: 'lucide:user'}, {id: 'attendance', label: 'Kehadiran', icon: 'lucide:calendar-check'}, {id: 'assessment', label: 'Perkembangan', icon: 'lucide:trending-up'}]" 
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="['flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300', activeTab === tab.id ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50']"
+        >
+          <Icon :name="tab.icon" class="w-4 h-4" />
+          {{ tab.label }}
+        </button>
+      </div>
 
-      <div class="p-8 space-y-10">
-        <!-- Data Siswa -->
-        <div class="space-y-6">
+      <div class="p-8 space-y-10 min-h-[400px]">
+        <!-- Data Siswa (Tab: Profile) -->
+        <div v-if="activeTab === 'profile'" class="space-y-6 animate-fade-in">
           <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
             <Icon name="lucide:backpack" class="w-5 h-5 text-primary-600" /> Profil Buah Hati
           </h3>
@@ -198,65 +297,112 @@ function formatDate(date: string | null): string {
           </div>
         </div>
 
-        <!-- Attendance Data -->
-        <div class="space-y-6" v-if="attendanceData">
-          <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
-            <Icon name="lucide:calendar-check" class="w-5 h-5 text-primary-600" /> Rekap Kehadiran Bulan Ini
-          </h3>
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-              <p class="text-xs font-bold text-slate-500 uppercase">Hadir</p>
-              <p class="text-2xl font-black text-emerald-600 mt-1">{{ attendanceData.summary.present }}</p>
+        <!-- Attendance Data (Tab: Attendance) -->
+        <div v-if="activeTab === 'attendance'" class="space-y-6 animate-fade-in">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h3 class="text-lg font-black text-heading flex items-center gap-2">
+              <Icon name="lucide:calendar-check" class="w-5 h-5 text-primary-600" /> Rekap Kehadiran
+            </h3>
+            <select v-model="attendanceFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none">
+              <option value="week">Minggu Ini</option>
+              <option value="month">Bulan Ini</option>
+              <option value="all">Keseluruhan</option>
+            </select>
+          </div>
+          
+          <div v-if="attendanceData" class="space-y-6 relative min-h-[200px]">
+            <!-- Standardized Loader -->
+            <div v-if="isAttendanceLoading" class="absolute inset-0 flex items-center justify-center z-10 bg-white/60 backdrop-blur-[2px] rounded-2xl transition-all duration-300">
+              <div class="text-center">
+                <Icon name="lucide:loader-circle" class="w-7 h-7 text-primary-500 animate-spin mx-auto mb-2" />
+                <p class="text-sm text-slate-500 font-medium">Memperbarui data kehadiran...</p>
+              </div>
             </div>
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-              <p class="text-xs font-bold text-slate-500 uppercase">Sakit</p>
-              <p class="text-2xl font-black text-amber-500 mt-1">{{ attendanceData.summary.sick }}</p>
+
+            <div v-if="computedAttendanceSummary" class="grid grid-cols-2 md:grid-cols-5 gap-4 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAttendanceLoading}">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-xs font-bold text-slate-500 uppercase">Hadir</p>
+                <p class="text-2xl font-black text-emerald-600 mt-1">{{ computedAttendanceSummary.present }}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-xs font-bold text-slate-500 uppercase">Sakit</p>
+                <p class="text-2xl font-black text-amber-500 mt-1">{{ computedAttendanceSummary.sick }}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-xs font-bold text-slate-500 uppercase">Izin</p>
+                <p class="text-2xl font-black text-blue-500 mt-1">{{ computedAttendanceSummary.permission }}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-xs font-bold text-slate-500 uppercase">Alfa</p>
+                <p class="text-2xl font-black text-rose-500 mt-1">{{ computedAttendanceSummary.absent }}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-primary-50 border border-primary-100 text-center shadow-inner">
+                <p class="text-xs font-bold text-primary-700 uppercase">Persentase</p>
+                <p class="text-2xl font-black text-primary-700 mt-1">{{ computedAttendanceSummary.percentage }}%</p>
+              </div>
             </div>
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-              <p class="text-xs font-bold text-slate-500 uppercase">Izin</p>
-              <p class="text-2xl font-black text-blue-500 mt-1">{{ attendanceData.summary.permission }}</p>
-            </div>
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-              <p class="text-xs font-bold text-slate-500 uppercase">Alfa</p>
-              <p class="text-2xl font-black text-rose-500 mt-1">{{ attendanceData.summary.absent }}</p>
-            </div>
-            <div class="p-4 rounded-xl bg-primary-50 border border-primary-100 text-center">
-              <p class="text-xs font-bold text-primary-700 uppercase">Persentase</p>
-              <p class="text-2xl font-black text-primary-700 mt-1">{{ attendanceData.summary.percentage }}%</p>
+            
+            <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-2">
+              <p class="text-xs text-slate-500 font-bold">Menampilkan data periode: <span class="text-primary-600 uppercase tracking-wide">{{ attendanceFilterLabel }}</span></p>
+              <p v-if="attendanceFilter === 'week'" class="text-[10px] text-slate-400">Dihitung otomatis berdasarkan rentang hari aktif minggu ini.</p>
             </div>
           </div>
+          <div v-else class="py-12 text-center text-slate-400">Belum ada data kehadiran.</div>
         </div>
 
-        <!-- Assessment Data -->
-        <div class="space-y-6" v-if="assessmentData && assessmentData.history.length > 0">
-          <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
-            <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-primary-600" /> Pencapaian Perkembangan
-          </h3>
+        <!-- Assessment Data (Tab: Assessment) -->
+        <div v-if="activeTab === 'assessment'" class="space-y-6 animate-fade-in relative min-h-[300px]">
+          <!-- Standardized Loader -->
+          <div v-if="isAssessmentLoading" class="absolute inset-0 flex items-center justify-center z-10 bg-white/60 backdrop-blur-[2px] rounded-2xl transition-all duration-300">
+            <div class="text-center">
+              <Icon name="lucide:loader-circle" class="w-7 h-7 text-primary-500 animate-spin mx-auto mb-2" />
+              <p class="text-sm text-slate-500 font-medium">Menyaring data perkembangan...</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">
+            <h3 class="text-lg font-black text-heading flex items-center gap-2">
+              <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-primary-600" /> Pencapaian Perkembangan
+            </h3>
+            <select v-model="assessmentSemesterFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none">
+              <option value="all">Semua Semester</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+            </select>
+          </div>
           
-          <div v-for="group in assessmentData.history" :key="group.academic_year + group.semester" class="space-y-4">
-            <h4 class="text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg inline-block">
-              {{ group.academic_year }} - {{ group.semester_label }}
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div v-for="item in group.items" :key="item.id" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
-                <div class="flex justify-between items-start gap-4">
-                  <p class="font-bold text-slate-800 leading-tight">{{ item.aspect }}</p>
-                  <span class="px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider shrink-0" 
-                    :class="{
-                      'bg-rose-100 text-rose-700': item.scale === 'BB',
-                      'bg-amber-100 text-amber-700': item.scale === 'MB',
-                      'bg-emerald-100 text-emerald-700': item.scale === 'BSH',
-                      'bg-primary-100 text-primary-700': item.scale === 'BSB'
-                    }">
-                    {{ item.scale }}
-                  </span>
-                </div>
-                <p class="text-xs font-semibold text-slate-500">{{ item.description }}</p>
-                <div v-if="item.notes" class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-sm text-slate-600 italic">
-                  "{{ item.notes }}"
+          <div v-if="filteredAssessmentHistory.length > 0" class="space-y-8 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">
+            <div v-for="group in filteredAssessmentHistory" :key="group.academic_year + group.semester" class="space-y-4">
+              <h4 class="text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg inline-block">
+                {{ group.academic_year }} - {{ group.semester_label }}
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-for="item in group.items" :key="item.id" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
+                  <div class="flex justify-between items-start gap-4">
+                    <p class="font-bold text-slate-800 leading-tight">{{ item.aspect }}</p>
+                    <span class="px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider shrink-0" 
+                      :class="{
+                        'bg-rose-100 text-rose-700': item.scale === 'BB',
+                        'bg-amber-100 text-amber-700': item.scale === 'MB',
+                        'bg-emerald-100 text-emerald-700': item.scale === 'BSH',
+                        'bg-primary-100 text-primary-700': item.scale === 'BSB'
+                      }">
+                      {{ item.scale }}
+                    </span>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-500">{{ item.description }}</p>
+                  <div v-if="item.notes" class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-sm text-slate-600 italic">
+                    "{{ item.notes }}"
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+          <div v-else class="py-20 text-center">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+              <Icon name="lucide:bar-chart-2" class="w-8 h-8" />
+            </div>
+            <p class="text-slate-500 font-medium">Belum ada catatan penilaian untuk periode ini.</p>
           </div>
         </div>
 

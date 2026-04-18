@@ -7,7 +7,6 @@ import type { Student } from '@/types'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
-import Loader from '@/components/ui/Loader/Loader.vue'
 
 const router = useRouter()
 const route = useRoute()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useSchoolStore } from '@/stores/school.store'
 import { classService } from '@/features/classes/services/class.service'
 import { attendanceService } from '@/features/attendance/services/attendance.service'
@@ -69,7 +69,9 @@ async function fetchStudents() {
 
     students.value = rawList.map(item => ({
       ...item,
-      status: item.status || 'present' // default to present
+      // Only set default 'present' for Teachers when creating new records.
+      // For Headmaster or existing records, keep the original status (could be null).
+      status: item.status || (schoolStore.isTeacher ? 'present' : null)
     })) as AttendanceRecord[]
   } catch (err: any) {
     error.value = 'Gagal memuat data siswa.'
@@ -105,7 +107,9 @@ async function saveAttendance() {
   }
 }
 
-function getStatusColor(status: string) {
+
+function getStatusColor(status: string | null) {
+  if (!status) return 'bg-slate-50 text-slate-400 border-slate-200 border-dashed'
   switch (status) {
     case 'present': return 'bg-emerald-50 text-emerald-700 border-emerald-200'
     case 'sick': return 'bg-amber-50 text-amber-700 border-amber-200'
@@ -114,6 +118,22 @@ function getStatusColor(status: string) {
     default: return 'bg-slate-50 text-slate-700 border-slate-200'
   }
 }
+
+const hasAnyAttendance = computed(() => {
+  return students.value.some(s => s.status !== null)
+})
+
+const attendanceStats = computed(() => {
+  const stats = { total: students.value.length, present: 0, sick: 0, permission: 0, absent: 0, uninputted: 0 }
+  students.value.forEach(s => {
+    if (s.status === 'present') stats.present++
+    else if (s.status === 'sick') stats.sick++
+    else if (s.status === 'permission') stats.permission++
+    else if (s.status === 'absent') stats.absent++
+    else stats.uninputted++
+  })
+  return stats
+})
 </script>
 
 <template>
@@ -142,6 +162,30 @@ function getStatusColor(status: string) {
       </div>
     </BaseCard>
 
+    <!-- Stats Widget -->
+    <div v-if="students.length > 0" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Siswa</p>
+        <p class="text-xl font-black text-slate-800">{{ attendanceStats.total }}</p>
+      </div>
+      <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 shadow-sm flex flex-col items-center">
+        <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Hadir</p>
+        <p class="text-xl font-black text-emerald-700">{{ attendanceStats.present }}</p>
+      </div>
+      <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 shadow-sm flex flex-col items-center">
+        <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Sakit</p>
+        <p class="text-xl font-black text-amber-700">{{ attendanceStats.sick }}</p>
+      </div>
+      <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-col items-center">
+        <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Izin</p>
+        <p class="text-xl font-black text-blue-700">{{ attendanceStats.permission }}</p>
+      </div>
+      <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-100 shadow-sm flex flex-col items-center">
+        <p class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1">Alfa</p>
+        <p class="text-xl font-black text-rose-700">{{ attendanceStats.absent }}</p>
+      </div>
+    </div>
+
     <!-- Error/Success Alerts -->
     <div v-if="error" class="p-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 flex items-center gap-3">
       <span>{{ error }}</span>
@@ -163,6 +207,13 @@ function getStatusColor(status: string) {
       <div v-else-if="students.length === 0" class="p-12 text-center text-slate-400">
         <p>Tidak ada siswa di kelas ini/tanggal belum dipilih.</p>
       </div>
+      <div v-else-if="!schoolStore.isTeacher && !hasAnyAttendance" class="p-20 text-center">
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+          <Icon name="lucide:calendar-x" class="w-8 h-8" />
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">Belum Ada Catatan Absensi</h3>
+        <p class="text-slate-500 max-w-xs mx-auto text-sm mt-1">Guru kelas belum mengisikan data kehadiran siswa untuk tanggal ini.</p>
+      </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -182,10 +233,13 @@ function getStatusColor(status: string) {
                 <div class="flex flex-wrap gap-2">
                   <label v-for="(label, val) in {'present': 'Hadir', 'sick': 'Sakit', 'permission': 'Izin', 'absent': 'Alfa'}" :key="val" class="cursor-pointer">
                     <input type="radio" :disabled="!schoolStore.isTeacher" :name="`status-${student.student_id}`" :value="val" v-model="student.status" class="hidden" />
-                    <span :class="['px-3 py-1.5 rounded-lg text-sm font-bold border transition-all block', student.status === val ? getStatusColor(val) : 'bg-white text-slate-600 border-slate-200', schoolStore.isTeacher ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
+                    <span :class="['px-3 py-1.5 rounded-lg text-sm font-bold border transition-all block', student.status === val ? getStatusColor(val) : 'bg-white text-slate-500 border-slate-200 border-dashed', schoolStore.isTeacher ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
                       {{ label }}
                     </span>
                   </label>
+                  <div v-if="!student.status && !schoolStore.isTeacher" class="py-1 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic">
+                    Belum diinput
+                  </div>
                 </div>
               </td>
               <td class="px-6 py-4">

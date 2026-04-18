@@ -30,7 +30,8 @@ const finalAspect = computed(() => {
   return aspectSelection.value === 'CUSTOM' ? customAspect.value.trim() : aspectSelection.value
 })
 
-const currentAcademicYear = ref('2025/2026') // default, can be dynamically fetched
+const selectedClass = computed(() => classes.value.find(c => c.id === selectedClassId.value))
+const currentAcademicYear = computed(() => selectedClass.value?.academic_year || '2025/2026')
 
 const students = ref<AssessmentRecord[]>([])
 const isLoadingClasses = ref(true)
@@ -60,7 +61,6 @@ async function fetchClasses() {
     classes.value = res.data
     if (classes.value.length > 0) {
       selectedClassId.value = classes.value[0]?.id || null
-      currentAcademicYear.value = classes.value[0]?.academic_year || '2025/2026'
     }
   } catch (err: any) {
     error.value = 'Gagal memuat data kelas.'
@@ -92,7 +92,9 @@ async function fetchStudents() {
 
     students.value = rawList.map(item => ({
       ...item,
-      scale: item.scale || 'MB' // default to MB
+      // Only set default 'MB' for Teachers when creating new records.
+      // For Headmaster or existing records, keep the original scale (could be null).
+      scale: item.scale || (schoolStore.isTeacher ? 'MB' : null)
     })) as AssessmentRecord[]
   } catch (err: any) {
     error.value = 'Gagal memuat data siswa.'
@@ -139,6 +141,9 @@ function getScaleColor(scale: string) {
     default: return 'bg-slate-50 text-slate-700 border-slate-200'
   }
 }
+const hasAnyAssessment = computed(() => {
+  return students.value.some(s => s.scale !== null)
+})
 </script>
 
 <template>
@@ -152,7 +157,7 @@ function getScaleColor(scale: string) {
 
     <!-- Filter Card -->
     <BaseCard class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="space-y-2">
           <label class="text-sm font-semibold text-slate-700">Pilih Kelas</label>
           <select v-model="selectedClassId" :disabled="isLoadingClasses" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
@@ -203,7 +208,14 @@ function getScaleColor(scale: string) {
         <p>Memuat form siswa...</p>
       </div>
       <div v-else-if="students.length === 0" class="p-12 text-center text-slate-400">
-        <p>Silakan isi filter di atas secara lengkap untuk menampilkan siswa.</p>
+        <p>Tidak ada siswa di kelas ini.</p>
+      </div>
+      <div v-else-if="!schoolStore.isTeacher && !hasAnyAssessment" class="p-20 text-center">
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+          <Icon name="lucide:bar-chart-2" class="w-8 h-8" />
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">Belum Ada Penilaian</h3>
+        <p class="text-slate-500 max-w-xs mx-auto text-sm mt-1">Belum ada input penilaian untuk aspek "{{ finalAspect }}" pada periode ini.</p>
       </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -224,10 +236,13 @@ function getScaleColor(scale: string) {
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
                   <label v-for="(label, val) in {'BB': 'BB', 'MB': 'MB', 'BSH': 'BSH', 'BSB': 'BSB'}" :key="val" class="cursor-pointer">
                     <input type="radio" :disabled="!schoolStore.isTeacher" :name="`scale-${student.student_id}`" :value="val" v-model="student.scale" class="hidden" />
-                    <div :class="['flex items-center text-center justify-center px-2 py-2 rounded-xl text-xs font-bold border transition-all h-full', student.scale === val ? getScaleColor(val) : 'bg-white text-slate-500 border-slate-200', schoolStore.isTeacher ? 'hover:bg-slate-50 border-dashed' : 'border-dashed opacity-70 cursor-not-allowed']">
+                    <div :class="['flex items-center text-center justify-center px-2 py-2 rounded-xl text-xs font-bold border transition-all h-full', student.scale === val ? getScaleColor(val) : 'bg-white text-slate-400 border-slate-200 border-dashed', (schoolStore.isTeacher) ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
                       {{ label }}
                     </div>
                   </label>
+                </div>
+                <div v-if="!student.scale && !schoolStore.isTeacher" class="mt-2 text-center py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic">
+                  Belum diinput
                 </div>
                 <p class="text-[10px] text-slate-400 mt-2 ml-1" v-if="student.scale === 'BB'">Belum Berkembang</p>
                 <p class="text-[10px] text-slate-400 mt-2 ml-1" v-else-if="student.scale === 'MB'">Mulai Berkembang</p>
