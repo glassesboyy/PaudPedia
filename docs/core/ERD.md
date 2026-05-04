@@ -42,12 +42,19 @@
    - [Tabel: courses](#tabel-courses)
    - [Tabel: modules](#tabel-modules)
    - [Tabel: lessons](#tabel-lessons)
+   - [Tabel: quizzes](#tabel-quizzes)
+   - [Tabel: quiz_questions](#tabel-quiz_questions)
+   - [Tabel: quiz_answers](#tabel-quiz_answers)
+   - [Tabel: quiz_attempts](#tabel-quiz_attempts)
+   - [Tabel: quiz_attempt_answers](#tabel-quiz_attempt_answers)
    - [Tabel: course_enrollments](#tabel-course_enrollments)
    - [Tabel: lesson_Progress](#tabel-lesson_progress)
    - [Tabel: products](#tabel-products)
    - [Tabel: articles](#tabel-articles)
    - [Tabel: testimonials](#tabel-testimonials)
 5. [Commerce Schema](#-commerce-schema)
+   - [Tabel: carts](#tabel-carts)
+   - [Tabel: cart_items](#tabel-cart_items)
    - [Tabel: orders](#tabel-orders)
    - [Tabel: order_items](#tabel-order_items)
    - [Tabel: promo_codes](#tabel-promo_codes)
@@ -650,6 +657,113 @@ Semua tabel memiliki (Laravel conventions):
 
 ---
 
+### Tabel: `quizzes`
+**Deskripsi:** Kuis untuk modul pembelajaran
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Kuis |
+| `module_id` | UUID | FK → modules.id, NOT NULL | Referensi modul |
+| `title` | VARCHAR(255) | NOT NULL | Judul kuis |
+| `description` | TEXT | NULL | Deskripsi kuis |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Foreign Key:**
+- `module_id` → `modules.id` ON DELETE CASCADE
+
+**Index:**
+- `idx_quizzes_module_id`
+
+---
+
+### Tabel: `quiz_questions`
+**Deskripsi:** Pertanyaan dalam kuis
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Pertanyaan |
+| `quiz_id` | BIGINT UNSIGNED | FK → quizzes.id, NOT NULL | Referensi kuis |
+| `question` | TEXT | NOT NULL | Teks pertanyaan |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Foreign Key:**
+- `quiz_id` → `quizzes.id` ON DELETE CASCADE
+
+**Index:**
+- `idx_quiz_questions_quiz_id`
+
+---
+
+### Tabel: `quiz_answers`
+**Deskripsi:** Pilihan jawaban untuk pertanyaan kuis
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Jawaban |
+| `quiz_question_id` | BIGINT UNSIGNED | FK → quiz_questions.id, NOT NULL | Referensi pertanyaan |
+| `answer` | TEXT | NOT NULL | Teks jawaban |
+| `is_correct` | BOOLEAN | NOT NULL, DEFAULT false | Menandakan jawaban benar |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Foreign Key:**
+- `quiz_question_id` → `quiz_questions.id` ON DELETE CASCADE
+
+**Index:**
+- `idx_quiz_answers_quiz_question_id`
+
+---
+
+### Tabel: `quiz_attempts`
+**Deskripsi:** Percobaan user dalam mengambil kuis
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Percobaan |
+| `quiz_id` | BIGINT UNSIGNED | FK → quizzes.id, NOT NULL | Referensi kuis |
+| `user_id` | BIGINT UNSIGNED | FK → users.id, NOT NULL | Referensi user |
+| `score` | DECIMAL(5,2) | NULL | Nilai kuis |
+| `status` | ENUM | NOT NULL, DEFAULT 'ongoing' | Status pengerjaan |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Enum:**
+- `status`: 'ongoing', 'completed'
+
+**Foreign Key:**
+- `quiz_id` → `quizzes.id` ON DELETE CASCADE
+- `user_id` → `users.id` ON DELETE CASCADE
+
+**Index:**
+- `idx_quiz_attempts_quiz_id`
+- `idx_quiz_attempts_user_id`
+
+---
+
+### Tabel: `quiz_attempt_answers`
+**Deskripsi:** Jawaban spesifik user dalam suatu percobaan kuis
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Jawaban Percobaan |
+| `quiz_attempt_id` | BIGINT UNSIGNED | FK → quiz_attempts.id, NOT NULL | Referensi attempt |
+| `quiz_question_id` | BIGINT UNSIGNED | FK → quiz_questions.id, NOT NULL | Referensi pertanyaan |
+| `quiz_answer_id` | BIGINT UNSIGNED | FK → quiz_answers.id, NULL | Jawaban yang dipilih |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Foreign Key:**
+- `quiz_attempt_id` → `quiz_attempts.id` ON DELETE CASCADE
+- `quiz_question_id` → `quiz_questions.id` ON DELETE CASCADE
+- `quiz_answer_id` → `quiz_answers.id` ON DELETE SET NULL
+
+**Index:**
+- `idx_quiz_attempt_answers_attempt_id`
+
+---
+
 ### Tabel: `course_enrollments`
 **Deskripsi:** Pendaftaran pengguna in courses
 
@@ -805,6 +919,52 @@ Semua tabel memiliki (Laravel conventions):
 ---
 
 ## 💰 Commerce Schema
+
+### Tabel: `carts`
+**Deskripsi:** Keranjang belanja user
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Cart |
+| `user_id` | BIGINT UNSIGNED | FK → users.id, UNIQUE, NOT NULL | Referensi user |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Foreign Key:**
+- `user_id` → `users.id` ON DELETE CASCADE
+
+**Index:**
+- `idx_carts_user_id` (UNIQUE)
+
+---
+
+### Tabel: `cart_items`
+**Deskripsi:** Item di dalam keranjang belanja
+
+| Kolom | Tipe | Constraint | Deskripsi |
+|--------|------|-------------|-------------|
+| `id` | BIGINT UNSIGNED | PK, AUTO_INCREMENT | ID Cart Item |
+| `cart_id` | BIGINT UNSIGNED | FK → carts.id, NOT NULL | Referensi cart |
+| `item_type` | ENUM | NOT NULL | Tipe item |
+| `item_id` | BIGINT UNSIGNED | NOT NULL | Referensi item ID |
+| `quantity` | INTEGER | NOT NULL, DEFAULT 1 | Kuantitas |
+| `created_at` | TIMESTAMP | NOT NULL | Waktu dibuat |
+| `updated_at` | TIMESTAMP | NOT NULL | Waktu diupdate |
+
+**Enum:**
+- `item_type`: 'course', 'webinar', 'product'
+
+**Foreign Key:**
+- `cart_id` → `carts.id` ON DELETE CASCADE
+
+**Index:**
+- `idx_cart_items_cart_id`
+- `idx_cart_items_item_type_id` (item_type, item_id)
+
+**Unique Constraint:**
+- `uq_cart_items_cart_item` (cart_id, item_type, item_id)
+
+---
 
 ### Tabel: `orders`
 **Deskripsi:** Order pembelian/transaksi
@@ -974,6 +1134,8 @@ CREATE INDEX idx_articles_published_featured ON articles(is_published, is_featur
 | `lesson_Progress` | `uq_lesson_Progress_enrollment_lesson` | `enrollment_id, lesson_id` |
 | `modules` | `uq_modules_course_order` | `course_id, order` |
 | `lessons` | `uq_lessons_module_order` | `module_id, order` |
+| `carts` | `uq_carts_user_id` | `user_id` |
+| `cart_items` | `uq_cart_items_cart_item` | `cart_id, item_type, item_id` |
 | `orders` | `uq_orders_number` | `order_number` |
 | `promo_codes` | `uq_promo_codes_code` | `code` |
 | `site_settings` | `uq_site_settings_key` | `key` |
@@ -1026,6 +1188,11 @@ categories (1) ────< articles (M)
 
 courses (1) ────< modules (M)
 modules (1) ────< lessons (M)
+modules (1) ────< quizzes (M)
+quizzes (1) ────< quiz_questions (M)
+quiz_questions (1) ────< quiz_answers (M)
+quizzes (1) ────< quiz_attempts (M) >──── (1) users
+quiz_attempts (1) ────< quiz_attempt_answers (M)
 
 users (1) ────< course_enrollments (M) >──── (1) courses
 course_enrollments (1) ────< lesson_Progress (M) >──── (1) lessons
@@ -1037,6 +1204,9 @@ users (0..1) ────< testimonials (M)
 ### Domain Perdagangan
 
 ```
+users (1) ──── (1) carts
+carts (1) ────< cart_items (M)
+
 users (1) ────< orders (M)
 orders (1) ────< order_items (M)
 

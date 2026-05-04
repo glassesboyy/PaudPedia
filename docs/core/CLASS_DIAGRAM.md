@@ -39,6 +39,11 @@
    - [13. Course](#13-course)
    - [14. Module](#14-module)
    - [15. Lesson](#15-lesson)
+   - [15.1 Quiz](#151-quiz)
+   - [15.2 QuizQuestion](#152-quizquestion)
+   - [15.3 QuizAnswer](#153-quizanswer)
+   - [15.4 QuizAttempt](#154-quizattempt)
+   - [15.5 QuizAttemptAnswer](#155-quizattemptanswer)
    - [16. CourseEnrollment](#16-courseenrollment)
    - [17. LessonProgress](#17-lessonprogress)
    - [18. Product](#18-product)
@@ -46,6 +51,8 @@
    - [20. Category](#20-category)
    - [21. Testimonial](#21-testimonial)
 4. [Commerce Entities](#-commerce-entities)
+   - [21.1 Cart](#211-cart)
+   - [21.2 CartItem](#212-cartitem)
    - [22. Order](#22-order)
    - [23. OrderItem](#23-orderitem)
    - [24. PromoCode](#24-promocode)
@@ -455,6 +462,94 @@
 
 ---
 
+### 15.1 Quiz
+**Deskripsi:** Kuis untuk modul pembelajaran
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `module_id` : UUID (FK → Module)
+- `title` : String
+- `description` : Text (nullable)
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → Module
+- Has Many → QuizQuestion
+- Has Many → QuizAttempt
+
+---
+
+### 15.2 QuizQuestion
+**Deskripsi:** Pertanyaan dalam kuis
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `quiz_id` : BIGINT (FK → Quiz)
+- `question` : Text
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → Quiz
+- Has Many → QuizAnswer
+- Has Many → QuizAttemptAnswer
+
+---
+
+### 15.3 QuizAnswer
+**Deskripsi:** Jawaban untuk pertanyaan kuis
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `quiz_question_id` : BIGINT (FK → QuizQuestion)
+- `answer` : Text
+- `is_correct` : Boolean
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → QuizQuestion
+
+---
+
+### 15.4 QuizAttempt
+**Deskripsi:** Percobaan user mengambil kuis
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `quiz_id` : BIGINT (FK → Quiz)
+- `user_id` : UUID (FK → User)
+- `score` : Decimal (nullable)
+- `status` : Enum ('ongoing', 'completed')
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → Quiz
+- Belongs To → User
+- Has Many → QuizAttemptAnswer
+
+---
+
+### 15.5 QuizAttemptAnswer
+**Deskripsi:** Pilihan jawaban user untuk sebuah percobaan kuis
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `quiz_attempt_id` : BIGINT (FK → QuizAttempt)
+- `quiz_question_id` : BIGINT (FK → QuizQuestion)
+- `quiz_answer_id` : BIGINT (FK → QuizAnswer, nullable)
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → QuizAttempt
+- Belongs To → QuizQuestion
+- Belongs To → QuizAnswer
+
+---
+
 ### 16. CourseEnrollment
 **Deskripsi:** Pendaftaran pengguna ke course (after payment)
 
@@ -602,6 +697,39 @@
 
 ## 💰 Commerce Entities
 
+### 21.1 Cart
+**Deskripsi:** Keranjang belanja user
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `user_id` : UUID (FK → User, unique)
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → User
+- Has Many → CartItem
+
+---
+
+### 21.2 CartItem
+**Deskripsi:** Item di dalam keranjang belanja
+
+**Atribut:**
+- `id` : BIGINT (PK)
+- `cart_id` : BIGINT (FK → Cart)
+- `item_type` : Enum ('webinar', 'course', 'product')
+- `item_id` : BIGINT (polymorphic FK)
+- `quantity` : Integer
+- `created_at` : Timestamp
+- `updated_at` : Timestamp
+
+**Relasi:**
+- Belongs To → Cart
+- Belongs To → Webinar | Course | Product (polymorphic)
+
+---
+
 ### 22. Order
 **Deskripsi:** Transaction/order untuk webinar, course, product
 
@@ -739,6 +867,11 @@ Category (1) ────< Article (M)
 
 Course (1) ────< Module (M)
 Module (1) ────< Lesson (M)
+Module (1) ────< Quiz (M)
+Quiz (1) ────< QuizQuestion (M)
+QuizQuestion (1) ────< QuizAnswer (M)
+Quiz (1) ────< QuizAttempt (M) >──── (1) User
+QuizAttempt (1) ────< QuizAttemptAnswer (M)
 
 Course (1) ────< CourseEnrollment (M) >──── (1) User
 CourseEnrollment (1) ────< LessonProgress (M) >──── (1) Lesson
@@ -747,10 +880,14 @@ CourseEnrollment (1) ────< LessonProgress (M) >──── (1) Lesson
 ### Domain Perdagangan
 
 ```
+User (1) ──── (1) Cart
+Cart (1) ────< CartItem (M)
+
 User (1) ────< Order (M)
 Order (1) ────< OrderItem (M)
 
 OrderItem (M) >──── (1) Webinar | Course | Product [polymorphic]
+CartItem (M) >──── (1) Webinar | Course | Product [polymorphic]
 
 CourseEnrollment ← Auto-created after Order.status = 'paid'
 ```
@@ -819,13 +956,13 @@ Examples: Finance, Assessment, Attendance
 **Domain Multi-Tenant:** 10 entities
 - User, School, SchoolMember, Teacher, Class, ParentProfile, Student, Attendance, Assessment, Finance
 
-**Domain Manajemen Konten:** 11 entities
-- Mentor, Webinar, Course, Module, Lesson, CourseEnrollment, LessonProgress, Product, Article, Category, Testimonial
+**Domain Manajemen Konten:** 16 entities
+- Mentor, Webinar, Course, Module, Lesson, CourseEnrollment, LessonProgress, Product, Article, Category, Testimonial, Quiz, QuizQuestion, QuizAnswer, QuizAttempt, QuizAttemptAnswer
 
-**Domain Perdagangan:** 4 entities
-- Order, OrderItem, PromoCode, SiteSettings
+**Domain Perdagangan:** 6 entities
+- Cart, CartItem, Order, OrderItem, PromoCode, SiteSettings
 
-**Total:** 25 entities
+**Total:** 32 entities
 
 ---
 

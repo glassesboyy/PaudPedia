@@ -30,13 +30,15 @@
    - [Flow 1: Webinar Purchase](#flow-1-webinar-purchase)
    - [Flow 2: Product Digital Purchase](#flow-2-product-digital-purchase)
    - [Flow 3: Course Enrollment](#flow-3-course-enrollment)
+   - [Flow 4: Cart to Checkout (Multiple Items)](#flow-4-cart-to-checkout-multiple-items)
 4. [Content Management Flows](#-content-management-flows)
    - [Flow 1: Absensi Input & View](#flow-1-absensi-input--view)
    - [Flow 2: Moderator Buat Webinar](#flow-2-moderator-buat-webinar)
    - [Flow 3: Moderator Buat Kursus](#flow-3-moderator-buat-kursus)
    - [Flow 4: User Complete Course & Get Certificate](#flow-4-user-complete-course--get-certificate)
-   - [Flow 5: Moderator Buat Produk Digital](#flow-5-moderator-buat-produk-digital)
-   - [Flow 6: Moderator Buat Artikel](#flow-6-moderator-buat-artikel)
+   - [Flow 5: Quiz Attempt & Auto-Grading](#flow-5-quiz-attempt--auto-grading)
+   - [Flow 6: Moderator Buat Produk Digital](#flow-6-moderator-buat-produk-digital)
+   - [Flow 7: Moderator Buat Artikel](#flow-7-moderator-buat-artikel)
 5. [Email Notification Flows](#-email-notification-flows)
 
 ---
@@ -480,6 +482,24 @@ Backend: Validate Pro access
 
 ---
 
+### Flow 4: Cart to Checkout (Multiple Items)
+
+```
+1. User browse berbagai produk (Webinar, Course, Product Digital)
+2. User klik "Add to Cart" pada beberapa item
+3. Item tersimpan di database `carts` dan `cart_items`
+4. User buka halaman Cart (/cart)
+5. User review list item, kuantitas, dan subtotal
+6. User input Promo Code (optional) → System validasi promo & hitung ulang total
+7. Klik "Proceed to Checkout"
+8. System generate Order dengan OrderItems polimorfik
+9. Redirect ke Midtrans payment gateway
+10. Midtrans webhook mengirim notifikasi (pending -> paid)
+11. System proses masing-masing item sesuai tipenya (enroll course, kirim download link, dsb)
+```
+
+---
+
 ## 🎓 Content Management Flows
 
 ### Flow 1: Absensi Input & View
@@ -584,7 +604,24 @@ Parent Flow:
 
 ---
 
-### Flow 5: Moderator Buat Produk Digital
+### Flow 5: Quiz Attempt & Auto-Grading
+
+```
+1. User akses lesson dengan tipe konten 'quiz'
+2. User klik "Mulai Kuis"
+3. System buat record di tabel `quiz_attempts` (status: ongoing)
+4. Tampil soal-soal kuis (`quiz_questions`)
+5. User pilih jawaban, system simpan ke `quiz_attempt_answers`
+6. User klik "Submit Kuis"
+7. System hitung nilai berdasarkan `is_correct` di `quiz_answers`
+8. Update `quiz_attempts` (status: completed, score: calculated)
+9. Jika nilai mencukupi (passing grade), lesson di-mark completed
+10. Lanjut ke materi berikutnya atau generate sertifikat jika ini materi terakhir
+```
+
+---
+
+### Flow 6: Moderator Buat Produk Digital
 
 ```
 1. Moderator login → /admin/products
@@ -615,7 +652,7 @@ Product Download Flow:
 
 ---
 
-### Flow 6: Moderator Buat Artikel
+### Flow 7: Moderator Buat Artikel
 
 ```
 1. Moderator login → /admin/articles
