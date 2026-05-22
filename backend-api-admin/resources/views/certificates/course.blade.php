@@ -136,7 +136,7 @@
 <div class="frame">
     <div class="inner">
         <div class="brand">PaudPedia</div>
-        <div class="title">Sertifikat Kelulusan Kontol Ayam</div>
+        <div class="title">Sertifikat Kelulusan</div>
         <div class="line"></div>
 
         <div class="sub">Dengan ini menyatakan bahwa</div>
