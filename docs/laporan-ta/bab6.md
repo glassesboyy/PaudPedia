@@ -1,0 +1,21 @@
+# BAB 6 KESIMPULAN DAN SARAN
+
+## 6.1 Kesimpulan
+Berdasarkan hasil analisis, perancangan, implementasi, hingga tahap pengujian yang telah dilakukan pada pengembangan platform Paudpedia, dapat ditarik beberapa kesimpulan utama sebagai berikut:
+
+1. Telah berhasil dibangun sebuah platform *Software as a Service* (SaaS) multi-sekolah (*multi-tenant*) yang mampu mewadahi manajemen operasional berbagai instansi Pendidikan Anak Usia Dini (PAUD) secara terpusat, dengan struktur pangkalan data yang diisolasi secara aman antar-institusi.
+2. Platform ini berhasil mendigitalisasi proses inti administrasi akademik PAUD, mulai dari pengelolaan pendaftaran data induk siswa, perekaman absensi harian, hingga penilaian observatif perkembangan anak yang bermuara pada kompilasi pencetakan rapor akhir semester secara otomatis.
+3. Integrasi modul manajemen keuangan telah terbukti sanggup memfasilitasi tata kelola institusi melalui sistem pelaporan tagihan Sumbangan Pembinaan Pendidikan (SPP) dan pencatatan buku tabungan celengan siswa, yang secara sinkron terhubung dengan dasbor pemantauan eksklusif keluarga (*Parent Dashboard*).
+4. Pengembangan ekosistem *Marketplace B2C* dan *Learning Management System* (LMS) telah sukses diwujudkan. Ekosistem ini menjembatani transaksi komersial kursus *online* publik, memfasilitasi kegiatan pemutaran video belajar asinkron dan kuis interaktif, serta dilengkapi dengan sistem validasi kelulusan yang secara otomatis menerbitkan dokumen sertifikasi.
+5. Hasil dari eksekusi serangkaian skenario uji berbasis fungsional (*Black Box Testing*), integrasi alur (*End-to-End Testing*), serta validasi tameng logika (*Business Rule Validation*) mensahkan bahwa keseluruhan fitur arsitektur sistem telah beroperasi secara presisi, tangguh, dan selaras dengan standar operasional proses bisnis yang dirancang.
+
+## 6.2 Saran
+Berdasarkan proses perancangan, pengembangan, dan evaluasi sistem yang telah dilalui, terdapat sejumlah saran dan rekomendasi yang dapat ditindaklanjuti sebagai bahan pengembangan platform pada fase berikutnya, maupun sebagai wawasan bagi pihak akademisi.
+
+### 6.2.1 Saran Pengembangan Sistem
+1. Pengembangan sistem selanjutnya dapat mempertimbangkan integrasi penanaman algoritma *Artificial Intelligence* (AI). Pemanfaatan AI dapat diterapkan pada ranah LMS sebagai agen rekomendasi pintar (*smart recommendation*) yang menyeleksi kursus edukasi spesifik sesuai dengan pola minat belajar pengguna. Selain itu, AI dapat diperbantukan pada tingkat *Super Admin* guna menyajikan prakiraan (*forecasting*) tren finansial *marketplace* secara prediktif demi mendukung laju keputusan bisnis korporasi.
+2. Mengingat platform ini menargetkan instansi PAUD formal di Indonesia, pemutakhiran berikutnya amat disarankan untuk membangun jalur pipa antarmuka pemrograman aplikasi (API) yang terintegrasi penuh dengan peladen sinkronisasi Data Pokok Pendidikan (Dapodik) milik Kementerian Pendidikan. Hal ini akan membebaskan staf tata usaha sekolah dari repetisi pengisian ganda formulir siswa baru.
+3. Sistem yang telah dikembangkan masih dapat diekspansi lebih jauh pada area tata kelola transaksi finansial tingkat sekolah. Penambahan dukungan *Payment Gateway* yang lebih dinamis untuk pembayaran SPP bulanan sekolah melalui transfer bank maya (*Virtual Account*) akan menaikkan tingkat kepraktisan bagi para orang tua dan mengakselerasi verifikasi omset kas institusi (*cash flow*).
+
+### 6.2.2 Saran Bagi Mahasiswa
+Berdasarkan pengalaman penulis selama menempuh pengerjaan perancangan Tugas Akhir berskala raksasa ini, keterlibatan secara menyeluruh di setiap fase *Software Development Life Cycle* (SDLC) memberikan suntikan pembelajaran yang amat berharga, baik dari segi teknikalitas bahasa pemrograman maupun kematangan dalam mengorkestrasi logika relasi basis data. Oleh karena itu, penulis sangat menyarankan agar rekan-rekan mahasiswa penerus dapat lebih berani mengeksekusi topik Tugas Akhir berbasis permasalahan konkret dan berarsitektur rumit (*Software as a Service*), serta memperbanyak keterlibatan kolaborasi riil di lingkungan industri. Langkah eksploratif ini niscaya akan mempertajam intuisi teknis, memperluas cakrawala pemahaman perancangan rekayasa perangkat lunak (*Software Engineering*), dan membentuk kesiapan mental di panggung dunia kerja profesional.

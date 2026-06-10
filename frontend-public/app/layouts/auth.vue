@@ -27,10 +27,15 @@ onMounted(() => {
     <div class="flex flex-1 flex-col lg:w-1/2 xl:w-[45%]">
       <!-- Top bar with logo + back link -->
       <div class="flex items-center justify-between p-4 sm:p-6">
-        <NuxtLink to="/" class="text-xl font-bold text-primary-600">
+        <NuxtLink 
+          to="/" 
+          class="text-xl font-bold text-primary-600"
+          :class="{ 'pointer-events-none opacity-80': $route.path === '/auth/verify-email' }"
+        >
           {{ siteSettings.siteName }}
         </NuxtLink>
         <NuxtLink
+          v-if="$route.path !== '/auth/verify-email'"
           to="/"
           class="flex items-center gap-1 text-sm text-muted hover:text-foreground transition-colors"
         >

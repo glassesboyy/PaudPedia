@@ -15,7 +15,6 @@ useSeo({
 })
 
 const landingData = ref<LandingPageData | null>(null)
-const isLoading = ref(true)
 const error = ref('')
 
 onMounted(async () => {
@@ -24,21 +23,14 @@ onMounted(async () => {
     landingData.value = response.data
   } catch {
     error.value = 'Gagal memuat data. Silakan muat ulang halaman.'
-  } finally {
-    isLoading.value = false
   }
 })
 </script>
 
 <template>
   <div>
-    <!-- Loading state -->
-    <div v-if="isLoading" class="min-h-[60vh] flex items-center justify-center">
-      <ULoading size="md" text="Memuat halaman..." />
-    </div>
-
     <!-- Error state -->
-    <div v-else-if="error" class="container py-16 text-center">
+    <div v-if="error" class="container py-16 text-center">
       <Icon name="lucide:alert-circle" class="w-12 h-12 text-danger-400 mx-auto" />
       <p class="mt-4 text-body">{{ error }}</p>
       <UButton variant="outline" size="sm" class="mt-4" @click="$router.go(0)">
@@ -47,7 +39,7 @@ onMounted(async () => {
     </div>
 
     <!-- Content -->
-    <template v-else>
+    <div v-else>
       <!-- FR-PP-01: Hero Section (with integrated stats) -->
       <HeroSection
         :stats="landingData?.statistics ?? null"
@@ -88,6 +80,6 @@ onMounted(async () => {
 
       <!-- CTA Section -->
       <CtaSection />
-    </template>
+    </div>
   </div>
 </template>

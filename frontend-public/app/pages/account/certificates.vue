@@ -10,7 +10,7 @@ import type { UserCertificate } from '~~/types'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Sertifikat Saya' })
@@ -235,3 +235,4 @@ onMounted(() => fetchCertificates())
     </template>
   </div>
 </template>
+

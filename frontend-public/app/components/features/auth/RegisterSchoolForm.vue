@@ -47,6 +47,8 @@ async function handleSubmit() {
   apiError.value = ''
   errors.value = {}
 
+  let redirectPath = ''
+
   if (isUpgrade.value) {
     // Authenticated user — only validate school fields
     const result = registerSchoolUpgradeSchema.safeParse({
@@ -65,9 +67,8 @@ async function handleSubmit() {
       // Refresh user data to get updated memberships
       await authStore.fetchUser()
       toast.success('Sekolah berhasil didaftarkan!')
-      // Redirect to SIAKAD with token
-      const siakadUrl = authStore.siakadUrl
-      await navigateTo(`${siakadUrl}/auth/token?token=${response.data.token}`, { external: true })
+      // Set redirect path
+      redirectPath = '/auth/verify-email'
     } catch (err: unknown) {
       const { fieldErrors, message } = parseApiError(err)
       if (Object.keys(fieldErrors).length > 0) {
@@ -90,9 +91,8 @@ async function handleSubmit() {
     try {
       const response = await authStore.registerSchool(result.data)
       toast.success('Registrasi berhasil! Sekolah Anda telah terdaftar.')
-      // Redirect to SIAKAD with token
-      const siakadUrl = authStore.siakadUrl
-      await navigateTo(`${siakadUrl}/auth/token?token=${response.data.token}`, { external: true })
+      // Set redirect path
+      redirectPath = '/auth/verify-email'
     } catch (err: unknown) {
       const { fieldErrors, message } = parseApiError(err)
       if (Object.keys(fieldErrors).length > 0) {
@@ -103,6 +103,10 @@ async function handleSubmit() {
     } finally {
       isSubmitting.value = false
     }
+  }
+
+  if (redirectPath) {
+    await navigateTo(redirectPath)
   }
 }
 </script>

@@ -10,7 +10,7 @@ import type { UserProduct } from '~~/types'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Produk Saya' })
@@ -251,3 +251,4 @@ onMounted(() => fetchProducts())
     </template>
   </div>
 </template>
+

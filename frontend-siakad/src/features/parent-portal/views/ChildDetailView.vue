@@ -5,7 +5,10 @@ import { useSchoolStore } from '@/stores/school.store'
 import { studentService } from '@/features/students/services/student.service'
 import { attendanceService } from '@/features/attendance/services/attendance.service'
 import { assessmentService } from '@/features/assessments/services/assessment.service'
+import { financeService } from '@/features/finances/services/finance.service'
+import { reportService } from '@/features/reports/services/report.service'
 import type { Student } from '@/types'
+import type { StudentFinanceSummary } from '@/features/finances/types/finance.types'
 import type { StudentAttendanceSummaryResponse } from '@/types/attendance.types'
 import type { StudentAssessmentHistoryResponse } from '@/types/assessment.types'
 import BaseCard from '@/components/ui/Card/Card.vue'
@@ -31,6 +34,9 @@ const attendanceFilter = ref('month') // 'week', 'month', 'all'
 const assessmentSemesterFilter = ref('all') // '1', '2', 'all'
 const isAttendanceLoading = ref(false)
 const isAssessmentLoading = ref(false)
+const financeData = ref<StudentFinanceSummary | null>(null)
+const isFinanceLoading = ref(false)
+const isDownloadingRapor = ref(false)
 
 const statusLabels: Record<string, string> = {
   active: 'Aktif',
@@ -113,6 +119,36 @@ async function fetchStudent() {
   } finally {
     isLoading.value = false
   }
+}
+
+async function fetchFinances() {
+  if (!schoolStore.currentSchoolId || !studentId.value || !schoolStore.isPro) return
+  isFinanceLoading.value = true
+  try {
+    const res = await financeService.getStudentFinances(schoolStore.currentSchoolId!, studentId.value)
+    financeData.value = res.data
+  } catch { /* silent */ }
+  finally { isFinanceLoading.value = false }
+}
+
+async function downloadRapor() {
+  if (isDownloadingRapor.value || !schoolStore.currentSchoolId) return
+  isDownloadingRapor.value = true
+  try {
+    const res = await reportService.downloadPdf(schoolStore.currentSchoolId!, studentId.value)
+    const blob = new Blob([res.data], { type: 'application/pdf' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `Rapor_${student.value?.name || studentId.value}.pdf`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  } catch { /* silent */ }
+  finally { isDownloadingRapor.value = false }
+}
+
+function formatCurrency(val: number): string {
+  return 'Rp ' + val.toLocaleString('id-ID')
 }
 
 function formatDate(date: string | null): string {
@@ -249,9 +285,9 @@ const computedAttendanceSummary = computed(() => {
       <!-- Tabs Navigation -->
       <div class="flex items-center gap-1 p-2 bg-slate-100 rounded-2xl mx-8 mt-4 border border-slate-200">
         <button 
-          v-for="tab in [{id: 'profile', label: 'Profil', icon: 'lucide:user'}, {id: 'attendance', label: 'Kehadiran', icon: 'lucide:calendar-check'}, {id: 'assessment', label: 'Perkembangan', icon: 'lucide:trending-up'}]" 
+          v-for="tab in [{id: 'profile', label: 'Profil', icon: 'lucide:user'}, {id: 'attendance', label: 'Kehadiran', icon: 'lucide:calendar-check'}, {id: 'assessment', label: 'Perkembangan', icon: 'lucide:trending-up'}, {id: 'finance', label: 'Keuangan', icon: 'lucide:wallet'}]" 
           :key="tab.id"
-          @click="activeTab = tab.id"
+          @click="activeTab = tab.id; if (tab.id === 'finance' && !financeData) fetchFinances()"
           :class="['flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300', activeTab === tab.id ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50']"
         >
           <Icon :name="tab.icon" class="w-4 h-4" />
@@ -406,6 +442,86 @@ const computedAttendanceSummary = computed(() => {
           </div>
         </div>
 
+        <!-- Tab: Finance (Pro Plan only) -->
+        <div v-if="activeTab === 'finance'" class="space-y-6 animate-fade-in">
+          <!-- Loading -->
+          <div v-if="isFinanceLoading" class="flex items-center justify-center py-16">
+            <div class="text-center">
+              <Icon name="lucide:loader-circle" class="w-7 h-7 text-primary-500 animate-spin mx-auto mb-2" />
+              <p class="text-sm text-muted">Memuat data keuangan...</p>
+            </div>
+          </div>
+
+          <!-- Not Pro -->
+          <div v-else-if="!schoolStore.isPro" class="py-16 text-center">
+            <div class="w-16 h-16 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-4 text-violet-300">
+              <Icon name="lucide:lock" class="w-8 h-8" />
+            </div>
+            <p class="text-slate-500 font-medium">Fitur keuangan hanya tersedia di Paket Pro.</p>
+          </div>
+
+          <!-- Data -->
+          <template v-else-if="financeData">
+            <!-- SPP Summary -->
+            <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
+              <Icon name="lucide:credit-card" class="w-5 h-5 text-primary-600" /> Riwayat SPP
+            </h3>
+            <div v-if="financeData.spp.history.length === 0" class="py-8 text-center text-sm text-slate-400">Belum ada data SPP</div>
+            <div v-else class="space-y-2">
+              <div v-for="rec in financeData.spp.history" :key="rec.id" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div>
+                  <p class="text-sm font-bold text-slate-800">{{ rec.description || 'SPP' }}</p>
+                  <p class="text-xs text-slate-400">{{ rec.month }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-slate-900">{{ rec.amount_formatted }}</p>
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full" :class="rec.is_paid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'">
+                    {{ rec.is_paid ? 'Lunas' : 'Belum Lunas' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Savings Summary -->
+            <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100 mt-6">
+              <Icon name="lucide:piggy-bank" class="w-5 h-5 text-emerald-600" /> Tabungan
+            </h3>
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div class="p-4 rounded-xl bg-emerald-50">
+                <p class="text-lg font-black text-emerald-700">{{ formatCurrency(financeData.savings.balance) }}</p>
+                <p class="text-[10px] font-bold text-emerald-500 uppercase">Saldo</p>
+              </div>
+              <div class="p-4 rounded-xl bg-blue-50">
+                <p class="text-lg font-black text-blue-700">{{ formatCurrency(financeData.savings.total_deposits) }}</p>
+                <p class="text-[10px] font-bold text-blue-500 uppercase">Total Setor</p>
+              </div>
+              <div class="p-4 rounded-xl bg-red-50">
+                <p class="text-lg font-black text-red-700">{{ formatCurrency(financeData.savings.total_withdrawals) }}</p>
+                <p class="text-[10px] font-bold text-red-500 uppercase">Total Tarik</p>
+              </div>
+            </div>
+            <div v-if="financeData.savings.history.length > 0" class="space-y-2">
+              <div v-for="rec in financeData.savings.history" :key="rec.id" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div>
+                  <p class="text-sm font-bold text-slate-800">{{ rec.transaction_type_label }}</p>
+                  <p class="text-xs text-slate-400">{{ rec.description || '-' }}</p>
+                </div>
+                <p class="text-sm font-bold" :class="rec.transaction_type === 'withdrawal' ? 'text-red-600' : 'text-emerald-700'">
+                  {{ rec.transaction_type === 'withdrawal' ? '-' : '+' }}{{ rec.amount_formatted }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Download Rapor (Pro Plan) -->
+        <div v-if="schoolStore.isPro" class="mt-6 flex justify-center">
+          <BaseButton variant="primary" :loading="isDownloadingRapor" @click="downloadRapor" class="shadow-lg shadow-primary-500/20">
+            <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
+            Download Rapor PDF
+          </BaseButton>
+        </div>
+
         <!-- Alert Read Only -->
         <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-4">
           <div class="p-2 bg-amber-100 rounded-xl text-amber-600">
@@ -420,3 +536,4 @@ const computedAttendanceSummary = computed(() => {
     </BaseCard>
   </div>
 </template>
+

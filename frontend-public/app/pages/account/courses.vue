@@ -10,7 +10,7 @@ import type { UserCourse } from '~~/types'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Kursus Saya' })
@@ -282,3 +282,4 @@ onMounted(() => fetchCourses())
     </template>
   </div>
 </template>
+

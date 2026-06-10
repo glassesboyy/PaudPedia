@@ -6,8 +6,10 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Api\V1\BaseController;
 use App\Models\Order;
+use App\Models\SubscriptionOrder;
 use App\Services\Api\MidtransService;
 use App\Services\Api\OrderProcessingService;
+use App\Services\Api\SubscriptionPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +18,8 @@ class MidtransController extends BaseController
 {
     public function __construct(
         protected MidtransService $midtransService,
-        protected OrderProcessingService $orderProcessingService
+        protected OrderProcessingService $orderProcessingService,
+        protected SubscriptionPaymentService $subscriptionPaymentService
     ) {}
 
     /**
@@ -41,6 +44,11 @@ class MidtransController extends BaseController
             if (!$this->midtransService->verifySignature($orderId, $statusCode, $grossAmount, $signatureKey)) {
                 Log::warning('Midtrans webhook: Invalid signature', ['order_id' => $orderId]);
                 return $this->error('Invalid signature', 403);
+            }
+
+            // Detect subscription order by SUB- prefix
+            if (str_starts_with($orderId, 'SUB-')) {
+                return $this->handleSubscriptionWebhook($orderId, $transactionStatus, $paymentType, $notification);
             }
 
             // Find order by midtrans_order_id
@@ -94,4 +102,38 @@ class MidtransController extends BaseController
             return $this->error('Internal error', 500);
         }
     }
+
+    /**
+     * Handle subscription-specific webhook (SUB- prefix orders).
+     */
+    protected function handleSubscriptionWebhook(string $orderId, string $transactionStatus, ?string $paymentType, $notification): JsonResponse
+    {
+        $subOrder = SubscriptionOrder::where('midtrans_order_id', $orderId)->first();
+
+        if (!$subOrder) {
+            Log::warning('Midtrans webhook: Subscription order not found', ['order_id' => $orderId]);
+            return $this->notFound('Subscription order tidak ditemukan');
+        }
+
+        if ($subOrder->isPaid()) {
+            return $this->success(null, 'Subscription order sudah diproses.');
+        }
+
+        $paymentStatus = PaymentStatus::fromMidtrans($transactionStatus);
+
+        if ($paymentStatus->isSuccessful()) {
+            $this->subscriptionPaymentService->handlePaymentSuccess(
+                $subOrder,
+                $notification->transaction_id ?? null,
+                $paymentType
+            );
+            Log::info('Midtrans webhook: Subscription upgraded', ['order_id' => $orderId, 'school_id' => $subOrder->school_id]);
+        } elseif ($paymentStatus->isFailed() || $paymentStatus->isCancelled()) {
+            $subOrder->markAsFailed();
+            Log::info('Midtrans webhook: Subscription payment failed', ['order_id' => $orderId]);
+        }
+
+        return $this->success(null, 'Subscription notification diproses.');
+    }
 }
+

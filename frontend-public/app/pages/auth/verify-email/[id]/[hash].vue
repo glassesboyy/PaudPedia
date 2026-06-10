@@ -65,9 +65,7 @@ onMounted(async () => {
         <h2 class="text-2xl font-bold text-heading">Email Terverifikasi!</h2>
         <p class="mt-2 mb-4 text-sm text-body">Email Anda berhasil diverifikasi. Anda sekarang bisa mengakses semua fitur.</p>
       </div>
-      <NuxtLink to="/account">
-        <UButton variant="primary" block>Ke Dashboard</UButton>
-      </NuxtLink>
+      <UButton @click="navigateTo('/')" variant="primary" block>Ke Beranda</UButton>
     </template>
 
     <!-- Error -->
@@ -80,9 +78,7 @@ onMounted(async () => {
         <p class="mt-2 text-sm text-body">{{ errorMessage }}</p>
       </div>
       <div class="space-y-2">
-        <NuxtLink to="/auth/verify-email">
-          <UButton variant="outline" block>Kirim Ulang Email Verifikasi</UButton>
-        </NuxtLink>
+        <UButton @click="navigateTo('/auth/verify-email')" variant="outline" block>Kirim Ulang Email Verifikasi</UButton>
         <NuxtLink
           to="/"
           class="block text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"

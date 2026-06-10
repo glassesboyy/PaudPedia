@@ -5,7 +5,7 @@
  */
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Pengaturan Akun' })
@@ -17,3 +17,4 @@ useSeo({ title: 'Pengaturan Akun' })
         <ChangePasswordForm />
   </div>
 </template>
+

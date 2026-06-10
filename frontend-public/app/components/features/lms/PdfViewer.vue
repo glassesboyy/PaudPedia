@@ -16,9 +16,29 @@ const pdfRef = ref<InstanceType<typeof VuePdfEmbed> | null>(null)
 
 function handleDocumentRender() {
   isLoading.value = false
-  // In vue-pdf-embed v2, this might be available this way
   if (pdfRef.value) {
-    pageCount.value = (pdfRef.value as any).pageCount || 1
+    const instance = pdfRef.value as any
+    if (instance.doc && instance.doc.numPages) {
+      pageCount.value = instance.doc.numPages
+    } else if (instance.pageCount) {
+      pageCount.value = instance.pageCount
+    }
+  }
+}
+
+function handleDocumentLoaded(doc: any) {
+  if (doc) {
+    if (doc.numPages) pageCount.value = doc.numPages
+    else if (doc._pdfInfo && doc._pdfInfo.numPages) pageCount.value = doc._pdfInfo.numPages
+  }
+  
+  if (pageCount.value <= 1 && pdfRef.value) {
+    const instance = pdfRef.value as any
+    if (instance.pageCount) {
+      pageCount.value = instance.pageCount
+    } else if (instance.doc && instance.doc.numPages) {
+      pageCount.value = instance.doc.numPages
+    }
   }
 }
 
@@ -53,6 +73,9 @@ function zoomOut() {
       
       <div class="flex items-center gap-2">
         <span class="text-xs text-muted">Halaman</span>
+        <UButton variant="ghost" size="sm" @click="currentPage > 1 && currentPage--" :disabled="currentPage <= 1">
+          <Icon name="lucide:chevron-left" class="w-4 h-4" />
+        </UButton>
         <input 
           v-model.number="currentPage" 
           type="number" 
@@ -61,6 +84,9 @@ function zoomOut() {
           class="w-16 text-center text-xs form-input rounded-md border-border-muted" 
         />
         <span class="text-xs text-muted">/ {{ pageCount }}</span>
+        <UButton variant="ghost" size="sm" @click="currentPage < pageCount && currentPage++" :disabled="currentPage >= pageCount">
+          <Icon name="lucide:chevron-right" class="w-4 h-4" />
+        </UButton>
       </div>
       
       <div>
@@ -79,14 +105,14 @@ function zoomOut() {
         </div>
       </div>
       
-      <div class="flex justify-center transition-transform duration-200" :style="{ transform: `scale(${scale})`, transformOrigin: 'top center' }">
+      <div class="w-full max-w-4xl mx-auto transition-transform duration-200 bg-white shadow-md border border-border" :style="{ transform: `scale(${scale})`, transformOrigin: 'top center' }">
         <VuePdfEmbed
           ref="pdfRef"
           :source="pdfUrl"
           :page="currentPage"
           @rendered="handleDocumentRender"
+          @loaded="handleDocumentLoaded"
           @error="handleLoadError"
-          class="bg-white shadow-md border border-border"
         />
       </div>
     </div>
@@ -104,5 +130,18 @@ function zoomOut() {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(156, 163, 175, 0.5);
   border-radius: 20px;
+}
+
+:deep(.vue-pdf-embed) {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+:deep(.vue-pdf-embed canvas) {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
 }
 </style>

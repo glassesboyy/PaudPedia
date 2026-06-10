@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\FinanceType;
 use App\Enums\PaymentMethod;
+use App\Enums\TransactionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,9 @@ class Finance extends Model
         'month',
         'is_paid',
         'paid_at',
+        'payment_method',
+        'transaction_type',
+        'recorded_by',
     ];
 
     protected $casts = [
@@ -27,12 +31,19 @@ class Finance extends Model
         'type' => FinanceType::class,
         'is_paid' => 'boolean',
         'paid_at' => 'datetime',
+        'payment_method' => PaymentMethod::class,
+        'transaction_type' => TransactionType::class,
     ];
 
     // Relationships
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function recorder(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recorded_by');
     }
 
     // Indirect relationship via student

@@ -215,7 +215,13 @@ const router = createRouter({
           path: 'finances/spp',
           name: 'SppManagement',
           component: () => import('@/features/finances/views/SppManagementView.vue'),
-          meta: { roles: ['headmaster'], requiresPro: true },
+          meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
+        },
+        {
+          path: 'finances/savings',
+          name: 'SavingsManagement',
+          component: () => import('@/features/finances/views/SavingsManagementView.vue'),
+          meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
         },
 
         // Reports (Pro Plan)
@@ -224,6 +230,12 @@ const router = createRouter({
           name: 'ReportSelection',
           component: () => import('@/features/reports/views/ReportSelectionView.vue'),
           meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
+        },
+        {
+          path: 'reports/:studentId',
+          name: 'ReportPreview',
+          component: () => import('@/features/reports/views/ReportPreviewView.vue'),
+          meta: { roles: ['headmaster', 'teacher', 'parent'], requiresPro: true },
         },
 
         // Parent Portal

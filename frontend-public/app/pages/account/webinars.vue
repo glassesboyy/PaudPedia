@@ -10,7 +10,7 @@ import type { UserWebinar } from '~~/types'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Webinar Saya' })
@@ -291,3 +291,4 @@ onMounted(() => fetchWebinars())
     </template>
   </div>
 </template>
+

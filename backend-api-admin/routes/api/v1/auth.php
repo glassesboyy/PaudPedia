@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\V1\School\ParentProfileController;
 use App\Http\Controllers\Api\V1\School\StudentController;
 use App\Http\Controllers\Api\V1\School\AttendanceController;
 use App\Http\Controllers\Api\V1\School\AssessmentController;
+use App\Http\Controllers\Api\V1\School\SubscriptionController;
+use App\Http\Controllers\Api\V1\School\FinanceController;
+use App\Http\Controllers\Api\V1\School\ReportController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,10 +38,14 @@ Route::prefix('auth')->name('auth.')->group(function () {
         ->name('verification.verify');
 });
 
-// Authenticated routes
-Route::prefix('auth')->name('auth.')->middleware(['auth:sanctum', 'verified'])->group(function () {
+// Authenticated routes (verification not required)
+Route::prefix('auth')->name('auth.')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('me'); 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+// Authenticated & Verified routes
+Route::prefix('auth')->name('auth.')->middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
     
     // Profile management (FR-UA-06)
@@ -101,6 +108,24 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/schools/{id}/classes/{classId}/assessments', [AssessmentController::class, 'store'])->name('assessments.store');
     Route::get('/schools/{id}/students/{studentId}/assessments/history', [AssessmentController::class, 'studentHistory'])->name('assessments.history');
 
+    // Subscription management (FR-SM)
+    Route::get('/schools/{id}/subscription', [SubscriptionController::class, 'show'])->name('subscription.show');
+    Route::post('/schools/{id}/subscription/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
+    Route::get('/schools/{id}/subscription/payment-history', [SubscriptionController::class, 'paymentHistory'])->name('subscription.payments');
+
+    // Finance management (FR-FN) — Pro Plan only
+    Route::get('/schools/{id}/finances/summary', [FinanceController::class, 'summary'])->name('finances.summary');
+    Route::get('/schools/{id}/finances/spp', [FinanceController::class, 'sppIndex'])->name('finances.spp.index');
+    Route::post('/schools/{id}/finances/spp', [FinanceController::class, 'sppStore'])->name('finances.spp.store');
+    Route::put('/schools/{id}/finances/spp/{financeId}', [FinanceController::class, 'sppUpdate'])->name('finances.spp.update');
+    Route::get('/schools/{id}/finances/savings', [FinanceController::class, 'savingsIndex'])->name('finances.savings.index');
+    Route::post('/schools/{id}/finances/savings', [FinanceController::class, 'savingsStore'])->name('finances.savings.store');
+    Route::get('/schools/{id}/students/{studentId}/finances', [FinanceController::class, 'studentFinances'])->name('finances.student');
+
+    // Report / Raport management (FR-RP) — Pro Plan only
+    Route::get('/schools/{id}/reports/students/{studentId}/data', [ReportController::class, 'reportData'])->name('reports.data');
+    Route::get('/schools/{id}/reports/students/{studentId}/pdf', [ReportController::class, 'downloadPdf'])->name('reports.pdf');
+
     // School memberships
     Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])
         ->name('my-memberships');
@@ -109,3 +134,4 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/testimonials', [TestimonialController::class, 'store'])
         ->name('testimonials.store');
 });
+

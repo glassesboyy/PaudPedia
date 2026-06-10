@@ -148,7 +148,15 @@ class WebinarForm
                             ->minValue(0)
                             ->default(0)
                             ->placeholder('100000')
-                            ->helperText('Harga saat ini'),
+                            ->helperText('Harga saat ini')
+                            ->rules([
+                                fn ($get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                    $originalPrice = $get('original_price');
+                                    if ($originalPrice !== null && $originalPrice !== '' && $value > $originalPrice) {
+                                        $fail('Harga tidak boleh lebih besar dari Harga Asli.');
+                                    }
+                                },
+                            ]),
 
                         TextInput::make('original_price')
                             ->label('Harga Asli (Opsional)')
@@ -157,6 +165,14 @@ class WebinarForm
                             ->minValue(0)
                             ->placeholder('150000')
                             ->helperText('Jika ada diskon, isi harga sebelum diskon')
+                            ->rules([
+                                fn ($get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                    $price = $get('price');
+                                    if ($value !== null && $value !== '' && $price !== null && $price !== '' && $value < $price) {
+                                        $fail('Harga Asli tidak boleh lebih kecil dari Harga.');
+                                    }
+                                },
+                            ])
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, $get, $set) {
                                 $price = $get('price');

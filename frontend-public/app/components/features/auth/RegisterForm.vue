@@ -33,10 +33,12 @@ async function handleSubmit() {
   errors.value = {}
   isSubmitting.value = true
 
+  let redirectPath = ''
+
   try {
     await authStore.register(result.data)
     toast.success('Registrasi berhasil! Silakan cek email untuk verifikasi.')
-    await navigateTo('/auth/verify-email')
+    redirectPath = '/auth/verify-email'
   } catch (err: unknown) {
     const { fieldErrors, message } = parseApiError(err)
     if (Object.keys(fieldErrors).length > 0) {
@@ -46,6 +48,10 @@ async function handleSubmit() {
     }
   } finally {
     isSubmitting.value = false
+  }
+
+  if (redirectPath) {
+    await navigateTo(redirectPath)
   }
 }
 </script>

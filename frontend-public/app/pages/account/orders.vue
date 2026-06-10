@@ -10,7 +10,7 @@ import type { Transaction } from '~~/types'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Riwayat Transaksi' })
@@ -466,3 +466,4 @@ onMounted(() => fetchTransactions())
   transform: scale(0.97);
 }
 </style>
+

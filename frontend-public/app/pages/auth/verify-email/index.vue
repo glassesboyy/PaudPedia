@@ -11,12 +11,21 @@ import { authService } from '~~/services'
 definePageMeta({ layout: 'auth' })
 useSeo({ title: 'Verifikasi Email' })
 
-const { user, isAuthenticated } = useAuth()
+const { user, isAuthenticated, logout } = useAuth()
 const toast = useToast()
 
 const isResending = ref(false)
 const resendCooldown = ref(0)
 let cooldownTimer: ReturnType<typeof setInterval> | null = null
+
+async function handleLogout() {
+  try {
+    await logout()
+    await navigateTo('/auth/login')
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 async function resendEmail() {
   if (resendCooldown.value > 0) return
@@ -74,13 +83,13 @@ onUnmounted(() => {
     </template>
 
     <div class="pt-2 space-y-2">
-      <NuxtLink
+      <button
         v-if="isAuthenticated"
-        to="/"
-        class="block text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+        @click="handleLogout"
+        class="block w-full text-center text-sm text-error-600 hover:text-error-700 font-medium transition-colors cursor-pointer"
       >
-        Kembali ke Beranda
-      </NuxtLink>
+        Ganti Akun (Logout)
+      </button>
       <NuxtLink
         v-else
         to="/auth/login"

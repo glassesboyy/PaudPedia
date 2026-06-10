@@ -58,7 +58,10 @@ const navItems = computed(() => {
       { name: 'Data Orang Tua', icon: 'parent', to: '/parents', roles: ['teacher'] },
       { name: 'Absensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
       { name: 'Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'] },
+      { name: 'Keuangan', icon: 'finance', to: '/finances', roles: ['headmaster'] },
+      { name: 'Laporan', icon: 'report', to: '/reports', roles: ['headmaster', 'teacher'] },
       { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'] },
+      { name: 'Langganan', icon: 'subscription', to: '/school/subscription', roles: ['headmaster'] },
       { name: 'Pengaturan Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'] },
     ]
   return items.filter((item) => item.roles.includes(role ?? ''))
@@ -74,6 +77,9 @@ const navIcons: Record<string, string> = {
   child: 'lucide:baby',
   assessment: 'lucide:bar-chart-2',
   school: 'lucide:settings',
+  finance: 'lucide:wallet',
+  report: 'lucide:file-text',
+  subscription: 'lucide:crown',
 }
 </script>
 

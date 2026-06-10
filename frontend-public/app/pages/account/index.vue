@@ -7,7 +7,7 @@
  */
 definePageMeta({
   layout: 'dashboard',
-  middleware: ['auth', 'email-verified'],
+  middleware: ['auth'],
 })
 
 useSeo({ title: 'Edit Profil' })
@@ -19,3 +19,4 @@ useSeo({ title: 'Edit Profil' })
     <EditProfileForm />
   </div>
 </template>
+
