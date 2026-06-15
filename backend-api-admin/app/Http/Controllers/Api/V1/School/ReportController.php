@@ -87,7 +87,26 @@ class ReportController extends Controller
     protected function buildReportData(School $school, Student $student, string $semester, string $academicYear): array
     {
         // Attendance summary
-        $attendances = Attendance::where('student_id', $student->id)->get();
+        // Calculate date range based on academic year and semester
+        $years = explode('/', $academicYear);
+        if (count($years) === 2) {
+            $startYear = (int)$years[0];
+            $endYear = (int)$years[1];
+            
+            if ($semester === '1') {
+                $startDate = "{$startYear}-07-01";
+                $endDate = "{$startYear}-12-31";
+            } else {
+                $startDate = "{$endYear}-01-01";
+                $endDate = "{$endYear}-06-30";
+            }
+            
+            $attendances = Attendance::where('student_id', $student->id)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->get();
+        } else {
+            $attendances = Attendance::where('student_id', $student->id)->get();
+        }
         $attendanceSummary = [
             'total' => $attendances->count(),
             'present' => $attendances->where('status', AttendanceStatus::PRESENT)->count(),

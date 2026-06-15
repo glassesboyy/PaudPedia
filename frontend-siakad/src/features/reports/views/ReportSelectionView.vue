@@ -52,7 +52,7 @@ onMounted(async () => {
 async function fetchClasses() {
   try {
     const res = await api.get<{ data: ClassRoom[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/classes`)
-    classes.value = res.data.data
+    classes.value = (res as any).data
     if (classes.value.length > 0) selectedClassId.value = classes.value[0]?.id ?? ''
   } catch { /* silent */ }
 }
@@ -60,7 +60,7 @@ async function fetchClasses() {
 async function fetchStudents() {
   try {
     const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students`)
-    students.value = res.data.data
+    students.value = (res as any).data
   } catch { /* silent */ }
 }
 
@@ -74,7 +74,7 @@ async function downloadReport(studentId: number) {
       academic_year: selectedAcademicYear.value,
     })
     // Trigger download
-    const blob = new Blob([res.data], { type: 'application/pdf' })
+    const blob = new Blob([res as any], { type: 'application/pdf' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -121,17 +121,23 @@ function previewReport(studentId: number) {
       </div>
 
       <!-- Filters -->
-      <BaseCard class="p-6 space-y-4">
-        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">Pilih Kelas & Semester</h3>
-        <div class="flex flex-wrap items-center gap-4">
-          <select v-model="selectedClassId" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500">
-            <option value="">Semua Kelas</option>
-            <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }} ({{ c.academic_year }})</option>
-          </select>
-          <select v-model="selectedSemester" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500">
-            <option value="1">Semester 1 (Ganjil)</option>
-            <option value="2">Semester 2 (Genap)</option>
-          </select>
+      <BaseCard class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700">Pilih Kelas</label>
+            <select v-model="selectedClassId" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
+              <option value="">Semua Kelas</option>
+              <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }} ({{ c.academic_year }})</option>
+            </select>
+          </div>
+          
+          <div class="space-y-2">
+            <label class="text-sm font-semibold text-slate-700">Semester</label>
+            <select v-model="selectedSemester" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
+              <option value="1">Semester 1 (Ganjil)</option>
+              <option value="2">Semester 2 (Genap)</option>
+            </select>
+          </div>
         </div>
       </BaseCard>
 
@@ -163,12 +169,12 @@ function previewReport(studentId: number) {
             </div>
             <div class="flex items-center gap-2">
               <BaseButton variant="ghost" size="sm" @click="previewReport(student.id)">
-                <template #prepend><Icon name="lucide:eye" class="w-4 h-4" /></template>
-                Preview
+                <template #prepend><Icon name="lucide:eye" class="w-3 h-3" /></template>
+                Lihat
               </BaseButton>
               <BaseButton variant="primary" size="sm" :loading="downloadingId === student.id" @click="downloadReport(student.id)">
-                <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
-                PDF
+                <template #prepend><Icon name="lucide:download" class="w-3 h-3" /></template>
+                Unduh Rapor
               </BaseButton>
             </div>
           </div>

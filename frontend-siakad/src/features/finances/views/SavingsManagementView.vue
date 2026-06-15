@@ -13,6 +13,7 @@ import type { ClassRoom, Student } from '@/types'
 import ProPlanGate from '@/features/finances/components/ProPlanGate.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
+import BaseInput from '@/components/ui/Input/Input.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 
 const router = useRouter()
@@ -29,7 +30,9 @@ const savingsRecords = ref<FinanceRecord[]>([])
 const balanceInfo = ref<{ balance: number; total_deposits: number; total_withdrawals: number } | null>(null)
 
 const selectedClassId = ref<number | ''>('')
-const selectedStudentId = ref<number | ''>('')
+const searchQuery = ref('')
+
+const isFiltering = computed(() => !!searchQuery.value || !!selectedClassId.value)
 
 const showForm = ref(false)
 const form = ref<SavingsPayload>({
@@ -46,6 +49,7 @@ const filteredStudents = computed(() => {
 
 onMounted(async () => {
   if (schoolStore.isPro) {
+    isLoading.value = true
     await Promise.all([fetchClasses(), fetchStudents(), fetchSavings()])
   }
   isLoading.value = false
@@ -54,27 +58,30 @@ onMounted(async () => {
 async function fetchClasses() {
   try {
     const res = await api.get<{ data: ClassRoom[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/classes`)
-    classes.value = res.data.data
+    classes.value = (res as any).data
   } catch { /* silent */ }
 }
 
 async function fetchStudents() {
   try {
     const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students`)
-    students.value = res.data.data
+    students.value = (res as any).data
   } catch { /* silent */ }
 }
 
 async function fetchSavings() {
+  isLoading.value = true
   try {
     const params: Record<string, unknown> = { per_page: 50 }
     if (selectedClassId.value) params.class_id = selectedClassId.value
-    if (selectedStudentId.value) params.student_id = selectedStudentId.value
+    if (searchQuery.value) params.search = searchQuery.value
     const res = await financeService.getSavingsList(schoolStore.currentSchoolId!, params as any)
-    savingsRecords.value = res.data.data
-    balanceInfo.value = res.data.balance_info || null
+    savingsRecords.value = (res as any).data
+    balanceInfo.value = (res as any).balance_info || null
   } catch {
     error.value = 'Gagal memuat data tabungan.'
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -85,7 +92,7 @@ async function submitSavings() {
   success.value = ''
   try {
     const res = await financeService.storeSavings(schoolStore.currentSchoolId!, form.value)
-    success.value = res.data.message
+    success.value = (res as any).message
     showForm.value = false
     form.value = { student_id: 0, amount: 0, transaction_type: 'deposit', description: '' }
     await fetchSavings()
@@ -105,6 +112,16 @@ function formatDate(dateStr: string): string {
 }
 
 function handleFilterChange() {
+  fetchSavings()
+}
+
+function handleSearchEnter() {
+  fetchSavings()
+}
+
+function handleReset() {
+  searchQuery.value = ''
+  selectedClassId.value = ''
   fetchSavings()
 }
 </script>
@@ -143,36 +160,8 @@ function handleFilterChange() {
         <button @click="error = ''" class="ml-auto text-red-400 hover:text-red-600"><Icon name="lucide:x" class="w-4 h-4" /></button>
       </div>
 
-      <!-- Balance Info -->
-      <BaseCard v-if="balanceInfo" class="p-6 border-2 border-emerald-100 bg-emerald-50/30">
-        <div class="flex items-center gap-6 flex-wrap">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <Icon name="lucide:wallet" class="w-6 h-6 text-emerald-600" />
-            </div>
-            <div>
-              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo</p>
-              <p class="text-xl font-black text-emerald-700">{{ formatCurrency(balanceInfo.balance) }}</p>
-            </div>
-          </div>
-          <div class="h-10 w-px bg-emerald-200 hidden md:block" />
-          <div>
-            <p class="text-xs text-slate-400">Total Setor</p>
-            <p class="text-sm font-bold text-emerald-600">{{ formatCurrency(balanceInfo.total_deposits) }}</p>
-          </div>
-          <div>
-            <p class="text-xs text-slate-400">Total Tarik</p>
-            <p class="text-sm font-bold text-red-500">{{ formatCurrency(balanceInfo.total_withdrawals) }}</p>
-          </div>
-        </div>
-      </BaseCard>
-
       <!-- Form -->
       <BaseCard v-if="showForm" class="p-6 border-2 border-emerald-200 shadow-xl space-y-5">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-black text-heading">Transaksi Tabungan</h3>
-          <button @click="showForm = false" class="text-slate-400 hover:text-slate-600"><Icon name="lucide:x" class="w-5 h-5" /></button>
-        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Siswa</label>
@@ -200,49 +189,103 @@ function handleFilterChange() {
         <div class="flex justify-end gap-3 pt-2">
           <BaseButton variant="ghost" @click="showForm = false">Batal</BaseButton>
           <BaseButton variant="primary" :loading="isSubmitting" :disabled="!form.student_id || !form.amount" @click="submitSavings" class="bg-emerald-600 hover:bg-emerald-700">
-            <template #prepend><Icon name="lucide:check" class="w-4 h-4" /></template>
             Simpan
           </BaseButton>
         </div>
       </BaseCard>
 
       <!-- Filters -->
-      <div class="flex flex-wrap items-center gap-3">
-        <select v-model="selectedClassId" @change="handleFilterChange" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium">
-          <option value="">Semua Kelas</option>
-          <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
-        </select>
-        <select v-model="selectedStudentId" @change="handleFilterChange" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium">
-          <option value="">Semua Siswa</option>
-          <option v-for="s in filteredStudents" :key="s.id" :value="s.id">{{ s.name }}</option>
-        </select>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="flex-1 max-w-sm">
+          <BaseInput
+            v-model="searchQuery"
+            placeholder="Cari nama siswa..."
+            @keyup.enter="handleSearchEnter"
+          >
+            <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
+          </BaseInput>
+        </div>
+        <div class="w-44">
+          <select v-model="selectedClassId" @change="handleFilterChange" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
+            <option value="">Semua Kelas</option>
+            <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <BaseButton 
+          v-if="isFiltering" 
+          variant="outline" 
+          size="md" 
+          @click="handleReset"
+          class="text-muted hover:text-primary-600 h-[42px]"
+        >
+          <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+          Reset
+        </BaseButton>
       </div>
 
-      <!-- Loading -->
-      <BaseCard v-if="isLoading" class="p-6"><Skeleton height="16rem" /></BaseCard>
-
       <!-- Records -->
-      <BaseCard v-else class="p-0 overflow-hidden border-none shadow-xl">
-        <div v-if="savingsRecords.length === 0" class="p-12 text-center">
-          <Icon name="lucide:piggy-bank" class="w-12 h-12 text-slate-200 mx-auto mb-3" />
-          <p class="text-sm text-slate-400 font-medium">Belum ada transaksi tabungan</p>
-        </div>
-        <div v-else class="overflow-x-auto">
+      <BaseCard class="p-0 overflow-hidden border-none shadow-xl">
+        <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-slate-50">
-                <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Siswa</th>
-                <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Jenis</th>
-                <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Nominal</th>
-                <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Catatan</th>
-                <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
+              <tr class="bg-surface-muted/50 border-b border-border/50">
+                <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Siswa</th>
+                <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Jenis</th>
+                <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Nominal</th>
+                <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Catatan</th>
+                <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Tanggal</th>
               </tr>
             </thead>
-            <tbody>
-              <tr v-for="r in savingsRecords" :key="r.id" class="border-t border-slate-100 hover:bg-slate-50 transition-colors">
+            <tbody class="divide-y divide-border/50 bg-white">
+              <!-- Loading State -->
+              <tr v-if="isLoading" v-for="i in 5" :key="i">
                 <td class="px-6 py-4">
-                  <p class="font-bold text-slate-800">{{ r.student_name }}</p>
-                  <p class="text-xs text-slate-400">{{ r.class_name || '-' }}</p>
+                  <div class="space-y-2">
+                    <Skeleton width="120px" height="0.875rem" />
+                    <Skeleton width="80px" height="0.6rem" />
+                  </div>
+                </td>
+                <td class="px-6 py-4"><Skeleton width="80px" height="1.5rem" class="rounded-full" /></td>
+                <td class="px-6 py-4"><Skeleton width="100px" height="1rem" /></td>
+                <td class="px-6 py-4"><Skeleton width="150px" height="0.875rem" /></td>
+                <td class="px-6 py-4"><Skeleton width="80px" height="0.875rem" /></td>
+              </tr>
+              <!-- Empty States -->
+              <tr v-else-if="savingsRecords.length === 0">
+                <td colspan="5" class="px-8 py-20 text-center">
+                  <!-- Case: Data truly empty -->
+                  <div v-if="!isFiltering" class="flex flex-col items-center gap-4 max-w-xs mx-auto">
+                    <div class="w-20 h-20 bg-surface-muted rounded-2xl flex items-center justify-center text-muted border-2 border-dashed border-border">
+                      <Icon name="lucide:piggy-bank" class="w-10 h-10" stroke-width="1.5" />
+                    </div>
+                    <div>
+                      <p class="text-lg font-bold text-heading">Belum ada Transaksi</p>
+                      <p class="text-sm text-muted">Belum ada catatan transaksi tabungan siswa yang dicatat.</p>
+                    </div>
+                    <BaseButton variant="primary" size="md" class="mt-2 w-full" @click="showForm = true">
+                      Buat Transaksi Pertama
+                    </BaseButton>
+                  </div>
+                  <!-- Case: Search/Filter empty -->
+                  <div v-else class="flex flex-col items-center gap-4 max-w-xs mx-auto">
+                    <div class="w-20 h-20 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-300">
+                      <Icon name="lucide:search-x" class="w-10 h-10" stroke-width="1.5" />
+                    </div>
+                    <div>
+                      <p class="text-lg font-bold text-heading">Transaksi Tidak Ditemukan</p>
+                      <p class="text-sm text-muted">Tidak ditemukan transaksi dengan kriteria filter yang aktif saat ini.</p>
+                    </div>
+                    <BaseButton variant="outline" size="md" class="mt-2 w-full" @click="handleReset">
+                      Bersihkan Filter & Cari Lagi
+                    </BaseButton>
+                  </div>
+                </td>
+              </tr>
+              <!-- Data Rows -->
+              <tr v-else v-for="r in savingsRecords" :key="r.id" class="hover:bg-primary-50/30 transition-all duration-300">
+                <td class="px-6 py-4">
+                  <p class="font-bold text-heading">{{ r.student_name }}</p>
+                  <p class="text-xs text-muted">{{ r.class_name || '-' }}</p>
                 </td>
                 <td class="px-6 py-4">
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold" :class="r.transaction_type === 'deposit' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'">
@@ -253,8 +296,8 @@ function handleFilterChange() {
                 <td class="px-6 py-4 font-bold" :class="r.transaction_type === 'withdrawal' ? 'text-red-600' : 'text-emerald-700'">
                   {{ r.transaction_type === 'withdrawal' ? '-' : '+' }}{{ r.amount_formatted }}
                 </td>
-                <td class="px-6 py-4 text-slate-600 text-xs">{{ r.description || '-' }}</td>
-                <td class="px-6 py-4 text-xs text-slate-400">{{ formatDate(r.created_at) }}</td>
+                <td class="px-6 py-4 text-muted text-xs">{{ r.description || '-' }}</td>
+                <td class="px-6 py-4 text-xs font-bold text-muted">{{ formatDate(r.created_at) }}</td>
               </tr>
             </tbody>
           </table>

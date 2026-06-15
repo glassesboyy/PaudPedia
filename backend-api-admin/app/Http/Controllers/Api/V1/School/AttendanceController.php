@@ -60,7 +60,8 @@ class AttendanceController extends Controller
                 'status' => $attendance ? $attendance->status->value : null,
                 'notes' => $attendance ? $attendance->notes : null,
                 'attendance_id' => $attendance ? $attendance->id : null,
-                'date' => $date
+                'date' => $date,
+                'proof_file_url' => $attendance && $attendance->proof_file_path ? asset('storage/' . $attendance->proof_file_path) : null
             ];
         });
 
@@ -100,6 +101,7 @@ class AttendanceController extends Controller
             'attendances.*.student_id' => 'required|exists:students,id',
             'attendances.*.status' => ['required', new Enum(AttendanceStatus::class)],
             'attendances.*.notes' => 'nullable|string|max:255',
+            'attendances.*.proof_file' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -115,7 +117,7 @@ class AttendanceController extends Controller
 
         $savedAttendances = [];
 
-        foreach ($attendancesData as $data) {
+        foreach ($attendancesData as $key => $data) {
             // Verify student belongs to this class
             $student = Student::where('id', $data['student_id'])
                 ->where('class_id', $class->id)
@@ -123,15 +125,27 @@ class AttendanceController extends Controller
 
             if (!$student) continue;
 
+            $updateData = [
+                'status' => $data['status'],
+                'notes' => $data['notes'] ?? null,
+            ];
+
+            // In Laravel, the file from an array input might be in the data array or in $request->file
+            // We can check if a file was uploaded for this specific attendance record
+            $fileKey = "attendances.{$key}.proof_file";
+            if ($request->hasFile($fileKey)) {
+                $path = $request->file($fileKey)->store('attendances', 'public');
+                $updateData['proof_file_path'] = $path;
+            } elseif (isset($data['remove_proof_file']) && $data['remove_proof_file'] === 'true') {
+                $updateData['proof_file_path'] = null;
+            }
+
             $attendance = Attendance::updateOrCreate(
                 [
                     'student_id' => $student->id,
                     'date' => $date,
                 ],
-                [
-                    'status' => $data['status'],
-                    'notes' => $data['notes'] ?? null,
-                ]
+                $updateData
             );
 
             $savedAttendances[] = $attendance;

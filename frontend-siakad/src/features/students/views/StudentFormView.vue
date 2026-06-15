@@ -272,12 +272,34 @@ async function handleSubmit() {
               <BaseInput v-model="form.birth_date" label="Tanggal Lahir" type="date" required :error="fieldErrors.birth_date">
                 <template #prepend><Icon name="lucide:calendar" class="w-5 h-5" /></template>
               </BaseInput>
-              <BaseSelect v-model="form.gender" :options="genderOptions" label="Jenis Kelamin" required :error="fieldErrors.gender" />
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                <div class="grid grid-cols-2 gap-3">
+                  <label v-for="opt in genderOptions.filter(o => o.value !== '')" :key="opt.value" class="cursor-pointer">
+                    <input type="radio" :name="'gender'" :value="opt.value" v-model="form.gender" class="hidden" />
+                    <div :class="['flex items-center justify-center h-11 rounded-xl text-sm font-bold border transition-all', form.gender === opt.value ? 'bg-primary-50 text-primary-700 border-primary-200 ring-2 ring-primary-500/20' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50']">
+                      {{ opt.label }}
+                    </div>
+                  </label>
+                </div>
+                <p v-if="fieldErrors.gender" class="text-xs text-rose-500">{{ fieldErrors.gender }}</p>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <BaseSelect v-model="form.class_id" :options="classOptions" label="Kelas" required :error="fieldErrors.class_id" />
-              <BaseSelect v-model="form.status" :options="statusOptions" label="Status" required :error="fieldErrors.status" />
+              <div class="space-y-1.5">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status <span class="text-rose-500">*</span></label>
+                <div class="grid grid-cols-3 gap-3">
+                  <label v-for="opt in statusOptions" :key="opt.value" class="cursor-pointer">
+                    <input type="radio" :name="'status'" :value="opt.value" v-model="form.status" class="hidden" />
+                    <div :class="['flex items-center justify-center h-11 rounded-xl text-xs font-bold border transition-all', form.status === opt.value ? 'bg-primary-50 text-primary-700 border-primary-200 ring-2 ring-primary-500/20' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50']">
+                      {{ opt.label }}
+                    </div>
+                  </label>
+                </div>
+                <p v-if="fieldErrors.status" class="text-xs text-rose-500">{{ fieldErrors.status }}</p>
+              </div>
             </div>
 
             <BaseInput v-model="form.enrollment_date" label="Tanggal Masuk" type="date" required :error="fieldErrors.enrollment_date">

@@ -37,6 +37,7 @@ const students = ref<AssessmentRecord[]>([])
 const isLoadingClasses = ref(true)
 const isLoadingStudents = ref(false)
 const isSaving = ref(false)
+const showValidationErrors = ref(false)
 const error = ref('')
 const successMessage = ref('')
 
@@ -106,8 +107,13 @@ async function fetchStudents() {
 async function saveAssessment() {
   if (!schoolStore.currentSchoolId || !selectedClassId.value || !finalAspect.value) return
   isSaving.value = true
-  error.value = ''
-  successMessage.value = ''
+  showValidationErrors.value = true
+  if (students.value.some(s => !s.notes || s.notes.trim() === '')) {
+    error.value = 'Mohon isi Catatan Perkembangan untuk semua siswa (kolom bergaris merah).'
+    isSaving.value = false
+    return
+  }
+
   try {
     const payload = {
       aspect: finalAspect.value,
@@ -250,7 +256,7 @@ const hasAnyAssessment = computed(() => {
                 <p class="text-[10px] text-slate-400 mt-2 ml-1" v-else-if="student.scale === 'BSB'">Berkembang Sangat Baik</p>
               </td>
               <td class="px-6 py-4 align-top">
-                <textarea v-model="student.notes" :disabled="!schoolStore.isTeacher" placeholder="Misal: Sudah mampu mengikuti intruksi..." class="w-full text-sm px-3 py-2 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all resize-y min-h-[80px] bg-white disabled:opacity-50 disabled:bg-slate-50"></textarea>
+                <textarea v-model="student.notes" :disabled="!schoolStore.isTeacher" placeholder="Misal: Sudah mampu mengikuti intruksi..." :class="['w-full text-sm px-3 py-2 rounded-xl border outline-none transition-all resize-y min-h-[80px] bg-white disabled:opacity-50 disabled:bg-slate-50 focus:ring-1', showValidationErrors && (!student.notes || student.notes.trim() === '') ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500 bg-danger-50/30' : 'border-slate-200 focus:border-primary-500 focus:ring-primary-500']"></textarea>
               </td>
             </tr>
           </tbody>

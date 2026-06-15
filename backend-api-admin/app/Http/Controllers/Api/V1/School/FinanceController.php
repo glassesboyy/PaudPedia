@@ -128,6 +128,12 @@ class FinanceController extends Controller
                 ->pluck('id');
             $query->whereIn('student_id', $classStudentIds);
         }
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->whereHas('student', function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%");
+            });
+        }
 
         $records = $query->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 20));
@@ -138,10 +144,96 @@ class FinanceController extends Controller
     }
 
     /**
-     * POST /api/v1/schools/{id}/finances/spp
+     * POST /api/v1/schools/{id}/finances/spp/batch
      * 
-     * Record a new SPP payment.
+     * Generate SPP Bills for an entire class.
      */
+    public function sppBatchStore(Request $request, int $id): JsonResponse
+    {
+        $school = School::findOrFail($id);
+        if ($gate = $this->ensureProPlan($school)) return $gate;
+
+        $membership = $request->user()->schoolMemberships()
+            ->where('school_id', $school->id)
+            ->first();
+
+        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
+            return response()->json(['message' => 'Akses ditolak.'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'class_id' => 'required|exists:classes,id',
+            'amount' => 'required|numeric|min:1',
+            'month' => 'required|string|max:7', // e.g. "2026-05"
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Verify class belongs to this school
+        $class = \App\Models\ClassRoom::where('id', $request->class_id)
+            ->where('school_id', $school->id)
+            ->first();
+
+        if (!$class) {
+            return response()->json(['message' => 'Kelas tidak valid.'], 404);
+        }
+
+        // Validate Month is within Academic Year
+        if ($class->academic_year) {
+            $parts = explode('/', $class->academic_year);
+            if (count($parts) === 2) {
+                $startYear = $parts[0];
+                $endYear = $parts[1];
+                $minMonth = "{$startYear}-07";
+                $maxMonth = "{$endYear}-06";
+
+                if ($request->month < $minMonth || $request->month > $maxMonth) {
+                    return response()->json([
+                        'message' => 'Bulan tagihan di luar rentang tahun ajaran kelas (' . $class->academic_year . ').'
+                    ], 422);
+                }
+            }
+        }
+
+        $students = Student::where('class_id', $class->id)
+            ->where('school_id', $school->id)
+            ->get();
+
+        if ($students->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada siswa di kelas ini.'], 422);
+        }
+
+        $count = 0;
+        foreach ($students as $student) {
+            // Check if ANY SPP record exists for this month for this student
+            $existing = Finance::where('student_id', $student->id)
+                ->where('type', FinanceType::SPP)
+                ->where('month', $request->month)
+                ->first();
+
+            if (!$existing) {
+                Finance::create([
+                    'student_id' => $student->id,
+                    'type' => FinanceType::SPP,
+                    'amount' => $request->amount,
+                    'description' => $request->description,
+                    'month' => $request->month,
+                    'is_paid' => false,
+                    'paid_at' => null,
+                    'payment_method' => null,
+                    'recorded_by' => $request->user()->id,
+                ]);
+                $count++;
+            }
+        }
+
+        return response()->json([
+            'message' => "Berhasil menerbitkan $count tagihan SPP untuk kelas {$class->name}."
+        ], 201);
+    }
     public function sppStore(Request $request, int $id): JsonResponse
     {
         $school = School::findOrFail($id);
@@ -288,6 +380,12 @@ class FinanceController extends Controller
                 ->where('class_id', $request->class_id)
                 ->pluck('id');
             $query->whereIn('student_id', $classStudentIds);
+        }
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->whereHas('student', function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%");
+            });
         }
 
         $records = $query->orderBy('created_at', 'desc')

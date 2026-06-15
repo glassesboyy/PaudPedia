@@ -71,7 +71,6 @@ const plans = [
       'Generate PDF rapor',
       'Manajemen keuangan (SPP & Tabungan)',
       'Laporan analitik lanjutan',
-      'Prioritas support',
     ],
     cta: 'Daftar Sekarang',
     highlighted: true,

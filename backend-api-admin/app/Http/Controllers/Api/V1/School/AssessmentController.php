@@ -111,7 +111,7 @@ class AssessmentController extends Controller
             'assessments' => 'required|array',
             'assessments.*.student_id' => 'required|exists:students,id',
             'assessments.*.scale' => ['required', new Enum(AssessmentScale::class)],
-            'assessments.*.notes' => 'nullable|string',
+            'assessments.*.notes' => 'required|string',
         ]);
 
         if ($validator->fails()) {

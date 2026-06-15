@@ -48,7 +48,7 @@ class AuthService
             ]);
         }
 
-        $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+        $user->load(['schoolMemberships.school', 'roles:id,name']);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -105,7 +105,7 @@ class AuthService
                 ]);
             }
 
-            $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+            $user->load(['schoolMemberships.school', 'roles:id,name']);
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -149,7 +149,7 @@ class AuthService
             $user->assignRole('headmaster');
 
             // 4. Return user and new token for consistency
-            $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+            $user->load(['schoolMemberships.school', 'roles:id,name']);
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return [
@@ -180,7 +180,7 @@ class AuthService
         }
 
         // Load memberships for initial state
-        $user->load(['schoolMemberships.school:id,name,npsn', 'roles:id,name']);
+        $user->load(['schoolMemberships.school', 'roles:id,name']);
 
         // Create new token
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -353,7 +353,7 @@ class AuthService
     {
         return $user->load([
             'roles:id,name',
-            'schoolMemberships.school:id,name,npsn'
+            'schoolMemberships.school'
         ]);
     }
 }

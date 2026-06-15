@@ -30,6 +30,13 @@ export const financeService = {
   },
 
   /**
+   * Batch generate SPP bills for a class
+   */
+  storeSppBatch(schoolId: number, payload: { class_id: number; amount: number; month: string; description?: string }) {
+    return api.post<{ message: string }>(`/api/v1/schools/${schoolId}/finances/spp/batch`, payload)
+  },
+
+  /**
    * Update an SPP payment
    */
   updateSpp(schoolId: number, financeId: number, payload: Partial<SppPaymentPayload>) {

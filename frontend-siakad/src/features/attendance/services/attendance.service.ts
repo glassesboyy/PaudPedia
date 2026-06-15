@@ -18,7 +18,7 @@ export const attendanceService = {
   /**
    * Store or update attendance in bulk
    */
-  storeBulkAttendance(schoolId: number, classId: number, payload: BulkAttendancePayload) {
+  storeBulkAttendance(schoolId: number, classId: number, payload: BulkAttendancePayload | FormData) {
     return api.post<{ message: string; count: number }>(`/api/v1/schools/${schoolId}/classes/${classId}/attendance`, payload)
   },
 

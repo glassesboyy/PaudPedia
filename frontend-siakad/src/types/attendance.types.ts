@@ -8,6 +8,9 @@ export interface AttendanceRecord {
   notes: string | null
   attendance_id: number | null
   date: string
+  proof_file?: File | null
+  proof_file_url?: string | null
+  remove_proof_file?: boolean
 }
 
 export interface AttendanceResponse {

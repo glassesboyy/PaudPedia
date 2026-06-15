@@ -12,13 +12,46 @@ const schoolStore = useSchoolStore()
 
 const classes = ref<ClassRoom[]>([])
 const selectedClassId = ref<number | null>(null)
+const selectedSemester = ref<string>('1')
 const selectedDate = ref<string>(new Date().toISOString().split('T')[0] || '')
 const todayDate = new Date().toISOString().split('T')[0]
+
+const selectedClass = computed(() => classes.value.find(c => c.id === selectedClassId.value))
+
+const minDate = computed(() => {
+  if (!selectedClass.value?.academic_year) return ''
+  const years = selectedClass.value.academic_year.split('/')
+  if (years.length !== 2) return ''
+  
+  if (selectedSemester.value === '1') {
+    return `${years[0]}-07-01`
+  } else {
+    return `${years[1]}-01-01`
+  }
+})
+
+const maxDate = computed(() => {
+  if (!selectedClass.value?.academic_year) return todayDate
+  const years = selectedClass.value.academic_year.split('/')
+  if (years.length !== 2) return todayDate
+  
+  if (selectedSemester.value === '1') {
+    return `${years[0]}-12-31`
+  } else {
+    return `${years[1]}-06-30`
+  }
+})
+
+watch([minDate, maxDate], () => {
+  if (minDate.value && selectedDate.value < minDate.value) selectedDate.value = minDate.value
+  if (maxDate.value && selectedDate.value > maxDate.value) selectedDate.value = maxDate.value
+})
 
 const students = ref<AttendanceRecord[]>([])
 const isLoadingClasses = ref(true)
 const isLoadingStudents = ref(false)
 const isSaving = ref(false)
+const previewImageUrl = ref<string | null>(null)
 const error = ref('')
 const successMessage = ref('')
 
@@ -63,16 +96,20 @@ async function fetchStudents() {
     // Ensure we have an array, supporting both raw array and wrapped { data: [] }
     const rawList = Array.isArray(res) ? res : (res as any).data
     
-    if (!Array.isArray(rawList)) {
+    if (!Array.isArray(rawList)) {  
       throw new Error('Invalid data format')
     }
 
     students.value = rawList.map(item => ({
       ...item,
+      ...item,
       // Only set default 'present' for Teachers when creating new records.
       // For Headmaster or existing records, keep the original status (could be null).
-      status: item.status || (schoolStore.isTeacher ? 'present' : null)
-    })) as AttendanceRecord[]
+      status: item.status || (schoolStore.isTeacher ? 'present' : null),
+      proof_file: null,
+      proof_file_url: item.proof_file_url || null,
+      remove_proof_file: false
+    })) as any[]
   } catch (err: any) {
     error.value = 'Gagal memuat data siswa.'
   } finally {
@@ -86,18 +123,26 @@ async function saveAttendance() {
   error.value = ''
   successMessage.value = ''
   try {
-    const payload = {
-      date: selectedDate.value,
-      attendances: students.value.map(s => ({
-        student_id: s.student_id,
-        status: s.status as AttendanceStatus,
-        notes: s.notes
-      }))
-    }
+    const formData = new FormData()
+    formData.append('date', selectedDate.value)
+    
+    students.value.forEach((s: any, index: number) => {
+      formData.append(`attendances[${index}][student_id]`, s.student_id)
+      formData.append(`attendances[${index}][status]`, s.status)
+      if (s.notes) {
+        formData.append(`attendances[${index}][notes]`, s.notes)
+      }
+      if (s.proof_file) {
+        formData.append(`attendances[${index}][proof_file]`, s.proof_file)
+      } else if (s.remove_proof_file) {
+        formData.append(`attendances[${index}][remove_proof_file]`, 'true')
+      }
+    })
+
     const res = await attendanceService.storeBulkAttendance(
       schoolStore.currentSchoolId as number,
       selectedClassId.value as number,
-      payload
+      formData as any
     )
     successMessage.value = (res as any).message
   } catch (err: any) {
@@ -107,6 +152,29 @@ async function saveAttendance() {
   }
 }
 
+function handleFileUpload(event: Event, student: any) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    const file = target.files[0]
+    if (file) {
+      student.proof_file = file
+      student.proof_file_url = URL.createObjectURL(file)
+      student.remove_proof_file = false
+    }
+  } else {
+    student.proof_file = null
+  }
+}
+
+function removeProofFile(student: any) {
+  student.proof_file = null
+  student.proof_file_url = null
+  student.remove_proof_file = true
+}
+
+function showPreview(url: string) {
+  previewImageUrl.value = url
+}
 
 function getStatusColor(status: string | null) {
   if (!status) return 'bg-slate-50 text-slate-400 border-slate-200 border-dashed'
@@ -147,11 +215,7 @@ const attendanceStats = computed(() => {
 
     <!-- Filter Card -->
     <BaseCard class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Tanggal Absensi</label>
-          <input type="date" :max="todayDate" v-model="selectedDate" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all shadow-sm" />
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="space-y-2">
           <label class="text-sm font-semibold text-slate-700">Pilih Kelas</label>
           <select v-model="selectedClassId" :disabled="isLoadingClasses" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all shadow-sm bg-white">
@@ -159,7 +223,19 @@ const attendanceStats = computed(() => {
             <option v-if="classes.length === 0" value="">Belum ada kelas</option>
           </select>
         </div>
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-slate-700">Pilih Semester</label>
+          <select v-model="selectedSemester" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all shadow-sm bg-white">
+            <option value="1">Semester 1 (Juli - Des)</option>
+            <option value="2">Semester 2 (Jan - Jun)</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-semibold text-slate-700">Tanggal Absensi</label>
+          <input type="date" :min="minDate" :max="maxDate" v-model="selectedDate" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all shadow-sm" />
+        </div>
       </div>
+
     </BaseCard>
 
     <!-- Stats Widget -->
@@ -220,7 +296,8 @@ const attendanceStats = computed(() => {
             <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-slate-500 font-bold">
               <th class="px-6 py-4">Nama Siswa</th>
               <th class="px-6 py-4">Status Kehadiran</th>
-              <th class="px-6 py-4 w-1/3">Catatan Tambahan</th>
+              <th class="px-6 py-4 w-1/4">Catatan Tambahan</th>
+              <th class="px-6 py-4">Bukti (Opsional)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -245,6 +322,17 @@ const attendanceStats = computed(() => {
               <td class="px-6 py-4">
                 <input type="text" v-model="student.notes" :disabled="!schoolStore.isTeacher" placeholder="Tuliskan catatan..." class="w-full text-sm px-3 py-2 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all bg-white disabled:opacity-50 disabled:bg-slate-50" />
               </td>
+              <td class="px-6 py-4">
+                <div v-if="student.proof_file_url" class="relative group inline-block w-full max-w-[120px]">
+                  <img :src="student.proof_file_url" @click="showPreview(student.proof_file_url)" class="h-16 w-full object-cover rounded-xl border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity" alt="Bukti Absen" title="Klik untuk memperbesar" />
+                  <button v-if="schoolStore.isTeacher" @click.stop="removeProofFile(student)" type="button" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity" title="Hapus Bukti">
+                    <Icon name="lucide:x" class="w-3 h-3" />
+                  </button>
+                </div>
+                <div v-else>
+                  <input type="file" @change="e => handleFileUpload(e, student)" :disabled="!schoolStore.isTeacher" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 disabled:opacity-50" />
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -255,5 +343,15 @@ const attendanceStats = computed(() => {
         </BaseButton>
       </div>
     </BaseCard>
+
+    <!-- Image Preview Modal -->
+    <div v-if="previewImageUrl" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" @click="previewImageUrl = null">
+      <div class="relative max-w-2xl max-h-[80vh] w-full" @click.stop>
+        <button @click="previewImageUrl = null" class="absolute -top-12 right-0 text-white hover:text-slate-200 p-2">
+          <Icon name="lucide:x" class="w-8 h-8" />
+        </button>
+        <img :src="previewImageUrl" class="max-w-full max-h-[80vh] mx-auto object-contain rounded-2xl shadow-2xl" alt="Preview Bukti Absen" />
+      </div>
+    </div>
   </div>
 </template>

@@ -116,6 +116,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Finance management (FR-FN) — Pro Plan only
     Route::get('/schools/{id}/finances/summary', [FinanceController::class, 'summary'])->name('finances.summary');
     Route::get('/schools/{id}/finances/spp', [FinanceController::class, 'sppIndex'])->name('finances.spp.index');
+    Route::post('/schools/{id}/finances/spp/batch', [FinanceController::class, 'sppBatchStore'])->name('finances.spp.batch');
     Route::post('/schools/{id}/finances/spp', [FinanceController::class, 'sppStore'])->name('finances.spp.store');
     Route::put('/schools/{id}/finances/spp/{financeId}', [FinanceController::class, 'sppUpdate'])->name('finances.spp.update');
     Route::get('/schools/{id}/finances/savings', [FinanceController::class, 'savingsIndex'])->name('finances.savings.index');

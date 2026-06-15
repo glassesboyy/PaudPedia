@@ -126,8 +126,18 @@ class SchoolsTable
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(fn ($state) => $state && $state->isPast() ? 'danger' : 'success')
-                    ->icon(fn ($state) => $state && $state->isPast() ? 'heroicon-o-clock' : 'heroicon-o-check-badge')
+                    ->color(function ($state) {
+                        if (!$state) return 'success';
+                        if ($state->isPast()) return 'danger';
+                        if ($state->diffInDays(now()) <= 7) return 'warning';
+                        return 'success';
+                    })
+                    ->icon(function ($state) {
+                        if (!$state) return 'heroicon-o-check-badge';
+                        if ($state->isPast()) return 'heroicon-o-x-circle';
+                        if ($state->diffInDays(now()) <= 7) return 'heroicon-o-exclamation-circle';
+                        return 'heroicon-o-check-badge';
+                    })
                     ->placeholder('Tidak terbatas'),
 
                 TextColumn::make('created_at')

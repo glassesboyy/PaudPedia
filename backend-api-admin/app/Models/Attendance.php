@@ -18,6 +18,7 @@ class Attendance extends Model
         'date',
         'status',
         'notes',
+        'proof_file_path',
     ];
 
     protected $casts = [

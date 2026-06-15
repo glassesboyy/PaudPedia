@@ -5,9 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Rapor Siswa - {{ $student['name'] }}</title>
     <style>
-        @page { margin: 2cm 2.5cm; }
+        @page { margin: 1.5cm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 11px; color: #1a1a1a; line-height: 1.5; }
+        body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 11px; color: #1a1a1a; line-height: 1.5; padding: 40px; }
 
         /* Header */
         .header { text-align: center; border-bottom: 3px double #333; padding-bottom: 15px; margin-bottom: 20px; }
@@ -203,28 +203,7 @@
         @endif
     </div>
 
-    {{-- Signatures --}}
-    <div class="signatures">
-        <table>
-            <tr>
-                <td>
-                    <p>Orang Tua / Wali,</p>
-                    <div class="signature-line"></div>
-                    <p class="signature-name">( ...................... )</p>
-                </td>
-                <td>
-                    <p>Guru Kelas,</p>
-                    <div class="signature-line"></div>
-                    <p class="signature-name">( ...................... )</p>
-                </td>
-                <td>
-                    <p>Kepala Sekolah,</p>
-                    <div class="signature-line"></div>
-                    <p class="signature-name">{{ $school['headmaster_name'] }}</p>
-                </td>
-            </tr>
-        </table>
-    </div>
+
 
     {{-- Footer --}}
     <div class="footer">

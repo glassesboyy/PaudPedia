@@ -35,7 +35,7 @@ async function fetchReport() {
       semester,
       academic_year: academicYear || undefined,
     })
-    report.value = res.data
+    report.value = res as any
   } catch (err: any) {
     error.value = err.response?.data?.message || 'Gagal memuat data rapor.'
   } finally {
@@ -51,7 +51,7 @@ async function downloadPdf() {
       semester,
       academic_year: academicYear || undefined,
     })
-    const blob = new Blob([res.data], { type: 'application/pdf' })
+    const blob = new Blob([res as any], { type: 'application/pdf' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -118,10 +118,10 @@ function getAttendancePercent(): string {
       <!-- School & Student Info -->
       <BaseCard class="p-0 overflow-hidden border-none shadow-xl">
         <!-- School Header -->
-        <div class="p-6 bg-gradient-to-r from-primary-600 to-primary-800 text-white text-center">
-          <h2 class="text-xl font-black uppercase tracking-wide">{{ report.school.name }}</h2>
-          <p class="text-sm text-white/70 mt-1">NPSN: {{ report.school.npsn }}</p>
-          <p class="text-xs text-white/50">{{ report.school.address }}</p>
+        <div class="p-6 bg-primary-600 text-white text-center rounded-2xl">
+          <h2 class="text-2xl font-bold text-white uppercase tracking-wide">{{ report.school.name }}</h2>
+          <p class="text-sm text-white mt-1">NPSN: {{ report.school.npsn }}</p>
+          <p class="text-xs text-white">{{ report.school.address }}</p>
         </div>
         <div class="p-6 border-b border-slate-100">
           <div class="flex items-start gap-6">

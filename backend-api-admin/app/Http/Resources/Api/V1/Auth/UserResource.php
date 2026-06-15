@@ -35,11 +35,7 @@ class UserResource extends JsonResource
                         'school_id' => $membership->school_id,
                         'role_type' => $membership->role_type,
                         'is_active' => $membership->is_active,
-                        'school' => [
-                            'id' => $membership->school->id,
-                            'name' => $membership->school->name,
-                            'npsn' => $membership->school->npsn,
-                        ]
+                        'school' => new \App\Http\Resources\Api\V1\School\SchoolResource($membership->school),
                     ];
                 });
             }),

@@ -30,13 +30,14 @@ const assessmentData = ref<StudentAssessmentHistoryResponse | null>(null)
 const error = ref('')
 
 const activeTab = ref('profile')
-const attendanceFilter = ref('month') // 'week', 'month', 'all'
+const attendanceFilter = ref('all') // 'semester1', 'semester2', 'all'
 const assessmentSemesterFilter = ref('all') // '1', '2', 'all'
 const isAttendanceLoading = ref(false)
 const isAssessmentLoading = ref(false)
 const financeData = ref<StudentFinanceSummary | null>(null)
 const isFinanceLoading = ref(false)
-const isDownloadingRapor = ref(false)
+const isDownloadingSemester1 = ref(false)
+const isDownloadingSemester2 = ref(false)
 
 const statusLabels: Record<string, string> = {
   active: 'Aktif',
@@ -76,11 +77,7 @@ async function fetchAttendance() {
   
   isAttendanceLoading.value = true
   const params: any = {}
-  if (attendanceFilter.value === 'month' || attendanceFilter.value === 'week') {
-    params.month = new Date().getMonth() + 1
-    params.year = new Date().getFullYear()
-  }
-  // For 'all', we leave params empty
+  // Fetch ALL history so we can compute semester locally
   
   try {
     const res = await attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, params)
@@ -101,10 +98,7 @@ async function fetchStudent() {
     try {
       isAttendanceLoading.value = true
       const [attRes, assRes] = await Promise.all([
-        attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, { 
-          month: new Date().getMonth() + 1, 
-          year: new Date().getFullYear() 
-        }),
+        attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, {}),
         assessmentService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value)
       ])
       attendanceData.value = (attRes as any)
@@ -126,25 +120,37 @@ async function fetchFinances() {
   isFinanceLoading.value = true
   try {
     const res = await financeService.getStudentFinances(schoolStore.currentSchoolId!, studentId.value)
-    financeData.value = res.data
+    financeData.value = res as any
   } catch { /* silent */ }
   finally { isFinanceLoading.value = false }
 }
 
-async function downloadRapor() {
-  if (isDownloadingRapor.value || !schoolStore.currentSchoolId) return
-  isDownloadingRapor.value = true
+async function downloadRapor(semesterTarget: string) {
+  if (!schoolStore.currentSchoolId) return
+  
+  if (semesterTarget === '1') isDownloadingSemester1.value = true
+  else isDownloadingSemester2.value = true
+
   try {
-    const res = await reportService.downloadPdf(schoolStore.currentSchoolId!, studentId.value)
-    const blob = new Blob([res.data], { type: 'application/pdf' })
+    const selectedGroup = assessmentData.value?.history.find(g => g.semester === semesterTarget) || assessmentData.value?.history[0]
+    const academicYear = selectedGroup?.academic_year
+
+    const res = await reportService.downloadPdf(schoolStore.currentSchoolId!, studentId.value, {
+      semester: semesterTarget,
+      academic_year: academicYear
+    })
+    const blob = new Blob([res as any], { type: 'application/pdf' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `Rapor_${student.value?.name || studentId.value}.pdf`
+    a.download = `Rapor_${student.value?.name || studentId.value}_Semester${semesterTarget}.pdf`
     a.click()
     window.URL.revokeObjectURL(url)
   } catch { /* silent */ }
-  finally { isDownloadingRapor.value = false }
+  finally { 
+    if (semesterTarget === '1') isDownloadingSemester1.value = false
+    else isDownloadingSemester2.value = false
+  }
 }
 
 function formatCurrency(val: number): string {
@@ -163,8 +169,8 @@ const filteredAssessmentHistory = computed(() => {
 })
 
 const attendanceFilterLabel = computed(() => {
-  if (attendanceFilter.value === 'week') return 'Minggu Ini'
-  if (attendanceFilter.value === 'month') return 'Bulan Ini'
+  if (attendanceFilter.value === 'semester1') return 'Semester 1'
+  if (attendanceFilter.value === 'semester2') return 'Semester 2'
   return 'Keseluruhan'
 })
 
@@ -172,18 +178,19 @@ const computedAttendanceSummary = computed(() => {
   if (!attendanceData.value) return null
   
   let history = attendanceData.value.history
-  
-  if (attendanceFilter.value === 'week') {
-    const now = new Date()
-    const startOfWeek = new Date(now)
-    // Find the nearest Sunday
-    startOfWeek.setDate(now.getDate() - now.getDay())
-    startOfWeek.setHours(0, 0, 0, 0)
-
+  if (attendanceFilter.value === 'semester1') {
     history = history.filter(h => {
-      const hDate = new Date(h.date)
-      hDate.setHours(0,0,0,0)
-      return hDate >= startOfWeek
+      const date = new Date(h.date)
+      const month = date.getMonth() + 1 // 1-12
+      // Semester 1: July (7) to December (12)
+      return month >= 7 && month <= 12
+    })
+  } else if (attendanceFilter.value === 'semester2') {
+    history = history.filter(h => {
+      const date = new Date(h.date)
+      const month = date.getMonth() + 1 // 1-12
+      // Semester 2: January (1) to June (6)
+      return month >= 1 && month <= 6
     })
   }
   
@@ -340,8 +347,8 @@ const computedAttendanceSummary = computed(() => {
               <Icon name="lucide:calendar-check" class="w-5 h-5 text-primary-600" /> Rekap Kehadiran
             </h3>
             <select v-model="attendanceFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none">
-              <option value="week">Minggu Ini</option>
-              <option value="month">Bulan Ini</option>
+              <option value="semester1">Semester 1</option>
+              <option value="semester2">Semester 2</option>
               <option value="all">Keseluruhan</option>
             </select>
           </div>
@@ -440,6 +447,21 @@ const computedAttendanceSummary = computed(() => {
             </div>
             <p class="text-slate-500 font-medium">Belum ada catatan penilaian untuk periode ini.</p>
           </div>
+          
+          <!-- Download Rapor (Pro Plan) -->
+          <div v-if="schoolStore.isPro" class="mt-8 flex flex-col items-center gap-4 border-t border-slate-100 pt-6">
+            <div class="flex items-center gap-4">
+              <BaseButton variant="primary" :loading="isDownloadingSemester1" @click="downloadRapor('1')" class="shadow-lg shadow-primary-500/20 px-6">
+                <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
+                Unduh Rapor Semester 1
+              </BaseButton>
+              <BaseButton variant="primary" :loading="isDownloadingSemester2" @click="downloadRapor('2')" class="shadow-lg shadow-primary-500/20 px-6">
+                <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
+                Unduh Rapor Semester 2
+              </BaseButton>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium">Laporan mencakup rekap kehadiran dan pencapaian perkembangan khusus untuk masing-masing semester.</p>
+          </div>
         </div>
 
         <!-- Tab: Finance (Pro Plan only) -->
@@ -467,18 +489,24 @@ const computedAttendanceSummary = computed(() => {
               <Icon name="lucide:credit-card" class="w-5 h-5 text-primary-600" /> Riwayat SPP
             </h3>
             <div v-if="financeData.spp.history.length === 0" class="py-8 text-center text-sm text-slate-400">Belum ada data SPP</div>
-            <div v-else class="space-y-2">
-              <div v-for="rec in financeData.spp.history" :key="rec.id" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div v-else class="space-y-3">
+              <div v-for="rec in financeData.spp.history" :key="rec.id" 
+                   class="flex items-center justify-between p-4 rounded-xl border transition-all"
+                   :class="rec.is_paid ? 'bg-slate-50 border-slate-100' : 'bg-red-50 border-red-200'">
                 <div>
-                  <p class="text-sm font-bold text-slate-800">{{ rec.description || 'SPP' }}</p>
-                  <p class="text-xs text-slate-400">{{ rec.month }}</p>
+                  <p class="text-sm font-bold" :class="rec.is_paid ? 'text-slate-800' : 'text-red-900'">Tagihan SPP - {{ rec.month }}</p>
+                  <p class="text-xs mt-1" :class="rec.is_paid ? 'text-slate-500' : 'text-red-700'">{{ rec.description || '-' }}</p>
                 </div>
                 <div class="text-right">
-                  <p class="text-sm font-bold text-slate-900">{{ rec.amount_formatted }}</p>
-                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full" :class="rec.is_paid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'">
+                  <p class="text-sm font-bold mb-1.5" :class="rec.is_paid ? 'text-slate-900' : 'text-red-900'">{{ rec.amount_formatted }}</p>
+                  <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider" :class="rec.is_paid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-200 text-red-900 animate-pulse'">
                     {{ rec.is_paid ? 'Lunas' : 'Belum Lunas' }}
                   </span>
                 </div>
+              </div>
+              <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl flex gap-3 text-sm text-blue-800">
+                <Icon name="lucide:info" class="w-5 h-5 text-blue-500 shrink-0" />
+                <p>Silakan lakukan pembayaran via tunai atau transfer bank kepada pihak administrasi sekolah.</p>
               </div>
             </div>
 
@@ -514,17 +542,11 @@ const computedAttendanceSummary = computed(() => {
           </template>
         </div>
 
-        <!-- Download Rapor (Pro Plan) -->
-        <div v-if="schoolStore.isPro" class="mt-6 flex justify-center">
-          <BaseButton variant="primary" :loading="isDownloadingRapor" @click="downloadRapor" class="shadow-lg shadow-primary-500/20">
-            <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
-            Download Rapor PDF
-          </BaseButton>
-        </div>
+
 
         <!-- Alert Read Only -->
         <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-4">
-          <div class="p-2 bg-amber-100 rounded-xl text-amber-600">
+          <div class="text-amber-600">
             <Icon name="lucide:info" class="w-5 h-5" />
           </div>
           <div>

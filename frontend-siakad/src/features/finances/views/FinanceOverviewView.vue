@@ -29,7 +29,7 @@ async function fetchSummary() {
   isLoading.value = true
   try {
     const res = await financeService.getSummary(schoolStore.currentSchoolId!)
-    summary.value = res.data
+    summary.value = res as any
   } catch {
     error.value = 'Gagal memuat data keuangan.'
   } finally {
@@ -79,40 +79,40 @@ function formatDate(dateStr: string): string {
     <template v-else-if="summary">
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <BaseCard class="p-6 border-none shadow-lg hover:shadow-xl transition-shadow cursor-pointer" @click="router.push({ name: 'SppManagement' })">
+        <BaseCard class="p-2 border-none shadow-lg hover:shadow-xl transition-shadow cursor-pointer" @click="router.push({ name: 'SppManagement' })">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center">
               <Icon name="lucide:credit-card" class="w-7 h-7 text-primary-500" />
             </div>
             <div>
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">SPP Terkumpul</p>
-              <p class="text-2xl font-black text-slate-900">{{ formatCurrency(summary.spp_collected) }}</p>
+              <p class="text-xl font-black text-slate-900">{{ formatCurrency(summary.spp_collected) }}</p>
               <p class="text-xs text-amber-600 font-medium">{{ formatCurrency(summary.spp_pending) }} belum lunas</p>
             </div>
           </div>
         </BaseCard>
 
-        <BaseCard class="p-6 border-none shadow-lg hover:shadow-xl transition-shadow cursor-pointer" @click="router.push({ name: 'SavingsManagement' })">
+        <BaseCard class="p-2 border-none shadow-lg hover:shadow-xl transition-shadow cursor-pointer" @click="router.push({ name: 'SavingsManagement' })">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center">
               <Icon name="lucide:piggy-bank" class="w-7 h-7 text-emerald-500" />
             </div>
             <div>
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Tabungan</p>
-              <p class="text-2xl font-black text-slate-900">{{ formatCurrency(summary.savings_balance) }}</p>
+              <p class="text-xl font-black text-slate-900">{{ formatCurrency(summary.savings_balance) }}</p>
               <p class="text-xs text-slate-400 font-medium">Total keseluruhan siswa</p>
             </div>
           </div>
         </BaseCard>
 
-        <BaseCard class="p-6 border-none shadow-lg">
+        <BaseCard class="p-2 border-none shadow-lg">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-violet-50 flex items-center justify-center">
               <Icon name="lucide:bar-chart-3" class="w-7 h-7 text-violet-500" />
             </div>
             <div>
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Pemasukan</p>
-              <p class="text-2xl font-black text-slate-900">{{ formatCurrency(summary.spp_collected + summary.total_deposits) }}</p>
+              <p class="text-xl font-black text-slate-900">{{ formatCurrency(summary.spp_collected + summary.total_deposits) }}</p>
               <p class="text-xs text-slate-400 font-medium">SPP + Tabungan</p>
             </div>
           </div>

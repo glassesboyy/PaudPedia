@@ -59,6 +59,8 @@ const navItems = computed(() => {
       { name: 'Absensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
       { name: 'Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'] },
       { name: 'Keuangan', icon: 'finance', to: '/finances', roles: ['headmaster'] },
+      { name: 'SPP', icon: 'finance', to: '/finances/spp', roles: ['teacher'] },
+      { name: 'Tabungan', icon: 'finance', to: '/finances/savings', roles: ['teacher'] },
       { name: 'Laporan', icon: 'report', to: '/reports', roles: ['headmaster', 'teacher'] },
       { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'] },
       { name: 'Langganan', icon: 'subscription', to: '/school/subscription', roles: ['headmaster'] },

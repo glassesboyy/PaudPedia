@@ -43,9 +43,6 @@ const freeFeatures = [
   { name: 'Maks. 5 Guru', included: true },
   { name: 'Manajemen Keuangan', included: false },
   { name: 'Laporan / Rapor PDF', included: false },
-  { name: 'Siswa Unlimited', included: false },
-  { name: 'Guru Unlimited', included: false },
-  { name: 'Prioritas Support', included: false },
 ]
 
 const proFeatures = [
@@ -58,7 +55,6 @@ const proFeatures = [
   { name: 'Guru Unlimited', included: true },
   { name: 'Manajemen Keuangan', included: true },
   { name: 'Laporan / Rapor PDF', included: true },
-  { name: 'Prioritas Support', included: true },
 ]
 
 onMounted(async () => {
@@ -178,7 +174,7 @@ function getStatusColor(status: string): string {
     <template v-else-if="info">
       <!-- Current Plan Status -->
       <BaseCard class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
-        <div class="p-8" :class="info.is_pro ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white' : 'bg-gradient-to-r from-slate-50 to-slate-100'">
+        <div class="p-8" :class="info.is_pro ? 'bg-primary-600 text-white' : 'bg-slate-50'">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
               <div class="w-16 h-16 rounded-2xl flex items-center justify-center" :class="info.is_pro ? 'bg-white/20' : 'bg-white border border-slate-200'">
@@ -261,8 +257,8 @@ function getStatusColor(status: string): string {
         </BaseCard>
 
         <!-- Pro Plan -->
-        <BaseCard class="p-0 overflow-hidden" :class="info.is_pro ? 'ring-2 ring-violet-500 ring-offset-2' : ''">
-          <div class="p-6 bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
+        <BaseCard class="p-0 overflow-hidden" :class="info.is_pro ? 'ring-2 ring-primary-500 ring-offset-2' : ''">
+          <div class="p-6 bg-primary-600 text-white">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-black flex items-center gap-2">
                 <Icon name="lucide:crown" class="w-5 h-5 text-amber-300" /> Pro
@@ -273,12 +269,12 @@ function getStatusColor(status: string): string {
           </div>
           <div class="p-6 space-y-3">
             <div v-for="f in proFeatures" :key="f.name" class="flex items-center gap-3 text-sm">
-              <Icon name="lucide:check" class="w-4 h-4 shrink-0 text-violet-500" />
+              <Icon name="lucide:check" class="w-4 h-4 shrink-0 text-primary-500" />
               <span class="text-slate-700 font-medium">{{ f.name }}</span>
             </div>
           </div>
           <div v-if="!info.is_pro" class="px-6 pb-6">
-            <BaseButton variant="primary" block :loading="isUpgrading" @click="handleUpgrade" class="bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/30">
+            <BaseButton variant="primary" block :loading="isUpgrading" @click="handleUpgrade" class="shadow-lg shadow-primary-500/30">
               <template #prepend><Icon name="lucide:zap" class="w-4 h-4" /></template>
               Upgrade Sekarang
             </BaseButton>
