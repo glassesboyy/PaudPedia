@@ -30,6 +30,7 @@ const assessmentData = ref<StudentAssessmentHistoryResponse | null>(null)
 const error = ref('')
 
 const activeTab = ref('profile')
+const selectedAcademicYear = ref<string>('')
 const attendanceFilter = ref('all') // 'semester1', 'semester2', 'all'
 const assessmentSemesterFilter = ref('all') // '1', '2', 'all'
 const isAttendanceLoading = ref(false)
@@ -61,7 +62,7 @@ onMounted(async () => {
 })
 
 watch(attendanceFilter, () => {
-  fetchAttendance()
+  // We compute locally, no need to re-fetch
 })
 
 watch(assessmentSemesterFilter, () => {
@@ -72,21 +73,59 @@ watch(assessmentSemesterFilter, () => {
   }, 400)
 })
 
-async function fetchAttendance() {
-  if (!schoolStore.currentSchoolId || !studentId.value) return
+const availableAcademicYears = computed(() => {
+  const years = new Set<string>()
   
-  isAttendanceLoading.value = true
-  const params: any = {}
-  // Fetch ALL history so we can compute semester locally
-  
-  try {
-    const res = await attendanceService.getStudentHistory(schoolStore.currentSchoolId!, studentId.value, params)
-    attendanceData.value = (res as any)
-  } catch (e) {
-    console.error('Failed fetching attendance', e)
-  } finally {
-    isAttendanceLoading.value = false
+  if (assessmentData.value?.history) {
+    assessmentData.value.history.forEach(h => {
+      if (h.academic_year) years.add(h.academic_year)
+    })
   }
+  
+  if (attendanceData.value?.history) {
+    attendanceData.value.history.forEach(h => {
+      const date = new Date(h.date)
+      const month = date.getMonth() + 1 // 1-12
+      const year = date.getFullYear()
+      if (month >= 7) {
+        years.add(`${year}/${year + 1}`)
+      } else {
+        years.add(`${year - 1}/${year}`)
+      }
+    })
+  }
+
+  // Fallback to current year if empty
+  if (years.size === 0) {
+    const currentYear = new Date().getFullYear()
+    const currentMonth = new Date().getMonth() + 1
+    if (currentMonth >= 7) {
+      years.add(`${currentYear}/${currentYear + 1}`)
+    } else {
+      years.add(`${currentYear - 1}/${currentYear}`)
+    }
+  }
+  
+  return Array.from(years).sort().reverse()
+})
+
+const isAcademicYearInitialized = ref(false)
+
+watch([availableAcademicYears, student, isLoading], () => {
+  if (isAcademicYearInitialized.value) return
+  if (isLoading.value) return // Wait until all data is fetched
+
+  if (student.value?.class?.academic_year && availableAcademicYears.value.includes(student.value.class.academic_year)) {
+    selectedAcademicYear.value = student.value.class.academic_year
+    isAcademicYearInitialized.value = true
+  } else if (availableAcademicYears.value.length > 0 && availableAcademicYears.value[0]) {
+    selectedAcademicYear.value = availableAcademicYears.value[0]
+    isAcademicYearInitialized.value = true
+  }
+}, { immediate: true, deep: true })
+
+async function fetchAttendance() {
+  // Kept for backward compatibility if needed, but data is fetched in fetchStudent.
 }
 
 async function fetchStudent() {
@@ -132,18 +171,16 @@ async function downloadRapor(semesterTarget: string) {
   else isDownloadingSemester2.value = true
 
   try {
-    const selectedGroup = assessmentData.value?.history.find(g => g.semester === semesterTarget) || assessmentData.value?.history[0]
-    const academicYear = selectedGroup?.academic_year
-
     const res = await reportService.downloadPdf(schoolStore.currentSchoolId!, studentId.value, {
       semester: semesterTarget,
-      academic_year: academicYear
+      academic_year: selectedAcademicYear.value
     })
     const blob = new Blob([res as any], { type: 'application/pdf' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `Rapor_${student.value?.name || studentId.value}_Semester${semesterTarget}.pdf`
+    const safeYear = (selectedAcademicYear.value || '').replace('/', '-')
+    a.download = `Rapor_${student.value?.name || studentId.value}_Semester${semesterTarget}_${safeYear}.pdf`
     a.click()
     window.URL.revokeObjectURL(url)
   } catch { /* silent */ }
@@ -163,9 +200,12 @@ function formatDate(date: string | null): string {
 }
 
 const filteredAssessmentHistory = computed(() => {
-  if (!assessmentData.value) return []
-  if (assessmentSemesterFilter.value === 'all') return assessmentData.value.history
-  return assessmentData.value.history.filter(group => group.semester === assessmentSemesterFilter.value)
+  if (!assessmentData.value || !selectedAcademicYear.value) return []
+  let history = assessmentData.value.history.filter(group => group.academic_year === selectedAcademicYear.value)
+  if (assessmentSemesterFilter.value !== 'all') {
+    history = history.filter(group => group.semester === assessmentSemesterFilter.value)
+  }
+  return history
 })
 
 const attendanceFilterLabel = computed(() => {
@@ -175,21 +215,32 @@ const attendanceFilterLabel = computed(() => {
 })
 
 const computedAttendanceSummary = computed(() => {
-  if (!attendanceData.value) return null
+  if (!attendanceData.value || !selectedAcademicYear.value) return null
   
-  let history = attendanceData.value.history
+  const parts = (selectedAcademicYear.value || '').split('/')
+  const startYear = parseInt(parts[0] || '0')
+  const endYear = parseInt(parts[1] || '0')
+  
+  let history = attendanceData.value.history.filter(h => {
+    const date = new Date(h.date)
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+    
+    if (year === startYear && month >= 7) return true
+    if (year === endYear && month <= 6) return true
+    return false
+  })
+  
   if (attendanceFilter.value === 'semester1') {
     history = history.filter(h => {
       const date = new Date(h.date)
-      const month = date.getMonth() + 1 // 1-12
-      // Semester 1: July (7) to December (12)
+      const month = date.getMonth() + 1
       return month >= 7 && month <= 12
     })
   } else if (attendanceFilter.value === 'semester2') {
     history = history.filter(h => {
       const date = new Date(h.date)
-      const month = date.getMonth() + 1 // 1-12
-      // Semester 2: January (1) to June (6)
+      const month = date.getMonth() + 1
       return month >= 1 && month <= 6
     })
   }
@@ -302,6 +353,8 @@ const computedAttendanceSummary = computed(() => {
         </button>
       </div>
 
+
+
       <div class="p-8 space-y-10 min-h-[400px]">
         <!-- Data Siswa (Tab: Profile) -->
         <div v-if="activeTab === 'profile'" class="space-y-6 animate-fade-in">
@@ -346,11 +399,16 @@ const computedAttendanceSummary = computed(() => {
             <h3 class="text-lg font-black text-heading flex items-center gap-2">
               <Icon name="lucide:calendar-check" class="w-5 h-5 text-primary-600" /> Rekap Kehadiran
             </h3>
-            <select v-model="attendanceFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none">
-              <option value="semester1">Semester 1</option>
-              <option value="semester2">Semester 2</option>
-              <option value="all">Keseluruhan</option>
-            </select>
+            <div class="flex items-center gap-2">
+              <select v-model="selectedAcademicYear" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+                <option v-for="year in availableAcademicYears" :key="year" :value="year">{{ year }}</option>
+              </select>
+              <select v-model="attendanceFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+                <option value="semester1">Semester 1</option>
+                <option value="semester2">Semester 2</option>
+                <option value="all">Keseluruhan</option>
+              </select>
+            </div>
           </div>
           
           <div v-if="attendanceData" class="space-y-6 relative min-h-[200px]">
@@ -407,11 +465,16 @@ const computedAttendanceSummary = computed(() => {
             <h3 class="text-lg font-black text-heading flex items-center gap-2">
               <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-primary-600" /> Pencapaian Perkembangan
             </h3>
-            <select v-model="assessmentSemesterFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none">
-              <option value="all">Semua Semester</option>
-              <option value="1">Semester 1</option>
-              <option value="2">Semester 2</option>
-            </select>
+            <div class="flex items-center gap-2">
+              <select v-model="selectedAcademicYear" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+                <option v-for="year in availableAcademicYears" :key="year" :value="year">{{ year }}</option>
+              </select>
+              <select v-model="assessmentSemesterFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+                <option value="all">Semua Semester</option>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+              </select>
+            </div>
           </div>
           
           <div v-if="filteredAssessmentHistory.length > 0" class="space-y-8 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">

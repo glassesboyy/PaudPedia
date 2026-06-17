@@ -294,10 +294,10 @@ const attendanceStats = computed(() => {
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-slate-500 font-bold">
-              <th class="px-6 py-4">Nama Siswa</th>
-              <th class="px-6 py-4">Status Kehadiran</th>
-              <th class="px-6 py-4 w-1/4">Catatan Tambahan</th>
-              <th class="px-6 py-4">Bukti (Opsional)</th>
+              <th class="px-6 py-4 min-w-[200px]">Nama Siswa</th>
+              <th class="px-6 py-4 whitespace-nowrap min-w-[250px]">Status Kehadiran</th>
+              <th class="px-6 py-4 w-1/4 min-w-[200px]">Catatan Tambahan</th>
+              <th class="px-6 py-4 min-w-[200px]">Bukti (Opsional)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
@@ -307,7 +307,7 @@ const attendanceStats = computed(() => {
                 <p class="text-xs text-slate-500 font-mono">{{ student.nisn || '-' }}</p>
               </td>
               <td class="px-6 py-4">
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-nowrap gap-2">
                   <label v-for="(label, val) in {'present': 'Hadir', 'sick': 'Sakit', 'permission': 'Izin', 'absent': 'Alfa'}" :key="val" class="cursor-pointer">
                     <input type="radio" :disabled="!schoolStore.isTeacher" :name="`status-${student.student_id}`" :value="val" v-model="student.status" class="hidden" />
                     <span :class="['px-3 py-1.5 rounded-lg text-sm font-bold border transition-all block', student.status === val ? getStatusColor(val) : 'bg-white text-slate-500 border-slate-200 border-dashed', schoolStore.isTeacher ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">

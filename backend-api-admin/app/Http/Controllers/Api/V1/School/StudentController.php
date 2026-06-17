@@ -34,10 +34,10 @@ class StudentController extends BaseController
         if ($membership->isTeacher()) {
             // Teacher now has global read-only access to all students in school
         } elseif ($membership->isParent()) {
-            // Parent can only see their own children
+            // Parent can only see their own active children
             $query->whereHas('parent', function ($q) use ($request) {
                 $q->where('user_id', $request->user()->id);
-            });
+            })->where('status', 'active');
         } elseif ($request->has('parent_user_id')) {
             // For specifically requested parent filtering (e.g. by headmaster)
             $query->whereHas('parent', function ($q) use ($request) {
@@ -144,8 +144,13 @@ class StudentController extends BaseController
         }
 
         // Parent validation: Can only view their own children
-        if ($membership->isParent() && $student->parent && $student->parent->user_id !== $request->user()->id) {
-            return $this->error('Akses ditolak. Anda hanya dapat melihat data anak Anda sendiri.', 403);
+        if ($membership->isParent()) {
+            if ($student->parent && $student->parent->user_id !== $request->user()->id) {
+                return $this->error('Akses ditolak. Anda hanya dapat melihat data anak Anda sendiri.', 403);
+            }
+            if ($student->status->value !== 'active') {
+                return $this->error('Akses ditolak. Data anak tidak aktif.', 403);
+            }
         }
 
         return $this->success(new StudentResource($student), 'Detail siswa berhasil diambil.');

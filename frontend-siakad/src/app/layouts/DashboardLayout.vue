@@ -56,7 +56,7 @@ const navItems = computed(() => {
       { name: 'Data Siswa', icon: 'student', to: '/students', roles: ['teacher'] },
       { name: 'Orang Tua', icon: 'parent', to: '/parents', roles: ['headmaster'] },
       { name: 'Data Orang Tua', icon: 'parent', to: '/parents', roles: ['teacher'] },
-      { name: 'Absensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
+      { name: 'Kehadiran', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
       { name: 'Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'] },
       { name: 'Keuangan', icon: 'finance', to: '/finances', roles: ['headmaster'] },
       { name: 'SPP', icon: 'finance', to: '/finances/spp', roles: ['teacher'] },

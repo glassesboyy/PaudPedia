@@ -24,9 +24,10 @@ const submitError = ref('')
 const isQuizTakingMode = ref(false)
 const isQuizReviewMode = ref(false)
 
-// Stepper
+// Randomization & Stepper
+const shuffledQuestions = ref<any[]>([])
 const currentStepIndex = ref(0)
-const currentQuestion = computed(() => props.quiz.questions[currentStepIndex.value])
+const currentQuestion = computed(() => shuffledQuestions.value[currentStepIndex.value])
 const isLastQuestion = computed(() => currentStepIndex.value === props.quiz.total_questions - 1)
 const isFirstQuestion = computed(() => currentStepIndex.value === 0)
 
@@ -34,10 +35,27 @@ const allQuestionsAnswered = computed(() => {
   return props.quiz.questions.every(q => selectedAnswers.value[q.id])
 })
 
+const quizProgressPercentage = computed(() => {
+  if (isQuizReviewMode.value) return 100
+  const answeredCount = Object.keys(selectedAnswers.value).length
+  if (props.quiz.total_questions === 0) return 0
+  return Math.round((answeredCount / props.quiz.total_questions) * 100)
+})
+
+function shuffleArray(array: any[]) {
+  const newArr = [...array]
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]]
+  }
+  return newArr
+}
+
 function startQuiz() {
   selectedAnswers.value = {}
   submitError.value = ''
   currentStepIndex.value = 0
+  shuffledQuestions.value = shuffleArray(props.quiz.questions)
   isQuizTakingMode.value = true
   isQuizReviewMode.value = false
 }
@@ -45,6 +63,7 @@ function startQuiz() {
 function startReview() {
   if (!props.quiz.latest_attempt) return
   currentStepIndex.value = 0
+  shuffledQuestions.value = shuffleArray(props.quiz.questions)
   isQuizReviewMode.value = true
   isQuizTakingMode.value = false
 }
@@ -108,6 +127,14 @@ function getReviewAnswerStatus(questionId: number, answerId: number) {
 
   return 'idle'
 }
+
+function getReviewQuestionStatus(questionId: number) {
+  if (!isQuizReviewMode.value || !props.quiz.latest_attempt) return 'unanswered'
+  const attemptAns = props.quiz.latest_attempt.answers.find(a => a.question_id === questionId)
+  if (!attemptAns) return 'unanswered'
+  if (attemptAns.is_correct) return 'correct'
+  return 'wrong'
+}
 </script>
 
 <template>
@@ -131,10 +158,34 @@ function getReviewAnswerStatus(questionId: number, answerId: number) {
           <div class="w-32 h-2.5 bg-surface-sunken rounded-full overflow-hidden border border-border">
             <div 
               class="h-full bg-primary-500 transition-all duration-300 ease-out"
-              :style="{ width: `${((currentStepIndex + 1) / quiz.total_questions) * 100}%` }"
+              :style="{ width: `${quizProgressPercentage}%` }"
             ></div>
           </div>
-          <span class="text-xs font-semibold text-primary-600 min-w-[2rem] text-right">{{ Math.round(((currentStepIndex + 1) / quiz.total_questions) * 100) }}%</span>
+          <span class="text-xs font-semibold text-primary-600 min-w-[2rem] text-right">{{ quizProgressPercentage }}%</span>
+        </div>
+      </div>
+
+      <!-- Question Navigator -->
+      <div class="mb-6 p-4 md:p-6 rounded-2xl border border-border bg-surface shadow-sm">
+        <h3 class="text-sm font-bold text-heading mb-3 flex items-center gap-2">
+          <Icon name="lucide:layout-grid" class="w-4 h-4 text-primary-500" />
+          Navigasi Soal
+        </h3>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="(q, idx) in shuffledQuestions"
+            :key="q.id"
+            @click="currentStepIndex = idx"
+            class="w-10 h-10 rounded-xl font-bold text-sm flex items-center justify-center transition-all border"
+            :class="[
+              currentStepIndex === idx ? 'ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-slate-900 border-primary-500' : '',
+              isQuizReviewMode 
+                ? (getReviewQuestionStatus(q.id) === 'correct' ? 'bg-success-100 text-success-800 border-success-200' : (getReviewQuestionStatus(q.id) === 'wrong' ? 'bg-danger-100 text-danger-800 border-danger-200' : 'bg-surface-sunken text-muted border-border'))
+                : (selectedAnswers[q.id] ? 'bg-primary-50 text-primary-700 border-primary-200' : 'bg-surface text-muted border-border hover:bg-surface-sunken')
+            ]"
+          >
+            {{ idx + 1 }}
+          </button>
         </div>
       </div>
 
@@ -290,9 +341,8 @@ function getReviewAnswerStatus(questionId: number, answerId: number) {
           <Icon name="lucide:info" class="w-5 h-5 text-primary-600" /> Petunjuk Evaluasi
         </h4>
         <ul class="text-sm text-primary-800 space-y-2.5 list-disc pl-5">
-          <li>Anda harus memperoleh nilai <strong>minimal 70</strong> (atau KKM materi terkait) untuk lulus.</li>
-          <li>Kuis berstatus tidak lulus akan <strong>mencegah Anda</strong> mengunduh Sertifikat Kelulusan.</li>
-          <li>Anda diizinkan mengulang kuis berulang kali untuk memperbaiki poin dan status kelulusan.</li>
+          <li>Anda harus memperoleh nilai <strong>minimal 70</strong> untuk lulus.</li>
+          <li>Anda diizinkan mengulang kuis berulang kali untuk memperbaiki nilai dan status kelulusan.</li>
         </ul>
       </div>
 

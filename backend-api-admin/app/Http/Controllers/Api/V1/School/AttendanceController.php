@@ -37,15 +37,26 @@ class AttendanceController extends Controller
         // Get date, default to today
         $date = $request->get('date', date('Y-m-d'));
 
-        // Get students in this class
-        $students = Student::where('class_id', $class->id)
-            ->where('school_id', $school->id)
-            ->where('status', \App\Enums\StudentStatus::ACTIVE) // active students only
+        // Get students in this class OR students who have attendance in this class on this date
+        $students = Student::where('school_id', $school->id)
+            ->where(function ($q) use ($class, $date) {
+                // Currently active in this class
+                $q->where(function ($subQ) use ($class) {
+                    $subQ->where('class_id', $class->id)
+                         ->where('status', \App\Enums\StudentStatus::ACTIVE);
+                });
+                // OR has attendance record for this class on this date
+                $q->orWhereHas('attendance', function ($subQ) use ($class, $date) {
+                    $subQ->where('class_id', $class->id)
+                         ->whereDate('date', $date);
+                });
+            })
             ->orderBy('name')
             ->get();
 
-        // Get attendances for these students on the specific date
+        // Get attendances for these students on the specific date FOR THIS CLASS
         $attendances = Attendance::whereIn('student_id', $students->pluck('id'))
+            ->where('class_id', $class->id)
             ->whereDate('date', $date)
             ->get()
             ->keyBy('student_id');
@@ -128,6 +139,7 @@ class AttendanceController extends Controller
             $updateData = [
                 'status' => $data['status'],
                 'notes' => $data['notes'] ?? null,
+                'class_id' => $class->id,
             ];
 
             // In Laravel, the file from an array input might be in the data array or in $request->file

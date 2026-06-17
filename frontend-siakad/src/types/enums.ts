@@ -25,8 +25,6 @@ export enum PAUDScale {
 
 export enum ClassLevel {
   KB = 'Kelompok Bermain (KB)',
-  TK_A = 'TK A',
-  TK_B = 'TK B',
   TPA = 'TPA',
   SPS = 'SPS',
 }
