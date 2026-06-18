@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\School\AssessmentController;
 use App\Http\Controllers\Api\V1\School\SubscriptionController;
 use App\Http\Controllers\Api\V1\School\FinanceController;
 use App\Http\Controllers\Api\V1\School\ReportController;
+use App\Http\Controllers\Api\V1\School\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -115,7 +116,7 @@ Route::middleware(['auth:sanctum', 'verified', \App\Http\Middleware\CheckActiveS
     Route::get('/schools/{id}/subscription/payment-history', [SubscriptionController::class, 'paymentHistory'])->name('subscription.payments');
 
     // Finance management (FR-FN) — Pro Plan only
-    Route::get('/schools/{id}/finances/summary', [FinanceController::class, 'summary'])->name('finances.summary');
+    Route::get('/schools/{id}/dashboard/headmaster', [DashboardController::class, 'headmasterSummary'])->name('dashboard.headmaster');
     Route::get('/schools/{id}/finances/spp', [FinanceController::class, 'sppIndex'])->name('finances.spp.index');
     Route::post('/schools/{id}/finances/spp/batch', [FinanceController::class, 'sppBatchStore'])->name('finances.spp.batch');
     Route::post('/schools/{id}/finances/spp', [FinanceController::class, 'sppStore'])->name('finances.spp.store');

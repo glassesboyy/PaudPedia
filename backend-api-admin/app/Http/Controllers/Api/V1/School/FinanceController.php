@@ -61,66 +61,7 @@ class FinanceController extends Controller
         return [];
     }
 
-    /**
-     * GET /api/v1/schools/{id}/finances/summary
-     * 
-     * Financial dashboard summary.
-     */
-    public function summary(Request $request, int $id): JsonResponse
-    {
-        $school = School::findOrFail($id);
-        
-        if ($gate = $this->ensureProPlan($school)) return $gate;
 
-        $membership = $request->user()->schoolMemberships()
-            ->where('school_id', $school->id)
-            ->first();
-
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
-            return response()->json(['message' => 'Akses ditolak.'], 403);
-        }
-
-        $studentIds = $this->getAccessibleStudentIds($request, $school->id);
-
-        // SPP summary
-        $totalSppCollected = Finance::whereIn('student_id', $studentIds)
-            ->where('type', FinanceType::SPP)
-            ->where('is_paid', true)
-            ->sum('amount');
-
-        $totalSppPending = Finance::whereIn('student_id', $studentIds)
-            ->where('type', FinanceType::SPP)
-            ->where('is_paid', false)
-            ->sum('amount');
-
-        // Savings summary
-        $totalDeposits = Finance::whereIn('student_id', $studentIds)
-            ->where('type', FinanceType::TABUNGAN)
-            ->where('transaction_type', TransactionType::DEPOSIT)
-            ->sum('amount');
-
-        $totalWithdrawals = Finance::whereIn('student_id', $studentIds)
-            ->where('type', FinanceType::TABUNGAN)
-            ->where('transaction_type', TransactionType::WITHDRAWAL)
-            ->sum('amount');
-
-        // Recent transactions
-        $recentTransactions = Finance::whereIn('student_id', $studentIds)
-            ->with('student:id,name,nisn')
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get()
-            ->map(fn ($f) => $this->formatFinanceRecord($f));
-
-        return response()->json([
-            'spp_collected' => (float) $totalSppCollected,
-            'spp_pending' => (float) $totalSppPending,
-            'savings_balance' => (float) ($totalDeposits - $totalWithdrawals),
-            'total_deposits' => (float) $totalDeposits,
-            'total_withdrawals' => (float) $totalWithdrawals,
-            'recent_transactions' => $recentTransactions,
-        ]);
-    }
 
     /**
      * GET /api/v1/schools/{id}/finances/spp

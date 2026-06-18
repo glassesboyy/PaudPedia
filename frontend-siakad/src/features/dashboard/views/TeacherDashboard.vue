@@ -62,7 +62,7 @@ async function fetchAllClasses() {
     <!-- Welcome Section -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Halo, {{ authStore.userName }} 👋</h1>
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Halo, {{ authStore.userName }}</h1>
         <p class="text-slate-500 font-medium tracking-tight">{{ copy.subtitle }}</p>
       </div>
     </div>

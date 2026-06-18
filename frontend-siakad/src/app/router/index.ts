@@ -205,12 +205,7 @@ const router = createRouter({
         },
 
         // Finances (Pro Plan)
-        {
-          path: 'finances',
-          name: 'FinanceOverview',
-          component: () => import('@/features/finances/views/FinanceOverviewView.vue'),
-          meta: { roles: ['headmaster'], requiresPro: true },
-        },
+
         {
           path: 'finances/spp',
           name: 'SppManagement',
