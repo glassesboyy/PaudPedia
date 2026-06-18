@@ -29,9 +29,11 @@ export interface School {
 }
 
 export interface SchoolMembership {
+  id: number
   school_id: number
   school: School
   role_type: UserRole
+  is_active: boolean
 }
 
 export interface Teacher {

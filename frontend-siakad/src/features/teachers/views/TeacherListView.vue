@@ -31,6 +31,11 @@ const showDeleteModal = ref(false)
 const deleteTarget = ref<Teacher | null>(null)
 const isDeleting = ref(false)
 
+// Toggle Active modal state
+const showToggleModal = ref(false)
+const toggleTarget = ref<Teacher | null>(null)
+const isToggling = ref(false)
+
 onMounted(() => {
   fetchTeachers()
 })
@@ -74,13 +79,33 @@ async function executeDelete() {
   isDeleting.value = true
   try {
     await teacherService.deleteTeacher(schoolStore.currentSchoolId!, deleteTarget.value.id)
-    showDeleteModal.value = false
-    deleteTarget.value = null
     await fetchTeachers()
-  } catch (error) {
-    alert('Gagal menghapus guru.')
+  } catch (error: any) {
+    generalError.value = error.response?.data?.message || 'Gagal menghapus guru.'
   } finally {
     isDeleting.value = false
+    showDeleteModal.value = false
+    deleteTarget.value = null
+  }
+}
+
+function confirmToggle(teacher: Teacher) {
+  toggleTarget.value = teacher
+  showToggleModal.value = true
+}
+
+async function executeToggle() {
+  if (!toggleTarget.value) return
+  isToggling.value = true
+  try {
+    await teacherService.toggleTeacherActive(schoolStore.currentSchoolId!, toggleTarget.value.id)
+    await fetchTeachers()
+  } catch (error: any) {
+    generalError.value = error.response?.data?.message || 'Gagal merubah status guru.'
+  } finally {
+    isToggling.value = false
+    showToggleModal.value = false
+    toggleTarget.value = null
   }
 }
 
@@ -151,7 +176,7 @@ function formatDate(dateString: string) {
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest">Informasi Guru</th>
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest">NIP</th>
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest">Spesialisasi</th>
-              <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest">Terdaftar Pada</th>
+              <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest text-center">Status</th>
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest text-right">Aksi</th>
             </tr>
           </thead>
@@ -167,10 +192,10 @@ function formatDate(dateString: string) {
                   </div>
                 </div>
               </td>
-              <td class="px-8 py-5"><Skeleton width="100px" height="1.5rem" class="rounded-lg" /></td>
+              <td class="px-8 py-5"><Skeleton width="100px" height="1.5rem" /></td>
               <td class="px-8 py-5"><Skeleton width="80px" height="1rem" class="rounded-full" /></td>
-              <td class="px-8 py-5"><Skeleton width="100px" height="1rem" /></td>
-              <td class="px-8 py-5 text-right"><Skeleton width="40px" height="2rem" class="ml-auto" /></td>
+              <td class="px-8 py-5 text-center"><Skeleton width="60px" height="1.5rem" class="rounded-full mx-auto" /></td>
+              <td class="px-8 py-5 text-right"><Skeleton width="80px" height="2rem" class="ml-auto" /></td>
             </tr>
             <tr v-else-if="teachers.length === 0">
               <td colspan="5" class="px-8 py-20 text-center">
@@ -226,9 +251,7 @@ function formatDate(dateString: string) {
                 </div>
               </td>
               <td class="px-8 py-5">
-                <div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-muted rounded-lg border border-border/50">
-                  <span class="text-xs font-bold text-heading">{{ teacher.nip || 'TIDAK ADA NIP' }}</span>
-                </div>
+                <p class="text-sm text-body font-mono">{{ teacher.nip || '-' }}</p>
               </td>
               <td class="px-8 py-5">
                 <span v-if="teacher.specialization" class="badge bg-primary-50 text-primary-700 ring-primary-600/10">
@@ -236,24 +259,34 @@ function formatDate(dateString: string) {
                 </span>
                 <span v-else class="text-xs text-muted font-medium italic">General</span>
               </td>
-              <td class="px-8 py-5 text-sm font-bold text-muted">
-                {{ formatDate(teacher.joined_at) }}
+              <td class="px-8 py-5 text-center">
+                <span :class="['px-3 py-1 rounded-full text-xs font-bold border', teacher.is_active ? 'bg-success-50 text-success-700 border-success-100' : 'bg-slate-50 text-slate-700 border-slate-100']">
+                  {{ teacher.is_active ? 'Aktif' : 'Nonaktif' }}
+                </span>
               </td>
               <td class="px-6 py-4 text-right" @click.stop>
-                <div class="flex items-center justify-end gap-2">
+                <div class="flex items-center justify-end gap-1">
                   <button 
-                    class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50 flex items-center gap-1.5 font-bold text-xs"
+                    class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50 flex items-center justify-center"
                     title="Lihat Detail"
                     @click="router.push({ name: 'TeacherDetail', params: { id: teacher.id } })"
                   >
                     <Icon name="lucide:eye" class="w-4 h-4" />
-                    <span v-if="!isHeadmaster">Detail</span>
                   </button>
                   <button 
                     v-if="isHeadmaster"
-                    class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50"
+                    class="p-1.5 text-muted transition-colors rounded-md flex items-center justify-center"
+                    :class="teacher.is_active ? 'hover:text-warning-600 hover:bg-warning-50' : 'hover:text-success-600 hover:bg-success-50'"
+                    @click="confirmToggle(teacher)"
+                    :title="teacher.is_active ? 'Nonaktifkan Guru' : 'Aktifkan Guru'"
+                  >
+                    <Icon :name="teacher.is_active ? 'lucide:user-x' : 'lucide:user-check'" class="w-4 h-4" />
+                  </button>
+                  <button 
+                    v-if="isHeadmaster"
+                    class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50 flex items-center justify-center"
                     @click="confirmDelete(teacher)"
-                    title="Hapus Guru"
+                    title="Hapus Permanen"
                   >
                       <Icon name="lucide:trash-2" class="w-4 h-4" />
                   </button>
@@ -300,6 +333,20 @@ function formatDate(dateString: string) {
       :loading="isDeleting"
       @confirm="executeDelete"
       @cancel="showDeleteModal = false"
+    />
+
+    <!-- Toggle Active Confirmation Modal -->
+    <ConfirmModal
+      :show="showToggleModal"
+      :title="toggleTarget?.is_active ? 'Nonaktifkan Guru?' : 'Aktifkan Guru?'"
+      :message="toggleTarget?.is_active 
+        ? `Anda akan menonaktifkan ${toggleTarget?.name}. Guru ini tidak akan bisa login, tetapi data riwayatnya tetap aman.` 
+        : `Anda akan mengaktifkan kembali ${toggleTarget?.name}. Guru ini akan bisa mengakses SIAKAD lagi.`"
+      :confirm-text="toggleTarget?.is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan'"
+      :variant="toggleTarget?.is_active ? 'warning' : 'primary'"
+      :loading="isToggling"
+      @confirm="executeToggle"
+      @cancel="showToggleModal = false"
     />
   </div>
 </template>

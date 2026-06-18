@@ -73,14 +73,13 @@ async function executeDelete() {
   isDeleting.value = true
   try {
     await parentService.deleteParent(schoolStore.currentSchoolId!, deleteTarget.value.id)
-    showDeleteModal.value = false
-    deleteTarget.value = null
     await fetchParents()
   } catch (error: any) {
-    const backendMessage = error.response?.data?.message
-    alert(backendMessage || 'Gagal menghapus data orang tua.')
+    generalError.value = error.response?.data?.message || 'Gagal menghapus data orang tua.'
   } finally {
     isDeleting.value = false
+    showDeleteModal.value = false
+    deleteTarget.value = null
   }
 }
 

@@ -18,6 +18,7 @@ export const ENDPOINTS = {
   TEACHERS: {
     LIST: (schoolId: number) => `/api/v1/schools/${schoolId}/teachers`,
     DETAIL: (schoolId: number, id: number) => `/api/v1/schools/${schoolId}/teachers/${id}`,
+    TOGGLE_ACTIVE: (schoolId: number, id: number) => `/api/v1/schools/${schoolId}/teachers/${id}/toggle-active`,
   },
   PARENTS: {
     LIST: (schoolId: number) => `/api/v1/schools/${schoolId}/parents`,

@@ -63,7 +63,7 @@ Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function
 });
 
 // Other authenticated routes (outside auth prefix)
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', 'verified', \App\Http\Middleware\CheckActiveSchoolMember::class])->group(function () {
     // School registration (authenticated upgrade)
     Route::post('/schools/register', [AuthController::class, 'registerSchoolUpgrade'])->name('schools.register');
 
@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/schools/{id}/teachers', [TeacherController::class, 'index'])->name('teachers.index');
     Route::post('/schools/{id}/teachers', [TeacherController::class, 'store'])->name('teachers.store');
     Route::get('/schools/{id}/teachers/{teacherId}', [TeacherController::class, 'show'])->name('teachers.show');
+    Route::patch('/schools/{id}/teachers/{teacherId}/toggle-active', [TeacherController::class, 'toggleActive'])->name('teachers.toggle-active');
     Route::delete('/schools/{id}/teachers/{teacherId}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
 
     // Class management

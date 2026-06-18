@@ -32,7 +32,19 @@ class StudentController extends BaseController
 
         // Strict role-based filtering
         if ($membership->isTeacher()) {
-            // Teacher now has global read-only access to all students in school
+            if ($request->boolean('only_my_class')) {
+                $teacher = \App\Models\Teacher::where('user_id', $request->user()->id)
+                    ->where('school_id', $schoolId)
+                    ->first();
+                
+                if ($teacher) {
+                    $classIds = \App\Models\ClassRoom::where('homeroom_teacher_id', $teacher->id)->pluck('id');
+                    $query->whereIn('class_id', $classIds);
+                } else {
+                    $query->whereRaw('1 = 0'); // Empty result if not a registered teacher
+                }
+            }
+            // else: Teacher now has global read-only access to all students in school
         } elseif ($membership->isParent()) {
             // Parent can only see their own active children
             $query->whereHas('parent', function ($q) use ($request) {

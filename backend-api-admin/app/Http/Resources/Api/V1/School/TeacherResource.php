@@ -24,7 +24,7 @@ class TeacherResource extends JsonResource
             'nip' => $this->nip,
             'specialization' => $this->specialization,
             'bio' => $this->bio,
-            'is_active' => $this->user->is_active,
+            'is_active' => $this->user->schoolMemberships->first()?->is_active ?? false,
             'homeroom_classes' => ClassRoomResource::collection($this->whenLoaded('homeroomClasses')),
             'joined_at' => $this->created_at?->toIso8601String(),
         ];

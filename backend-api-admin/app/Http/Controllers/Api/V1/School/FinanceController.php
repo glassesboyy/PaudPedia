@@ -31,6 +31,37 @@ class FinanceController extends Controller
     }
 
     /**
+     * Helper: Get accessible student IDs based on role.
+     */
+    protected function getAccessibleStudentIds(Request $request, int $schoolId): array
+    {
+        $membership = $request->user()->schoolMemberships()
+            ->where('school_id', $schoolId)
+            ->first();
+
+        if (!$membership) return [];
+
+        if ($membership->isHeadmaster()) {
+            return Student::where('school_id', $schoolId)->pluck('id')->toArray();
+        }
+
+        if ($membership->isTeacher()) {
+            $teacher = \App\Models\Teacher::where('user_id', $request->user()->id)
+                ->where('school_id', $schoolId)
+                ->first();
+
+            if (!$teacher) return [];
+
+            $classIds = \App\Models\ClassRoom::where('homeroom_teacher_id', $teacher->id)->pluck('id');
+            return Student::where('school_id', $schoolId)
+                ->whereIn('class_id', $classIds)
+                ->pluck('id')->toArray();
+        }
+
+        return [];
+    }
+
+    /**
      * GET /api/v1/schools/{id}/finances/summary
      * 
      * Financial dashboard summary.
@@ -49,7 +80,7 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        $studentIds = Student::where('school_id', $school->id)->pluck('id');
+        $studentIds = $this->getAccessibleStudentIds($request, $school->id);
 
         // SPP summary
         $totalSppCollected = Finance::whereIn('student_id', $studentIds)
@@ -109,7 +140,7 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        $studentIds = Student::where('school_id', $school->id)->pluck('id');
+        $studentIds = $this->getAccessibleStudentIds($request, $school->id);
 
         $query = Finance::whereIn('student_id', $studentIds)
             ->where('type', FinanceType::SPP)
@@ -198,8 +229,11 @@ class FinanceController extends Controller
             }
         }
 
+        $accessibleStudentIds = $this->getAccessibleStudentIds($request, $school->id);
+
         $students = Student::where('class_id', $class->id)
             ->where('school_id', $school->id)
+            ->whereIn('id', $accessibleStudentIds)
             ->get();
 
         if ($students->isEmpty()) {
@@ -366,7 +400,7 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        $studentIds = Student::where('school_id', $school->id)->pluck('id');
+        $studentIds = $this->getAccessibleStudentIds($request, $school->id);
 
         $query = Finance::whereIn('student_id', $studentIds)
             ->where('type', FinanceType::TABUNGAN)
@@ -454,6 +488,11 @@ class FinanceController extends Controller
 
         if (!$student) {
             return response()->json(['message' => 'Siswa tidak ditemukan di sekolah ini.'], 404);
+        }
+
+        $accessibleStudentIds = $this->getAccessibleStudentIds($request, $school->id);
+        if (!in_array($student->id, $accessibleStudentIds)) {
+            return response()->json(['message' => 'Anda tidak memiliki akses ke siswa ini.'], 403);
         }
 
         // For withdrawal, check balance

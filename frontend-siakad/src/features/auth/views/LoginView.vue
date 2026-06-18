@@ -77,13 +77,16 @@ async function handleLogin() {
       const publicUrl = import.meta.env.VITE_PUBLIC_URL || 'http://localhost:3000'
       window.location.href = `${publicUrl}/auth/register?type=school`
       return
-    } else if (schoolStore.memberships.length === 1 && schoolStore.memberships[0]) {
-      // Single school — auto-select and go to dashboard
-      schoolStore.selectSchool(schoolStore.memberships[0].school_id)
-      router.push({ name: 'Dashboard' })
     } else {
-      // Multiple schools — show selector
-      router.push({ name: 'SelectSchool' })
+      const activeMemberships = schoolStore.memberships.filter(m => m.is_active)
+      if (activeMemberships.length === 1 && activeMemberships[0]) {
+        // Single active school — auto-select and go to dashboard
+        schoolStore.selectSchool(activeMemberships[0].school_id)
+        router.push({ name: 'Dashboard' })
+      } else {
+        // Multiple schools (or 0 active schools) — show selector
+        router.push({ name: 'SelectSchool' })
+      }
     }
   } catch (err: any) {
     // Handle validation errors from API

@@ -39,7 +39,9 @@ class TeacherController extends BaseController
         }
 
         $teachers = Teacher::where('school_id', $schoolId)
-            ->with('user')
+            ->with(['user.schoolMemberships' => function ($q) use ($schoolId) {
+                $q->where('school_id', $schoolId)->where('role_type', \App\Enums\RoleType::TEACHER);
+            }])
             ->orderBy('created_at', 'desc')
             ->paginate($request->get('limit', 10));
 
@@ -74,7 +76,9 @@ class TeacherController extends BaseController
         }
 
         $teacher = Teacher::where('school_id', $schoolId)
-            ->with(['user', 'homeroomClasses'])
+            ->with(['user.schoolMemberships' => function ($q) use ($schoolId) {
+                $q->where('school_id', $schoolId)->where('role_type', \App\Enums\RoleType::TEACHER);
+            }, 'homeroomClasses'])
             ->findOrFail($teacherId);
 
         return $this->success(new TeacherResource($teacher), 'Data guru berhasil diambil.');
@@ -180,6 +184,49 @@ class TeacherController extends BaseController
     }
 
     /**
+     * Toggle active status of a teacher in a school.
+     *
+     * @param Request $request
+     * @param int $schoolId
+     * @param int $teacherId
+     * @return JsonResponse
+     */
+    public function toggleActive(Request $request, int $schoolId, int $teacherId): JsonResponse
+    {
+        $membership = $request->user()->schoolMemberships()
+            ->where('school_id', $schoolId)
+            ->first();
+
+        if (!$membership || !$membership->isHeadmaster()) {
+            return $this->error('Akses ditolak. Anda bukan pengelola sekolah ini.', 403);
+        }
+
+        $teacher = Teacher::where('school_id', $schoolId)->where('id', $teacherId)->first();
+
+        if (!$teacher) {
+            return $this->error('Data guru tidak ditemukan.', 404);
+        }
+
+        $schoolMember = SchoolMember::where('school_id', $schoolId)
+            ->where('user_id', $teacher->user_id)
+            ->where('role_type', RoleType::TEACHER)
+            ->first();
+
+        if (!$schoolMember) {
+            return $this->error('Data keanggotaan tidak ditemukan.', 404);
+        }
+
+        // Toggle status
+        $schoolMember->update([
+            'is_active' => !$schoolMember->is_active
+        ]);
+
+        $statusText = $schoolMember->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        return $this->success(null, "Guru berhasil $statusText.");
+    }
+
+    /**
      * Remove a teacher from school.
      *
      * @param Request $request
@@ -201,6 +248,12 @@ class TeacherController extends BaseController
 
         if (!$teacher) {
             return $this->error('Data guru tidak ditemukan.', 404);
+        }
+
+        $hasClass = \App\Models\ClassRoom::where('homeroom_teacher_id', $teacher->id)->exists();
+        
+        if ($hasClass) {
+            return $this->error('Tidak dapat menghapus guru karena terdaftar sebagai wali kelas. Silakan gunakan fitur Nonaktifkan guru.', 400);
         }
 
         return DB::transaction(function () use ($teacher, $schoolId) {

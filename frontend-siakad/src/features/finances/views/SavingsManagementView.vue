@@ -12,6 +12,7 @@ import type { FinanceRecord, SavingsPayload } from '@/features/finances/types/fi
 import type { ClassRoom, Student } from '@/types'
 import ProPlanGate from '@/features/finances/components/ProPlanGate.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
+import BaseModal from '@/components/ui/Modal/Modal.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
@@ -64,7 +65,7 @@ async function fetchClasses() {
 
 async function fetchStudents() {
   try {
-    const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students`)
+    const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students?only_my_class=true`)
     students.value = (res as any).data
   } catch { /* silent */ }
 }
@@ -161,7 +162,7 @@ function handleReset() {
       </div>
 
       <!-- Form -->
-      <BaseCard v-if="showForm" class="p-6 border-2 border-emerald-200 shadow-xl space-y-5">
+      <BaseModal :show="showForm" title="Transaksi Baru" @close="showForm = false">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Siswa</label>
@@ -186,13 +187,15 @@ function handleReset() {
             <input v-model="form.description" type="text" placeholder="Catatan transaksi..." class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
         </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <BaseButton variant="ghost" @click="showForm = false">Batal</BaseButton>
-          <BaseButton variant="primary" :loading="isSubmitting" :disabled="!form.student_id || !form.amount" @click="submitSavings" class="bg-emerald-600 hover:bg-emerald-700">
-            Simpan
-          </BaseButton>
-        </div>
-      </BaseCard>
+        <template #footer>
+          <div class="flex justify-end gap-3">
+            <BaseButton variant="ghost" @click="showForm = false">Batal</BaseButton>
+            <BaseButton variant="primary" :loading="isSubmitting" :disabled="!form.student_id || !form.amount" @click="submitSavings" class="bg-emerald-600 hover:bg-emerald-700">
+              Simpan
+            </BaseButton>
+          </div>
+        </template>
+      </BaseModal>
 
       <!-- Filters -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">

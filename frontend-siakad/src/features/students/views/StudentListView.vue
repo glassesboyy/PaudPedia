@@ -115,13 +115,13 @@ async function executeDelete() {
   isDeleting.value = true
   try {
     await studentService.deleteStudent(schoolStore.currentSchoolId!, deleteTarget.value.id)
-    showDeleteModal.value = false
-    deleteTarget.value = null
     await fetchStudents()
   } catch (error: any) {
-    alert(error.response?.data?.message || 'Gagal menghapus data siswa.')
+    generalError.value = error.response?.data?.message || 'Gagal menghapus data siswa.'
   } finally {
     isDeleting.value = false
+    showDeleteModal.value = false
+    deleteTarget.value = null
   }
 }
 

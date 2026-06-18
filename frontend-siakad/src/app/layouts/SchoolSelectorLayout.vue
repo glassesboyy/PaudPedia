@@ -15,7 +15,7 @@ const authStore = useAuthStore()
 const schoolStore = useSchoolStore()
 
 const isLoggingOut = ref(false)
-const memberships = computed(() => schoolStore.memberships)
+const memberships = computed(() => schoolStore.memberships.filter(m => m.is_active))
 const isLoading = computed(() => schoolStore.isLoading)
 
 const roleLabels: Record<string, string> = {

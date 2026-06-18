@@ -74,14 +74,13 @@ async function executeDelete() {
   isDeleting.value = true
   try {
     await classService.deleteClass(schoolStore.currentSchoolId!, deleteTarget.value.id)
-    showDeleteModal.value = false
-    deleteTarget.value = null
     await fetchClasses()
   } catch (error: any) {
-    const backendMessage = error.response?.data?.message
-    alert(backendMessage || 'Gagal menghapus kelas.')
+    generalError.value = error.response?.data?.message || 'Gagal menghapus kelas.'
   } finally {
     isDeleting.value = false
+    showDeleteModal.value = false
+    deleteTarget.value = null
   }
 }
 </script>

@@ -240,7 +240,12 @@ class School extends Model
             return true;
         }
         
-        return $this->teachers()->count() < $this->teacher_limit;
+        $activeTeachersCount = \App\Models\SchoolMember::where('school_id', $this->id)
+            ->where('role_type', \App\Enums\RoleType::TEACHER)
+            ->where('is_active', true)
+            ->count();
+            
+        return $activeTeachersCount < $this->teacher_limit;
     }
 
     public function hasFeature(string $feature): bool

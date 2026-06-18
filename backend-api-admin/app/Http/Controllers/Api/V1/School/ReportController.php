@@ -197,9 +197,19 @@ class ReportController extends Controller
 
         if (!$membership) return null;
 
-        return Student::where('id', $studentId)
-            ->where('school_id', $school->id)
-            ->with('class')
-            ->first();
+        $query = Student::where('id', $studentId)->where('school_id', $school->id)->with('class');
+
+        if ($membership->isTeacher()) {
+            $teacher = \App\Models\Teacher::where('user_id', $user->id)
+                ->where('school_id', $school->id)
+                ->first();
+
+            if (!$teacher) return null;
+
+            $classIds = \App\Models\ClassRoom::where('homeroom_teacher_id', $teacher->id)->pluck('id');
+            $query->whereIn('class_id', $classIds);
+        }
+
+        return $query->first();
     }
 }

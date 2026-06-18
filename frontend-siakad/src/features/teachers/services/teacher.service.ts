@@ -38,4 +38,11 @@ export const teacherService = {
   async deleteTeacher(schoolId: number, teacherId: number): Promise<ApiResponse<null>> {
     return http.delete(ENDPOINTS.TEACHERS.DETAIL(schoolId, teacherId))
   },
+
+  /**
+   * Toggle active status of a teacher in a school.
+   */
+  async toggleTeacherActive(schoolId: number, teacherId: number): Promise<ApiResponse<null>> {
+    return http.patch(ENDPOINTS.TEACHERS.TOGGLE_ACTIVE(schoolId, teacherId))
+  },
 }

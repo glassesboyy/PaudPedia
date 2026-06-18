@@ -59,7 +59,7 @@ async function fetchClasses() {
 
 async function fetchStudents() {
   try {
-    const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students`)
+    const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students?only_my_class=true`)
     students.value = (res as any).data
   } catch { /* silent */ }
 }
@@ -121,25 +121,20 @@ function previewReport(studentId: number) {
       </div>
 
       <!-- Filters -->
-      <BaseCard class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="space-y-2">
-            <label class="text-sm font-semibold text-slate-700">Pilih Kelas</label>
-            <select v-model="selectedClassId" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
-              <option value="">Semua Kelas</option>
-              <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }} ({{ c.academic_year }})</option>
-            </select>
-          </div>
-          
-          <div class="space-y-2">
-            <label class="text-sm font-semibold text-slate-700">Semester</label>
-            <select v-model="selectedSemester" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
-              <option value="1">Semester 1 (Ganjil)</option>
-              <option value="2">Semester 2 (Genap)</option>
-            </select>
-          </div>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="w-64">
+          <select v-model="selectedClassId" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
+            <option value="">Semua Kelas</option>
+            <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
+          </select>
         </div>
-      </BaseCard>
+        <div class="w-64">
+          <select v-model="selectedSemester" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
+            <option value="1">Semester 1 (Ganjil)</option>
+            <option value="2">Semester 2 (Genap)</option>
+          </select>
+        </div>
+      </div>
 
       <!-- Loading -->
       <BaseCard v-if="isLoading" class="p-6"><Skeleton height="16rem" /></BaseCard>
