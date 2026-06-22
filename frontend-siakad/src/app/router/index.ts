@@ -203,6 +203,24 @@ const router = createRouter({
           component: () => import('@/features/assessments/views/AssessmentInputView.vue'),
           meta: { roles: ['headmaster', 'teacher'] },
         },
+        {
+          path: 'assessments/report',
+          name: 'AssessmentReport',
+          component: () => import('@/features/assessments/views/AssessmentReportView.vue'),
+          meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
+        },
+        {
+          path: 'assessments/settings',
+          name: 'AssessmentSettings',
+          component: () => import('@/features/assessments/views/AssessmentSettingsView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+        {
+          path: 'assessments/guide',
+          name: 'AssessmentGuide',
+          component: () => import('@/features/assessments/views/AssessmentGuideView.vue'),
+          meta: { roles: ['headmaster', 'teacher', 'parent'] },
+        },
 
         // Finances (Pro Plan)
 
@@ -226,12 +244,7 @@ const router = createRouter({
           component: () => import('@/features/reports/views/ReportSelectionView.vue'),
           meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
         },
-        {
-          path: 'reports/:studentId',
-          name: 'ReportPreview',
-          component: () => import('@/features/reports/views/ReportPreviewView.vue'),
-          meta: { roles: ['headmaster', 'teacher', 'parent'], requiresPro: true },
-        },
+
 
         // Parent Portal
         {

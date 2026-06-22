@@ -8,11 +8,11 @@ import type {
 
 export const assessmentService = {
   /**
-   * Get assessment list for a specific class, aspect, and semester
+   * Get assessment list for a specific class, month, and semester
    */
-  getAssessmentList(schoolId: number, classId: number, aspect: string, semester: Semester, academicYear: string) {
+  getAssessmentList(schoolId: number, classId: number, month: string, semester: Semester, academicYear: string) {
     return api.get<AssessmentResponse>(`/api/v1/schools/${schoolId}/classes/${classId}/assessments`, {
-      params: { aspect, semester, academic_year: academicYear }
+      params: { month, semester, academic_year: academicYear }
     })
   },
 
@@ -28,5 +28,60 @@ export const assessmentService = {
    */
   getStudentHistory(schoolId: number, studentId: number) {
     return api.get<StudentAssessmentHistoryResponse>(`/api/v1/schools/${schoolId}/students/${studentId}/assessments/history`)
+  },
+
+  /**
+   * Get assessment matrix for a student (6 months)
+   */
+  getStudentMatrix(schoolId: number, studentId: number, semester: Semester, academicYear: string) {
+    return api.get<any>(`/api/v1/schools/${schoolId}/students/${studentId}/assessments/matrix`, {
+      params: { semester, academic_year: academicYear }
+    })
+  },
+
+  /**
+   * Get student narrative report draft
+   */
+  getStudentReport(schoolId: number, classId: number, studentId: number, semester: Semester, academicYear: string) {
+    return api.get<any>(`/api/v1/schools/${schoolId}/classes/${classId}/students/${studentId}/report`, {
+      params: { semester, academic_year: academicYear }
+    })
+  },
+
+  /**
+   * Save student narrative report draft
+   */
+  saveStudentReport(schoolId: number, classId: number, studentId: number, payload: any) {
+    return api.post<any>(`/api/v1/schools/${schoolId}/classes/${classId}/students/${studentId}/report`, payload)
+  },
+
+  // --- Master Data Settings ---
+
+  getPrograms(schoolId: number) {
+    return api.get<any>(`/api/v1/schools/${schoolId}/development-programs`)
+  },
+
+  storeProgram(schoolId: number, payload: { name: string; order: number }) {
+    return api.post<any>(`/api/v1/schools/${schoolId}/development-programs`, payload)
+  },
+
+  updateProgram(schoolId: number, programId: number, payload: { name: string; order: number }) {
+    return api.put<any>(`/api/v1/schools/${schoolId}/development-programs/${programId}`, payload)
+  },
+
+  destroyProgram(schoolId: number, programId: number) {
+    return api.delete<any>(`/api/v1/schools/${schoolId}/development-programs/${programId}`)
+  },
+
+  storeIndicator(schoolId: number, programId: number, payload: { name: string; order: number }) {
+    return api.post<any>(`/api/v1/schools/${schoolId}/development-programs/${programId}/indicators`, payload)
+  },
+
+  updateIndicator(schoolId: number, indicatorId: number, payload: { name: string; order: number }) {
+    return api.put<any>(`/api/v1/schools/${schoolId}/development-indicators/${indicatorId}`, payload)
+  },
+
+  destroyIndicator(schoolId: number, indicatorId: number) {
+    return api.delete<any>(`/api/v1/schools/${schoolId}/development-indicators/${indicatorId}`)
   }
 }

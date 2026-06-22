@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             // Permissions & Roles (MUST BE FIRST)
             PermissionSeeder::class,
             RoleSeeder::class,
+            SystemSettingSeeder::class,
             
             // Core data
             UserSeeder::class,

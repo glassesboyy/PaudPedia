@@ -23,6 +23,7 @@ const schoolStore = useSchoolStore()
 const isLoading = ref(true)
 const isSubmitting = ref(false)
 const error = ref('')
+const formError = ref('')
 const success = ref('')
 
 const classes = ref<ClassRoom[]>([])
@@ -89,6 +90,7 @@ async function fetchSavings() {
 async function submitSavings() {
   if (isSubmitting.value || !form.value.student_id || !form.value.amount) return
   isSubmitting.value = true
+  formError.value = ''
   error.value = ''
   success.value = ''
   try {
@@ -98,10 +100,15 @@ async function submitSavings() {
     form.value = { student_id: 0, amount: 0, transaction_type: 'deposit', description: '' }
     await fetchSavings()
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'Gagal mencatat transaksi.'
+    formError.value = err.response?.data?.message || 'Gagal mencatat transaksi.'
   } finally {
     isSubmitting.value = false
   }
+}
+
+function closeForm() {
+  showForm.value = false
+  formError.value = ''
 }
 
 function formatCurrency(val: number): string {
@@ -128,13 +135,10 @@ function handleReset() {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto animate-fade-in space-y-6">
+  <div class="animate-fade-in space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <button @click="router.push({ name: 'FinanceOverview' })" class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors">
-          <Icon name="lucide:arrow-left" class="w-5 h-5" />
-        </button>
         <div>
           <h1 class="text-2xl font-bold text-heading">Tabungan Siswa</h1>
           <p class="text-sm text-muted">Kelola setoran dan penarikan tabungan siswa</p>
@@ -162,7 +166,12 @@ function handleReset() {
       </div>
 
       <!-- Form -->
-      <BaseModal :show="showForm" title="Transaksi Baru" @close="showForm = false">
+      <BaseModal :show="showForm" title="Transaksi Baru" @close="closeForm">
+        <div v-if="formError" class="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3">
+          <Icon name="lucide:alert-circle" class="w-4 h-4 text-red-600 shrink-0" />
+          <p class="text-xs font-medium text-red-800">{{ formError }}</p>
+          <button @click="formError = ''" class="ml-auto text-red-400 hover:text-red-600"><Icon name="lucide:x" class="w-3 h-3" /></button>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Siswa</label>
@@ -189,7 +198,7 @@ function handleReset() {
         </div>
         <template #footer>
           <div class="flex justify-end gap-3">
-            <BaseButton variant="ghost" @click="showForm = false">Batal</BaseButton>
+            <BaseButton variant="ghost" @click="closeForm">Batal</BaseButton>
             <BaseButton variant="primary" :loading="isSubmitting" :disabled="!form.student_id || !form.amount" @click="submitSavings" class="bg-emerald-600 hover:bg-emerald-700">
               Simpan
             </BaseButton>

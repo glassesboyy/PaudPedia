@@ -183,7 +183,13 @@ async function downloadRapor(semesterTarget: string) {
     a.download = `Rapor_${student.value?.name || studentId.value}_Semester${semesterTarget}_${safeYear}.pdf`
     a.click()
     window.URL.revokeObjectURL(url)
-  } catch { /* silent */ }
+  } catch (err: any) {
+    if (err.response?.data?.message) {
+      alert(err.response.data.message)
+    } else {
+      alert('Gagal mengunduh rapor. Pastikan data rapor telah disusun.')
+    }
+  }
   finally { 
     if (semesterTarget === '1') isDownloadingSemester1.value = false
     else isDownloadingSemester2.value = false
@@ -207,6 +213,71 @@ const filteredAssessmentHistory = computed(() => {
   }
   return history
 })
+
+function getAvailableMonths(semester: string) {
+  if (semester === '1') {
+    return [
+      { value: '7', label: 'Juli' },
+      { value: '8', label: 'Agustus' },
+      { value: '9', label: 'September' },
+      { value: '10', label: 'Oktober' },
+      { value: '11', label: 'November' },
+      { value: '12', label: 'Desember' }
+    ]
+  } else {
+    return [
+      { value: '1', label: 'Januari' },
+      { value: '2', label: 'Februari' },
+      { value: '3', label: 'Maret' },
+      { value: '4', label: 'April' },
+      { value: '5', label: 'Mei' },
+      { value: '6', label: 'Juni' }
+    ]
+  }
+}
+
+function getScaleForMonth(matrix: Record<string, any>, indicatorId: number, monthNum: string) {
+  if (!matrix || !matrix[indicatorId]) return null
+  const monthPad = monthNum.toString().padStart(2, '0')
+  const key = Object.keys(matrix[indicatorId]).find(k => k.endsWith(`-${monthPad}`))
+  if (key) return matrix[indicatorId][key]
+  return null
+}
+
+function getFinalScale(matrix: Record<string, any>, indicatorId: number, semester: string) {
+  if (!matrix || !matrix[indicatorId]) return null
+  const months = getAvailableMonths(semester).map(m => m.value)
+  let totalPoints = 0
+  let count = 0
+  
+  const scalePoints: Record<string, number> = { 'BB': 1, 'MB': 2, 'BSH': 3, 'BSB': 4 }
+  const pointScales: Record<number, string> = { 1: 'BB', 2: 'MB', 3: 'BSH', 4: 'BSB' }
+  const pointColors: Record<number, string> = { 
+    1: 'bg-rose-100 text-rose-700 border-rose-200', 
+    2: 'bg-amber-100 text-amber-700 border-amber-200', 
+    3: 'bg-emerald-100 text-emerald-700 border-emerald-200', 
+    4: 'bg-primary-100 text-primary-700 border-primary-200' 
+  }
+
+  for (const month of months) {
+    const data = getScaleForMonth(matrix, indicatorId, month)
+    if (data) {
+      const scaleValue = data.scale
+      if (scalePoints[scaleValue]) {
+        totalPoints += scalePoints[scaleValue]
+        count++
+      }
+    }
+  }
+
+  if (count === 0) return null
+
+  const average = Math.round(totalPoints / count)
+  return {
+    scale: pointScales[average],
+    color: pointColors[average]
+  }
+}
 
 const attendanceFilterLabel = computed(() => {
   if (attendanceFilter.value === 'semester1') return 'Semester 1'
@@ -260,12 +331,9 @@ const computedAttendanceSummary = computed(() => {
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto animate-fade-in space-y-6">
+  <div class="w-full mx-auto animate-fade-in space-y-6">
     <!-- Header -->
     <div class="flex items-center gap-4">
-      <button @click="router.back()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors">
-        <Icon name="lucide:arrow-left" class="w-5 h-5" />
-      </button>
       <div>
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-sm text-muted">{{ copy.subtitle }}</p>
@@ -477,53 +545,80 @@ const computedAttendanceSummary = computed(() => {
             </div>
           </div>
           
-          <div v-if="filteredAssessmentHistory.length > 0" class="space-y-8 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">
+          <div v-if="filteredAssessmentHistory.length > 0" class="space-y-12 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">
             <div v-for="group in filteredAssessmentHistory" :key="group.academic_year + group.semester" class="space-y-4">
               <h4 class="text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg inline-block">
                 {{ group.academic_year }} - {{ group.semester_label }}
               </h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div v-for="item in group.items" :key="item.id" class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
-                  <div class="flex justify-between items-start gap-4">
-                    <p class="font-bold text-slate-800 leading-tight">{{ item.aspect }}</p>
-                    <span class="px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider shrink-0" 
-                      :class="{
-                        'bg-rose-100 text-rose-700': item.scale === 'BB',
-                        'bg-amber-100 text-amber-700': item.scale === 'MB',
-                        'bg-emerald-100 text-emerald-700': item.scale === 'BSH',
-                        'bg-primary-100 text-primary-700': item.scale === 'BSB'
-                      }">
-                      {{ item.scale }}
-                    </span>
-                  </div>
-                  <p class="text-xs font-semibold text-slate-500">{{ item.description }}</p>
-                  <div v-if="item.notes" class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-sm text-slate-600 italic">
-                    "{{ item.notes }}"
-                  </div>
+              
+              <div class="overflow-hidden border border-slate-200 rounded-xl">
+                <div class="overflow-x-auto custom-scrollbar">
+                  <table class="w-full text-left border-collapse min-w-[600px]">
+                    <thead class="bg-slate-50">
+                      <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-600 font-bold">
+                        <th class="px-4 py-3 min-w-[200px]">Program & Indikator</th>
+                        <th v-for="m in getAvailableMonths(group.semester)" :key="m.value" class="px-2 py-3 text-center border-l border-slate-200 w-16">
+                          {{ m.label.split(' ')[0] }}
+                        </th>
+                        <th class="px-3 py-3 text-center border-l border-slate-200 w-32 bg-primary-50/50 text-primary-800">
+                          Capaian Akhir
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                      <template v-for="prog in assessmentData?.programs" :key="`prog-${prog.id}`">
+                        <tr class="bg-primary-50/30">
+                          <td :colspan="getAvailableMonths(group.semester).length + 2" class="px-4 py-2 font-bold text-primary-800 text-sm border-y border-primary-100">
+                            {{ prog.name }}
+                          </td>
+                        </tr>
+                        <tr v-for="ind in prog.indicators" :key="`ind-${ind.id}`" class="hover:bg-slate-50 transition-colors">
+                          <td class="px-4 py-3 text-sm text-slate-700 pl-8">
+                            • {{ ind.name }}
+                          </td>
+                          <td v-for="m in getAvailableMonths(group.semester)" :key="m.value" class="px-2 py-3 text-center border-l border-slate-100">
+                            <div v-if="getScaleForMonth(group.matrix, ind.id, m.value)" 
+                                :class="['inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold border shadow-sm cursor-help', 
+                                          getScaleForMonth(group.matrix, ind.id, m.value)?.scale_color || 'bg-slate-100 text-slate-600 border-slate-200']"
+                                :title="getScaleForMonth(group.matrix, ind.id, m.value)?.scale_label">
+                              {{ getScaleForMonth(group.matrix, ind.id, m.value)?.scale }}
+                            </div>
+                            <div v-else class="text-slate-300 text-xs">-</div>
+                          </td>
+                          <td class="px-3 py-3 text-center border-l border-slate-100 bg-slate-50/50">
+                            <div v-if="getFinalScale(group.matrix, ind.id, group.semester)" 
+                                :class="['inline-flex items-center justify-center px-2 py-1 rounded-lg text-xs font-bold border shadow-sm w-full', getFinalScale(group.matrix, ind.id, group.semester)?.color]">
+                              {{ getFinalScale(group.matrix, ind.id, group.semester)?.scale }}
+                            </div>
+                            <div v-else class="text-slate-300 text-xs">-</div>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Download Rapor (Pro Plan) specific to this semester -->
+              <div v-if="schoolStore.isPro" class="mt-4 flex flex-col items-start gap-2 border border-slate-100 bg-slate-50/50 rounded-xl p-4">
+                <div class="flex items-center gap-4 w-full">
+                  <BaseButton variant="primary" :disabled="!group.is_report_generated" :loading="group.semester === '1' ? isDownloadingSemester1 : isDownloadingSemester2" @click="downloadRapor(group.semester)" class="shadow-sm px-6 whitespace-nowrap">
+                    <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
+                    Unduh Rapor {{ group.semester_label }}
+                  </BaseButton>
+                  <p v-if="!group.is_report_generated" class="text-sm text-amber-600 font-medium flex items-center gap-1.5">
+                    <Icon name="lucide:info" class="w-4 h-4" />
+                    Rapor naratif untuk semester ini belum disusun oleh Wali Kelas, sehingga dokumen belum dapat diunduh.
+                  </p>
+                  <p v-else class="text-xs text-slate-500 font-medium">
+                    Laporan mencakup rekap kehadiran dan pencapaian perkembangan khusus untuk semester ini.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
-          <div v-else class="py-20 text-center">
-            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-              <Icon name="lucide:bar-chart-2" class="w-8 h-8" />
-            </div>
-            <p class="text-slate-500 font-medium">Belum ada catatan penilaian untuk periode ini.</p>
-          </div>
-          
-          <!-- Download Rapor (Pro Plan) -->
-          <div v-if="schoolStore.isPro" class="mt-8 flex flex-col items-center gap-4 border-t border-slate-100 pt-6">
-            <div class="flex items-center gap-4">
-              <BaseButton variant="primary" :loading="isDownloadingSemester1" @click="downloadRapor('1')" class="shadow-lg shadow-primary-500/20 px-6">
-                <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
-                Unduh Rapor Semester 1
-              </BaseButton>
-              <BaseButton variant="primary" :loading="isDownloadingSemester2" @click="downloadRapor('2')" class="shadow-lg shadow-primary-500/20 px-6">
-                <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
-                Unduh Rapor Semester 2
-              </BaseButton>
-            </div>
-            <p class="text-[10px] text-slate-400 font-medium">Laporan mencakup rekap kehadiran dan pencapaian perkembangan khusus untuk masing-masing semester.</p>
+          <div v-else class="py-20 text-center border border-dashed border-slate-200 rounded-xl">
+            <p class="text-slate-500 font-medium">Belum ada catatan penilaian tercatat.</p>
           </div>
         </div>
 

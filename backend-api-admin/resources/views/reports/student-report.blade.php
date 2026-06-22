@@ -160,48 +160,122 @@
         @endif
     </div>
 
-    {{-- Assessment --}}
-    <div class="section">
-        <div class="section-title">Pencapaian Perkembangan</div>
-        @if(count($assessments) > 0)
-            <table class="data-table">
+    {{-- Assessment Matrix --}}
+    @if(isset($programs) && count($programs) > 0)
+        @php
+            $monthsMap = $semester === '1' ? [
+                7 => 'JUL', 8 => 'AGS', 9 => 'SEP', 10 => 'OKT', 11 => 'NOV', 12 => 'DES'
+            ] : [
+                1 => 'JAN', 2 => 'FEB', 3 => 'MAR', 4 => 'APR', 5 => 'MEI', 6 => 'JUN'
+            ];
+            $scales = ['BB' => 1, 'MB' => 2, 'BSH' => 3, 'BSB' => 4];
+            $reverseScales = [1 => 'BB', 2 => 'MB', 3 => 'BSH', 4 => 'BSB'];
+        @endphp
+        <div class="section">
+            <div class="section-title" style="margin-bottom: 10px;">Rekap Nilai (Matriks 6 Bulan)</div>
+            <table class="data-table" style="font-size: 9px;">
                 <thead>
                     <tr>
-                        <th style="width: 5%;">No.</th>
-                        <th style="width: 35%;">Aspek Perkembangan</th>
-                        <th class="text-center" style="width: 12%;">Capaian</th>
-                        <th style="width: 48%;">Catatan Guru</th>
+                        <th style="width: 45%; text-align: left;">Program & Indikator</th>
+                        @foreach($monthsMap as $m)
+                            <th class="text-center" style="width: 7%;">{{ $m }}</th>
+                        @endforeach
+                        <th class="text-center" style="width: 13%;">Capaian Akhir</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($assessments as $index => $assessment)
-                        <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
-                            <td>{{ $assessment['aspect'] }}</td>
-                            <td class="text-center">
-                                <span class="scale-badge scale-{{ strtolower($assessment['scale']) }}">
-                                    {{ $assessment['scale'] }}
-                                </span>
-                            </td>
-                            <td>{{ $assessment['notes'] ?? '-' }}</td>
+                    @foreach($programs as $prog)
+                        <tr style="background-color: #f1f5f9;">
+                            <td colspan="8" style="font-weight: bold; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;">{{ $prog->name }}</td>
                         </tr>
+                        @foreach($prog->indicators as $ind)
+                            <tr>
+                                <td style="padding-left: 15px;">• {{ $ind->name }}</td>
+                                @php
+                                    $total = 0;
+                                    $count = 0;
+                                @endphp
+                                @foreach($monthsMap as $num => $m)
+                                    <td class="text-center" style="font-weight: bold; color: #475569;">
+                                        @php
+                                            $val = '-';
+                                            if (isset($matrix[$ind->id])) {
+                                                $monthPad = str_pad($num, 2, '0', STR_PAD_LEFT);
+                                                foreach ($matrix[$ind->id] as $mKey => $mData) {
+                                                    if (str_ends_with($mKey, '-' . $monthPad)) {
+                                                        $val = $mData['scale'];
+                                                        if (isset($scales[$val])) {
+                                                            $total += $scales[$val];
+                                                            $count++;
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        @endphp
+                                        {{ $val }}
+                                    </td>
+                                @endforeach
+                                <td class="text-center" style="font-weight: bold; background-color: #f8fafc; border-left: 1px solid #e2e8f0;">
+                                    @php
+                                        $final = '-';
+                                        if ($count > 0) {
+                                            $avg = (int) round($total / $count);
+                                            $final = $reverseScales[$avg] ?? '-';
+                                        }
+                                    @endphp
+                                    {{ $final }}
+                                </td>
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>
+        </div>
+    @endif
 
-            <div style="margin-top: 10px; padding: 8px; background: #f8f8f8; border: 1px solid #e5e5e5; font-size: 9px;">
-                <strong>Keterangan Capaian:</strong><br>
-                BB = Belum Berkembang &nbsp;|&nbsp;
-                MB = Mulai Berkembang &nbsp;|&nbsp;
-                BSH = Berkembang Sesuai Harapan &nbsp;|&nbsp;
-                BSB = Berkembang Sangat Baik
-            </div>
-        @else
-            <p style="text-align: center; padding: 20px; color: #999; font-style: italic;">
-                Belum ada data penilaian untuk periode ini.
+
+    {{-- Narrative Report --}}
+    @if(isset($report))
+        <div class="section">
+            <div class="section-title">I. Pendahuluan</div>
+            <p style="text-align: justify; margin-bottom: 15px; font-size: 11px;">
+                {{ $report['introduction_notes'] ?: '-' }}
             </p>
-        @endif
-    </div>
+
+            <div class="section-title">II. Perkembangan Peserta Didik</div>
+            @if(count($report['details']) > 0)
+                @foreach($report['details'] as $detail)
+                    <div style="margin-bottom: 12px;">
+                        <h4 style="font-size: 12px; margin-bottom: 4px;">{{ $detail['program'] }}</h4>
+                        <p style="text-align: justify; font-size: 11px; margin-left: 10px;">
+                            {{ $detail['narrative'] ?: '-' }}
+                        </p>
+                    </div>
+                @endforeach
+            @else
+                <p style="color: #999; font-style: italic;">Belum ada catatan per program perkembangan.</p>
+            @endif
+
+            <div class="section-title" style="margin-top: 15px;">III. Penutup</div>
+            <p style="text-align: justify; margin-bottom: 15px; font-size: 11px;">
+                {{ $report['closing_notes'] ?: '-' }}
+            </p>
+
+            <div class="section-title">IV. Rekomendasi / Saran</div>
+            <p style="text-align: justify; margin-bottom: 15px; font-size: 11px;">
+                {{ $report['recommendation'] ?: '-' }}
+            </p>
+        </div>
+
+
+    @else
+        <div class="section">
+            <p style="text-align: center; padding: 20px; color: #999; font-style: italic;">
+                Belum ada data rapor naratif untuk periode ini.
+            </p>
+        </div>
+    @endif
 
 
 

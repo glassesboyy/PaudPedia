@@ -3,54 +3,98 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useSchoolStore } from '@/stores/school.store'
 import { classService } from '@/features/classes/services/class.service'
 import { assessmentService } from '@/features/assessments/services/assessment.service'
-import { AttendanceStatus, PAUDScale } from '@/types'
-import type { ClassRoom, AssessmentRecord, Semester } from '@/types'
+import { PAUDScale } from '@/types'
+import type { ClassRoom, Semester, DevelopmentProgram } from '@/types'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import Icon from '@/components/ui/Icon/Icon.vue'
+import { format } from 'date-fns'
 
 const schoolStore = useSchoolStore()
 
 const classes = ref<ClassRoom[]>([])
 const selectedClassId = ref<number | null>(null)
 const selectedSemester = ref<Semester>('1')
+const selectedMonth = ref<string>('')
 
-const predefinedAspects = [
-  'Nilai Agama dan Moral',
-  'Fisik Motorik',
-  'Kognitif',
-  'Bahasa',
-  'Sosial Emosional',
-  'Seni'
-]
-const aspectSelection = ref<string>(predefinedAspects[0] || '')
-const customAspect = ref('')
+const programs = ref<DevelopmentProgram[]>([])
+const activeStudentId = ref<number | null>(null)
 
-const finalAspect = computed(() => {
-  return aspectSelection.value === 'CUSTOM' ? customAspect.value.trim() : aspectSelection.value
-})
-
-const selectedClass = computed(() => classes.value.find(c => c.id === selectedClassId.value))
-const currentAcademicYear = computed(() => selectedClass.value?.academic_year || '2025/2026')
-
-const students = ref<AssessmentRecord[]>([])
+const students = ref<any[]>([])
 const isLoadingClasses = ref(true)
 const isLoadingStudents = ref(false)
 const isSaving = ref(false)
+const searchQuery = ref('')
 const showValidationErrors = ref(false)
 const error = ref('')
 const successMessage = ref('')
+
+// Form state: { [student_id]: { [indicator_id]: { scale, notes } } }
+const formState = ref<Record<number, Record<number, { scale: PAUDScale | null, notes: string }>>>({})
+
+const selectedClass = computed(() => classes.value.find(c => c.id === selectedClassId.value))
+const currentAcademicYear = computed<string | null>(() => selectedClass.value?.academic_year || null)
+
+// Calculate the 6 months available based on the academic year and semester
+const availableMonths = computed(() => {
+  if (!currentAcademicYear.value) return []
+  
+  const years = currentAcademicYear.value.split('/') // e.g. ["2024", "2025"]
+  if (years.length !== 2) return []
+
+  const startYear = parseInt(years[0]!)
+  const endYear = parseInt(years[1]!)
+  
+  const months = []
+  if (selectedSemester.value === '1') {
+    // July to December of startYear
+    for (let m = 7; m <= 12; m++) {
+      const date = new Date(startYear, m - 1, 1)
+      months.push({
+        value: format(date, 'yyyy-MM'),
+        label: format(date, 'MMMM yyyy')
+      })
+    }
+  } else {
+    // January to June of endYear
+    for (let m = 1; m <= 6; m++) {
+      const date = new Date(endYear, m - 1, 1)
+      months.push({
+        value: format(date, 'yyyy-MM'),
+        label: format(date, 'MMMM yyyy')
+      })
+    }
+  }
+  return months
+})
+
+const filteredStudents = computed(() => {
+  if (!searchQuery.value) return students.value
+  const q = searchQuery.value.toLowerCase()
+  return students.value.filter(s => s.name.toLowerCase().includes(q) || (s.nisn && s.nisn.toLowerCase().includes(q)))
+})
+
+// Automatically set selectedMonth to the first available month when semester changes
+watch(availableMonths, (newMonths) => {
+  if (newMonths.length > 0 && !newMonths.find(m => m.value === selectedMonth.value)) {
+    selectedMonth.value = newMonths[0]!.value
+  }
+}, { immediate: true })
 
 onMounted(async () => {
   await fetchClasses()
 })
 
-watch([selectedClassId, aspectSelection, customAspect, selectedSemester], () => {
-  // Only fetch if required fields are present
-  if (selectedClassId.value && finalAspect.value.length > 0) {
+watch([selectedClassId, selectedMonth, selectedSemester], () => {
+  if (selectedClassId.value && selectedMonth.value) {
+    // Prevent double fetching when class changes but month hasn't synced yet
+    if (!availableMonths.value.find(m => m.value === selectedMonth.value)) {
+      return // Wait for availableMonths watcher to update selectedMonth
+    }
     fetchStudents()
   } else {
     students.value = []
+    programs.value = []
   }
 })
 
@@ -71,7 +115,7 @@ async function fetchClasses() {
 }
 
 async function fetchStudents() {
-  if (!schoolStore.currentSchoolId || !selectedClassId.value || !finalAspect.value) return
+  if (!schoolStore.currentSchoolId || !selectedClassId.value || !selectedMonth.value) return
   isLoadingStudents.value = true
   error.value = ''
   successMessage.value = ''
@@ -79,51 +123,88 @@ async function fetchStudents() {
     const res = await assessmentService.getAssessmentList(
       schoolStore.currentSchoolId as number,
       selectedClassId.value as number,
-      finalAspect.value,
+      selectedMonth.value,
       selectedSemester.value,
-      currentAcademicYear.value
+      currentAcademicYear.value as string
     )
     
-    // Ensure we have an array
-    const rawList = Array.isArray(res) ? res : (res as any).data
-    
-    if (!Array.isArray(rawList)) {
-      throw new Error('Invalid data format')
+    const responseData = res as any
+
+    students.value = responseData.data || []
+    programs.value = responseData.programs || []
+
+    // Set first student as active
+    if (students.value.length > 0) {
+      if (!activeStudentId.value || !students.value.find(s => s.student_id === activeStudentId.value)) {
+        activeStudentId.value = students.value[0].student_id
+      }
+    } else {
+      activeStudentId.value = null
     }
 
-    students.value = rawList.map(item => ({
-      ...item,
-      // Only set default 'MB' for Teachers when creating new records.
-      // For Headmaster or existing records, keep the original scale (could be null).
-      scale: item.scale || (schoolStore.isTeacher ? 'MB' : null)
-    })) as AssessmentRecord[]
+    // Initialize form state
+    const newFormState: any = {}
+    students.value.forEach(student => {
+      newFormState[student.student_id] = {}
+      programs.value.forEach(program => {
+        program.indicators.forEach((indicator: any) => {
+          const existingScale = student.assessments && student.assessments[indicator.id] ? student.assessments[indicator.id] : null
+          newFormState[student.student_id][indicator.id] = {
+            scale: existingScale || (schoolStore.isTeacher ? 'MB' : null),
+            notes: '' // We could load existing notes if API returned them
+          }
+        })
+      })
+    })
+    formState.value = newFormState
+
   } catch (err: any) {
     error.value = 'Gagal memuat data siswa.'
+    console.error(err)
   } finally {
     isLoadingStudents.value = false
   }
 }
 
+const activeStudent = computed(() => students.value.find(s => s.student_id === activeStudentId.value))
+
 async function saveAssessment() {
-  if (!schoolStore.currentSchoolId || !selectedClassId.value || !finalAspect.value) return
+  if (!schoolStore.currentSchoolId || !selectedClassId.value || !selectedMonth.value) return
+  
   isSaving.value = true
   showValidationErrors.value = true
-  if (students.value.some(s => !s.notes || s.notes.trim() === '')) {
-    error.value = 'Mohon isi Catatan Perkembangan untuk semua siswa (kolom bergaris merah).'
+  
+  // Flatten form state into array for API
+  const payloadAssessments: any[] = []
+  
+  students.value.forEach(student => {
+    programs.value.forEach(program => {
+      program.indicators.forEach((indicator: any) => {
+        const data = formState.value[student.student_id]?.[indicator.id as number]
+        if (data && data.scale) {
+          payloadAssessments.push({
+            student_id: student.student_id,
+            indicator_id: indicator.id,
+            scale: data.scale,
+            notes: data.notes || null
+          })
+        }
+      })
+    })
+  })
+
+  if (payloadAssessments.length === 0) {
+    error.value = 'Belum ada penilaian yang diisi.'
     isSaving.value = false
     return
   }
 
   try {
     const payload = {
-      aspect: finalAspect.value,
+      month: selectedMonth.value,
       semester: selectedSemester.value,
-      academic_year: currentAcademicYear.value,
-      assessments: students.value.map(s => ({
-        student_id: s.student_id,
-        scale: s.scale as PAUDScale,
-        notes: s.notes
-      }))
+      academic_year: currentAcademicYear.value as string,
+      assessments: payloadAssessments
     }
     const res = await assessmentService.storeBulkAssessment(
       schoolStore.currentSchoolId as number,
@@ -131,6 +212,8 @@ async function saveAssessment() {
       payload
     )
     successMessage.value = (res as any).message
+    // Refetch to sync state
+    fetchStudents()
   } catch (err: any) {
     error.value = 'Gagal menyimpan penilaian.'
   } finally {
@@ -147,8 +230,9 @@ function getScaleColor(scale: string) {
     default: return 'bg-slate-50 text-slate-700 border-slate-200'
   }
 }
+
 const hasAnyAssessment = computed(() => {
-  return students.value.some(s => s.scale !== null)
+  return students.value.some(s => s.assessments && Object.keys(s.assessments).length > 0)
 })
 </script>
 
@@ -157,7 +241,7 @@ const hasAnyAssessment = computed(() => {
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-heading">Penilaian Skala Perkembangan</h1>
-        <p class="text-sm text-muted">Input pencatatan perkembangan anak secara bulk.</p>
+        <p class="text-sm text-muted">Input pencatatan perkembangan anak secara periodik (Bulanan).</p>
       </div>
     </div>
 
@@ -166,107 +250,187 @@ const hasAnyAssessment = computed(() => {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="space-y-2">
           <label class="text-sm font-semibold text-slate-700">Pilih Kelas</label>
-          <select v-model="selectedClassId" :disabled="isLoadingClasses" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
+          <select v-model="selectedClassId" :disabled="isLoadingClasses" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm transition-all">
             <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }} ({{ c.academic_year }})</option>
             <option v-if="classes.length === 0" value="">Belum ada kelas</option>
           </select>
         </div>
         
         <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Aspek Perkembangan</label>
-          <select v-model="aspectSelection" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
-            <option v-for="aspect in predefinedAspects" :key="aspect" :value="aspect">{{ aspect }}</option>
-            <option value="CUSTOM">+ Tulis Manual Lainnya...</option>
+          <label class="text-sm font-semibold text-slate-700">Semester</label>
+          <select v-model="selectedSemester" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm transition-all">
+            <option value="1">Semester 1 (Ganjil)</option>
+            <option value="2">Semester 2 (Genap)</option>
           </select>
         </div>
 
-        <div v-if="aspectSelection === 'CUSTOM'" class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Nama Aspek (Manual)</label>
-          <input type="text" v-model="customAspect" placeholder="Contoh: Kreativitas Bermain" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none shadow-sm" />
-        </div>
-
         <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Semester</label>
-          <select v-model="selectedSemester" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm">
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
+          <label class="text-sm font-semibold text-slate-700">Bulan Penilaian</label>
+          <select v-model="selectedMonth" class="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white shadow-sm transition-all">
+            <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.label }}</option>
+            <option v-if="availableMonths.length === 0" value="">-- Pilih --</option>
           </select>
         </div>
       </div>
     </BaseCard>
 
     <!-- Error/Success -->
-    <div v-if="error" class="p-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 flex items-center gap-3">
+    <div v-if="error" class="p-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 flex items-center gap-3 shadow-sm">
+      <Icon name="lucide:alert-circle" class="w-5 h-5 shrink-0" />
       <span>{{ error }}</span>
     </div>
-    <div v-if="!schoolStore.isTeacher" class="p-4 bg-blue-50 text-blue-700 rounded-xl border border-blue-100 flex items-start gap-3">
+    <div v-if="!schoolStore.isTeacher" class="p-4 bg-blue-50 text-blue-700 rounded-xl border border-blue-100 flex items-start gap-3 shadow-sm">
       <div class="p-1"><Icon name="lucide:info" class="w-4 h-4" /></div>
-      <span class="text-sm">Anda mengakses halaman ini sebagai Peninjau (Read-Only). Hanya Guru Kelas yang dapat mengisikan penilaian.</span>
+      <span class="text-sm">Anda mengakses halaman ini sebagai Peninjau (Read-Only). Hanya Guru Kelas yang dapat mengisikan penilaian bulanan.</span>
     </div>
-    <div v-if="successMessage" class="p-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 flex items-center gap-3">
+    <div v-if="successMessage" class="p-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 flex items-center gap-3 shadow-sm">
+      <Icon name="lucide:check-circle" class="w-5 h-5 shrink-0" />
       <span>{{ successMessage }}</span>
     </div>
 
-    <!-- Main Content Table -->
-    <BaseCard class="p-0 overflow-hidden shadow-sm">
-      <div v-if="isLoadingStudents" class="p-12 text-center text-slate-400">
-        <div class="animate-spin w-8 h-8 rounded-full border-4 border-slate-200 border-t-primary-500 mx-auto mb-4"></div>
-        <p>Memuat form siswa...</p>
-      </div>
-      <div v-else-if="students.length === 0" class="p-12 text-center text-slate-400">
-        <p>Tidak ada siswa di kelas ini.</p>
-      </div>
-      <div v-else-if="!schoolStore.isTeacher && !hasAnyAssessment" class="p-20 text-center">
-        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-          <Icon name="lucide:bar-chart-2" class="w-8 h-8" />
+    <!-- Main Content: Student-Centric Layout -->
+    <div v-if="isLoadingStudents" class="p-12 text-center text-slate-400 bg-white rounded-xl border border-slate-100 shadow-sm">
+      <div class="animate-spin w-8 h-8 rounded-full border-4 border-slate-200 border-t-primary-500 mx-auto mb-4"></div>
+      <p>Memuat formulir indikator...</p>
+    </div>
+    
+    <div v-else-if="students.length === 0 && selectedClassId" class="p-12 text-center text-slate-400 bg-white rounded-xl border border-slate-100 shadow-sm">
+      <p>Tidak ada siswa di kelas ini.</p>
+    </div>
+
+    <div v-else-if="students.length > 0" class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start relative">
+      
+      <!-- Left: Student List -->
+      <div class="lg:col-span-1 space-y-3 bg-white rounded-xl shadow-sm border border-slate-100 p-3 max-h-[calc(100vh-10rem)] flex flex-col sticky top-4">
+        <div class="space-y-2 shrink-0">
+          <h3 class="font-bold text-slate-700 px-1 text-sm uppercase tracking-wider">Daftar Siswa</h3>
+          <div class="relative">
+            <Icon name="lucide:search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              v-model="searchQuery" 
+              type="text" 
+              placeholder="Cari siswa..." 
+              class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+            />
+          </div>
         </div>
-        <h3 class="text-lg font-bold text-slate-800">Belum Ada Penilaian</h3>
-        <p class="text-slate-500 max-w-xs mx-auto text-sm mt-1">Belum ada input penilaian untuk aspek "{{ finalAspect }}" pada periode ini.</p>
+        
+        <div class="space-y-1.5 overflow-y-auto custom-scrollbar flex-1 pr-1">
+          <button 
+            v-for="(student, idx) in filteredStudents" 
+            :key="student.student_id"
+            @click="activeStudentId = student.student_id"
+            :class="[
+              'w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center justify-between border',
+              activeStudentId === student.student_id 
+                ? 'bg-primary-50 border-primary-200 shadow-sm relative overflow-hidden' 
+                : 'bg-white border-transparent hover:bg-slate-50 hover:border-slate-200'
+            ]"
+          >
+            <div v-if="activeStudentId === student.student_id" class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500"></div>
+            <div>
+              <p :class="['font-bold text-sm line-clamp-1', activeStudentId === student.student_id ? 'text-primary-700' : 'text-slate-700']">{{ student.name }}</p>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">{{ student.nisn || '-' }}</p>
+            </div>
+            <Icon name="lucide:chevron-right" :class="['w-4 h-4 shrink-0 ml-2', activeStudentId === student.student_id ? 'text-primary-500' : 'text-slate-300']" />
+          </button>
+          
+          <div v-if="filteredStudents.length === 0" class="text-center py-4 text-sm text-slate-400 italic">
+            Siswa tidak ditemukan.
+          </div>
+        </div>
       </div>
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider text-slate-500 font-bold">
-              <th class="px-6 py-4 w-1/4">Nama Siswa</th>
-              <th class="px-6 py-4 whitespace-nowrap min-w-[320px]">Skala (BB, MB, BSH, BSB)</th>
-              <th class="px-6 py-4">Catatan Perkembangan</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr v-for="student in students" :key="student.student_id" class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-6 py-4 align-top">
-                <p class="font-bold text-slate-800">{{ student.name }}</p>
-                <p class="text-xs text-slate-500 font-mono mt-0.5">{{ student.nisn || '-' }}</p>
-              </td>
-              <td class="px-6 py-4 align-top">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                  <label v-for="(label, val) in {'BB': 'BB', 'MB': 'MB', 'BSH': 'BSH', 'BSB': 'BSB'}" :key="val" class="cursor-pointer">
-                    <input type="radio" :disabled="!schoolStore.isTeacher" :name="`scale-${student.student_id}`" :value="val" v-model="student.scale" class="hidden" />
-                    <div :class="['flex items-center text-center justify-center px-2 py-2 rounded-xl text-xs font-bold border transition-all h-full', student.scale === val ? getScaleColor(val) : 'bg-white text-slate-400 border-slate-200 border-dashed', (schoolStore.isTeacher) ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
+
+      <!-- Right: Assessment Form -->
+      <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden flex flex-col relative" v-if="activeStudent">
+        <!-- Form Header -->
+        <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center sticky top-0 z-20 backdrop-blur-md">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">{{ activeStudent.name }}</h2>
+            <p class="text-sm text-slate-500 mt-1">Isi penilaian indikator untuk siswa ini.</p>
+          </div>
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-slate-200 shadow-sm text-primary-600 font-bold text-lg overflow-hidden shrink-0">
+            <img v-if="activeStudent.photo_url" :src="activeStudent.photo_url" class="w-full h-full object-cover" />
+            <span v-else>{{ activeStudent.name.charAt(0).toUpperCase() }}</span>
+          </div>
+        </div>
+
+        <!-- Form Body (Programs & Indicators) -->
+        <div class="p-6 space-y-8">
+          <div v-for="program in programs" :key="program.id" class="space-y-4">
+            
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
+              <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+                <Icon name="lucide:folder-tree" class="w-4 h-4" />
+              </div>
+              <h3 class="text-lg font-bold text-slate-800">{{ program.name }}</h3>
+            </div>
+
+            <div v-if="program.indicators.length === 0" class="text-sm text-slate-400 italic px-11">
+              Tidak ada indikator.
+            </div>
+
+            <div class="space-y-3 px-2 md:px-11">
+              <div v-for="(indicator, idx) in program.indicators" :key="indicator.id" class="p-4 rounded-xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm transition-all grid grid-cols-1 xl:grid-cols-2 gap-4 items-center">
+                
+                <div class="flex gap-3 items-start pr-4">
+                  <span class="text-slate-300 font-mono text-sm mt-0.5">{{ idx + 1 }}.</span>
+                  <p class="text-sm text-slate-700 leading-relaxed">{{ indicator.name }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <label v-for="(label, val) in {'BB': 'BB', 'MB': 'MB', 'BSH': 'BSH', 'BSB': 'BSB'}" :key="val" class="cursor-pointer h-10">
+                    <input 
+                      type="radio" 
+                      :disabled="!schoolStore.isTeacher" 
+                      :name="`scale-${activeStudent.student_id}-${indicator.id}`" 
+                      :value="val" 
+                      v-model="formState[activeStudent.student_id]![indicator.id as number]!.scale" 
+                      class="hidden" 
+                    />
+                    <div :class="[
+                      'flex items-center text-center justify-center px-2 py-1 rounded-lg text-xs font-bold border transition-all h-full', 
+                      formState[activeStudent.student_id]?.[indicator.id as number]?.scale === val ? getScaleColor(val) : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100', 
+                      (schoolStore.isTeacher) ? 'hover:shadow-sm' : 'opacity-70 cursor-not-allowed'
+                    ]">
                       {{ label }}
                     </div>
                   </label>
                 </div>
-                <div v-if="!student.scale && !schoolStore.isTeacher" class="mt-2 text-center py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic">
-                  Belum diinput
-                </div>
-                <p class="text-[10px] text-slate-400 mt-2 ml-1" v-if="student.scale === 'BB'">Belum Berkembang</p>
-                <p class="text-[10px] text-slate-400 mt-2 ml-1" v-else-if="student.scale === 'MB'">Mulai Berkembang</p>
-                <p class="text-[10px] text-slate-400 mt-2 ml-1" v-else-if="student.scale === 'BSH'">Berkembang Sesuai Harapan</p>
-                <p class="text-[10px] text-slate-400 mt-2 ml-1" v-else-if="student.scale === 'BSB'">Berkembang Sangat Baik</p>
-              </td>
-              <td class="px-6 py-4 align-top">
-                <textarea v-model="student.notes" :disabled="!schoolStore.isTeacher" placeholder="Misal: Sudah mampu mengikuti intruksi..." :class="['w-full text-sm px-3 py-2 rounded-xl border outline-none transition-all resize-y min-h-[80px] bg-white disabled:opacity-50 disabled:bg-slate-50 focus:ring-1', showValidationErrors && (!student.notes || student.notes.trim() === '') ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500 bg-danger-50/30' : 'border-slate-200 focus:border-primary-500 focus:ring-primary-500']"></textarea>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Sticky Save Button -->
+        <div v-if="schoolStore.isTeacher" class="p-4 border-t border-slate-100 bg-white flex justify-between items-center sticky bottom-0 z-20 shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.1)]">
+          <p class="text-xs text-slate-500 hidden sm:block">Perubahan otomatis disimpan saat menekan tombol simpan.</p>
+          <BaseButton variant="primary" :disabled="isSaving" @click="saveAssessment" class="px-8 shadow-md hover:shadow-lg transition-all w-full sm:w-auto">
+            <Icon v-if="!isSaving" name="lucide:save" class="w-4 h-4 mr-2" />
+            <div v-else class="animate-spin w-4 h-4 rounded-full border-2 border-white/30 border-t-white mr-2"></div>
+            {{ isSaving ? 'Menyimpan...' : 'Simpan Seluruh Penilaian Kelas' }}
+          </BaseButton>
+        </div>
+
       </div>
-      <div v-if="schoolStore.isTeacher" class="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end">
-        <BaseButton variant="primary" :disabled="isSaving || students.length === 0" @click="saveAssessment" class="px-8 shadow-md">
-          {{ isSaving ? 'Menyimpan...' : 'Simpan Penilaian' }}
-        </BaseButton>
-      </div>
-    </BaseCard>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1; 
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; 
+}
+</style>

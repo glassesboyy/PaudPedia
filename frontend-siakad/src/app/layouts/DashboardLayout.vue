@@ -48,22 +48,37 @@ function switchSchool() {
 const navItems = computed(() => {
   const role = schoolStore.currentRole
     const items = [
-      { name: 'Dashboard', icon: 'dashboard', to: '/', roles: ['headmaster', 'teacher', 'parent'] },
-      { name: 'Kelas', icon: 'class', to: '/classes', roles: ['headmaster'] },
-      { name: 'Daftar Kelas', icon: 'class', to: '/classes', roles: ['teacher'] },
-      { name: 'Guru', icon: 'teacher', to: '/teachers', roles: ['headmaster'] },
-      { name: 'Siswa', icon: 'student', to: '/students', roles: ['headmaster'] },
-      { name: 'Data Siswa', icon: 'student', to: '/students', roles: ['teacher'] },
-      { name: 'Orang Tua', icon: 'parent', to: '/parents', roles: ['headmaster'] },
-      { name: 'Data Orang Tua', icon: 'parent', to: '/parents', roles: ['teacher'] },
-      { name: 'Kehadiran', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'] },
-      { name: 'Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'] },
-      { name: 'SPP', icon: 'finance', to: '/finances/spp', roles: ['headmaster', 'teacher'] },
-      { name: 'Tabungan', icon: 'finance', to: '/finances/savings', roles: ['headmaster', 'teacher'] },
-      { name: 'Laporan', icon: 'report', to: '/reports', roles: ['headmaster', 'teacher'] },
-      { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'] },
-      { name: 'Langganan', icon: 'subscription', to: '/school/subscription', roles: ['headmaster'] },
-      { name: 'Pengaturan Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'] },
+      { name: 'Dashboard', icon: 'dashboard', to: '/', roles: ['headmaster', 'teacher', 'parent'], isPro: false },
+      
+      { name: 'Manajemen Kelas', icon: 'class', to: '/classes', roles: ['headmaster'], isPro: false },
+      { name: 'Manajemen Pendidik', icon: 'teacher', to: '/teachers', roles: ['headmaster'], isPro: false },
+      { name: 'Manajemen Siswa', icon: 'student', to: '/students', roles: ['headmaster'], isPro: false },
+      { name: 'Manajemen Wali Murid', icon: 'parent', to: '/parents', roles: ['headmaster'], isPro: false },
+      { name: 'Rekap Presensi', icon: 'attendance', to: '/attendance', roles: ['headmaster'], isPro: false },
+      { name: 'Paket Langganan', icon: 'subscription', to: '/school/subscription', roles: ['headmaster'], isPro: false },
+      { name: 'Profil Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'], isPro: false },
+
+      { name: 'Kelas Saya', icon: 'class', to: '/classes', roles: ['teacher'], isPro: false },
+      { name: 'Data Siswa', icon: 'student', to: '/students', roles: ['teacher'], isPro: false },
+      { name: 'Data Wali Murid', icon: 'parent', to: '/parents', roles: ['teacher'], isPro: false },
+      { name: 'Presensi Kelas', icon: 'attendance', to: '/attendance', roles: ['teacher'], isPro: false },
+      
+      { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'], isPro: false },
+
+      { name: 'Input Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'], isPro: false },
+      { name: 'Master Penilaian', icon: 'settings', to: '/assessments/settings', roles: ['headmaster'], isPro: false },
+      { name: 'Panduan Penilaian', icon: 'info', to: '/assessments/guide', roles: ['headmaster', 'teacher', 'parent'], isPro: false },
+
+      // PRO PLAN Features
+      { name: 'Rapor Naratif', icon: 'report_builder', to: '/assessments/report', roles: ['headmaster', 'teacher'], isPro: true },
+      
+      { name: 'Manajemen SPP', icon: 'finance', to: '/finances/spp', roles: ['headmaster'], isPro: true },
+      { name: 'Manajemen Tabungan', icon: 'savings', to: '/finances/savings', roles: ['headmaster'], isPro: true },
+      { name: 'Cetak Rapor', icon: 'report', to: '/reports', roles: ['headmaster'], isPro: true },
+
+      { name: 'Tagihan SPP', icon: 'finance', to: '/finances/spp', roles: ['teacher'], isPro: true },
+      { name: 'Tabungan Siswa', icon: 'savings', to: '/finances/savings', roles: ['teacher'], isPro: true },
+      { name: 'Cetak Rapor', icon: 'report', to: '/reports', roles: ['teacher'], isPro: true },
     ]
   return items.filter((item) => item.roles.includes(role ?? ''))
 })
@@ -79,9 +94,34 @@ const navIcons: Record<string, string> = {
   assessment: 'lucide:bar-chart-2',
   school: 'lucide:settings',
   finance: 'lucide:wallet',
+  savings: 'lucide:piggy-bank',
   report: 'lucide:file-text',
+  report_builder: 'lucide:book-open',
   subscription: 'lucide:crown',
+  settings: 'lucide:settings-2',
+  info: 'lucide:info',
 }
+
+const freePlanItems = computed(() => navItems.value.filter(item => !item.isPro))
+const proPlanItems = computed(() => navItems.value.filter(item => item.isPro))
+
+import { useRoute } from 'vue-router'
+const route = useRoute()
+
+const activeItemTo = computed(() => {
+  const allItems = [...freePlanItems.value, ...proPlanItems.value]
+  const matchingItems = allItems.filter(item => route.path === item.to || (item.to !== '/' && route.path.startsWith(item.to + '/')))
+  if (matchingItems.length === 0) {
+    const fallbackMatch = allItems.filter(item => item.to !== '/' && route.path.startsWith(item.to))
+    if (fallbackMatch.length > 0) {
+      fallbackMatch.sort((a, b) => b.to.length - a.to.length)
+      return fallbackMatch[0]!.to
+    }
+    return null
+  }
+  matchingItems.sort((a, b) => b.to.length - a.to.length)
+  return matchingItems[0]!.to
+})
 </script>
 
 <template>
@@ -131,21 +171,61 @@ const navIcons: Record<string, string> = {
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
-          <RouterLink
-            v-for="item in navItems"
-            :key="item.name"
-            :to="item.to"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 no-underline hover:bg-slate-50 hover:text-slate-900 transition-all duration-200 group border border-transparent"
-            active-class="!bg-primary-600 !text-white !border-primary-500 shadow-sm"
-            @click="isSidebarOpen = false"
-          >
-            <Icon 
-              :name="navIcons[item.icon]"
-              class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110" 
-            />
-            {{ item.name }}
-          </RouterLink>
+        <nav class="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+          
+          <!-- FREE PLAN -->
+          <div>
+            <p class="px-4 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">Umum</p>
+            <div class="space-y-1">
+              <RouterLink
+                v-for="item in freePlanItems"
+                :key="item.name"
+                :to="item.to"
+                :class="[
+                  'flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 group border',
+                  activeItemTo === item.to
+                    ? 'bg-primary-50 text-primary-700 border-primary-200 shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent'
+                ]"
+                @click="isSidebarOpen = false"
+              >
+                <Icon 
+                  :name="navIcons[item.icon]"
+                  :class="['w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110', activeItemTo === item.to ? 'text-primary-600' : 'text-slate-400']" 
+                />
+                {{ item.name }}
+              </RouterLink>
+            </div>
+          </div>
+
+          <!-- PRO PLAN -->
+          <div v-if="proPlanItems.length > 0">
+            <div class="flex items-center gap-2 px-4 mb-2">
+              <p class="text-[10px] font-extrabold text-amber-500 uppercase tracking-widest">PRO PLAN</p>
+              <Icon name="lucide:crown" class="w-3 h-3 text-amber-500" />
+            </div>
+            <div class="space-y-1">
+              <RouterLink
+                v-for="item in proPlanItems"
+                :key="item.name"
+                :to="item.to"
+                :class="[
+                  'flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 group border',
+                  activeItemTo === item.to
+                    ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent'
+                ]"
+                @click="isSidebarOpen = false"
+              >
+                <Icon 
+                  :name="navIcons[item.icon]"
+                  :class="['w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110', activeItemTo === item.to ? 'text-amber-600' : 'text-slate-400']" 
+                />
+                {{ item.name }}
+              </RouterLink>
+            </div>
+          </div>
+
         </nav>
 
         <!-- Sidebar footer -->

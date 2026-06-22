@@ -109,6 +109,20 @@ Route::middleware(['auth:sanctum', 'verified', \App\Http\Middleware\CheckActiveS
     Route::get('/schools/{id}/classes/{classId}/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
     Route::post('/schools/{id}/classes/{classId}/assessments', [AssessmentController::class, 'store'])->name('assessments.store');
     Route::get('/schools/{id}/students/{studentId}/assessments/history', [AssessmentController::class, 'studentHistory'])->name('assessments.history');
+    Route::get('/schools/{id}/students/{studentId}/assessments/matrix', [AssessmentController::class, 'studentMatrix'])->name('assessments.matrix');
+
+    // Report / Raport Narrative Management
+    Route::get('/schools/{id}/classes/{classId}/students/{studentId}/report', [\App\Http\Controllers\Api\V1\School\StudentReportController::class, 'show'])->name('student-reports.show');
+    Route::post('/schools/{id}/classes/{classId}/students/{studentId}/report', [\App\Http\Controllers\Api\V1\School\StudentReportController::class, 'store'])->name('student-reports.store');
+
+    // Assessment Settings (Programs & Indicators)
+    Route::get('/schools/{id}/development-programs', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'getPrograms'])->name('assessments.settings.programs');
+    Route::post('/schools/{id}/development-programs', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'storeProgram'])->name('assessments.settings.programs.store');
+    Route::put('/schools/{id}/development-programs/{programId}', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'updateProgram'])->name('assessments.settings.programs.update');
+    Route::delete('/schools/{id}/development-programs/{programId}', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'destroyProgram'])->name('assessments.settings.programs.destroy');
+    Route::post('/schools/{id}/development-programs/{programId}/indicators', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'storeIndicator'])->name('assessments.settings.indicators.store');
+    Route::put('/schools/{id}/development-indicators/{indicatorId}', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'updateIndicator'])->name('assessments.settings.indicators.update');
+    Route::delete('/schools/{id}/development-indicators/{indicatorId}', [\App\Http\Controllers\Api\V1\School\AssessmentSettingController::class, 'destroyIndicator'])->name('assessments.settings.indicators.destroy');
 
     // Subscription management (FR-SM)
     Route::get('/schools/{id}/subscription', [SubscriptionController::class, 'show'])->name('subscription.show');
@@ -126,8 +140,10 @@ Route::middleware(['auth:sanctum', 'verified', \App\Http\Middleware\CheckActiveS
     Route::get('/schools/{id}/students/{studentId}/finances', [FinanceController::class, 'studentFinances'])->name('finances.student');
 
     // Report / Raport management (FR-RP) — Pro Plan only
+    // Assessment & Report Export (FR-SA-04)
     Route::get('/schools/{id}/reports/students/{studentId}/data', [ReportController::class, 'reportData'])->name('reports.data');
     Route::get('/schools/{id}/reports/students/{studentId}/pdf', [ReportController::class, 'downloadPdf'])->name('reports.pdf');
+    Route::get('/schools/{id}/classes/{classId}/reports-status', [ReportController::class, 'statusList'])->name('reports.status');
 
     // School memberships
     Route::get('/my-memberships', [SchoolController::class, 'myMemberships'])
@@ -138,3 +154,8 @@ Route::middleware(['auth:sanctum', 'verified', \App\Http\Middleware\CheckActiveS
         ->name('testimonials.store');
 });
 
+// Super Admin routes
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::apiResource('admin/development-programs', \App\Http\Controllers\Api\V1\Admin\DevelopmentProgramController::class);
+    Route::apiResource('admin/development-indicators', \App\Http\Controllers\Api\V1\Admin\DevelopmentIndicatorController::class)->only(['store', 'update', 'destroy']);
+});

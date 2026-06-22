@@ -180,33 +180,6 @@ class ManageSiteSettings extends Page implements HasSchemas
                 ->columns(2)
                 ->collapsible(),
 
-            Section::make('Pengaturan Pembayaran (Midtrans)')
-                ->description('Konfigurasi payment gateway Midtrans')
-                ->schema([
-                    TextInput::make('midtrans_client_key')
-                        ->label('Client Key')
-                        ->required()
-                        ->maxLength(255)
-                        ->placeholder('SB-Mid-client-xxx atau Mid-client-xxx')
-                        ->helperText('Midtrans Client Key untuk frontend'),
-
-                    TextInput::make('midtrans_server_key')
-                        ->label('Server Key')
-                        ->required()
-                        ->password()
-                        ->maxLength(255)
-                        ->placeholder('SB-Mid-server-xxx atau Mid-server-xxx')
-                        ->helperText('Midtrans Server Key untuk backend (disembunyikan)'),
-
-                    Toggle::make('midtrans_is_production')
-                        ->label('Mode Production')
-                        ->required()
-                        ->helperText('Aktifkan untuk menggunakan production environment Midtrans')
-                        ->default(false),
-                ])
-                ->columns(1)
-                ->collapsible()
-                ->collapsed(),
 
             Section::make('Pengaturan Langganan')
                 ->description('Konfigurasi paket gratis dan pro untuk sekolah')

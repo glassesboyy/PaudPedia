@@ -244,6 +244,11 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Siswa tidak ditemukan di sekolah ini.'], 404);
         }
 
+        $accessibleStudentIds = $this->getAccessibleStudentIds($request, $school->id);
+        if ($membership->isTeacher() && !in_array($student->id, $accessibleStudentIds)) {
+            return response()->json(['message' => 'Akses ditolak. Anda hanya dapat mengelola SPP siswa di kelas Anda sendiri.'], 403);
+        }
+
         // Prevent duplicate SPP for same student + same month
         $existing = Finance::where('student_id', $student->id)
             ->where('type', FinanceType::SPP)
@@ -293,7 +298,7 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        $studentIds = Student::where('school_id', $school->id)->pluck('id');
+        $studentIds = $this->getAccessibleStudentIds($request, $school->id);
         $finance = Finance::whereIn('student_id', $studentIds)
             ->where('id', $financeId)
             ->where('type', FinanceType::SPP)
@@ -503,6 +508,12 @@ class FinanceController extends Controller
             if (!$membership) {
                 return response()->json(['message' => 'Akses ditolak.'], 403);
             }
+
+            $accessibleStudentIds = $this->getAccessibleStudentIds($request, $school->id);
+            if ($membership->isTeacher() && !in_array($studentId, $accessibleStudentIds)) {
+                return response()->json(['message' => 'Akses ditolak. Anda hanya dapat melihat data finansial siswa di kelas Anda sendiri.'], 403);
+            }
+
             $student = Student::where('id', $studentId)
                 ->where('school_id', $school->id)
                 ->firstOrFail();

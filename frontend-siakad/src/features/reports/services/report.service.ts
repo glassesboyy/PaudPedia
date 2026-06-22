@@ -55,4 +55,11 @@ export const reportService = {
       responseType: 'blob',
     })
   },
+
+  /**
+   * Get list of student IDs who have generated reports for a class
+   */
+  getReportsStatusList(schoolId: number, classId: number, params?: { semester?: string; academic_year?: string }) {
+    return api.get<{ generated_student_ids: number[] }>(`/api/v1/schools/${schoolId}/classes/${classId}/reports-status`, { params })
+  }
 }

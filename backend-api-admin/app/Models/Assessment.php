@@ -14,8 +14,8 @@ class Assessment extends Model
 
     protected $fillable = [
         'student_id',
-        'aspect',
-        'description',
+        'indicator_id',
+        'assessment_month',
         'scale',
         'semester',
         'academic_year',
@@ -35,6 +35,11 @@ class Assessment extends Model
         return $this->belongsTo(Student::class);
     }
 
+    public function indicator(): BelongsTo
+    {
+        return $this->belongsTo(DevelopmentIndicator::class, 'indicator_id');
+    }
+
     // Indirect relationships via student
     public function school()
     {
@@ -52,9 +57,9 @@ class Assessment extends Model
         return $query->where('semester', $semester);
     }
 
-    public function scopeByAspect($query, string $aspect)
+    public function scopeByMonth($query, string $month)
     {
-        return $query->where('aspect', $aspect);
+        return $query->where('assessment_month', $month);
     }
 
     public function scopeByScale($query, AssessmentScale $scale)

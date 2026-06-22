@@ -203,16 +203,13 @@ function handleReset() {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto animate-fade-in space-y-6">
+  <div class="animate-fade-in space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <button @click="router.push({ name: 'FinanceOverview' })" class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors">
-          <Icon name="lucide:arrow-left" class="w-5 h-5" />
-        </button>
         <div>
-          <h1 class="text-2xl font-bold text-heading">Pembayaran SPP</h1>
-          <p class="text-sm text-muted">Catat dan kelola pembayaran SPP bulanan siswa</p>
+          <h1 class="text-2xl font-bold text-heading">Manajemen SPP</h1>
+          <p class="text-sm text-muted">Kelola tagihan dan pembayaran SPP bulanan.</p>
         </div>
       </div>
       <BaseButton v-if="schoolStore.isPro" variant="primary" @click="openForm" class="shadow-lg shadow-primary-500/20">

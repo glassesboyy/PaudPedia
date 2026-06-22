@@ -15,34 +15,28 @@ use Illuminate\Http\Request;
 class ReportController extends Controller
 {
     /**
-     * GET /api/v1/schools/{id}/reports/students/{studentId}/data
-     * 
-     * Get report data for preview.
+     * GET /api/v1/schools/{id}/classes/{classId}/reports/status
      */
-    public function reportData(Request $request, int $id, int $studentId): JsonResponse
+    public function statusList(Request $request, int $id, int $classId)
     {
         $school = School::findOrFail($id);
-
-        if (!$school->isPro()) {
-            return response()->json([
-                'message' => 'Fitur rapor hanya tersedia untuk Pro Plan.',
-                'upgrade_required' => true,
-            ], 403);
-        }
-
-        $user = $request->user();
-        $student = $this->resolveStudent($user, $school, $studentId);
-
-        if (!$student) {
-            return response()->json(['message' => 'Akses ditolak atau siswa tidak ditemukan.'], 403);
-        }
-
+        
         $semester = $request->get('semester', '1');
-        $academicYear = $request->get('academic_year', $student->class?->academic_year ?? date('Y') . '/' . (date('Y') + 1));
-
-        $data = $this->buildReportData($school, $student, $semester, $academicYear);
-
-        return response()->json($data);
+        $academicYear = $request->get('academic_year', date('Y') . '/' . (date('Y') + 1));
+        
+        $semesterEnum = \App\Enums\Semester::tryFrom($semester);
+        
+        $reports = \App\Models\StudentReport::whereHas('student', function($q) use ($classId) {
+            $q->where('class_id', $classId);
+        })
+        ->where('semester', $semesterEnum)
+        ->where('academic_year', $academicYear)
+        ->pluck('student_id')
+        ->toArray();
+        
+        return response()->json([
+            'generated_student_ids' => $reports
+        ]);
     }
 
     /**
@@ -70,8 +64,21 @@ class ReportController extends Controller
 
         $semester = $request->get('semester', '1');
         $academicYear = $request->get('academic_year', $student->class?->academic_year ?? date('Y') . '/' . (date('Y') + 1));
+        
+        $semesterEnum = \App\Enums\Semester::tryFrom($semester);
+        $studentReport = \App\Models\StudentReport::where('student_id', $student->id)
+            ->where('semester', $semesterEnum)
+            ->where('academic_year', $academicYear)
+            ->with('details.program')
+            ->first();
 
-        $data = $this->buildReportData($school, $student, $semester, $academicYear);
+        if (!$studentReport) {
+            return response()->json([
+                'message' => 'Rapor Naratif belum disusun oleh Guru untuk periode ini.'
+            ], 400);
+        }
+
+        $data = $this->buildReportData($school, $student, $studentReport, $semester, $academicYear);
 
         $pdf = Pdf::loadView('reports.student-report', $data);
         $pdf->setPaper('a4', 'portrait');
@@ -81,10 +88,7 @@ class ReportController extends Controller
         return $pdf->download($filename);
     }
 
-    /**
-     * Build report data for view/pdf.
-     */
-    protected function buildReportData(School $school, Student $student, string $semester, string $academicYear): array
+    protected function buildReportData(School $school, Student $student, \App\Models\StudentReport $studentReport, string $semester, string $academicYear): array
     {
         // Attendance summary
         // Calculate date range based on academic year and semester
@@ -116,17 +120,15 @@ class ReportController extends Controller
         ];
 
         // Assessment data
-        $assessments = Assessment::where('student_id', $student->id)
-            ->where('semester', $semester)
-            ->where('academic_year', $academicYear)
-            ->get()
-            ->map(fn ($a) => [
-                'id' => $a->id,
-                'aspect' => $a->aspect,
-                'scale' => $a->scale->value,
-                'scale_label' => $a->scale->label(),
-                'notes' => $a->notes,
-            ]);
+        // For PDF, we compute final scale per indicator to show in a table, or just pass the StudentReport data
+        // The PDF will show the narrative and maybe we don't need the matrix in the PDF, just the narrative!
+        // But the user said: "saya ingin pada bagian tabelnya, terdapat 1 kolom tambahan yakni "Capaian Akhir Semester" ... (dan ini dibuat per indikator)" - Oh that was for the "Penyusunan Rapor Naratif" UI, not the PDF.
+        // Wait, for the PDF they want "nilai (yang diambil dari fitur rapor naratif)".
+        
+        $reportDetails = $studentReport->details->map(fn ($detail) => [
+            'program' => $detail->program->name,
+            'narrative' => $detail->narrative,
+        ]);
 
         // School logo URL
         $logoUrl = null;
@@ -148,6 +150,30 @@ class ReportController extends Controller
                 $photoMime = mime_content_type($photoPath);
                 $photoUrl = "data:{$photoMime};base64,{$photoData}";
             }
+        }
+
+        // Get programs
+        $programs = \App\Models\DevelopmentProgram::with('indicators')
+            ->where('school_id', $school->id)
+            ->orderBy('order')
+            ->get();
+
+        // Get matrix
+        $assessments = Assessment::where('student_id', $student->id)
+            ->where('academic_year', $academicYear)
+            ->where('semester', \App\Enums\Semester::tryFrom($semester))
+            ->get();
+            
+        $matrix = [];
+        foreach ($assessments as $ast) {
+            if (!isset($matrix[$ast->indicator_id])) {
+                $matrix[$ast->indicator_id] = [];
+            }
+            $matrix[$ast->indicator_id][$ast->assessment_month] = [
+                'scale' => $ast->scale->value,
+                'scale_label' => $ast->scale->label(),
+                'scale_color' => $ast->scale->color(),
+            ];
         }
 
         return [
@@ -172,7 +198,14 @@ class ReportController extends Controller
             'semester_label' => $semester === '1' ? 'Semester 1 (Ganjil)' : 'Semester 2 (Genap)',
             'academic_year' => $academicYear,
             'attendance' => $attendanceSummary,
-            'assessments' => $assessments,
+            'report' => [
+                'introduction_notes' => $studentReport->introduction_notes,
+                'closing_notes' => $studentReport->closing_notes,
+                'recommendation' => $studentReport->recommendation,
+                'details' => $reportDetails,
+            ],
+            'programs' => $programs,
+            'matrix' => $matrix,
             'generated_at' => now()->format('d F Y'),
         ];
     }

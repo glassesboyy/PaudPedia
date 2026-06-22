@@ -45,12 +45,6 @@ async function fetchMyChildren() {
   <div class="space-y-6 animate-fade-in">
     <!-- Header -->
     <div class="flex items-center gap-4">
-      <button
-        @click="router.push('/')"
-        class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors"
-      >
-        <Icon name="lucide:arrow-left" class="w-5 h-5" />
-      </button>
       <div>
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-sm text-muted">{{ copy.subtitle }}</p>
