@@ -10,6 +10,7 @@ import BaseAlert from '@/components/ui/Alert/Alert.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import { Pagination } from '@/components/ui'
 import { usePageCopy } from '@/utils/copy-helper'
 
 const router = useRouter()
@@ -20,7 +21,7 @@ const copy = computed(() => getCopy('parent'))
 
 const isLoading = ref(false)
 const parents = ref<ParentProfile[]>([])
-const meta = ref({ current_page: 1, last_page: 1, total: 0 })
+const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 20 }) // TODO: Revert per_page to 20 after testing
 const generalError = ref('')
 const searchQuery = ref('')
 
@@ -42,6 +43,7 @@ async function fetchParents(page = 1) {
   try {
     const response = await parentService.getParents(schoolStore.currentSchoolId, {
       page,
+      per_page: 20, // TODO: Revert to 20 after testing
       search: searchQuery.value || undefined,
     })
     parents.value = response.data
@@ -255,19 +257,13 @@ function getParentDisplayName(p: ParentProfile): string {
       </div>
 
       <!-- Pagination -->
-      <div v-if="meta.last_page > 1" class="px-6 py-4 bg-muted/30 border-t border-border-muted flex items-center justify-between">
-        <p class="text-xs text-muted">
-          Menampilkan {{ parents.length }} dari {{ meta.total }} orang tua
-        </p>
-        <div class="flex gap-2">
-          <BaseButton variant="outline" size="sm" :disabled="meta.current_page === 1" @click="fetchParents(meta.current_page - 1)">
-            Sebelumnya
-          </BaseButton>
-          <BaseButton variant="outline" size="sm" :disabled="meta.current_page === meta.last_page" @click="fetchParents(meta.current_page + 1)">
-            Selanjutnya
-          </BaseButton>
-        </div>
-      </div>
+      <Pagination
+        :current-page="meta.current_page"
+        :last-page="meta.last_page"
+        :total-items="meta.total"
+        :items-per-page="meta.per_page"
+        @page-change="fetchParents"
+      />
     </BaseCard>
 
     <!-- Delete Confirmation Modal -->

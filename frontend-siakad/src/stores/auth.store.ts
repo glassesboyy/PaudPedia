@@ -40,6 +40,7 @@ export const useAuthStore = defineStore('auth', {
         // Populate school memberships from user data if available to save a request
         if (this.user.school_memberships) {
           schoolStore.memberships = this.user.school_memberships
+          schoolStore.isLoading = false
         } else {
           await schoolStore.fetchMemberships()
         }

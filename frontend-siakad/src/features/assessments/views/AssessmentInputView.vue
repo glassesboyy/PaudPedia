@@ -8,6 +8,7 @@ import type { ClassRoom, Semester, DevelopmentProgram } from '@/types'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import Icon from '@/components/ui/Icon/Icon.vue'
+import { Pagination } from '@/components/ui'
 import { format } from 'date-fns'
 
 const schoolStore = useSchoolStore()
@@ -74,6 +75,21 @@ const filteredStudents = computed(() => {
   return students.value.filter(s => s.name.toLowerCase().includes(q) || (s.nisn && s.nisn.toLowerCase().includes(q)))
 })
 
+const currentPage = ref(1)
+const itemsPerPage = 20 // TODO: Revert to 20 after testing
+
+const paginatedStudents = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredStudents.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(filteredStudents.value.length / itemsPerPage))
+
+watch(searchQuery, () => {
+  currentPage.value = 1
+})
+
 // Automatically set selectedMonth to the first available month when semester changes
 watch(availableMonths, (newMonths) => {
   if (newMonths.length > 0 && !newMonths.find(m => m.value === selectedMonth.value)) {
@@ -95,6 +111,12 @@ watch([selectedClassId, selectedMonth, selectedSemester], () => {
   } else {
     students.value = []
     programs.value = []
+  }
+})
+
+watch(students, (newStudents) => {
+  if (newStudents.length > 0 && !activeStudentId.value) {
+    activeStudentId.value = newStudents[0].student_id
   }
 })
 
@@ -317,7 +339,7 @@ const hasAnyAssessment = computed(() => {
         
         <div class="space-y-1.5 overflow-y-auto custom-scrollbar flex-1 pr-1">
           <button 
-            v-for="(student, idx) in filteredStudents" 
+            v-for="(student, idx) in paginatedStudents" 
             :key="student.student_id"
             @click="activeStudentId = student.student_id"
             :class="[
@@ -338,6 +360,17 @@ const hasAnyAssessment = computed(() => {
           <div v-if="filteredStudents.length === 0" class="text-center py-4 text-sm text-slate-400 italic">
             Siswa tidak ditemukan.
           </div>
+        </div>
+        
+        <div class="pt-2 border-t border-slate-100">
+          <Pagination
+            v-if="filteredStudents.length > 0"
+            :current-page="currentPage"
+            :last-page="totalPages"
+            :items-per-page="itemsPerPage"
+            @page-change="page => currentPage = page"
+            class="scale-90 origin-left"
+          />
         </div>
       </div>
 

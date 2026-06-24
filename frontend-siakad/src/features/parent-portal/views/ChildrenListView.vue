@@ -7,6 +7,7 @@ import { studentService } from '@/features/students/services/student.service'
 import type { Student } from '@/types'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import { Pagination } from '@/components/ui'
 import { usePageCopy } from '@/utils/copy-helper'
 
 const authStore = useAuthStore()
@@ -17,6 +18,7 @@ const { getCopy } = usePageCopy()
 const copy = computed(() => getCopy('student'))
 
 const myChildren = ref<Student[]>([])
+const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 10 }) // TODO: Revert per_page to 10 after testing
 const isLoading = ref(true)
 
 onMounted(async () => {
@@ -25,14 +27,16 @@ onMounted(async () => {
   }
 })
 
-async function fetchMyChildren() {
+async function fetchMyChildren(page = 1) {
   isLoading.value = true
   try {
     const response = await studentService.getStudents(schoolStore.currentSchoolId!, {
       parent_user_id: authStore.user?.id,
-      per_page: 50
+      page,
+      per_page: 10 // TODO: Revert to 10 after testing
     })
-    myChildren.value = response.data
+    myChildren.value = (response as any).data
+    meta.value = (response as any).meta
   } catch {
     myChildren.value = []
   } finally {
@@ -130,5 +134,15 @@ async function fetchMyChildren() {
         </div>
       </BaseCard>
     </div>
+    
+    <!-- TODO: Revert items-per-page to 10 after testing -->
+    <Pagination
+      v-if="myChildren.length > 0"
+      :current-page="meta.current_page"
+      :last-page="meta.last_page"
+      :total-items="meta.total"
+      :items-per-page="meta.per_page" 
+      @page-change="fetchMyChildren"
+    />
   </div>
 </template>

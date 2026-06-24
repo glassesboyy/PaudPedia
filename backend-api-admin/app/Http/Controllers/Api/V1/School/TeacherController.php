@@ -43,7 +43,7 @@ class TeacherController extends BaseController
                 $q->where('school_id', $schoolId)->where('role_type', \App\Enums\RoleType::TEACHER);
             }])
             ->orderBy('created_at', 'desc')
-            ->paginate($request->get('limit', 10));
+            ->paginate($request->get('per_page', 10));
 
         return $this->success([
             'teachers' => TeacherResource::collection($teachers),

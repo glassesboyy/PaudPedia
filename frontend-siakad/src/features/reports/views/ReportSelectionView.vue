@@ -3,7 +3,7 @@
  * ReportSelectionView — Pilih siswa dan semester untuk generate rapor.
  * Role: Headmaster, Teacher (Pro Plan only)
  */
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSchoolStore } from '@/stores/school.store'
 import { reportService } from '@/features/reports/services/report.service'
@@ -13,6 +13,7 @@ import ProPlanGate from '@/features/finances/components/ProPlanGate.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import { Pagination } from '@/components/ui'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
@@ -42,6 +43,21 @@ const filteredStudents = computed(() => {
   return list
 })
 
+const currentPage = ref(1)
+const itemsPerPage = 20 // TODO: Revert to 20 after testing
+
+const paginatedStudents = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return filteredStudents.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(filteredStudents.value.length / itemsPerPage))
+
+watch([selectedClassId, selectedSemester, selectedStatus], () => {
+  currentPage.value = 1
+})
+
 const selectedClassName = computed(() => {
   const cls = classes.value.find(c => c.id === selectedClassId.value)
   return cls?.name || ''
@@ -69,7 +85,7 @@ async function fetchClasses() {
 
 async function fetchStudents() {
   try {
-    const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students?only_my_class=true`)
+    const res = await api.get<{ data: Student[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/students?only_my_class=true&per_page=100`)
     students.value = (res as any).data
     await fetchReportsStatus()
   } catch { /* silent */ }
@@ -198,7 +214,7 @@ async function downloadReport(studentId: number) {
         </div>
 
         <div v-else class="divide-y divide-slate-100">
-          <div v-for="student in filteredStudents" :key="student.id" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors">
+          <div v-for="student in paginatedStudents" :key="student.id" class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors">
             <div class="w-10 h-10 rounded-full overflow-hidden bg-primary-50 flex items-center justify-center shrink-0">
               <img v-if="student.photo_url" :src="student.photo_url" class="w-full h-full object-cover" />
               <span v-else class="text-sm font-bold text-primary-600">{{ student.name.charAt(0).toUpperCase() }}</span>
@@ -227,6 +243,16 @@ async function downloadReport(studentId: number) {
             </div>
           </div>
         </div>
+        
+        <!-- Pagination -->
+        <Pagination
+          v-if="filteredStudents.length > 0"
+          :current-page="currentPage"
+          :last-page="totalPages"
+          :total-items="filteredStudents.length"
+          :items-per-page="itemsPerPage"
+          @page-change="page => currentPage = page"
+        />
       </BaseCard>
     </template>
   </div>

@@ -16,6 +16,7 @@ import BaseModal from '@/components/ui/Modal/Modal.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import { Pagination } from '@/components/ui'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
@@ -28,6 +29,7 @@ const success = ref('')
 const classes = ref<ClassRoom[]>([])
 const students = ref<Student[]>([])
 const sppRecords = ref<FinanceRecord[]>([])
+const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 50 }) // TODO: Revert per_page to 50 after testing
 
 // Filters
 const selectedClassId = ref<number | ''>('')
@@ -94,15 +96,21 @@ async function fetchStudents() {
   } catch { /* silent */ }
 }
 
-async function fetchSppRecords() {
+async function fetchSppRecords(page = 1) {
   isLoading.value = true
   try {
-    const params: Record<string, unknown> = { per_page: 50 }
+    const params: Record<string, unknown> = { page, per_page: 50 } // TODO: Revert to 50 after testing
     if (selectedMonth.value) params.month = selectedMonth.value
     if (selectedClassId.value) params.class_id = selectedClassId.value
     if (searchQuery.value) params.search = searchQuery.value
     const res = await financeService.getSppList(schoolStore.currentSchoolId!, params as any)
     sppRecords.value = (res as any).data
+    meta.value = {
+      current_page: (res as any).current_page,
+      last_page: (res as any).last_page,
+      total: (res as any).total,
+      per_page: (res as any).per_page
+    }
   } catch {
     error.value = 'Gagal memuat data SPP.'
   } finally {
@@ -191,14 +199,14 @@ function formatMonth(m: string): string {
 }
 
 function handleSearchEnter() {
-  fetchSppRecords()
+  fetchSppRecords(1)
 }
 
 function handleReset() {
   searchQuery.value = ''
   selectedClassId.value = ''
   selectedMonth.value = ''
-  fetchSppRecords()
+  fetchSppRecords(1)
 }
 </script>
 
@@ -285,13 +293,13 @@ function handleReset() {
           </BaseInput>
         </div>
         <div class="w-44">
-          <select v-model="selectedClassId" @change="fetchSppRecords" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
+          <select v-model="selectedClassId" @change="() => fetchSppRecords(1)" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
             <option value="">Semua Kelas</option>
             <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
           </select>
         </div>
         <div class="w-44">
-          <input v-model="selectedMonth" @change="fetchSppRecords" type="month" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all" />
+          <input v-model="selectedMonth" @change="() => fetchSppRecords(1)" type="month" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all" />
         </div>
         <BaseButton 
           v-if="isFiltering" 
@@ -399,6 +407,14 @@ function handleReset() {
             </tbody>
           </table>
         </div>
+        <!-- Pagination -->
+        <Pagination
+          :current-page="meta.current_page"
+          :last-page="meta.last_page"
+          :total-items="meta.total"
+          :items-per-page="meta.per_page"
+          @page-change="fetchSppRecords"
+        />
       </BaseCard>
 
       <!-- Verification Modal -->

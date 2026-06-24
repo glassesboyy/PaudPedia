@@ -10,6 +10,7 @@ import BaseAlert from '@/components/ui/Alert/Alert.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import { Pagination } from '@/components/ui'
 import { usePageCopy } from '@/utils/copy-helper'
 
 const router = useRouter()
@@ -22,7 +23,7 @@ const isHeadmaster = computed(() => schoolStore.isHeadmaster)
 
 const isLoading = ref(false)
 const classes = ref<ClassRoom[]>([])
-const meta = ref({ current_page: 1, last_page: 1, total: 0 })
+const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 10 }) // TODO: Revert to 10 after testing
 const generalError = ref('')
 const searchQuery = ref('')
 
@@ -41,7 +42,7 @@ async function fetchClasses(page = 1) {
   isLoading.value = true
   generalError.value = ''
   try {
-    const params: Record<string, any> = { page }
+    const params: Record<string, any> = { page, per_page: 10 } // TODO: Revert to 10 after testing
     if (searchQuery.value) params.search = searchQuery.value
 
     const response = await classService.getClasses(schoolStore.currentSchoolId, params)
@@ -271,29 +272,13 @@ async function executeDelete() {
       </div>
 
       <!-- Pagination -->
-      <div v-if="meta.last_page > 1" class="px-6 py-4 bg-muted/30 border-t border-border-muted flex items-center justify-between">
-        <p class="text-xs text-muted">
-          Menampilkan {{ classes.length }} dari {{ meta.total }} kelas
-        </p>
-        <div class="flex gap-2">
-          <BaseButton 
-            variant="outline" 
-            size="sm" 
-            :disabled="meta.current_page === 1"
-            @click="fetchClasses(meta.current_page - 1)"
-          >
-            Sebelumnya
-          </BaseButton>
-          <BaseButton 
-            variant="outline" 
-            size="sm" 
-            :disabled="meta.current_page === meta.last_page"
-            @click="fetchClasses(meta.current_page + 1)"
-          >
-            Selanjutnya
-          </BaseButton>
-        </div>
-      </div>
+      <Pagination
+        :current-page="meta.current_page"
+        :last-page="meta.last_page"
+        :total-items="meta.total"
+        :items-per-page="meta.per_page"
+        @page-change="fetchClasses"
+      />
     </BaseCard>
 
     <!-- Delete Confirmation Modal -->

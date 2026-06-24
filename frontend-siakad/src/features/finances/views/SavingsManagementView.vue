@@ -16,6 +16,7 @@ import BaseModal from '@/components/ui/Modal/Modal.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import { Pagination } from '@/components/ui'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
@@ -30,6 +31,7 @@ const classes = ref<ClassRoom[]>([])
 const students = ref<Student[]>([])
 const savingsRecords = ref<FinanceRecord[]>([])
 const balanceInfo = ref<{ balance: number; total_deposits: number; total_withdrawals: number } | null>(null)
+const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 50 }) // TODO: Revert per_page to 50 after testing
 
 const selectedClassId = ref<number | ''>('')
 const searchQuery = ref('')
@@ -71,15 +73,21 @@ async function fetchStudents() {
   } catch { /* silent */ }
 }
 
-async function fetchSavings() {
+async function fetchSavings(page = 1) {
   isLoading.value = true
   try {
-    const params: Record<string, unknown> = { per_page: 50 }
+    const params: Record<string, unknown> = { page, per_page: 50 } // TODO: Revert to 50 after testing
     if (selectedClassId.value) params.class_id = selectedClassId.value
     if (searchQuery.value) params.search = searchQuery.value
     const res = await financeService.getSavingsList(schoolStore.currentSchoolId!, params as any)
     savingsRecords.value = (res as any).data
     balanceInfo.value = (res as any).balance_info || null
+    meta.value = {
+      current_page: (res as any).current_page,
+      last_page: (res as any).last_page,
+      total: (res as any).total,
+      per_page: (res as any).per_page
+    }
   } catch {
     error.value = 'Gagal memuat data tabungan.'
   } finally {
@@ -120,17 +128,17 @@ function formatDate(dateStr: string): string {
 }
 
 function handleFilterChange() {
-  fetchSavings()
+  fetchSavings(1)
 }
 
 function handleSearchEnter() {
-  fetchSavings()
+  fetchSavings(1)
 }
 
 function handleReset() {
   searchQuery.value = ''
   selectedClassId.value = ''
-  fetchSavings()
+  fetchSavings(1)
 }
 </script>
 
@@ -314,6 +322,14 @@ function handleReset() {
             </tbody>
           </table>
         </div>
+        <!-- Pagination -->
+        <Pagination
+          :current-page="meta.current_page"
+          :last-page="meta.last_page"
+          :total-items="meta.total"
+          :items-per-page="meta.per_page"
+          @page-change="fetchSavings"
+        />
       </BaseCard>
     </template>
   </div>

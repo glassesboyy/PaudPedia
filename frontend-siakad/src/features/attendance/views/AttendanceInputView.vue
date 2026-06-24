@@ -7,6 +7,7 @@ import { AttendanceStatus } from '@/types'
 import type { ClassRoom, AttendanceRecord } from '@/types'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
+import { Pagination } from '@/components/ui'
 
 const schoolStore = useSchoolStore()
 
@@ -55,11 +56,23 @@ const previewImageUrl = ref<string | null>(null)
 const error = ref('')
 const successMessage = ref('')
 
+const currentPage = ref(1)
+const itemsPerPage = 20 // TODO: Revert to 20 after testing
+
+const paginatedStudents = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return students.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(students.value.length / itemsPerPage))
+
 onMounted(async () => {
   await fetchClasses()
 })
 
 watch([selectedClassId, selectedDate], () => {
+  currentPage.value = 1
   if (selectedClassId.value) {
     fetchStudents()
   }
@@ -301,7 +314,7 @@ const attendanceStats = computed(() => {
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <tr v-for="student in students" :key="student.student_id" class="hover:bg-slate-50/50 transition-colors">
+            <tr v-for="student in paginatedStudents" :key="student.student_id" class="hover:bg-slate-50/50 transition-colors">
               <td class="px-6 py-4">
                 <p class="font-bold text-slate-800">{{ student.name }}</p>
                 <p class="text-xs text-slate-500 font-mono">{{ student.nisn || '-' }}</p>
@@ -337,6 +350,16 @@ const attendanceStats = computed(() => {
           </tbody>
         </table>
       </div>
+      <!-- Pagination -->
+      <Pagination
+        v-if="students.length > 0"
+        :current-page="currentPage"
+        :last-page="totalPages"
+        :total-items="students.length"
+        :items-per-page="itemsPerPage"
+        @page-change="page => currentPage = page"
+      />
+
       <div v-if="schoolStore.isTeacher" class="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end">
         <BaseButton variant="primary" :disabled="isSaving || students.length === 0" @click="saveAttendance" class="px-8 shadow-md">
           {{ isSaving ? 'Menyimpan...' : 'Simpan Absensi' }}
