@@ -46,7 +46,7 @@ function getParentDisplayName(p: ParentProfile): string {
 <template>
   <div class="max-w-4xl mx-auto animate-fade-in space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <button
           @click="router.push({ name: 'ParentList' })"

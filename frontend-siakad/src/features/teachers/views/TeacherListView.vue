@@ -149,7 +149,7 @@ function formatDate(dateString: string) {
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-muted">{{ copy.subtitle }}</p>
       </div>
-      <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'TeacherCreate' })">
+      <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'TeacherCreate' })" class="w-full sm:w-auto">
         <template #prepend>
           <Icon name="lucide:plus" class="w-4 h-4" />
         </template>

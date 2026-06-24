@@ -150,14 +150,14 @@ function handleReset() {
 <template>
   <div class="animate-fade-in space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <div>
           <h1 class="text-2xl font-bold text-heading">Tabungan Siswa</h1>
           <p class="text-sm text-muted">Kelola setoran dan penarikan tabungan siswa</p>
         </div>
       </div>
-      <BaseButton v-if="schoolStore.isPro" variant="primary" @click="showForm = true" class="shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700">
+      <BaseButton v-if="schoolStore.isPro" variant="primary" @click="showForm = true" class="shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto">
         <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Transaksi Baru
       </BaseButton>

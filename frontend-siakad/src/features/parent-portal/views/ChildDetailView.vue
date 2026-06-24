@@ -388,48 +388,48 @@ const computedAttendanceSummary = computed(() => {
     <!-- Detail Content -->
     <BaseCard v-else-if="student" class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
       <!-- Photo + Name Section -->
-      <div class="p-8 bg-slate-50 border-b border-slate-100 flex items-center gap-6">
-        <div class="w-24 h-24 rounded-2xl overflow-hidden bg-white border-2 border-slate-200 shadow-sm shrink-0">
+      <div class="p-8 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-white border-2 border-slate-200 shadow-sm shrink-0">
           <img v-if="student.photo_url" :src="student.photo_url" class="w-full h-full object-cover" />
           <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
             <Icon name="lucide:user" class="w-12 h-12" />
           </div>
         </div>
-        <div class="space-y-2">
-          <h2 class="text-2xl font-black text-heading">{{ student.name }}</h2>
-          <div class="flex items-center gap-2 flex-wrap">
+        <div class="space-y-3 sm:space-y-2 mt-2 sm:mt-0">
+          <h2 class="text-2xl font-black text-heading leading-tight">{{ student.name }}</h2>
+          <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
             <span :class="['px-3 py-1 rounded-full text-xs font-bold border', statusColors[student.status] || 'bg-slate-50 text-slate-700']">
               {{ statusLabels[student.status] || student.status }}
             </span>
-            <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
-              {{ student.class?.name || 'Belum ada kelas' }}
+            <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+              <Icon name="lucide:school" class="w-3.5 h-3.5" /> {{ student.class?.name || 'Belum ada kelas' }}
             </span>
           </div>
         </div>
       </div>
       
       <!-- Tabs Navigation -->
-      <div class="flex items-center gap-1 p-2 bg-slate-100 rounded-2xl mx-8 mt-4 border border-slate-200">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 p-2 bg-slate-100 rounded-2xl mx-4 sm:mx-8 mt-4 border border-slate-200">
         <button 
           v-for="tab in [{id: 'profile', label: 'Profil', icon: 'lucide:user'}, {id: 'attendance', label: 'Kehadiran', icon: 'lucide:calendar-check'}, {id: 'assessment', label: 'Perkembangan', icon: 'lucide:trending-up'}, {id: 'finance', label: 'Keuangan', icon: 'lucide:wallet'}]" 
           :key="tab.id"
           @click="activeTab = tab.id; if (tab.id === 'finance' && !financeData) fetchFinances()"
-          :class="['flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300', activeTab === tab.id ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50']"
+          :class="['flex items-center justify-center gap-2 py-3 px-2 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300', activeTab === tab.id ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50']"
         >
-          <Icon :name="tab.icon" class="w-4 h-4" />
-          {{ tab.label }}
+          <Icon :name="tab.icon" class="w-4 h-4 shrink-0" />
+          <span class="truncate">{{ tab.label }}</span>
         </button>
       </div>
 
 
 
-      <div class="p-8 space-y-10 min-h-[400px]">
+      <div class="p-5 sm:p-8 space-y-10 min-h-[400px]">
         <!-- Data Siswa (Tab: Profile) -->
         <div v-if="activeTab === 'profile'" class="space-y-6 animate-fade-in">
           <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100">
             <Icon name="lucide:backpack" class="w-5 h-5 text-primary-600" /> Profil Buah Hati
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 sm:gap-y-8">
             <div class="space-y-1.5">
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Icon name="lucide:user" class="w-3 h-3" /> Nama Lengkap</p>
               <p class="text-base font-bold text-slate-800">{{ student.name }}</p>
@@ -463,15 +463,15 @@ const computedAttendanceSummary = computed(() => {
 
         <!-- Attendance Data (Tab: Attendance) -->
         <div v-if="activeTab === 'attendance'" class="space-y-6 animate-fade-in">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100">
             <h3 class="text-lg font-black text-heading flex items-center gap-2">
               <Icon name="lucide:calendar-check" class="w-5 h-5 text-primary-600" /> Rekap Kehadiran
             </h3>
-            <div class="flex items-center gap-2">
-              <select v-model="selectedAcademicYear" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <select v-model="selectedAcademicYear" class="w-full sm:w-auto text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-2 sm:py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
                 <option v-for="year in availableAcademicYears" :key="year" :value="year">{{ year }}</option>
               </select>
-              <select v-model="attendanceFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+              <select v-model="attendanceFilter" class="w-full sm:w-auto text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-2 sm:py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
                 <option value="semester1">Semester 1</option>
                 <option value="semester2">Semester 2</option>
                 <option value="all">Keseluruhan</option>
@@ -488,26 +488,26 @@ const computedAttendanceSummary = computed(() => {
               </div>
             </div>
 
-            <div v-if="computedAttendanceSummary" class="grid grid-cols-2 md:grid-cols-5 gap-4 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAttendanceLoading}">
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                <p class="text-xs font-bold text-slate-500 uppercase">Hadir</p>
-                <p class="text-2xl font-black text-emerald-600 mt-1">{{ computedAttendanceSummary.present }}</p>
+            <div v-if="computedAttendanceSummary" class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 transition-all duration-300" :class="{'opacity-20 blur-[1px]': isAttendanceLoading}">
+              <div class="p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase">Hadir</p>
+                <p class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">{{ computedAttendanceSummary.present }}</p>
               </div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                <p class="text-xs font-bold text-slate-500 uppercase">Sakit</p>
-                <p class="text-2xl font-black text-amber-500 mt-1">{{ computedAttendanceSummary.sick }}</p>
+              <div class="p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase">Sakit</p>
+                <p class="text-xl sm:text-2xl font-black text-amber-500 mt-1">{{ computedAttendanceSummary.sick }}</p>
               </div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                <p class="text-xs font-bold text-slate-500 uppercase">Izin</p>
-                <p class="text-2xl font-black text-blue-500 mt-1">{{ computedAttendanceSummary.permission }}</p>
+              <div class="p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase">Izin</p>
+                <p class="text-xl sm:text-2xl font-black text-blue-500 mt-1">{{ computedAttendanceSummary.permission }}</p>
               </div>
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                <p class="text-xs font-bold text-slate-500 uppercase">Alfa</p>
-                <p class="text-2xl font-black text-rose-500 mt-1">{{ computedAttendanceSummary.absent }}</p>
+              <div class="p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                <p class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase">Alfa</p>
+                <p class="text-xl sm:text-2xl font-black text-rose-500 mt-1">{{ computedAttendanceSummary.absent }}</p>
               </div>
-              <div class="p-4 rounded-xl bg-primary-50 border border-primary-100 text-center shadow-inner">
-                <p class="text-xs font-bold text-primary-700 uppercase">Persentase</p>
-                <p class="text-2xl font-black text-primary-700 mt-1">{{ computedAttendanceSummary.percentage }}%</p>
+              <div class="p-3 sm:p-4 rounded-xl bg-primary-50 border border-primary-100 text-center shadow-inner col-span-2 md:col-span-1">
+                <p class="text-[11px] sm:text-xs font-bold text-primary-700 uppercase">Persentase</p>
+                <p class="text-xl sm:text-2xl font-black text-primary-700 mt-1">{{ computedAttendanceSummary.percentage }}%</p>
               </div>
             </div>
             
@@ -529,15 +529,15 @@ const computedAttendanceSummary = computed(() => {
             </div>
           </div>
 
-          <div class="flex items-center justify-between pb-2 border-b border-slate-100" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100" :class="{'opacity-20 blur-[1px]': isAssessmentLoading}">
             <h3 class="text-lg font-black text-heading flex items-center gap-2">
               <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-primary-600" /> Pencapaian Perkembangan
             </h3>
-            <div class="flex items-center gap-2">
-              <select v-model="selectedAcademicYear" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <select v-model="selectedAcademicYear" class="w-full sm:w-auto text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-2 sm:py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
                 <option v-for="year in availableAcademicYears" :key="year" :value="year">{{ year }}</option>
               </select>
-              <select v-model="assessmentSemesterFilter" class="text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
+              <select v-model="assessmentSemesterFilter" class="w-full sm:w-auto text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-2 sm:py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
                 <option value="all">Semua Semester</option>
                 <option value="1">Semester 1</option>
                 <option value="2">Semester 2</option>
@@ -600,13 +600,13 @@ const computedAttendanceSummary = computed(() => {
               </div>
               
               <!-- Download Rapor (Pro Plan) specific to this semester -->
-              <div v-if="schoolStore.isPro" class="mt-4 flex flex-col items-start gap-2 border border-slate-100 bg-slate-50/50 rounded-xl p-4">
-                <div class="flex items-center gap-4 w-full">
-                  <BaseButton variant="primary" :disabled="!group.is_report_generated" :loading="group.semester === '1' ? isDownloadingSemester1 : isDownloadingSemester2" @click="downloadRapor(group.semester)" class="shadow-sm px-6 whitespace-nowrap">
+              <div v-if="schoolStore.isPro" class="mt-4 flex flex-col items-start gap-3 border border-slate-100 bg-slate-50/50 rounded-xl p-4">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+                  <BaseButton variant="primary" :disabled="!group.is_report_generated" :loading="group.semester === '1' ? isDownloadingSemester1 : isDownloadingSemester2" @click="downloadRapor(group.semester)" class="w-full sm:w-auto shadow-sm px-6 whitespace-nowrap shrink-0">
                     <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
                     Unduh Rapor {{ group.semester_label }}
                   </BaseButton>
-                  <p v-if="!group.is_report_generated" class="text-sm text-amber-600 font-medium flex items-center gap-1.5">
+                  <p v-if="!group.is_report_generated" class="text-xs sm:text-sm text-amber-600 font-medium flex items-center gap-1.5">
                     <Icon name="lucide:info" class="w-4 h-4" />
                     Rapor naratif untuk semester ini belum disusun oleh Wali Kelas, sehingga dokumen belum dapat diunduh.
                   </p>
@@ -649,13 +649,13 @@ const computedAttendanceSummary = computed(() => {
             <div v-if="financeData.spp.history.length === 0" class="py-8 text-center text-sm text-slate-400">Belum ada data SPP</div>
             <div v-else class="space-y-3">
               <div v-for="rec in financeData.spp.history" :key="rec.id" 
-                   class="flex items-center justify-between p-4 rounded-xl border transition-all"
+                   class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all gap-2 sm:gap-4"
                    :class="rec.is_paid ? 'bg-slate-50 border-slate-100' : 'bg-red-50 border-red-200'">
                 <div>
-                  <p class="text-sm font-bold" :class="rec.is_paid ? 'text-slate-800' : 'text-red-900'">Tagihan SPP - {{ rec.month }}</p>
-                  <p class="text-xs mt-1" :class="rec.is_paid ? 'text-slate-500' : 'text-red-700'">{{ rec.description || '-' }}</p>
+                  <p class="text-sm font-bold text-left" :class="rec.is_paid ? 'text-slate-800' : 'text-red-900'">Tagihan SPP - {{ rec.month }}</p>
+                  <p class="text-xs mt-1 text-left" :class="rec.is_paid ? 'text-slate-500' : 'text-red-700'">{{ rec.description || '-' }}</p>
                 </div>
-                <div class="text-right">
+                <div class="text-left sm:text-right flex items-center justify-between sm:block">
                   <p class="text-sm font-bold mb-1.5" :class="rec.is_paid ? 'text-slate-900' : 'text-red-900'">{{ rec.amount_formatted }}</p>
                   <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider" :class="rec.is_paid ? 'bg-emerald-100 text-emerald-800' : 'bg-red-200 text-red-900 animate-pulse'">
                     {{ rec.is_paid ? 'Lunas' : 'Belum Lunas' }}
@@ -672,16 +672,16 @@ const computedAttendanceSummary = computed(() => {
             <h3 class="text-lg font-black text-heading flex items-center gap-2 pb-2 border-b border-slate-100 mt-6">
               <Icon name="lucide:piggy-bank" class="w-5 h-5 text-emerald-600" /> Tabungan
             </h3>
-            <div class="grid grid-cols-3 gap-4 text-center">
-              <div class="p-4 rounded-xl bg-emerald-50">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
+              <div class="p-3 sm:p-4 rounded-xl bg-emerald-50">
                 <p class="text-lg font-black text-emerald-700">{{ formatCurrency(financeData.savings.balance) }}</p>
                 <p class="text-[10px] font-bold text-emerald-500 uppercase">Saldo</p>
               </div>
-              <div class="p-4 rounded-xl bg-blue-50">
+              <div class="p-3 sm:p-4 rounded-xl bg-blue-50">
                 <p class="text-lg font-black text-blue-700">{{ formatCurrency(financeData.savings.total_deposits) }}</p>
                 <p class="text-[10px] font-bold text-blue-500 uppercase">Total Setor</p>
               </div>
-              <div class="p-4 rounded-xl bg-red-50">
+              <div class="p-3 sm:p-4 rounded-xl bg-red-50">
                 <p class="text-lg font-black text-red-700">{{ formatCurrency(financeData.savings.total_withdrawals) }}</p>
                 <p class="text-[10px] font-bold text-red-500 uppercase">Total Tarik</p>
               </div>
@@ -716,4 +716,3 @@ const computedAttendanceSummary = computed(() => {
     </BaseCard>
   </div>
 </template>
-

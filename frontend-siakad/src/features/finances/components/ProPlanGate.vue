@@ -4,6 +4,7 @@
  * Shows upgrade prompt when school is on Free Plan.
  */
 import { useRouter } from 'vue-router'
+import { useSchoolStore } from '@/stores/school.store'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 
@@ -12,6 +13,7 @@ defineProps<{
 }>()
 
 const router = useRouter()
+const schoolStore = useSchoolStore()
 </script>
 
 <template>
@@ -28,19 +30,15 @@ const router = useRouter()
         </p>
       </div>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <BaseButton variant="primary" @click="router.push({ name: 'Subscription' })" class="bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/25">
+        <BaseButton v-if="schoolStore.isHeadmaster" variant="primary" @click="router.push({ name: 'Subscription' })" class="bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-500/25">
           <template #prepend><Icon name="lucide:crown" class="w-4 h-4" /></template>
           Lihat Paket Pro
         </BaseButton>
-        <BaseButton variant="ghost" @click="router.back()">
-          <template #prepend><Icon name="lucide:arrow-left" class="w-4 h-4" /></template>
-          Kembali
-        </BaseButton>
       </div>
-      <div class="flex items-center justify-center gap-6 text-xs text-slate-400 pt-4">
-        <span class="flex items-center gap-1.5"><Icon name="lucide:check-circle" class="w-3.5 h-3.5 text-violet-400" /> Keuangan</span>
-        <span class="flex items-center gap-1.5"><Icon name="lucide:check-circle" class="w-3.5 h-3.5 text-violet-400" /> Rapor PDF</span>
-        <span class="flex items-center gap-1.5"><Icon name="lucide:check-circle" class="w-3.5 h-3.5 text-violet-400" /> Unlimited</span>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4 sm:gap-6 text-sm text-slate-500 pt-6 max-w-max mx-auto">
+        <span class="flex items-center gap-2"><Icon name="lucide:check-circle" class="w-4 h-4 text-violet-500 shrink-0" /> Manajemen Keuangan</span>
+        <span class="flex items-center gap-2"><Icon name="lucide:check-circle" class="w-4 h-4 text-violet-500 shrink-0" /> Pembuatan Raport & E-Raport</span>
+        <span class="flex items-center gap-2"><Icon name="lucide:check-circle" class="w-4 h-4 text-violet-500 shrink-0" /> Unlimited Kuota Guru & Siswa</span>
       </div>
     </div>
   </BaseCard>

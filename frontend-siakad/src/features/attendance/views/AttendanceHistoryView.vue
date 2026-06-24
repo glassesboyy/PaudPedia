@@ -120,54 +120,56 @@ async function fetchHistory() {
     </div>
 
     <template v-else-if="attendanceData">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <BaseCard class="p-6 text-center shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">Hadir</p>
-          <p class="text-3xl font-black text-emerald-600 mt-2">{{ attendanceData.summary.present }}</p>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+        <BaseCard class="p-4 sm:p-6 text-center shadow-sm">
+          <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase">Hadir</p>
+          <p class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1 sm:mt-2">{{ attendanceData.summary.present }}</p>
         </BaseCard>
-        <BaseCard class="p-6 text-center shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">Sakit</p>
-          <p class="text-3xl font-black text-amber-500 mt-2">{{ attendanceData.summary.sick }}</p>
+        <BaseCard class="p-4 sm:p-6 text-center shadow-sm">
+          <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase">Sakit</p>
+          <p class="text-2xl sm:text-3xl font-black text-amber-500 mt-1 sm:mt-2">{{ attendanceData.summary.sick }}</p>
         </BaseCard>
-        <BaseCard class="p-6 text-center shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">Izin</p>
-          <p class="text-3xl font-black text-blue-500 mt-2">{{ attendanceData.summary.permission }}</p>
+        <BaseCard class="p-4 sm:p-6 text-center shadow-sm">
+          <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase">Izin</p>
+          <p class="text-2xl sm:text-3xl font-black text-blue-500 mt-1 sm:mt-2">{{ attendanceData.summary.permission }}</p>
         </BaseCard>
-        <BaseCard class="p-6 text-center shadow-sm">
-          <p class="text-xs font-bold text-slate-500 uppercase">Alfa</p>
-          <p class="text-3xl font-black text-rose-500 mt-2">{{ attendanceData.summary.absent }}</p>
+        <BaseCard class="p-4 sm:p-6 text-center shadow-sm">
+          <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase">Alfa</p>
+          <p class="text-2xl sm:text-3xl font-black text-rose-500 mt-1 sm:mt-2">{{ attendanceData.summary.absent }}</p>
         </BaseCard>
-        <BaseCard class="p-6 text-center shadow-sm border-2 border-primary-100 bg-primary-50">
-          <p class="text-xs font-bold text-primary-700 uppercase">Rasio Hadir</p>
-          <p class="text-3xl font-black text-primary-700 mt-2">{{ attendanceData.summary.percentage }}%</p>
+        <BaseCard class="p-4 sm:p-6 text-center shadow-sm border-2 border-primary-100 bg-primary-50 col-span-2 md:col-span-1">
+          <p class="text-[10px] sm:text-xs font-bold text-primary-700 uppercase">Rasio Hadir</p>
+          <p class="text-2xl sm:text-3xl font-black text-primary-700 mt-1 sm:mt-2">{{ attendanceData.summary.percentage }}%</p>
         </BaseCard>
       </div>
 
       <BaseCard class="p-0 overflow-hidden shadow-sm">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500 font-bold">
-            <tr>
-              <th class="px-6 py-4">Tanggal</th>
-              <th class="px-6 py-4">Status</th>
-              <th class="px-6 py-4">Keterangan</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr v-for="item in attendanceData.history" :key="item.id">
-              <td class="px-6 py-4 font-medium">{{ item.date }}</td>
-              <td class="px-6 py-4 font-bold" :class="{
-                'text-emerald-600': item.status === 'present',
-                'text-amber-500': item.status === 'sick',
-                'text-blue-500': item.status === 'permission',
-                'text-rose-500': item.status === 'absent'
-              }">{{ item.status_label }}</td>
-              <td class="px-6 py-4 text-slate-600">{{ item.notes || '-' }}</td>
-            </tr>
-            <tr v-if="attendanceData.history.length === 0">
-              <td colspan="3" class="px-6 py-12 text-center text-slate-400">Belum ada rekapan pada bulan ini.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500 font-bold">
+              <tr>
+                <th class="px-6 py-4">Tanggal</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 w-full">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr v-for="item in attendanceData.history" :key="item.id">
+                <td class="px-6 py-4 font-medium">{{ item.date }}</td>
+                <td class="px-6 py-4 font-bold" :class="{
+                  'text-emerald-600': item.status === 'present',
+                  'text-amber-500': item.status === 'sick',
+                  'text-blue-500': item.status === 'permission',
+                  'text-rose-500': item.status === 'absent'
+                }">{{ item.status_label }}</td>
+                <td class="px-6 py-4 text-slate-600 whitespace-normal">{{ item.notes || '-' }}</td>
+              </tr>
+              <tr v-if="attendanceData.history.length === 0">
+                <td colspan="3" class="px-6 py-12 text-center text-slate-400">Belum ada rekapan pada bulan ini.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </BaseCard>
     </template>
   </div>

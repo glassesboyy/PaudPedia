@@ -180,62 +180,66 @@ const chartOptions = {
 <template>
   <div class="flex flex-col h-full w-full">
     <!-- Chart Header & Filters -->
-    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6">
+    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
       
       <!-- Custom Legend / Toggles -->
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2">
         <button 
           @click="toggleFilter('spp')"
           :class="[
-            'px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-2',
+            'px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-2 w-full sm:w-auto',
             activeFilters.spp ? 'bg-sky-50 border-sky-200 text-sky-700' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'
           ]"
         >
-          <div :class="['w-2.5 h-2.5 rounded-full', activeFilters.spp ? 'bg-sky-500' : 'bg-slate-300']"></div>
+          <div :class="['w-2.5 h-2.5 rounded-full shrink-0', activeFilters.spp ? 'bg-sky-500' : 'bg-slate-300']"></div>
           SPP Terkumpul
         </button>
 
         <button 
           @click="toggleFilter('tabungan')"
           :class="[
-            'px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-2',
+            'px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-2 w-full sm:w-auto',
             activeFilters.tabungan ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'
           ]"
         >
-          <div :class="['w-2.5 h-2.5 rounded-full', activeFilters.tabungan ? 'bg-emerald-500' : 'bg-slate-300']"></div>
+          <div :class="['w-2.5 h-2.5 rounded-full shrink-0', activeFilters.tabungan ? 'bg-emerald-500' : 'bg-slate-300']"></div>
           Tabungan Masuk
         </button>
 
         <button 
           @click="toggleFilter('total')"
           :class="[
-            'px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-2',
+            'px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-2 w-full sm:w-auto',
             activeFilters.total ? 'bg-violet-50 border-violet-200 text-violet-700' : 'bg-white border-slate-200 text-slate-400 hover:bg-slate-50'
           ]"
         >
-          <div :class="['w-2.5 h-2.5 rounded-full', activeFilters.total ? 'bg-violet-500' : 'bg-slate-300']"></div>
+          <div :class="['w-2.5 h-2.5 rounded-full shrink-0', activeFilters.total ? 'bg-violet-500' : 'bg-slate-300']"></div>
           Total Pemasukan
         </button>
       </div>
 
       <!-- Time Range Selector (Month pickers) -->
-      <div class="flex items-center gap-2 flex-wrap">
-        <span class="text-xs font-bold text-slate-400">Dari:</span>
-        <input 
-          type="month" 
-          v-model="localStart" 
-          :max="localEnd"
-          class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 cursor-pointer"
-        />
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <span class="text-xs font-bold text-slate-400 shrink-0 w-12 sm:w-auto">Dari:</span>
+          <input 
+            type="month" 
+            v-model="localStart" 
+            :max="localEnd"
+            class="flex-1 px-3 py-2 sm:py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 cursor-pointer w-full"
+          />
+        </div>
         
-        <span class="text-xs font-bold text-slate-400">Hingga:</span>
-        <input 
-          type="month" 
-          v-model="localEnd" 
-          :min="localStart"
-          :max="maxEndMonth"
-          class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 cursor-pointer"
-        />
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <span class="text-xs font-bold text-slate-400 shrink-0 w-12 sm:w-auto">Hingga:</span>
+          <input 
+            type="month" 
+            v-model="localEnd" 
+            :min="localStart"
+            :max="maxEndMonth"
+            class="flex-1 px-3 py-2 sm:py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-200 cursor-pointer w-full"
+          />
+        </div>
       </div>
     </div>
 

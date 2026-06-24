@@ -55,7 +55,6 @@ const navItems = computed(() => {
       { name: 'Manajemen Siswa', icon: 'student', to: '/students', roles: ['headmaster'], isPro: false },
       { name: 'Manajemen Wali Murid', icon: 'parent', to: '/parents', roles: ['headmaster'], isPro: false },
       { name: 'Rekap Presensi', icon: 'attendance', to: '/attendance', roles: ['headmaster'], isPro: false },
-      { name: 'Paket Langganan', icon: 'subscription', to: '/school/subscription', roles: ['headmaster'], isPro: false },
       { name: 'Profil Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'], isPro: false },
 
       { name: 'Kelas Saya', icon: 'class', to: '/classes', roles: ['teacher'], isPro: false },
@@ -105,11 +104,18 @@ const navIcons: Record<string, string> = {
 const freePlanItems = computed(() => navItems.value.filter(item => !item.isPro))
 const proPlanItems = computed(() => navItems.value.filter(item => item.isPro))
 
+const subscriptionItem = computed(() => {
+  if (schoolStore.currentRole !== 'headmaster') return null
+  return { name: 'Paket Langganan', icon: 'subscription', to: '/school/subscription' }
+})
+
 import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const activeItemTo = computed(() => {
   const allItems = [...freePlanItems.value, ...proPlanItems.value]
+  if (subscriptionItem.value) allItems.push(subscriptionItem.value as any)
+  
   const matchingItems = allItems.filter(item => route.path === item.to || (item.to !== '/' && route.path.startsWith(item.to + '/')))
   if (matchingItems.length === 0) {
     const fallbackMatch = allItems.filter(item => item.to !== '/' && route.path.startsWith(item.to))
@@ -170,9 +176,36 @@ const activeItemTo = computed(() => {
           </button>
         </div>
 
-        <!-- Navigation -->
         <nav class="flex-1 overflow-y-auto px-4 py-4 space-y-6">
           
+          <!-- SUBSCRIPTION SETTINGS (TOP) -->
+          <div v-if="subscriptionItem" class="pb-4 mb-4 border-b border-slate-100">
+            <RouterLink
+              :to="subscriptionItem.to"
+              :class="[
+                'flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 group border shadow-sm relative overflow-hidden',
+                activeItemTo === subscriptionItem.to
+                  ? 'bg-violet-600 text-white hover:text-white border-violet-600 shadow-violet-600/20'
+                  : 'bg-violet-50 text-violet-700 border-violet-100 hover:bg-violet-100 hover:text-violet-900 hover:border-violet-200'
+              ]"
+              @click="isSidebarOpen = false"
+            >
+              <div class="flex items-center gap-3">
+                <Icon 
+                  :name="navIcons[subscriptionItem.icon]"
+                  :class="['w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110', activeItemTo === subscriptionItem.to ? 'text-white' : 'text-violet-600 group-hover:text-violet-800']" 
+                />
+                <span :class="activeItemTo === subscriptionItem.to ? 'group-hover:text-white text-white' : 'group-hover:text-violet-900'">{{ subscriptionItem.name }}</span>
+              </div>
+              <span 
+                v-if="activeItemTo !== subscriptionItem.to"
+                class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-violet-100 text-violet-700 border border-violet-200"
+              >
+                Pro
+              </span>
+            </RouterLink>
+          </div>
+
           <!-- FREE PLAN -->
           <div>
             <p class="px-4 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">Umum</p>

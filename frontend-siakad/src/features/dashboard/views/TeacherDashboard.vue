@@ -129,9 +129,9 @@ async function fetchAllClasses() {
             class="p-4 border-none shadow-lg shadow-primary-900/5 hover:shadow-xl hover:shadow-primary-900/10 cursor-pointer group transition-all duration-300 rounded-[1.5rem] bg-white border border-transparent hover:border-primary-100"
             @click="router.push({ name: 'ClassDetail', params: { id: c.id } })"
           >
-            <div class="flex items-center gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <!-- Icon/Visual -->
-              <div class="w-14 h-14 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-sm border border-primary-100 group-hover:border-primary-600">
+              <div class="w-14 h-14 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-sm border border-primary-100 group-hover:border-primary-600 self-start sm:self-auto">
                 <Icon name="lucide:users" class="w-7 h-7" stroke-width="2" />
               </div>
               
@@ -143,7 +143,7 @@ async function fetchAllClasses() {
                     {{ c.level || 'TA' }}
                   </span>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4">
                    <div class="flex items-center gap-1.5">
                      <Icon name="lucide:user-2" class="w-3.5 h-3.5 text-slate-400" />
                      <span class="text-xs font-bold text-slate-500 uppercase">{{ c.current_students || 0 }} Siswa Terdaftar</span>

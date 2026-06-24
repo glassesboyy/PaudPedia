@@ -61,7 +61,7 @@ async function fetchMyChildren() {
     </div>
 
     <!-- Stats Grid -->
-    <div class="flex gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <RouterLink 
         v-for="stat in stats" 
         :key="stat.name" 
@@ -123,9 +123,9 @@ async function fetchMyChildren() {
             class="p-4 border-none shadow-lg shadow-primary-900/5 hover:shadow-xl hover:shadow-primary-900/10 cursor-pointer group transition-all duration-300 rounded-[1.5rem] bg-white border border-transparent hover:border-primary-100"
             @click="router.push({ name: 'ChildDetail', params: { id: child.id } })"
           >
-            <div class="flex items-center gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <!-- Visual -->
-              <div class="w-16 h-16 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm group-hover:scale-105 transition-transform duration-500">
+              <div class="w-16 h-16 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm group-hover:scale-105 transition-transform duration-500 self-start sm:self-auto">
                 <img v-if="child.photo_url" :src="child.photo_url" class="w-full h-full object-cover" />
                 <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
                   <Icon name="lucide:user" class="w-8 h-8" />
@@ -140,7 +140,7 @@ async function fetchMyChildren() {
                     {{ child.status }}
                   </span>
                 </div>
-                <div class="flex items-center flex-wrap gap-4">
+                <div class="flex items-center flex-wrap gap-2 sm:gap-4">
                   <div class="flex items-center gap-2">
                     <div class="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
                     <span class="text-xs font-bold text-slate-600 uppercase">{{ child.class?.name || 'Belum Ada Kelas' }}</span>

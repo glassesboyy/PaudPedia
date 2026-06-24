@@ -218,14 +218,14 @@ function handleReset() {
 <template>
   <div class="animate-fade-in space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <div>
           <h1 class="text-2xl font-bold text-heading">Manajemen SPP</h1>
           <p class="text-sm text-muted">Kelola tagihan dan pembayaran SPP bulanan.</p>
         </div>
       </div>
-      <BaseButton v-if="schoolStore.isPro" variant="primary" @click="openForm" class="shadow-lg shadow-primary-500/20">
+      <BaseButton v-if="schoolStore.isPro" variant="primary" @click="openForm" class="shadow-lg shadow-primary-500/20 w-full sm:w-auto">
         <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Buat Tagihan Kelas
       </BaseButton>
@@ -277,9 +277,9 @@ function handleReset() {
           </div>
         </div>
         <template #footer>
-          <div class="flex justify-end gap-3">
-            <BaseButton variant="ghost" @click="showForm = false">Batal</BaseButton>
-            <BaseButton variant="primary" :loading="isSubmitting" :disabled="!form.class_id || !form.amount" @click="submitSppBatch">
+          <div class="flex flex-col sm:flex-row sm:justify-end gap-3 w-full">
+            <BaseButton variant="ghost" @click="showForm = false" class="w-full sm:w-auto order-last sm:order-first">Batal</BaseButton>
+            <BaseButton variant="primary" :loading="isSubmitting" :disabled="!form.class_id || !form.amount" @click="submitSppBatch" class="w-full sm:w-auto">
               Buat Tagihan
             </BaseButton>
           </div>

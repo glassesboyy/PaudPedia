@@ -94,21 +94,21 @@ async function fetchMyChildren(page = 1) {
           <Icon name="lucide:smile" class="w-32 h-32" />
         </div>
 
-        <div class="flex items-start gap-5 relative z-10">
-          <div class="w-20 h-20 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm group-hover:scale-105 transition-transform duration-300">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 relative z-10">
+          <div class="w-24 h-24 sm:w-20 sm:h-20 rounded-2xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm group-hover:scale-105 transition-transform duration-300">
             <img v-if="child.photo_url" :src="child.photo_url" class="w-full h-full object-cover" />
             <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
               <Icon name="lucide:user" class="w-10 h-10" />
             </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-start justify-between gap-2 mb-1">
-              <h4 class="font-bold text-heading group-hover:text-primary-700 transition-colors text-lg truncate leading-tight">{{ child.name }}</h4>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider shrink-0 overflow-hidden">
+          <div class="flex-1 min-w-0 w-full text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-2 mb-1">
+              <h4 class="font-bold text-heading group-hover:text-primary-700 transition-colors text-lg leading-tight break-words">{{ child.name }}</h4>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider shrink-0">
                 {{ child.status }}
               </span>
             </div>
-            <div class="flex items-center gap-1.5 text-sm text-primary-600 font-bold mb-3 truncate">
+            <div class="flex items-center justify-center sm:justify-start gap-1.5 text-sm text-primary-600 font-bold mb-3">
               <Icon name="lucide:school" class="w-3.5 h-3.5" />
               <span class="truncate">{{ child.class?.name || 'Belum Ada Kelas' }}</span>
             </div>

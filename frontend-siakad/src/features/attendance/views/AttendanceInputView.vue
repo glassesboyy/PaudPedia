@@ -320,14 +320,14 @@ const attendanceStats = computed(() => {
                 <p class="text-xs text-slate-500 font-mono">{{ student.nisn || '-' }}</p>
               </td>
               <td class="px-6 py-4">
-                <div class="flex flex-nowrap gap-2">
-                  <label v-for="(label, val) in {'present': 'Hadir', 'sick': 'Sakit', 'permission': 'Izin', 'absent': 'Alfa'}" :key="val" class="cursor-pointer">
+                <div class="grid grid-cols-2 xl:grid-cols-4 gap-2 min-w-[240px]">
+                  <label v-for="(label, val) in {'present': 'Hadir', 'sick': 'Sakit', 'permission': 'Izin', 'absent': 'Alfa'}" :key="val" class="cursor-pointer h-10">
                     <input type="radio" :disabled="!schoolStore.isTeacher" :name="`status-${student.student_id}`" :value="val" v-model="student.status" class="hidden" />
-                    <span :class="['px-3 py-1.5 rounded-lg text-sm font-bold border transition-all block', student.status === val ? getStatusColor(val) : 'bg-white text-slate-500 border-slate-200 border-dashed', schoolStore.isTeacher ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
+                    <div :class="['flex items-center justify-center h-full px-2 rounded-lg text-xs font-bold border transition-all', student.status === val ? getStatusColor(val) : 'bg-white text-slate-500 border-slate-200 border-dashed', schoolStore.isTeacher ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
                       {{ label }}
-                    </span>
+                    </div>
                   </label>
-                  <div v-if="!student.status && !schoolStore.isTeacher" class="py-1 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic">
+                  <div v-if="!student.status && !schoolStore.isTeacher" class="col-span-2 xl:col-span-4 py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic text-center">
                     Belum diinput
                   </div>
                 </div>
@@ -360,8 +360,8 @@ const attendanceStats = computed(() => {
         @page-change="page => currentPage = page"
       />
 
-      <div v-if="schoolStore.isTeacher" class="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end">
-        <BaseButton variant="primary" :disabled="isSaving || students.length === 0" @click="saveAttendance" class="px-8 shadow-md">
+      <div v-if="schoolStore.isTeacher" class="p-4 sm:p-6 border-t border-slate-100 bg-slate-50/50 flex sm:justify-end">
+        <BaseButton variant="primary" :disabled="isSaving || students.length === 0" @click="saveAttendance" class="px-8 shadow-md w-full sm:w-auto">
           {{ isSaving ? 'Menyimpan...' : 'Simpan Absensi' }}
         </BaseButton>
       </div>

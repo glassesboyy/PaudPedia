@@ -18,10 +18,11 @@ const uiStore = useUIStore()
         <!-- Mobile sidebar toggle -->
         <button
           type="button"
-          class="lg:hidden p-2 rounded-lg text-body hover:bg-surface-muted transition-colors"
+          class="lg:hidden p-2 transition-colors"
           @click="uiStore.toggleMobileSidebar()"
+          title="Buka Menu Profil"
         >
-          <Icon name="lucide:menu" class="w-5 h-5" />
+          <Icon name="lucide:panel-left" class="w-5 h-5" />
         </button>
       </template>
     </TheNavbar>

@@ -8,6 +8,7 @@ import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import BaseAlert from '@/components/ui/Alert/Alert.vue'
+import Pagination from '@/components/ui/Pagination/Pagination.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,16 +40,32 @@ async function fetchClassDetail() {
     isLoading.value = false
   }
 }
+
+// Pagination state
+const currentPage = ref(1)
+const itemsPerPage = 10 // TODO: Revert
+
+const paginatedStudents = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  const end = start + itemsPerPage
+  return students.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(students.value.length / itemsPerPage))
+
+function handlePageChange(page: number) {
+  currentPage.value = page
+}
 </script>
 
 <template>
   <div class="space-y-6 animate-fade-in">
     <!-- Header -->
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <button
           @click="router.push({ name: 'ClassList' })"
-          class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors"
+          class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors shrink-0"
         >
           <Icon name="lucide:arrow-left" class="w-5 h-5" />
         </button>
@@ -57,8 +74,8 @@ async function fetchClassDetail() {
           <p class="text-sm text-muted">Informasi lengkap dan daftar siswa dalam kelas</p>
         </div>
       </div>
-      <div v-if="classData && schoolStore.currentRole === 'headmaster'" class="flex gap-2">
-        <BaseButton variant="outline" @click="router.push({ name: 'ClassEdit', params: { id: classData.id } })">
+      <div v-if="classData && schoolStore.currentRole === 'headmaster'" class="flex gap-2 w-full sm:w-auto">
+        <BaseButton variant="outline" @click="router.push({ name: 'ClassEdit', params: { id: classData.id } })" class="w-full sm:w-auto">
           <template #prepend><Icon name="lucide:pencil" class="w-4 h-4" /></template>
           Edit Kelas
         </BaseButton>
@@ -161,9 +178,9 @@ async function fetchClassDetail() {
 
       <!-- Bottom Panel: Student List -->
       <BaseCard class="border-none shadow-xl shadow-primary-900/5 overflow-hidden">
-        <div class="p-8 border-b border-slate-50 flex items-center justify-between bg-white">
+        <div class="p-5 sm:p-8 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
           <h3 class="text-xl font-black text-heading tracking-tight">Daftar Siswa Enrol</h3>
-          <span class="px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">{{ students.length }} Siswa Terdaftar</span>
+          <span class="px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold w-max">{{ students.length }} Siswa Terdaftar</span>
         </div>
         
         <div class="overflow-x-auto">
@@ -183,7 +200,7 @@ async function fetchClassDetail() {
                 </td>
               </tr>
               <tr 
-                v-for="s in students" 
+                v-for="s in paginatedStudents" 
                 :key="s.id"
                 class="hover:bg-primary-50/30 transition-all group cursor-pointer"
                 @click="router.push({ name: 'StudentDetail', params: { id: s.id } })"
@@ -218,6 +235,15 @@ async function fetchClassDetail() {
             </tbody>
           </table>
         </div>
+        
+        <Pagination
+          v-if="students.length > itemsPerPage"
+          :current-page="currentPage"
+          :last-page="totalPages"
+          :total-items="students.length"
+          :items-per-page="itemsPerPage"
+          @page-change="handlePageChange"
+        />
       </BaseCard>
     </div>
   </div>

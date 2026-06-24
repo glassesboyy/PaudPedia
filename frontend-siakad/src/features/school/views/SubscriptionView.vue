@@ -134,7 +134,7 @@ function getStatusColor(status: string): string {
 <template>
   <div class="animate-fade-in space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <div>
           <h1 class="text-2xl font-bold text-heading">Paket Berlangganan</h1>
@@ -171,7 +171,7 @@ function getStatusColor(status: string): string {
     <template v-else-if="info">
       <!-- Current Plan Status -->
       <BaseCard class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
-        <div class="p-8" :class="info.is_pro ? 'bg-primary-600 text-white' : 'bg-slate-50'">
+        <div class="p-8 rounded-xl" :class="info.is_pro ? 'bg-primary-600 text-white' : 'bg-slate-50'">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div class="flex items-center gap-5">
               <div class="w-16 h-16 rounded-2xl flex items-center justify-center" :class="info.is_pro ? 'bg-white/20' : 'bg-white border border-slate-200'">
@@ -179,9 +179,8 @@ function getStatusColor(status: string): string {
               </div>
               <div>
                 <p class="text-xs font-black uppercase tracking-widest mb-1" :class="info.is_pro ? 'text-white/60' : 'text-slate-400'">Paket Aktif</p>
-                <h2 class="text-3xl font-black" :class="info.is_pro ? 'text-white' : 'text-slate-900'">
+                <h2 class="text-3xl font-black uppercase tracking-widest" :class="info.is_pro ? 'text-white' : 'text-slate-900'">
                   {{ info.plan_label }}
-                  <span v-if="info.is_pro" class="text-sm font-bold ml-2 text-amber-300">✨</span>
                 </h2>
                 <p v-if="info.is_pro && info.subscription_ended_at" class="text-sm mt-1" :class="info.is_pro ? 'text-white/70' : 'text-slate-500'">
                   Berlaku hingga {{ formatDate(info.subscription_ended_at) }}
@@ -238,7 +237,7 @@ function getStatusColor(status: string): string {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Free Plan -->
         <BaseCard class="p-0 overflow-hidden" :class="!info.is_pro ? 'ring-2 ring-primary-500 ring-offset-2' : ''">
-          <div class="p-6 bg-slate-50 border-b border-slate-100">
+          <div class="p-6 rounded-t-xl bg-slate-100 border-b border-slate-200">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-black text-slate-800">Gratis</h3>
               <span v-if="!info.is_pro" class="text-[10px] font-black text-primary-600 bg-primary-50 border border-primary-100 px-3 py-1 rounded-full uppercase tracking-widest">Aktif</span>
@@ -255,7 +254,7 @@ function getStatusColor(status: string): string {
 
         <!-- Pro Plan -->
         <BaseCard class="p-0 overflow-hidden" :class="info.is_pro ? 'ring-2 ring-primary-500 ring-offset-2' : ''">
-          <div class="p-6 bg-primary-600 text-white">
+          <div class="p-6 rounded-t-xl bg-primary-600 text-white">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-black flex items-center gap-2">
                 <Icon name="lucide:crown" class="w-5 h-5 text-amber-300" /> Pro

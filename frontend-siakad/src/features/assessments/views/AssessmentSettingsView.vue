@@ -114,7 +114,7 @@ async function deleteIndicator(indicatorId: number) {
         <h1 class="text-2xl font-bold text-slate-800">Master Data Penilaian</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola Program Perkembangan dan Indikator secara dinamis untuk Rapor.</p>
       </div>
-      <BaseButton variant="primary" @click="isAddingProgram = true">
+      <BaseButton variant="primary" @click="isAddingProgram = true" class="w-full sm:w-auto">
         <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Tambah Program Baru
       </BaseButton>
@@ -195,10 +195,12 @@ async function deleteIndicator(indicatorId: number) {
           </div>
 
           <!-- Add Indicator Inline -->
-          <div v-if="addingIndicatorFor === program.id" class="flex gap-2">
+          <div v-if="addingIndicatorFor === program.id" class="flex flex-col sm:flex-row gap-2">
             <BaseInput v-model="newIndicatorName" placeholder="Ketik nama indikator..." class="flex-1" @keyup.enter="addIndicator(program.id)" />
-            <BaseButton variant="primary" @click="addIndicator(program.id)">Simpan</BaseButton>
-            <BaseButton variant="outline" @click="addingIndicatorFor = null">Batal</BaseButton>
+            <div class="flex gap-2">
+              <BaseButton variant="primary" @click="addIndicator(program.id)">Simpan</BaseButton>
+              <BaseButton variant="outline" @click="addingIndicatorFor = null">Batal</BaseButton>
+            </div>
           </div>
           <button v-else @click="addingIndicatorFor = program.id" class="text-sm font-bold text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors">
             <Icon name="lucide:plus" class="w-4 h-4" /> Tambah Indikator Baru

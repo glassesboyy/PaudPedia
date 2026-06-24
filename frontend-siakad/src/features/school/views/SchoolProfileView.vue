@@ -35,7 +35,7 @@ async function fetchSchoolProfile() {
 <template>
   <div class="animate-fade-in space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <div>
           <h1 class="text-2xl font-bold text-heading">Profil Sekolah</h1>
@@ -45,7 +45,7 @@ async function fetchSchoolProfile() {
       <BaseButton 
         variant="primary" 
         @click="router.push({ name: 'SchoolSettings' })"
-        class="shadow-lg shadow-primary-500/20"
+        class="shadow-lg shadow-primary-500/20 w-full sm:w-auto"
       >
         <template #prepend><Icon name="lucide:edit-3" class="w-4 h-4" /></template>
         Edit Data Sekolah

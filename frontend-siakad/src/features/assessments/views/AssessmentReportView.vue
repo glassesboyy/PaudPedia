@@ -318,12 +318,12 @@ function getFinalScale(indicatorId: number) {
 <template>
   <div class="space-y-6 animate-fade-in flex flex-col">
     <!-- Header -->
-    <div class="flex items-center justify-between shrink-0">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
       <div>
         <h1 class="text-2xl font-bold text-heading">Penyusunan Rapor Naratif</h1>
         <p class="text-sm text-muted">Lihat rekapitulasi 6 bulan dan susun deskripsi perkembangan.</p>
       </div>
-      <BaseButton v-if="schoolStore.isTeacher" variant="primary" :disabled="isSaving || !selectedStudentId" @click="saveReport" class="shadow-md">
+      <BaseButton v-if="schoolStore.isTeacher && schoolStore.isPro" variant="primary" :disabled="isSaving || !selectedStudentId" @click="saveReport" class="shadow-md w-full sm:w-auto">
         <Icon v-if="!isSaving" name="lucide:save" class="w-4 h-4 mr-2" />
         <div v-else class="animate-spin w-4 h-4 rounded-full border-2 border-white/30 border-t-white mr-2"></div>
         {{ isSaving ? 'Menyimpan...' : 'Simpan Draft Rapor' }}

@@ -67,7 +67,7 @@ function getParentDisplayName(): string {
 <template>
   <div class="max-w-4xl mx-auto animate-fade-in space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <button @click="router.push({ name: 'StudentList' })" class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface hover:bg-surface-muted border border-border text-muted transition-colors">
           <Icon name="lucide:arrow-left" class="w-5 h-5" />
