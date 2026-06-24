@@ -44,9 +44,18 @@ class SubscriptionPaymentService
         $orderId = 'SUB-' . $school->id . '-' . time() . '-' . strtoupper(substr(md5(uniqid()), 0, 4));
 
         // Check for existing pending order and expire it
-        SubscriptionOrder::where('school_id', $school->id)
+        $pendingOrders = SubscriptionOrder::where('school_id', $school->id)
             ->where('status', 'pending')
-            ->update(['status' => 'expired']);
+            ->get();
+
+        foreach ($pendingOrders as $pendingOrder) {
+            try {
+                \Midtrans\Transaction::cancel($pendingOrder->midtrans_order_id);
+            } catch (\Exception $e) {
+                // Ignore errors if the transaction hasn't been paid or doesn't exist in Midtrans yet
+            }
+            $pendingOrder->update(['status' => 'expired']);
+        }
 
         // Create subscription order record
         $subscriptionOrder = SubscriptionOrder::create([

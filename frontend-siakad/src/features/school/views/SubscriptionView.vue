@@ -12,6 +12,8 @@ import type { SubscriptionInfo, SubscriptionOrder } from '@/types/subscription.t
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
+import Pagination from '@/components/ui/Pagination/Pagination.vue'
+import Modal from '@/components/ui/Modal/Modal.vue'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
@@ -22,6 +24,31 @@ const error = ref('')
 const successMessage = ref('')
 const info = ref<SubscriptionInfo | null>(null)
 const paymentHistory = ref<SubscriptionOrder[]>([])
+
+// Pagination state
+const currentPage = ref(1)
+const lastPage = ref(1)
+const totalItems = ref(0)
+const itemsPerPage = ref(5)
+const isHistoryLoading = ref(false)
+
+// Modal state
+const showDetailModal = ref(false)
+const selectedOrder = ref<SubscriptionOrder | null>(null)
+
+const selectedDuration = ref(1)
+const durationOptions = [
+  { value: 1, label: '1 Bulan' },
+  { value: 3, label: '3 Bulan' },
+  { value: 6, label: '6 Bulan' },
+  { value: 12, label: '1 Tahun' },
+]
+
+const selectedPriceFormatted = computed(() => {
+  if (!info.value) return ''
+  const price = (info.value as any).pro_monthly_price * selectedDuration.value
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price)
+})
 
 const usagePercentStudent = computed(() => {
   if (!info.value || !info.value.student_limit) return 0
@@ -59,22 +86,35 @@ const proFeatures = [
 
 onMounted(async () => {
   await fetchData()
+  await fetchHistory()
 })
 
 async function fetchData() {
   isLoading.value = true
   error.value = ''
   try {
-    const [infoRes, historyRes] = await Promise.all([
-      subscriptionService.getInfo(schoolStore.currentSchoolId!),
-      subscriptionService.getPaymentHistory(schoolStore.currentSchoolId!),
-    ])
+    const infoRes = await subscriptionService.getInfo(schoolStore.currentSchoolId!)
     info.value = (infoRes as any)
-    paymentHistory.value = (historyRes as any).data
   } catch {
     error.value = 'Gagal memuat data langganan.'
   } finally {
     isLoading.value = false
+  }
+}
+
+async function fetchHistory(page: number = 1) {
+  isHistoryLoading.value = true
+  try {
+    const res = await subscriptionService.getPaymentHistory(schoolStore.currentSchoolId!, page) as any
+    paymentHistory.value = res.data
+    currentPage.value = res.current_page
+    lastPage.value = res.last_page
+    totalItems.value = res.total
+    itemsPerPage.value = res.per_page
+  } catch {
+    // silently fail history
+  } finally {
+    isHistoryLoading.value = false
   }
 }
 
@@ -83,7 +123,7 @@ async function handleUpgrade() {
   isUpgrading.value = true
   error.value = ''
   try {
-    const res = await subscriptionService.initiateUpgrade(schoolStore.currentSchoolId!)
+    const res = await subscriptionService.initiateUpgrade(schoolStore.currentSchoolId!, selectedDuration.value)
     const snapToken = (res as any).snap_token
 
     // Open Midtrans Snap popup
@@ -92,11 +132,12 @@ async function handleUpgrade() {
         onSuccess: async () => {
           successMessage.value = 'Pembayaran berhasil! Paket Pro Anda aktif.'
           await fetchData()
+          await fetchHistory()
           await schoolStore.fetchMemberships()
         },
         onPending: () => {
           successMessage.value = 'Pembayaran sedang diproses. Status akan diperbarui otomatis.'
-          fetchData()
+          fetchHistory()
         },
         onError: () => {
           error.value = 'Pembayaran gagal. Silakan coba lagi.'
@@ -115,6 +156,33 @@ async function handleUpgrade() {
   }
 }
 
+function resumePayment(order: any) {
+  if (!order.snap_token) {
+    error.value = 'Token pembayaran tidak ditemukan.'
+    return
+  }
+  
+  if ((window as any).snap) {
+    ;(window as any).snap.pay(order.snap_token, {
+      onSuccess: async () => {
+        successMessage.value = 'Pembayaran berhasil! Paket Pro Anda aktif.'
+        await fetchData()
+        await fetchHistory()
+        await schoolStore.fetchMemberships()
+      },
+      onPending: () => {
+        successMessage.value = 'Pembayaran sedang diproses. Status akan diperbarui otomatis.'
+        fetchHistory()
+      },
+      onError: () => {
+        error.value = 'Pembayaran gagal. Silakan coba lagi.'
+      },
+    })
+  } else {
+    error.value = 'Midtrans belum terkonfigurasi. Hubungi administrator.'
+  }
+}
+
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '-'
   return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -128,6 +196,11 @@ function getStatusColor(status: string): string {
     expired: 'bg-slate-100 text-slate-500 border-slate-200',
   }
   return colors[status] || 'bg-slate-100 text-slate-500'
+}
+
+function viewDetail(order: SubscriptionOrder) {
+  selectedOrder.value = order
+  showDetailModal.value = true
 }
 </script>
 
@@ -269,10 +342,27 @@ function getStatusColor(status: string): string {
               <span class="text-slate-700 font-medium">{{ f.name }}</span>
             </div>
           </div>
-          <div v-if="!info.is_pro" class="px-6 pb-6">
+          <div class="px-6 pb-6 space-y-4">
+            <div class="space-y-2">
+              <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pilih Durasi Perpanjangan</p>
+              <div class="grid grid-cols-2 gap-2">
+                <button 
+                  v-for="opt in durationOptions" 
+                  :key="opt.value"
+                  @click="selectedDuration = opt.value"
+                  class="px-3 py-2 text-sm font-bold rounded-lg border-2 transition-all"
+                  :class="selectedDuration === opt.value ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
+              <p class="text-sm font-bold text-slate-800 flex justify-between mt-2 pt-2 border-t border-slate-100">
+                Total Tagihan: <span class="text-primary-600">{{ selectedPriceFormatted }}</span>
+              </p>
+            </div>
             <BaseButton variant="primary" block :loading="isUpgrading" @click="handleUpgrade" class="shadow-lg shadow-primary-500/30">
               <template #prepend><Icon name="lucide:zap" class="w-4 h-4" /></template>
-              Upgrade Sekarang
+              {{ info.is_pro ? 'Perpanjang Sekarang' : 'Upgrade Sekarang' }}
             </BaseButton>
           </div>
         </BaseCard>
@@ -293,6 +383,7 @@ function getStatusColor(status: string): string {
                 <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Nominal</th>
                 <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Durasi</th>
                 <th class="px-6 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                <th class="px-6 py-3 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -305,11 +396,80 @@ function getStatusColor(status: string): string {
                     {{ order.status_label }}
                   </span>
                 </td>
+                <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                  <BaseButton 
+                    v-if="order.status === 'pending'"
+                    variant="outline" 
+                    size="sm" 
+                    @click="resumePayment(order)"
+                  >
+                    <template #prepend><Icon name="lucide:credit-card" class="w-4 h-4" /></template>
+                    Lanjutkan
+                  </BaseButton>
+                  <BaseButton 
+                    v-else
+                    variant="ghost" 
+                    size="sm" 
+                    @click="viewDetail(order)"
+                  >
+                    <template #prepend><Icon name="lucide:file-text" class="w-4 h-4" /></template>
+                    Detail
+                  </BaseButton>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <Pagination
+          v-if="paymentHistory.length > 0"
+          :current-page="currentPage"
+          :last-page="lastPage"
+          :total-items="totalItems"
+          :items-per-page="itemsPerPage"
+          @page-change="fetchHistory"
+        />
       </BaseCard>
+
+      <!-- Detail Modal -->
+      <Modal :show="showDetailModal" title="Detail Pembayaran" @close="showDetailModal = false">
+        <div v-if="selectedOrder" class="space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Tanggal Transaksi</p>
+              <p class="text-sm font-bold text-slate-800">{{ formatDate(selectedOrder.created_at) }}</p>
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border" :class="getStatusColor(selectedOrder.status)">
+              {{ selectedOrder.status_label }}
+            </span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-slate-50 p-4 rounded-xl space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-slate-500">Paket Langganan</span>
+                <span class="text-sm font-bold text-slate-800">Pro Plan</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-slate-500">Durasi</span>
+                <span class="text-sm font-bold text-slate-800">{{ selectedOrder.duration_months }} Bulan</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-slate-500">Metode Pembayaran</span>
+                <span class="text-sm font-bold text-slate-800 capitalize">{{ selectedOrder.payment_method?.replace(/_/g, ' ') || '-' }}</span>
+              </div>
+              <div class="flex items-center justify-between pt-3 border-t border-slate-200">
+                <span class="text-sm font-bold text-slate-800">Total Tagihan</span>
+                <span class="text-lg font-black text-primary-600">{{ selectedOrder.amount_formatted }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <template #footer>
+          <div class="flex justify-end">
+            <BaseButton variant="secondary" @click="showDetailModal = false">Tutup</BaseButton>
+          </div>
+        </template>
+      </Modal>
     </template>
   </div>
 </template>

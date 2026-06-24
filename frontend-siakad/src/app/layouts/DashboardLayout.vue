@@ -45,6 +45,12 @@ function switchSchool() {
   router.push({ name: 'SelectSchool' })
 }
 
+onMounted(async () => {
+  if (schoolStore.currentSchoolId) {
+    await schoolStore.fetchSubscriptionInfo()
+  }
+})
+
 const navItems = computed(() => {
   const role = schoolStore.currentRole
     const items = [
@@ -79,7 +85,11 @@ const navItems = computed(() => {
       { name: 'Tabungan Siswa', icon: 'savings', to: '/finances/savings', roles: ['teacher'], isPro: true },
       { name: 'Cetak Rapor', icon: 'report', to: '/reports', roles: ['teacher'], isPro: true },
     ]
-  return items.filter((item) => item.roles.includes(role ?? ''))
+  return items.filter((item) => {
+    if (!item.roles.includes(role ?? '')) return false
+    if (item.isPro && !schoolStore.isPro) return false
+    return true
+  })
 })
 
 const navIcons: Record<string, string> = {
@@ -197,12 +207,6 @@ const activeItemTo = computed(() => {
                 />
                 <span :class="activeItemTo === subscriptionItem.to ? 'group-hover:text-white text-white' : 'group-hover:text-violet-900'">{{ subscriptionItem.name }}</span>
               </div>
-              <span 
-                v-if="activeItemTo !== subscriptionItem.to"
-                class="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-violet-100 text-violet-700 border border-violet-200"
-              >
-                Pro
-              </span>
             </RouterLink>
           </div>
 
@@ -305,7 +309,46 @@ const activeItemTo = computed(() => {
       </header>
 
       <!-- Page content -->
-      <main class="p-4 sm:p-6 lg:p-8">
+      <main class="p-4 sm:p-6 lg:p-8 space-y-6">
+        <!-- Core Lock Banner -->
+        <div v-if="schoolStore.isCoreLocked" class="bg-danger-50 border-2 border-danger-500 rounded-2xl p-6 md:p-8 shadow-xl shadow-danger-900/10 relative overflow-hidden">
+          <div class="absolute -right-10 -bottom-10 opacity-5">
+            <Icon name="lucide:lock" class="w-64 h-64 text-danger-900" />
+          </div>
+          <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+            <div>
+              <h2 class="text-xl md:text-2xl font-black text-danger-700 flex items-center gap-3 mb-2">
+                <Icon name="lucide:lock" class="w-6 h-6" /> Akses Terkunci
+              </h2>
+              <p class="text-danger-600 font-medium max-w-3xl leading-relaxed">
+                Jumlah data Anda (Siswa: {{ schoolStore.subscriptionInfo?.student_usage }}/{{ schoolStore.subscriptionInfo?.student_limit }}, Guru: {{ schoolStore.subscriptionInfo?.teacher_usage }}/{{ schoolStore.subscriptionInfo?.teacher_limit }}) melebihi batas Paket Gratis. Untuk menggunakan seluruh fitur SIAKAD kembali secara normal, Anda harus Upgrade ke Paket Pro atau menonaktifkan/menghapus kelebihan data.
+              </p>
+            </div>
+            <BaseButton variant="danger" size="lg" @click="$router.push('/school/subscription')" class="whitespace-nowrap shadow-lg shadow-danger-500/30">
+              <template #prepend><Icon name="lucide:crown" class="w-5 h-5" /></template>
+              Upgrade Sekarang
+            </BaseButton>
+          </div>
+        </div>
+
+        <!-- H-3 Warning Banner (Danger/Red) -->
+        <div v-else-if="schoolStore.isHeadmaster && schoolStore.daysUntilExpiration !== null && schoolStore.daysUntilExpiration <= 3" class="bg-danger-50 border-2 border-danger-500 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <Icon name="lucide:alert-triangle" class="w-6 h-6 text-danger-600 flex-shrink-0" />
+            <p class="text-danger-800 font-medium">Masa aktif paket Pro Anda tinggal <strong class="text-danger-900 font-black">{{ schoolStore.daysUntilExpiration }} hari</strong> lagi. Jangan sampai fitur terkunci, segera lakukan perpanjangan!</p>
+          </div>
+          <button v-if="$route.path !== '/school/subscription'" class="bg-danger-600 hover:bg-danger-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors shadow-sm whitespace-nowrap" @click="$router.push('/school/subscription')">Perpanjang</button>
+        </div>
+
+        <!-- H-7 Warning Banner (Amber/Yellow) -->
+        <div v-else-if="schoolStore.isHeadmaster && schoolStore.daysUntilExpiration !== null && schoolStore.daysUntilExpiration <= 7" class="bg-amber-50 border-2 border-amber-500 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <Icon name="lucide:alert-circle" class="w-6 h-6 text-amber-600 flex-shrink-0" />
+            <p class="text-amber-800 font-medium">Masa aktif paket Pro Anda tinggal <strong class="text-amber-900 font-black">{{ schoolStore.daysUntilExpiration }} hari</strong> lagi. Jangan sampai fitur terkunci, segera lakukan perpanjangan!</p>
+          </div>
+          <button v-if="$route.path !== '/school/subscription'" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition-colors shadow-sm whitespace-nowrap" @click="$router.push('/school/subscription')">Perpanjang</button>
+        </div>
+
         <RouterView />
       </main>
     </div>

@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import { authService } from '@/features/auth/services/auth.service'
+import { subscriptionService } from '@/features/school/services/subscription.service'
 import type { School, SchoolMembership } from '@/types'
+import type { SubscriptionInfo } from '@/types/subscription.types'
 
 interface SchoolState {
   currentSchool: School | null
   memberships: SchoolMembership[]
+  subscriptionInfo: SubscriptionInfo | null
   isLoading: boolean
 }
 
@@ -12,6 +15,7 @@ export const useSchoolStore = defineStore('school', {
   state: (): SchoolState => ({
     currentSchool: null,
     memberships: [],
+    subscriptionInfo: null,
     isLoading: true,
   }),
 
@@ -35,6 +39,27 @@ export const useSchoolStore = defineStore('school', {
     isParent(): boolean {
       return this.currentRole === 'parent'
     },
+    isCoreLocked(state): boolean {
+      if (!state.subscriptionInfo) return false
+      if (state.subscriptionInfo.is_pro) return false
+      
+      const s = state.subscriptionInfo
+      const studentOver = s.student_limit !== null && s.student_usage > s.student_limit
+      const teacherOver = s.teacher_limit !== null && s.teacher_usage > s.teacher_limit
+      
+      return studentOver || teacherOver
+    },
+    daysUntilExpiration(state): number | null {
+      if (!state.subscriptionInfo?.subscription_ended_at) return null
+      if (!state.subscriptionInfo.is_pro) return null
+      
+      const end = new Date(state.subscriptionInfo.subscription_ended_at).getTime()
+      const now = new Date().getTime()
+      const diff = end - now
+      
+      if (diff < 0) return 0
+      return Math.ceil(diff / (1000 * 60 * 60 * 24))
+    }
   },
 
   actions: {
@@ -68,10 +93,24 @@ export const useSchoolStore = defineStore('school', {
     /**
      * Select a school to work with.
      */
-    selectSchool(schoolId: number) {
+    async selectSchool(schoolId: number) {
       const membership = this.memberships.find((m) => m.school_id === schoolId)
       if (membership) {
         this.currentSchool = membership.school
+        await this.fetchSubscriptionInfo()
+      }
+    },
+
+    /**
+     * Fetch subscription info for current school.
+     */
+    async fetchSubscriptionInfo() {
+      if (!this.currentSchoolId) return
+      try {
+        const res = await subscriptionService.getInfo(this.currentSchoolId)
+        this.subscriptionInfo = res as any
+      } catch {
+        this.subscriptionInfo = null
       }
     },
 
@@ -80,6 +119,7 @@ export const useSchoolStore = defineStore('school', {
      */
     clearSchool() {
       this.currentSchool = null
+      this.subscriptionInfo = null
       // memberships = [] // REMOVED: keep memberships for the selection screen
     },
   },

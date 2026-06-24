@@ -57,13 +57,14 @@ class SubscriptionController extends Controller
             return response()->json(['message' => 'Hanya Kepala Sekolah yang dapat melakukan upgrade.'], 403);
         }
 
-        // Already Pro?
-        if ($school->isPro() && $school->subscription_ended_at?->isFuture()) {
-            return response()->json(['message' => 'Sekolah sudah berlangganan Pro Plan.'], 422);
-        }
+        $request->validate([
+            'duration_months' => 'nullable|integer|in:1,3,6,12',
+        ]);
+        
+        $durationMonths = (int) $request->input('duration_months', 1);
 
         try {
-            $order = $this->subscriptionService->createUpgradeTransaction($school);
+            $order = $this->subscriptionService->createUpgradeTransaction($school, $durationMonths);
 
             return response()->json([
                 'message' => 'Silakan selesaikan pembayaran.',
@@ -100,19 +101,21 @@ class SubscriptionController extends Controller
 
         $orders = SubscriptionOrder::where('school_id', $school->id)
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($order) => [
-                'id' => $order->id,
-                'amount' => $order->amount,
-                'amount_formatted' => $order->formatted_amount,
-                'status' => $order->status->value,
-                'status_label' => $order->status->label(),
-                'duration_months' => $order->duration_months,
-                'payment_method' => $order->payment_method,
-                'paid_at' => $order->paid_at?->toISOString(),
-                'created_at' => $order->created_at->toISOString(),
-            ]);
+            ->paginate(5); // Show 5 per page
 
-        return response()->json(['data' => $orders]);
+        $orders->getCollection()->transform(fn ($order) => [
+            'id' => $order->id,
+            'amount' => $order->amount,
+            'amount_formatted' => $order->formatted_amount,
+            'status' => $order->status->value,
+            'status_label' => $order->status->label(),
+            'duration_months' => $order->duration_months,
+            'payment_method' => $order->payment_method,
+            'paid_at' => $order->paid_at?->toISOString(),
+            'created_at' => $order->created_at->toISOString(),
+            'snap_token' => $order->snap_token,
+        ]);
+
+        return response()->json($orders);
     }
 }

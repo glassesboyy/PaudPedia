@@ -12,14 +12,16 @@ export const subscriptionService = {
   /**
    * Initiate Pro Plan upgrade via Midtrans
    */
-  initiateUpgrade(schoolId: number) {
-    return api.post<UpgradeResponse>(`/api/v1/schools/${schoolId}/subscription/upgrade`)
+  initiateUpgrade(schoolId: number, durationMonths: number = 1) {
+    return api.post<UpgradeResponse>(`/api/v1/schools/${schoolId}/subscription/upgrade`, {
+      duration_months: durationMonths
+    })
   },
 
   /**
    * Get subscription payment history
    */
-  getPaymentHistory(schoolId: number) {
-    return api.get<{ data: SubscriptionOrder[] }>(`/api/v1/schools/${schoolId}/subscription/payment-history`)
+  getPaymentHistory(schoolId: number, page: number = 1) {
+    return api.get<any>(`/api/v1/schools/${schoolId}/subscription/payment-history?page=${page}`)
   },
 }

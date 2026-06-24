@@ -64,7 +64,12 @@ Route::prefix('auth')->name('auth.')->middleware('auth:sanctum')->group(function
 });
 
 // Other authenticated routes (outside auth prefix)
-Route::middleware(['auth:sanctum', 'verified', \App\Http\Middleware\CheckActiveSchoolMember::class])->group(function () {
+Route::middleware([
+    'auth:sanctum', 
+    'verified', 
+    \App\Http\Middleware\CheckActiveSchoolMember::class,
+    \App\Http\Middleware\CheckSchoolLimits::class
+])->group(function () {
     // School registration (authenticated upgrade)
     Route::post('/schools/register', [AuthController::class, 'registerSchoolUpgrade'])->name('schools.register');
 
