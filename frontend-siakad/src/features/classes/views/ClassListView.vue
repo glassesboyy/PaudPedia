@@ -8,10 +8,12 @@ import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseAlert from '@/components/ui/Alert/Alert.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
+import BaseSelect from '@/components/ui/Input/Select.vue'
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import { Pagination } from '@/components/ui'
 import { usePageCopy } from '@/utils/copy-helper'
+import { ClassLevel } from '@/types/enums'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
@@ -26,15 +28,47 @@ const classes = ref<ClassRoom[]>([])
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 10 }) // TODO: Revert to 10 after testing
 const generalError = ref('')
 const searchQuery = ref('')
+const filterLevel = ref('')
+const filterAcademicYear = ref('')
+const showAdvancedFilters = ref(false)
 
 // Delete modal state
 const showDeleteModal = ref(false)
 const deleteTarget = ref<ClassRoom | null>(null)
 const isDeleting = ref(false)
 
-onMounted(() => {
-  fetchClasses()
+const levelOptions = computed(() => {
+  const options = (Object.values(ClassLevel) as string[]).map(val => ({
+    value: val,
+    label: val
+  }))
+  return [{ value: '', label: 'Semua Tingkatan' }, ...options]
 })
+
+const academicYears = ref<string[]>([])
+
+const academicYearOptions = computed(() => {
+  const options = [{ value: '', label: 'Semua Tahun Ajaran' }]
+  academicYears.value.forEach(year => {
+    options.push({ value: year, label: year })
+  })
+  return options
+})
+
+onMounted(async () => {
+  await Promise.all([
+    fetchClasses(),
+    fetchAcademicYears()
+  ])
+})
+
+async function fetchAcademicYears() {
+  if (!schoolStore.currentSchoolId) return
+  try {
+    const response = await classService.getAcademicYears(schoolStore.currentSchoolId)
+    academicYears.value = response.data as unknown as string[]
+  } catch { /* silent */ }
+}
 
 async function fetchClasses(page = 1) {
   if (!schoolStore.currentSchoolId) return
@@ -44,6 +78,8 @@ async function fetchClasses(page = 1) {
   try {
     const params: Record<string, any> = { page, per_page: 10 } // TODO: Revert to 10 after testing
     if (searchQuery.value) params.search = searchQuery.value
+    if (filterLevel.value) params.level = filterLevel.value
+    if (filterAcademicYear.value) params.academic_year = filterAcademicYear.value
 
     const response = await classService.getClasses(schoolStore.currentSchoolId, params)
     classes.value = response.data
@@ -60,10 +96,20 @@ function handleSearch() {
   fetchClasses(1)
 }
 
-function handleReset() {
-  searchQuery.value = ''
+function handleFilterChange() {
   fetchClasses(1)
 }
+
+function handleReset() {
+  searchQuery.value = ''
+  filterLevel.value = ''
+  filterAcademicYear.value = ''
+  fetchClasses(1)
+}
+
+const isFiltering = computed(() => {
+  return searchQuery.value || filterLevel.value || filterAcademicYear.value
+})
 
 function confirmDelete(classRoom: ClassRoom) {
   deleteTarget.value = classRoom
@@ -103,26 +149,57 @@ async function executeDelete() {
     </div>
 
     <!-- Search & Filters -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-      <div class="flex-1 max-w-md">
-        <BaseInput
-          v-model="searchQuery"
-          placeholder="Cari nama kelas..."
-          @keyup.enter="handleSearch"
+    <div class="flex flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="flex-1 max-w-md">
+          <BaseInput
+            v-model="searchQuery"
+            placeholder="Cari nama kelas..."
+            @keyup.enter="handleSearch"
+          >
+            <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
+          </BaseInput>
+        </div>
+        <BaseButton 
+          variant="outline" 
+          size="md" 
+          @click="showAdvancedFilters = !showAdvancedFilters"
+          :class="showAdvancedFilters ? 'bg-primary-50 text-primary-700 border-primary-200' : ''"
         >
-          <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
-        </BaseInput>
+          <template #prepend><Icon name="lucide:sliders-horizontal" class="w-4 h-4" /></template>
+          Filter Lanjutan
+        </BaseButton>
+        <BaseButton 
+          v-if="isFiltering" 
+          variant="outline" 
+          size="md" 
+          @click="handleReset"
+          class="text-muted hover:text-primary-600"
+        >
+          <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+          Reset
+        </BaseButton>
       </div>
-      <BaseButton 
-        v-if="searchQuery" 
-        variant="outline" 
-        size="md" 
-        @click="handleReset"
-        class="text-muted hover:text-primary-600"
-      >
-        <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
-        Reset
-      </BaseButton>
+
+      <!-- Advanced Filters Panel -->
+      <div v-show="showAdvancedFilters" class="p-4 bg-surface rounded-xl border border-border grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-200">
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Tingkatan (Level)</label>
+          <BaseSelect 
+            v-model="filterLevel" 
+            :options="levelOptions" 
+            @change="handleFilterChange" 
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Tahun Ajaran</label>
+          <BaseSelect 
+            v-model="filterAcademicYear" 
+            :options="academicYearOptions"
+            @change="handleFilterChange" 
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Error state -->
@@ -165,7 +242,7 @@ async function executeDelete() {
             <tr v-else-if="classes.length === 0">
               <td colspan="5" class="px-8 py-20 text-center">
                 <!-- Case: Data truly empty -->
-                <div v-if="!searchQuery" class="flex flex-col items-center gap-4 max-w-xs mx-auto text-center">
+                <div v-if="!isFiltering" class="flex flex-col items-center gap-4 max-w-xs mx-auto text-center">
                   <div class="w-20 h-20 bg-surface-muted rounded-2xl flex items-center justify-center text-muted border-2 border-dashed border-border mx-auto">
                     <Icon name="lucide:school" class="w-10 h-10" stroke-width="1.5" />
                   </div>
@@ -191,7 +268,7 @@ async function executeDelete() {
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading">Kelas Tidak Ditemukan</p>
-                    <p class="text-sm text-muted">Tidak ditemukan kelas dengan kata kunci <span class="font-bold text-primary-600">"{{ searchQuery }}"</span></p>
+                    <p class="text-sm text-muted">Tidak ditemukan kelas berdasarkan filter yang dipilih</p>
                   </div>
                   <BaseButton variant="outline" size="md" class="mt-2 w-full" @click="handleReset">
                     Bersihkan Pencarian

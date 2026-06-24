@@ -8,6 +8,7 @@ import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseAlert from '@/components/ui/Alert/Alert.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
+import BaseSelect from '@/components/ui/Input/Select.vue'
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import { Pagination } from '@/components/ui'
@@ -64,6 +65,10 @@ function handleReset() {
   searchQuery.value = ''
   fetchParents(1)
 }
+
+const isFiltering = computed(() => {
+  return !!searchQuery.value
+})
 
 function confirmDelete(parent: ParentProfile) {
   deleteTarget.value = parent
@@ -166,7 +171,7 @@ function getParentDisplayName(p: ParentProfile): string {
             <tr v-else-if="parents.length === 0">
               <td colspan="5" class="px-8 py-20 text-center">
                 <!-- Case: Data truly empty -->
-                <div v-if="!searchQuery" class="flex flex-col items-center gap-4 max-w-xs mx-auto">
+                <div v-if="!isFiltering" class="flex flex-col items-center gap-4 max-w-xs mx-auto">
                   <div class="w-20 h-20 bg-surface-muted rounded-2xl flex items-center justify-center text-muted border-2 border-dashed border-border">
                     <Icon name="lucide:users" class="w-10 h-10" stroke-width="1.5" />
                   </div>

@@ -38,11 +38,37 @@ class TeacherController extends BaseController
             return $this->error('Akses ditolak. Anda bukan pengelola atau pengajar sekolah ini.', 403);
         }
 
-        $teachers = Teacher::where('school_id', $schoolId)
+        $query = Teacher::where('school_id', $schoolId)
             ->with(['user.schoolMemberships' => function ($q) use ($schoolId) {
                 $q->where('school_id', $schoolId)->where('role_type', \App\Enums\RoleType::TEACHER);
-            }])
-            ->orderBy('created_at', 'desc')
+            }]);
+
+        // Filter by Search (Name or NIP)
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nip', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by Status (Active/Inactive)
+        if ($request->has('status')) {
+            $isActive = $request->get('status') === 'active';
+            $query->whereHas('user.schoolMemberships', function ($q) use ($schoolId, $isActive) {
+                $q->where('school_id', $schoolId)
+                  ->where('role_type', \App\Enums\RoleType::TEACHER)
+                  ->where('is_active', $isActive);
+            });
+        }
+
+        // Filter by Specialization
+        if ($specialization = $request->get('specialization')) {
+            $query->where('specialization', 'like', "%{$specialization}%");
+        }
+
+        $teachers = $query->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 10));
 
         return $this->success([

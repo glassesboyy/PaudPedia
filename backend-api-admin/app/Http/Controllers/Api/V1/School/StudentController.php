@@ -75,6 +75,18 @@ class StudentController extends BaseController
             $query->where('status', $status);
         }
 
+        // Filter by gender
+        if ($gender = $request->get('gender')) {
+            $query->where('gender', $gender);
+        }
+
+        // Filter by class level
+        if ($level = $request->get('level')) {
+            $query->whereHas('class', function ($q) use ($level) {
+                $q->where('level', $level);
+            });
+        }
+
         $students = $query->orderBy('name', 'asc')
             ->paginate($request->get('per_page', 10));
 

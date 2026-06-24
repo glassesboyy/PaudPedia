@@ -31,8 +31,8 @@ class ClassRoomController extends Controller
         $query = ClassRoom::where('school_id', $school->id)
             ->with(['homeroomTeacher.user']);
 
-        // Teacher HANYA boleh melihat kelas miliknya (homeroom)
-        if ($membership->isTeacher()) {
+        // Teacher HANYA boleh melihat kelas miliknya (homeroom), kecuali all_classes diminta
+        if ($membership->isTeacher() && !$request->boolean('all_classes')) {
             $query->whereHas('homeroomTeacher', function ($q) use ($request) {
                 $q->where('user_id', $request->user()->id);
             });
@@ -41,6 +41,27 @@ class ClassRoomController extends Controller
             $query->whereHas('homeroomTeacher', function ($q) use ($request) {
                 $q->where('user_id', $request->get('teacher_user_id'));
             });
+        }
+
+        // Return distinct academic years if requested
+        if ($request->boolean('return_academic_years')) {
+            $years = $query->select('academic_year')
+                ->whereNotNull('academic_year')
+                ->where('academic_year', '!=', '')
+                ->distinct()
+                ->orderBy('academic_year', 'desc')
+                ->pluck('academic_year');
+            return response()->json(['data' => $years]);
+        }
+
+        // Filter by Academic Year
+        if ($academicYear = $request->get('academic_year')) {
+            $query->where('academic_year', $academicYear);
+        }
+
+        // Filter by Level
+        if ($level = $request->get('level')) {
+            $query->where('level', $level);
         }
 
         $classes = $query->latest()

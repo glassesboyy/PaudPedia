@@ -52,6 +52,11 @@ class ParentProfileController extends BaseController
             });
         }
 
+        // Filter by minimum number of children
+        if ($minChildren = $request->get('min_children')) {
+            $query->has('children', '>=', (int) $minChildren);
+        }
+
         $parents = $query->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 10));
 

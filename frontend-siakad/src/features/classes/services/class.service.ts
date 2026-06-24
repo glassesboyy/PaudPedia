@@ -7,6 +7,10 @@ export const classService = {
     return api.get(ENDPOINTS.CLASSES.LIST(schoolId), { params })
   },
 
+  getAcademicYears(schoolId: number): Promise<ApiResponse<string[]>> {
+    return api.get(ENDPOINTS.CLASSES.LIST(schoolId), { params: { return_academic_years: 1, all_classes: 1 } })
+  },
+
   getClass(schoolId: number, classId: number): Promise<ApiResponse<ClassRoom>> {
     return api.get(ENDPOINTS.CLASSES.DETAIL(schoolId, classId))
   },

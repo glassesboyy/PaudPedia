@@ -29,6 +29,8 @@ const generalError = ref('')
 const searchQuery = ref('')
 const filterClass = ref('')
 const filterStatus = ref('')
+const filterGender = ref('')
+const showAdvancedFilters = ref(false)
 
 // Classes for filter
 const classes = ref<ClassRoom[]>([])
@@ -64,7 +66,7 @@ onMounted(async () => {
 async function fetchClasses() {
   if (!schoolStore.currentSchoolId) return
   try {
-    const response = await classService.getClasses(schoolStore.currentSchoolId, { per_page: 100 })
+    const response = await classService.getClasses(schoolStore.currentSchoolId, { per_page: 100, all_classes: 1 })
     classes.value = response.data
   } catch { /* ignore */ }
 }
@@ -78,6 +80,7 @@ async function fetchStudents(page = 1) {
     if (searchQuery.value) params.search = searchQuery.value
     if (filterClass.value) params.class_id = filterClass.value
     if (filterStatus.value) params.status = filterStatus.value
+    if (filterGender.value) params.gender = filterGender.value
 
     const response = await studentService.getStudents(schoolStore.currentSchoolId, params)
     students.value = response.data
@@ -101,10 +104,13 @@ function handleReset() {
   searchQuery.value = ''
   filterClass.value = ''
   filterStatus.value = ''
+  filterGender.value = ''
   fetchStudents(1)
 }
 
-const isFiltering = computed(() => !!(searchQuery.value || filterClass.value || filterStatus.value))
+const isFiltering = computed(() => {
+  return searchQuery.value || filterClass.value || filterStatus.value || filterGender.value
+})
 
 function confirmDelete(student: Student) {
   deleteTarget.value = student
@@ -132,11 +138,19 @@ const classOptions = computed(() => [
 ])
 
 const statusOptions = [
-  { value: '', label: 'Semua Status' },
-  { value: 'active', label: 'Aktif' },
-  { value: 'graduated', label: 'Lulus' },
-  { value: 'transferred', label: 'Pindah' },
+  { label: 'Semua Status', value: '' },
+  { label: 'Aktif', value: 'active' },
+  { label: 'Lulus', value: 'graduated' },
+  { label: 'Pindah', value: 'transferred' },
 ]
+
+const genderOptions = [
+  { label: 'Semua Kelamin', value: '' },
+  { label: 'Laki-laki', value: 'male' },
+  { label: 'Perempuan', value: 'female' },
+]
+
+
 </script>
 
 <template>
@@ -155,29 +169,50 @@ const statusOptions = [
       </BaseButton>
     </div>
 
-    <!-- Filters -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-      <div class="flex-1 max-w-sm">
-        <BaseInput v-model="searchQuery" placeholder="Cari nama atau NISN..." @keyup.enter="handleSearch">
-          <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
-        </BaseInput>
+    <!-- Search & Filters -->
+    <div class="flex flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="flex-1 max-w-sm">
+          <BaseInput v-model="searchQuery" placeholder="Cari nama atau NISN..." @keyup.enter="handleSearch">
+            <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
+          </BaseInput>
+        </div>
+        <BaseButton 
+          variant="outline" 
+          size="md" 
+          @click="showAdvancedFilters = !showAdvancedFilters"
+          :class="showAdvancedFilters ? 'bg-primary-50 text-primary-700 border-primary-200' : ''"
+        >
+          <template #prepend><Icon name="lucide:sliders-horizontal" class="w-4 h-4" /></template>
+          Filter Lanjutan
+        </BaseButton>
+        <BaseButton 
+          v-if="isFiltering" 
+          variant="outline" 
+          size="md" 
+          @click="handleReset"
+          class="text-muted hover:text-primary-600"
+        >
+          <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+          Reset
+        </BaseButton>
       </div>
-      <div class="w-44">
-        <BaseSelect v-model="filterClass" :options="classOptions" @change="handleFilterChange" />
+
+      <!-- Advanced Filters Panel -->
+      <div v-show="showAdvancedFilters" class="p-4 bg-surface rounded-xl border border-border grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2 duration-200">
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Kelas</label>
+          <BaseSelect v-model="filterClass" :options="classOptions" @change="handleFilterChange" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Status Siswa</label>
+          <BaseSelect v-model="filterStatus" :options="statusOptions" @change="handleFilterChange" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Jenis Kelamin</label>
+          <BaseSelect v-model="filterGender" :options="genderOptions" @change="handleFilterChange" />
+        </div>
       </div>
-      <div class="w-44">
-        <BaseSelect v-model="filterStatus" :options="statusOptions" @change="handleFilterChange" />
-      </div>
-      <BaseButton 
-        v-if="isFiltering" 
-        variant="outline" 
-        size="md" 
-        @click="handleReset"
-        class="text-muted hover:text-primary-600"
-      >
-        <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
-        Reset
-      </BaseButton>
     </div>
 
     <!-- Error -->

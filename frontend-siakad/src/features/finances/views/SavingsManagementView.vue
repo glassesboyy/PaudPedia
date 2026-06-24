@@ -33,10 +33,12 @@ const savingsRecords = ref<FinanceRecord[]>([])
 const balanceInfo = ref<{ balance: number; total_deposits: number; total_withdrawals: number } | null>(null)
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 50 }) // TODO: Revert per_page to 50 after testing
 
-const selectedClassId = ref<number | ''>('')
 const searchQuery = ref('')
+const selectedClassId = ref<number | ''>('')
+const filterTransactionType = ref('')
+const showAdvancedFilters = ref(false)
 
-const isFiltering = computed(() => !!searchQuery.value || !!selectedClassId.value)
+const isFiltering = computed(() => !!searchQuery.value || !!selectedClassId.value || !!filterTransactionType.value)
 
 const showForm = ref(false)
 const form = ref<SavingsPayload>({
@@ -61,7 +63,7 @@ onMounted(async () => {
 
 async function fetchClasses() {
   try {
-    const res = await api.get<{ data: ClassRoom[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/classes`)
+    const res = await api.get<{ data: ClassRoom[] }>(`/api/v1/schools/${schoolStore.currentSchoolId}/classes?all_classes=1&per_page=100`)
     classes.value = (res as any).data
   } catch { /* silent */ }
 }
@@ -79,6 +81,7 @@ async function fetchSavings(page = 1) {
     const params: Record<string, unknown> = { page, per_page: 50 } // TODO: Revert to 50 after testing
     if (selectedClassId.value) params.class_id = selectedClassId.value
     if (searchQuery.value) params.search = searchQuery.value
+    if (filterTransactionType.value) params.transaction_type = filterTransactionType.value
     const res = await financeService.getSavingsList(schoolStore.currentSchoolId!, params as any)
     savingsRecords.value = (res as any).data
     balanceInfo.value = (res as any).balance_info || null
@@ -138,8 +141,10 @@ function handleSearchEnter() {
 function handleReset() {
   searchQuery.value = ''
   selectedClassId.value = ''
+  filterTransactionType.value = ''
   fetchSavings(1)
 }
+
 </script>
 
 <template>
@@ -214,33 +219,57 @@ function handleReset() {
         </template>
       </BaseModal>
 
-      <!-- Filters -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        <div class="flex-1 max-w-sm">
-          <BaseInput
-            v-model="searchQuery"
-            placeholder="Cari nama siswa..."
-            @keyup.enter="handleSearchEnter"
+      <!-- Search & Filters -->
+      <div class="flex flex-col space-y-4">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div class="flex-1 max-w-sm">
+            <BaseInput
+              v-model="searchQuery"
+              placeholder="Cari nama siswa..."
+              @keyup.enter="handleSearchEnter"
+            >
+              <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
+            </BaseInput>
+          </div>
+          <BaseButton 
+            variant="outline" 
+            size="md" 
+            @click="showAdvancedFilters = !showAdvancedFilters"
+            :class="showAdvancedFilters ? 'bg-primary-50 text-primary-700 border-primary-200 h-[42px]' : 'h-[42px]'"
           >
-            <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
-          </BaseInput>
+            <template #prepend><Icon name="lucide:sliders-horizontal" class="w-4 h-4" /></template>
+            Filter Lanjutan
+          </BaseButton>
+          <BaseButton 
+            v-if="isFiltering" 
+            variant="outline" 
+            size="md" 
+            @click="handleReset"
+            class="text-muted hover:text-primary-600 h-[42px]"
+          >
+            <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+            Reset
+          </BaseButton>
         </div>
-        <div class="w-44">
-          <select v-model="selectedClassId" @change="handleFilterChange" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
-            <option value="">Semua Kelas</option>
-            <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
-          </select>
+
+        <!-- Advanced Filters Panel -->
+        <div v-show="showAdvancedFilters" class="p-4 bg-surface rounded-xl border border-border grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-200">
+          <div>
+            <label class="block text-xs font-semibold text-muted mb-1.5">Kelas</label>
+            <select v-model="selectedClassId" @change="handleFilterChange" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
+              <option value="">Semua Kelas</option>
+              <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-muted mb-1.5">Jenis Transaksi</label>
+            <select v-model="filterTransactionType" @change="handleFilterChange" class="w-full h-[42px] px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all">
+              <option value="">Semua Transaksi</option>
+              <option value="deposit">Setoran</option>
+              <option value="withdrawal">Penarikan</option>
+            </select>
+          </div>
         </div>
-        <BaseButton 
-          v-if="isFiltering" 
-          variant="outline" 
-          size="md" 
-          @click="handleReset"
-          class="text-muted hover:text-primary-600 h-[42px]"
-        >
-          <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
-          Reset
-        </BaseButton>
       </div>
 
       <!-- Records -->

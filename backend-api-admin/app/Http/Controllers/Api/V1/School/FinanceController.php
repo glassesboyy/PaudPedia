@@ -106,6 +106,9 @@ class FinanceController extends Controller
                 $q->where('name', 'like', "%{$searchTerm}%");
             });
         }
+        if ($paymentMethod = $request->get('payment_method')) {
+            $query->where('payment_method', $paymentMethod);
+        }
 
         $records = $query->orderBy('created_at', 'desc')
             ->paginate($request->get('per_page', 20));
@@ -366,6 +369,9 @@ class FinanceController extends Controller
             $query->whereHas('student', function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%");
             });
+        }
+        if ($transactionType = $request->get('transaction_type')) {
+            $query->where('transaction_type', $transactionType);
         }
 
         $records = $query->orderBy('created_at', 'desc')

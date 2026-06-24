@@ -7,6 +7,7 @@ import type { Teacher } from '@/types'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseAlert from '@/components/ui/Alert/Alert.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
+import BaseSelect from '@/components/ui/Input/Select.vue'
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
@@ -25,6 +26,9 @@ const isLoading = ref(false)
 const teachers = ref<Teacher[]>([])
 const meta = ref({ current_page: 1, last_page: 1, total: 0, per_page: 20 }) // TODO: Revert per_page to 20 after testing
 const searchQuery = ref('')
+const filterStatus = ref('')
+const filterSpecialization = ref('')
+const showAdvancedFilters = ref(false)
 const generalError = ref('')
 
 // Delete modal state
@@ -47,8 +51,10 @@ async function fetchTeachers(page = 1) {
   isLoading.value = true
   generalError.value = ''
   try {
-    const params: Record<string, any> = { page, per_page: 2 }
+    const params: Record<string, any> = { page, per_page: 20 }
     if (searchQuery.value) params.search = searchQuery.value
+    if (filterStatus.value) params.status = filterStatus.value
+    if (filterSpecialization.value) params.specialization = filterSpecialization.value
 
     const response = await teacherService.getTeachers(schoolStore.currentSchoolId, params)
     teachers.value = response.data.teachers
@@ -65,10 +71,26 @@ function handleSearch() {
   fetchTeachers(1)
 }
 
-function handleReset() {
-  searchQuery.value = ''
+function handleFilterChange() {
   fetchTeachers(1)
 }
+
+function handleReset() {
+  searchQuery.value = ''
+  filterStatus.value = ''
+  filterSpecialization.value = ''
+  fetchTeachers(1)
+}
+
+const isFiltering = computed(() => {
+  return searchQuery.value || filterStatus.value || filterSpecialization.value
+})
+
+const statusOptions = [
+  { label: 'Semua Status', value: '' },
+  { label: 'Aktif', value: 'active' },
+  { label: 'Nonaktif', value: 'inactive' },
+]
 
 function confirmDelete(teacher: Teacher) {
   deleteTarget.value = teacher
@@ -136,26 +158,50 @@ function formatDate(dateString: string) {
     </div>
 
     <!-- Search & Filters -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-      <div class="flex-1 max-w-md">
-        <BaseInput
-          v-model="searchQuery"
-          placeholder="Cari nama guru atau NIP..."
-          @keyup.enter="handleSearch"
+    <div class="flex flex-col space-y-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="flex-1 max-w-md">
+          <BaseInput
+            v-model="searchQuery"
+            placeholder="Cari nama guru atau NIP..."
+            @keyup.enter="handleSearch"
+          >
+            <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
+          </BaseInput>
+        </div>
+        <BaseButton 
+          variant="outline" 
+          size="md" 
+          @click="showAdvancedFilters = !showAdvancedFilters"
+          :class="showAdvancedFilters ? 'bg-primary-50 text-primary-700 border-primary-200' : ''"
         >
-          <template #prepend><Icon name="lucide:search" class="w-4 h-4" /></template>
-        </BaseInput>
+          <template #prepend><Icon name="lucide:sliders-horizontal" class="w-4 h-4" /></template>
+          Filter Lanjutan
+        </BaseButton>
+        <BaseButton 
+          v-if="isFiltering" 
+          variant="outline" 
+          size="md" 
+          @click="handleReset"
+          class="text-muted hover:text-primary-600"
+        >
+          <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+          Reset
+        </BaseButton>
       </div>
-      <BaseButton 
-        v-if="searchQuery" 
-        variant="outline" 
-        size="md" 
-        @click="handleReset"
-        class="text-muted hover:text-primary-600"
-      >
-        <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
-        Reset
-      </BaseButton>
+
+      <!-- Advanced Filters Panel -->
+      <div v-show="showAdvancedFilters" class="p-4 bg-surface rounded-xl border border-border grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-200">
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Status Keaktifan</label>
+          <BaseSelect v-model="filterStatus" :options="statusOptions" @change="handleFilterChange" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-muted mb-1.5">Spesialisasi</label>
+          <BaseInput v-model="filterSpecialization" placeholder="Ketik spesialisasi..." @keyup.enter="handleFilterChange">
+          </BaseInput>
+        </div>
+      </div>
     </div>
 
     <!-- Error state -->
@@ -201,7 +247,7 @@ function formatDate(dateString: string) {
             <tr v-else-if="teachers.length === 0">
               <td colspan="5" class="px-8 py-20 text-center">
                 <!-- Case: Data truly empty -->
-                <div v-if="!searchQuery" class="flex flex-col items-center gap-4 max-w-xs mx-auto">
+                <div v-if="!isFiltering" class="flex flex-col items-center gap-4 max-w-xs mx-auto">
                   <div class="w-20 h-20 bg-surface-muted rounded-2xl flex items-center justify-center text-muted border-2 border-dashed border-border">
                       <Icon name="lucide:graduation-cap" class="w-10 h-10" stroke-width="1.5" />
                   </div>
@@ -225,7 +271,7 @@ function formatDate(dateString: string) {
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading">Guru Tidak Ditemukan</p>
-                    <p class="text-sm text-muted">Tidak ditemukan guru dengan kata kunci <span class="font-bold text-primary-600">"{{ searchQuery }}"</span></p>
+                    <p class="text-sm text-muted">Tidak ditemukan guru dengan filter yang dipilih.</p>
                   </div>
                   <BaseButton variant="outline" size="md" class="mt-2 w-full" @click="handleReset">
                     Bersihkan Pencarian

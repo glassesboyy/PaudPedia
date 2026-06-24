@@ -3,7 +3,7 @@ import { ENDPOINTS } from '@/services/http/endpoints'
 import type { ApiResponse, PaginatedResponse, ParentProfile } from '@/types'
 
 export const parentService = {
-  getParents(schoolId: number, params?: { page?: number; per_page?: number; search?: string }): Promise<PaginatedResponse<ParentProfile>> {
+  getParents(schoolId: number, params?: Record<string, any>): Promise<PaginatedResponse<ParentProfile>> {
     return api.get(ENDPOINTS.PARENTS.LIST(schoolId), { params })
   },
 
