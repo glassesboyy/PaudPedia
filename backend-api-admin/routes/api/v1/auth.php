@@ -134,6 +134,12 @@ Route::middleware([
     Route::post('/schools/{id}/subscription/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
     Route::get('/schools/{id}/subscription/payment-history', [SubscriptionController::class, 'paymentHistory'])->name('subscription.payments');
 
+    // Headmaster transfer management
+    Route::post('/schools/{id}/transfer/initiate', [\App\Http\Controllers\Api\V1\School\TransferController::class, 'initiate'])->name('transfer.initiate');
+    Route::get('/schools/transfer/accept/{token}', [\App\Http\Controllers\Api\V1\School\TransferController::class, 'show'])->name('transfer.show');
+    Route::post('/schools/transfer/accept/{token}', [\App\Http\Controllers\Api\V1\School\TransferController::class, 'accept'])->name('transfer.accept');
+    Route::post('/schools/transfer/reject/{token}', [\App\Http\Controllers\Api\V1\School\TransferController::class, 'reject'])->name('transfer.reject');
+
     // Finance management (FR-FN) — Pro Plan only
     Route::get('/schools/{id}/dashboard/headmaster', [DashboardController::class, 'headmasterSummary'])->name('dashboard.headmaster');
     Route::get('/schools/{id}/finances/spp', [FinanceController::class, 'sppIndex'])->name('finances.spp.index');

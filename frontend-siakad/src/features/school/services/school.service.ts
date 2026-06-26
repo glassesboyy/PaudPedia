@@ -17,4 +17,11 @@ export const schoolService = {
     // We use common FormData for logo upload support
     return http.post(ENDPOINTS.SCHOOL.PROFILE(schoolId), data)
   },
+
+  /**
+   * Initiate headmaster transfer.
+   */
+  async transferHeadmaster(schoolId: number, email: string): Promise<any> {
+    return http.post(ENDPOINTS.SCHOOL.TRANSFER_INITIATE(schoolId), { email })
+  },
 }

@@ -9,6 +9,7 @@ export const ENDPOINTS = {
     BASE: (schoolId: number) => `/api/v1/schools/${schoolId}`,
     PROFILE: (schoolId: number) => `/api/v1/schools/${schoolId}`,
     SUBSCRIPTION: (schoolId: number) => `/api/v1/schools/${schoolId}/subscription`,
+    TRANSFER_INITIATE: (schoolId: number) => `/api/v1/schools/${schoolId}/transfer/initiate`,
     MEMBERSHIPS: '/api/v1/my-memberships',
   },
   STUDENTS: {

@@ -7,6 +7,7 @@ import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseAlert from '@/components/ui/Alert/Alert.vue'
+import ConfirmModal from '@/components/ui/Modal/ConfirmModal.vue'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
@@ -16,6 +17,13 @@ const isSaving = ref(false)
 const message = ref({ type: '', text: '' })
 const logoPreview = ref<string | null>(null)
 const logoFile = ref<File | null>(null)
+
+// Transfer state
+const transferEmail = ref('')
+const isTransferring = ref(false)
+const transferMessage = ref({ type: '', text: '' })
+const transferError = ref('')
+const showTransferConfirm = ref(false)
 
 const form = reactive({
   name: '',
@@ -119,6 +127,36 @@ async function handleSubmit() {
     }
   } finally {
     isSaving.value = false
+  }
+}
+
+async function handleTransfer() {
+  if (!transferEmail.value || isTransferring.value) return
+  showTransferConfirm.value = true
+}
+
+async function submitTransfer() {
+  isTransferring.value = true
+  transferMessage.value = { type: '', text: '' }
+  transferError.value = ''
+  showTransferConfirm.value = false
+
+  try {
+    const res = await schoolService.transferHeadmaster(schoolStore.currentSchoolId!, transferEmail.value)
+    transferMessage.value = { type: 'success', text: res.message || 'Undangan berhasil dikirim!' }
+    transferEmail.value = ''
+  } catch (error: any) {
+    const apiErrors = error.response?.data?.errors
+    if (apiErrors && apiErrors.email) {
+      transferError.value = apiErrors.email[0]
+    } else {
+      transferMessage.value = { 
+        type: 'error', 
+        text: error.response?.data?.message || 'Gagal mengirim undangan transfer.' 
+      }
+    }
+  } finally {
+    isTransferring.value = false
   }
 }
 </script>
@@ -292,5 +330,67 @@ async function handleSubmit() {
         </div>
       </form>
     </BaseCard>
+
+    <!-- Danger Zone: Transfer Ownership -->
+    <BaseCard v-if="!isLoading" class="p-0 border-danger-200 shadow-xl shadow-danger-900/5 overflow-hidden border">
+      <div class="p-8 bg-danger-50 border-b border-danger-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-danger-100 rounded-xl flex items-center justify-center shrink-0">
+          <Icon name="lucide:alert-triangle" class="w-6 h-6 text-danger-600" />
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-danger-900">Transfer Kepemilikan (Danger Zone)</h3>
+          <p class="text-sm text-danger-700">Tindakan ini akan memindahkan jabatan Kepala Sekolah beserta seluruh hak aksesnya ke akun lain.</p>
+        </div>
+      </div>
+      
+      <div class="p-8 space-y-6">
+        <BaseAlert 
+          v-if="transferMessage.text" 
+          :variant="transferMessage.type === 'success' ? 'success' : 'danger'"
+          dismissible
+          @dismiss="transferMessage.text = ''"
+        >
+          {{ transferMessage.text }}
+        </BaseAlert>
+        
+        <p class="text-sm text-slate-600">
+          Masukkan alamat email pengguna yang akan menggantikan posisi Anda sebagai Kepala Sekolah. Sebuah undangan akan dikirimkan ke email tersebut. Jika undangan diterima, <strong>Anda akan langsung kehilangan akses ke panel ini dan status Anda diturunkan menjadi Guru biasa.</strong>
+        </p>
+
+        <form @submit.prevent="handleTransfer" class="flex gap-4 items-end">
+          <div class="flex-1">
+            <BaseInput
+              v-model="transferEmail"
+              label="Email Kepala Sekolah Baru"
+              placeholder="Contoh: guru@sekolah.sch.id"
+              type="email"
+              required
+              :error="transferError"
+            >
+              <template #prepend><Icon name="lucide:mail" class="w-5 h-5" /></template>
+            </BaseInput>
+          </div>
+          <BaseButton 
+            type="submit" 
+            variant="danger" 
+            :loading="isTransferring"
+            class="px-6 mb-1"
+          >
+            Kirim Undangan Transfer
+          </BaseButton>
+        </form>
+      </div>
+    </BaseCard>
+
+    <!-- Confirm Modal -->
+    <ConfirmModal
+      :show="showTransferConfirm"
+      title="Konfirmasi Transfer Kepemilikan"
+      :message="`PERINGATAN! Anda akan kehilangan akses Kepala Sekolah jika Bpk/Ibu ${transferEmail} menyetujui undangan ini. Lanjutkan?`"
+      confirmText="Kirim Undangan"
+      variant="danger"
+      @confirm="submitTransfer"
+      @cancel="showTransferConfirm = false"
+    />
   </div>
 </template>

@@ -44,6 +44,14 @@ const router = createRouter({
       component: () => import('@/features/auth/views/TokenCallbackView.vue'),
     },
 
+    // ── Accept Transfer (standalone) ─
+    {
+      path: '/transfer/accept/:token',
+      name: 'AcceptTransfer',
+      component: () => import('@/features/school/views/AcceptTransferView.vue'),
+      meta: { requiresAuth: true },
+    },
+
     // ── School selection (after login, before dashboard) ─
     {
       path: '/select-school',
