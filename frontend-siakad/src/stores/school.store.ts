@@ -33,11 +33,38 @@ export const useSchoolStore = defineStore('school', {
     isHeadmaster(): boolean {
       return this.currentRole === 'headmaster'
     },
+    isOperator(): boolean {
+      return this.currentRole === 'operator'
+    },
+    isManager(): boolean {
+      return this.currentRole === 'headmaster' || this.currentRole === 'operator'
+    },
     isTeacher(): boolean {
       return this.currentRole === 'teacher'
     },
     isParent(): boolean {
       return this.currentRole === 'parent'
+    },
+    canManageOperators(): boolean {
+      return this.isHeadmaster
+    },
+    canManageTeachers(): boolean {
+      return this.isOperator
+    },
+    canManageStudents(): boolean {
+      return this.isOperator
+    },
+    canManageClasses(): boolean {
+      return this.isOperator
+    },
+    canManageParents(): boolean {
+      return this.isOperator
+    },
+    canManageFinances(): boolean {
+      return this.isOperator
+    },
+    canManageSubscription(): boolean {
+      return this.isHeadmaster
     },
     isCoreLocked(state): boolean {
       if (!state.subscriptionInfo) return false

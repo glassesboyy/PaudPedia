@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useSchoolStore } from '@/stores/school.store'
 import HeadmasterDashboard from './HeadmasterDashboard.vue'
+import OperatorDashboard from './OperatorDashboard.vue'
 import TeacherDashboard from './TeacherDashboard.vue'
 import ParentDashboard from './ParentDashboard.vue'
 
@@ -13,6 +14,7 @@ const currentRole = computed(() => schoolStore.currentRole)
 <template>
   <div>
     <HeadmasterDashboard v-if="currentRole === 'headmaster'" />
+    <OperatorDashboard v-else-if="currentRole === 'operator'" />
     <TeacherDashboard v-else-if="currentRole === 'teacher'" />
     <ParentDashboard v-else-if="currentRole === 'parent'" />
     <div v-else class="text-center py-20">

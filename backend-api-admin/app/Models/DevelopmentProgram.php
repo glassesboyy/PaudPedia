@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DevelopmentProgram extends Model
 {
-    protected $fillable = ['school_id', 'name', 'order'];
+    protected $fillable = ['school_id', 'name', 'order', 'is_active'];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function school()
     {

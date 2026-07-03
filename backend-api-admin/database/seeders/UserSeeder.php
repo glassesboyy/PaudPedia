@@ -17,6 +17,7 @@ class UserSeeder extends Seeder
             'admin' => Role::firstOrCreate(['name' => 'admin']),           // Super Admin - Full access
             'moderator' => Role::firstOrCreate(['name' => 'moderator']),   // Content Manager
             'headmaster' => Role::firstOrCreate(['name' => 'headmaster']), // Kepala Sekolah
+            'operator' => Role::firstOrCreate(['name' => 'operator']),     // Operator Sekolah
             'teacher' => Role::firstOrCreate(['name' => 'teacher']),       // Guru
             'parent' => Role::firstOrCreate(['name' => 'parent']),         // Orang Tua
             'user' => Role::firstOrCreate(['name' => 'user']),             // User terdaftar (e-learning)

@@ -77,7 +77,7 @@ const router = createRouter({
           path: 'school/profile',
           name: 'SchoolProfile',
           component: () => import('@/features/school/views/SchoolProfileView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher', 'parent'] },
         },
         {
           path: 'school/settings',
@@ -92,30 +92,50 @@ const router = createRouter({
           meta: { roles: ['headmaster'] },
         },
 
+        // Operators
+        {
+          path: 'operators',
+          name: 'OperatorList',
+          component: () => import('@/features/operators/views/OperatorListView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+        {
+          path: 'operators/create',
+          name: 'OperatorCreate',
+          component: () => import('@/features/operators/views/OperatorFormView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+        {
+          path: 'operators/:id',
+          name: 'OperatorDetail',
+          component: () => import('@/features/operators/views/OperatorDetailView.vue'),
+          meta: { roles: ['headmaster'] },
+        },
+
         // Classes
         {
           path: 'classes',
           name: 'ClassList',
           component: () => import('@/features/classes/views/ClassListView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'classes/:id',
           name: 'ClassDetail',
           component: () => import('@/features/classes/views/ClassDetailView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'classes/create',
           name: 'ClassCreate',
           component: () => import('@/features/classes/views/ClassFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
         {
           path: 'classes/:id/edit',
           name: 'ClassEdit',
           component: () => import('@/features/classes/views/ClassFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
 
         // Teachers
@@ -123,19 +143,19 @@ const router = createRouter({
           path: 'teachers',
           name: 'TeacherList',
           component: () => import('@/features/teachers/views/TeacherListView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
         {
           path: 'teachers/:id',
           name: 'TeacherDetail',
           component: () => import('@/features/teachers/views/TeacherDetailView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
         {
           path: 'teachers/create',
           name: 'TeacherCreate',
           component: () => import('@/features/teachers/views/TeacherFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
 
         // Parents
@@ -143,25 +163,25 @@ const router = createRouter({
           path: 'parents',
           name: 'ParentList',
           component: () => import('@/features/parents/views/ParentListView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'parents/create',
           name: 'ParentCreate',
           component: () => import('@/features/parents/views/ParentFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
         {
           path: 'parents/:id',
           name: 'ParentDetail',
           component: () => import('@/features/parents/views/ParentDetailView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'parents/:id/edit',
           name: 'ParentEdit',
           component: () => import('@/features/parents/views/ParentFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
 
         // Students
@@ -169,25 +189,25 @@ const router = createRouter({
           path: 'students',
           name: 'StudentList',
           component: () => import('@/features/students/views/StudentListView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'students/create',
           name: 'StudentCreate',
           component: () => import('@/features/students/views/StudentFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
         {
           path: 'students/:id',
           name: 'StudentDetail',
           component: () => import('@/features/students/views/StudentDetailView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'students/:id/edit',
           name: 'StudentEdit',
           component: () => import('@/features/students/views/StudentFormView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['headmaster', 'operator'] },
         },
 
         // Attendance
@@ -195,13 +215,13 @@ const router = createRouter({
           path: 'attendance',
           name: 'AttendanceInput',
           component: () => import('@/features/attendance/views/AttendanceInputView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
         {
           path: 'attendance/history',
           name: 'AttendanceHistory',
           component: () => import('@/features/attendance/views/AttendanceHistoryView.vue'),
-          meta: { roles: ['headmaster', 'teacher'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher'] },
         },
 
         // Assessments
@@ -221,13 +241,13 @@ const router = createRouter({
           path: 'assessments/settings',
           name: 'AssessmentSettings',
           component: () => import('@/features/assessments/views/AssessmentSettingsView.vue'),
-          meta: { roles: ['headmaster'] },
+          meta: { roles: ['operator'] },
         },
         {
           path: 'assessments/guide',
           name: 'AssessmentGuide',
           component: () => import('@/features/assessments/views/AssessmentGuideView.vue'),
-          meta: { roles: ['headmaster', 'teacher', 'parent'] },
+          meta: { roles: ['headmaster', 'operator', 'teacher', 'parent'] },
         },
 
         // Finances (Pro Plan)
@@ -236,13 +256,13 @@ const router = createRouter({
           path: 'finances/spp',
           name: 'SppManagement',
           component: () => import('@/features/finances/views/SppManagementView.vue'),
-          meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
+          meta: { roles: ['headmaster', 'operator', 'teacher'], requiresPro: true },
         },
         {
           path: 'finances/savings',
           name: 'SavingsManagement',
           component: () => import('@/features/finances/views/SavingsManagementView.vue'),
-          meta: { roles: ['headmaster', 'teacher'], requiresPro: true },
+          meta: { roles: ['headmaster', 'operator', 'teacher'], requiresPro: true },
         },
 
         // Reports (Pro Plan)

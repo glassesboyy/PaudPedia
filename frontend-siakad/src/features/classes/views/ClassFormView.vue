@@ -357,8 +357,9 @@ async function handleSubmit() {
             @click="router.back()"
             :disabled="isSubmitting"
           >
-            Batal
-          </BaseButton>
+              <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+              Batal
+            </BaseButton>
           <BaseButton 
             type="submit" 
             variant="primary" 

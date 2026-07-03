@@ -41,7 +41,8 @@ class FinanceController extends Controller
 
         if (!$membership) return [];
 
-        if ($membership->isHeadmaster()) {
+        // Headmaster and Operator can see all students in the school
+        if ($membership->isHeadmaster() || $membership->isOperator()) {
             return Student::where('school_id', $schoolId)->pluck('id')->toArray();
         }
 
@@ -77,7 +78,7 @@ class FinanceController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
+        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'operator', 'teacher'])) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
@@ -132,8 +133,8 @@ class FinanceController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
-            return response()->json(['message' => 'Akses ditolak.'], 403);
+        if (!$membership || !in_array($membership->role_type->value, ['operator', 'teacher'])) {
+            return response()->json(['message' => 'Akses ditolak. Hanya Operator dan Guru yang dapat membuat tagihan SPP.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -221,8 +222,8 @@ class FinanceController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
-            return response()->json(['message' => 'Akses ditolak.'], 403);
+        if (!$membership || !in_array($membership->role_type->value, ['operator', 'teacher'])) {
+            return response()->json(['message' => 'Akses ditolak. Hanya Operator dan Guru yang dapat mencatat pembayaran SPP.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -297,8 +298,8 @@ class FinanceController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
-            return response()->json(['message' => 'Akses ditolak.'], 403);
+        if (!$membership || !in_array($membership->role_type->value, ['operator', 'teacher'])) {
+            return response()->json(['message' => 'Akses ditolak. Hanya Operator dan Guru yang dapat memperbarui data SPP.'], 403);
         }
 
         $studentIds = $this->getAccessibleStudentIds($request, $school->id);
@@ -345,7 +346,7 @@ class FinanceController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
+        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'operator', 'teacher'])) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
@@ -419,8 +420,8 @@ class FinanceController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'teacher'])) {
-            return response()->json(['message' => 'Akses ditolak.'], 403);
+        if (!$membership || !in_array($membership->role_type->value, ['operator', 'teacher'])) {
+            return response()->json(['message' => 'Akses ditolak. Hanya Operator dan Guru yang dapat mencatat tabungan.'], 403);
         }
 
         $validator = Validator::make($request->all(), [

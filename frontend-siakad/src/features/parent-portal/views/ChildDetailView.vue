@@ -381,7 +381,10 @@ const computedAttendanceSummary = computed(() => {
           <template #prepend><Icon name="lucide:refresh-cw" class="w-4 h-4" /></template>
           Coba Lagi
         </BaseButton>
-        <BaseButton variant="outline" @click="router.back()">Kembali</BaseButton>
+        <BaseButton variant="outline" @click="router.back()">
+              <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+              Batal
+            </BaseButton>
       </div>
     </div>
 

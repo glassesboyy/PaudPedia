@@ -1,3 +1,13 @@
+> **Catatan Pembaruan Dokumen (Sinkronisasi Codebase):**
+> Seluruh isi pada dokumen ini telah mengalami perubahan arsitektur dokumen dan pembaruan substansi. Bagian yang diubah secara masif meliputi:
+> - **3.1.1 - 3.1.4** (Restrukturisasi urutan, penghapusan ERD, penambahan Class Diagram untuk Manajemen Multi-School).
+> - **3.2.1 - 3.2.4** (Restrukturisasi urutan, penghapusan ERD, penambahan Class Diagram untuk Manajemen Data Siswa).
+> - **3.3.1 - 3.3.4** (Restrukturisasi urutan, penghapusan ERD, penambahan Class Diagram untuk Sistem Penilaian & Skala PAUD).
+> 
+> *Catatan ini dapat Anda hapus saat dokumen akan dicetak.*
+
+---
+
 BAB 3	PERANCANGAN PRODUK
 Arsitektur sistem pada platform Paudpedia dirancang menggunakan pendekatan modular yang membagi aplikasi ke dalam tiga komponen utama, yaitu Admin Panel, Public B2C, dan SIAKAD (Sistem Informasi Akademik). Admin Panel digunakan oleh Admin dan Moderator untuk melakukan pengelolaan konten, katalog produk, administrasi platform, serta monitoring keseluruhan sistem. Sementara itu, Public B2C ditujukan bagi pengguna umum (User/Guest) yang menyediakan layanan Marketplace untuk produk digital, sistem transaksi, serta Learning Management System (LMS) yang dilengkapi dengan fitur sertifikasi.
 
@@ -8,49 +18,7 @@ Komponen SIAKAD berfungsi sebagai sistem manajemen internal sekolah berbasis mul
 3.1	Rancangan Manajemen Multi-School dan Anggota Sekolah (Modul 2)
 Fitur ini dirancang menggunakan arsitektur multi-tenant yang memungkinkan satu platform (SIAKAD) digunakan oleh banyak sekolah secara independen. Setiap sekolah memiliki ruang kerja dan datanya sendiri yang tidak saling bercampur, di mana manajemen data, paket langganan (Free/Pro), serta kapasitas siswa dan guru dikelola secara terpusat oleh Headmaster. Selain itu, fitur Hak Akses didasarkan pada Role-Based Access Control (RBAC) yang membedakan otoritas pengguna menjadi Kepala Sekolah (Headmaster), Guru (Teacher), dan Orang Tua (Parent). Implementasi ini memastikan bahwa guru hanya dapat melihat dan mengelola data di sekolah tempat mereka terdaftar, dan satu pengguna (User) dapat tergabung dalam beberapa sekolah dengan role yang berbeda secara fleksibel.
 
-3.1.1	Wireframe
-Tampilan yang berkaitan dengan fitur ini meliputi:
-- Halaman Registrasi & Pembuatan Sekolah (/auth/register)
-- Halaman Selector Sekolah (/select-school)
-- Halaman Manajemen Anggota Sekolah (/teachers)
-- Halaman Pengaturan Profil Sekolah (/school/profile, /school/settings)
-
-3.1.2	Entity Relationship Diagram (ERD)
-
-**Entitas: schools**
-Atribut: name, npsn, subscription_plan, subscription_expires_at
-Relasi:
-- One-to-Many ke entitas `school_members` | Kata Relasi: "Memiliki Anggota"
-- One-to-Many ke entitas `classes` | Kata Relasi: "Memiliki Kelas"
-
-**Entitas: users**
-Atribut: name, email, password, phone
-Relasi:
-- One-to-Many ke entitas `school_members` | Kata Relasi: "Terdaftar Sebagai"
-
-**Entitas: school_members**
-Atribut: role, is_active, joined_at
-Relasi:
-- Many-to-One ke entitas `schools` | Kata Relasi: "Bagian Dari"
-- Many-to-One ke entitas `users` | Kata Relasi: "Dimiliki Oleh"
-
-**Entitas: classes**
-Atribut: name, level, capacity, academic_year
-Relasi:
-- Many-to-One ke entitas `schools` | Kata Relasi: "Berada Di"
-
-*Penjelasan Keseluruhan:*
-Diagram ERD pada modul ini berfokus pada manajemen identitas dan isolasi arsitektur *multi-tenant* (banyak sekolah dalam satu platform). Entitas `schools` bertindak sebagai sentral/induk yang menyimpan profil institusi dan memegang batas kedaluwarsa paket langganan. Untuk mengatur hak akses, entitas autentikasi global `users` dihubungkan dengan `schools` melalui entitas penghubung (tabel pivot) bernama `school_members`. Penggunaan tabel penghubung ini sangat krusial karena satu entitas *user* (pengguna) dimungkinkan untuk memiliki multi-peran di berbagai instansi yang berbeda, misalnya bertindak sebagai wali murid di Sekolah A, namun sekaligus menjabat sebagai guru di Sekolah B. *Role* atau jabatan tersebut disimpan secara eksplisit dalam entitas `school_members`. Lebih lanjut, entitas `schools` juga mendistribusikan kewenangannya ke bawah dengan memiliki entitas `classes` yang merepresentasikan daftar pembagian rombongan belajar (rombel) fisik sesuai batas kapasitas dan jenjang akademik yang diselenggarakan oleh institusi sekolah yang bersangkutan.
-
-3.1.3	Database Schema
-- schools
-- users
-- school_members
-- classes
-
-Tabel `schools` berisi kolom id, nama, npsn, tipe berlangganan, batas siswa/guru, dan status. Tabel `users` berisi kredensial akun pengguna secara umum. Tabel `school_members` bertindak sebagai *junction table* yang memiliki Foreign Key `school_id` ke tabel schools, `user_id` ke tabel users, serta kolom `role`. Tabel `classes` memiliki Foreign Key `school_id` ke schools, serta `homeroom_teacher_id` opsional.
-
-3.1.4	Activity Diagram
+3.1.1	Activity Diagram
 ```text
 [Start]
    |
@@ -112,73 +80,29 @@ Validasi Kredensial Pengguna
 ```
 Diagram di atas menggambarkan alur aktivitas saat pengguna masuk ke dalam sistem dengan kapabilitas multi-school. Sistem akan memvalidasi akun, mengecek afiliasi sekolah, lalu menentukan hak akses (role) secara dinamis baik itu sebagai Kepala Sekolah, Guru, maupun Orang Tua di ruang kerja tenant sekolah yang dipilih.
 
-3.1.5	Use Case Diagram
-1. Use Case: Register School
-   Role: Headmaster
-   Deskripsi: Headmaster mendaftarkan sekolah baru ke dalam sistem untuk tenant pertamanya.
-
-2. Use Case: Manage Teachers
-   Role: Headmaster
-   Deskripsi: Headmaster menambahkan atau mencopot akses guru di sekolah tersebut.
-
-3. Use Case: Manage Classes
-   Role: Headmaster
-   Deskripsi: Headmaster membuat ruangan kelas dan menugaskan wali kelas.
-
-4. Use Case: Switch School
+3.1.2	Use Case Diagram
+1. Use Case: Switch School
    Role: Headmaster, Teacher, Parent
    Deskripsi: Pengguna yang memiliki peranan di banyak sekolah beralih dari satu sistem tenant sekolah ke sekolah lainnya melalui dashboard.
+
+3.1.3	Class Diagram
+Struktur *Class Diagram* pada modul ini dibangun menggunakan arsitektur Model dari Eloquent ORM di Laravel, yang mewakili representasi OOP (*Object-Oriented Programming*) dari struktur arsitektur *multi-tenant*:
+- **Class `School`**: Model sentral dari tenant. Memiliki atribut `name`, `npsn`, `subscription_plan`, dan `subscription_ended_at`. Memuat relasi koleksi *one-to-many* seperti `members()`, `teachers()`, `classes()`. Diperkaya fungsi validasi bisnis seperti `isPro()`, `isFree()`, `getRemainingStudentSlots()`, dan `canAddTeacher()`.
+- **Class `User`**: Model pengelola autentikasi global. Menyimpan state kredensial `name`, `email`, `password`, dan properti identitas pengguna lainnya. Dilengkapi mekanisme otorisasi lewat *method* seperti `hasSchoolRole()`, `isTeacher()`, dan `isParent()`.
+- **Class `SchoolMember`**: *Junction Class* atau perantara yang menghubungkan `User` dengan `School`. Memegang kunci otorisasi per-*tenant* melalui properti *Enum* `role_type` (seperti *Headmaster*, *Teacher*, *Parent*). Dilengkapi dengan metode validasi fungsional seperti `isHeadmaster()` dan ruang lingkup *query* (*Scope*) spesifik peran.
+- **Class `ClassRoom`**: Merepresentasikan entitas fisik ruangan kelas. Terikat kuat pada *tenant* (`school_id`). Menyimpan detail kapasitas (`capacity`) dan merelasikan guru penanggung jawab lewat `homeroomTeacher()`.
+
+3.1.4	Wireframe
+Tampilan yang berkaitan dengan fitur ini meliputi:
+- Halaman Registrasi & Pembuatan Sekolah (/auth/register)
+- Halaman Selector Sekolah (/select-school)
+- Halaman Manajemen Anggota Sekolah (/teachers)
+- Halaman Pengaturan Profil Sekolah (/school/profile, /school/settings)
 
 3.2	Rancangan Manajemen Data Siswa dan Orang Tua 
 Rancangan manajemen data ini secara eksplisit memisahkan identitas anak didik (Siswa) dari akun pengguna otentikasi sistem, dikarenakan rentang usia anak usia dini (PAUD) yang belum mampu mengelola login mandiri. Oleh karena itu, data profil dan perekaman perkembangan siswa akan selalu ditautkan secara langsung pada profil Orang Tua (Parent Profile) yang berfungsi sebagai wali sah pemegang akses masuk ke sistem (Login). Mekanisme ini juga dirancang sedemikian rupa sehingga satu entitas Orang Tua dapat terhubung secara sentral ke profil beberapa anak sekaligus (Multiple Children Support) di berbagai kelas, bahkan ketika belum ada siswa yang dimasukkan (skenario *waiting list* penerimaan).
 
-3.2.1	Wireframe
-Tampilan yang berkaitan dengan fitur ini meliputi:
-- Halaman Data Induk Siswa (/students)
-- Formulir Tambah/Edit Siswa (/students/create, /students/:id/edit)
-- Halaman Manajemen Profil Orang Tua (/parents)
-- Halaman Profil Siswa atau Detail (/students/:id)
-- Dashboard Parent (/children)
-
-3.2.2	Entity Relationship Diagram (ERD)
-
-**Entitas: parent_profiles**
-Atribut: father_name, mother_name, phone, address
-Relasi:
-- Many-to-One ke entitas `schools` | Kata Relasi: "Terdaftar Di"
-- One-to-One ke entitas `users` | Kata Relasi: "Dikaitkan Dengan"
-- One-to-Many ke entitas `students` | Kata Relasi: "Mewali"
-
-**Entitas: students**
-Atribut: name, nisn, birth_date, gender, enrollment_date, status
-Relasi:
-- Many-to-One ke entitas `parent_profiles` | Kata Relasi: "Diasuh Oleh"
-- Many-to-One ke entitas `schools` | Kata Relasi: "Bersekolah Di"
-- Many-to-One ke entitas `classes` | Kata Relasi: "Ditempatkan Di"
-
-**Entitas: schools**
-Atribut: name, npsn
-Relasi:
-- One-to-Many ke entitas `parent_profiles` | Kata Relasi: "Memiliki Wali"
-- One-to-Many ke entitas `students` | Kata Relasi: "Mendidik Siswa"
-
-**Entitas: classes**
-Atribut: name, level
-Relasi:
-- One-to-Many ke entitas `students` | Kata Relasi: "Ditempati Oleh"
-
-*Penjelasan Keseluruhan:*
-Struktur ERD pada modul pendaftaran ini secara tegas memisahkan data personal anak dari entitas autentikasi sistem. Data profil wali murid disimpan khusus pada entitas `parent_profiles` yang berelasi *one-to-one* dengan akun masuk sistem global `users`, sekaligus berafiliasi kepada `schools` tertentu. Sementara itu, entitas rekam jejak anak (`students`) diatur sedemikian rupa agar bergantung mutlak dengan kardinalitas *many-to-one* kepada profil orang tua (`parent_profiles`). Hal ini merepresentasikan logika di dunia nyata bahwa satu profil keluarga dapat mendaftarkan, membayarkan, dan memantau perkembangan lebih dari satu anak (kakak-beradik) sekaligus dalam satu *dashboard* aplikasi. Entitas `students` sama sekali tidak diberikan hak sistem otentikasi mandiri, melainkan hak interaksinya sepenuhnya diwakili/dipegang oleh wali mereka. Selain itu, entitas anak juga memuat *Foreign Key* ke tabel `classes` untuk menetapkan lokasi pembagian rombongan belajar fiktifnya, serta referensi tegas ke entitas `schools` guna menjamin rekaman anak PAUD A tidak akan bocor atau terekspos secara *cross-tenant* ke institusi PAUD B.
-
-3.2.3	Database Schema
-- students
-- parent_profiles
-- schools
-- classes
-
-Tabel `parent_profiles` memiliki referensi *Foreign Key* berupa `school_id` dan `user_id`. Terdapat pengisian spesifik wali (father_name, mother_name) dan email yang dibuat komposit eksklusif per `school_id`. Tabel `students` memuat referensi relasional berupa Foreign Key `school_id`, `class_id`, dan `parent_profile_id`. Atribut yang dicatat berupa biodata nama, nisn, gender. Constraint dirancang Restrict pada wali murid agar data tidak terhapus selama anak didik masih tertaut.
-
-3.2.4	Activity Diagram
+3.2.1	Activity Diagram
 ```text
 [Start]
    |
@@ -215,7 +139,7 @@ Kirim Email Akses ke Wali
 ```
 Diagram di atas menjabarkan proses ketika Kepala Sekolah menambahkan siswa baru. Sistem memfasilitasi penautan langsung kepada profil Orang Tua yang ada atau otomatis memandu pembuatan profil wali baru agar akun *login* Orang Tua siap digunakan saat itu juga untuk memantau anak.
 
-3.2.5	Use Case Diagram
+3.2.2	Use Case Diagram
 1. Use Case: Manage Students
    Role: Headmaster
    Deskripsi: Headmaster menambah, menyunting, atau menonaktifkan akun siswa pada sekolah.
@@ -232,56 +156,25 @@ Diagram di atas menjabarkan proses ketika Kepala Sekolah menambahkan siswa baru.
    Role: Parent
    Deskripsi: Parent memantau eksklusif rekapan data anak miliknya yang terhubung dan tidak dapat mengintip rekapan anak di luar tanggung jawabnya.
 
+3.2.3	Class Diagram
+Model dan pemetaan objek untuk manajemen siswa dan wali melibatkan kolaborasi entitas spesifik beserta entitas pendukung dari struktur *tenant* sekolah:
+- **Class `ParentProfile`**: Mewakili wali murid di sebuah institusi. Model ini memfasilitasi informasi komprehensif orang tua (`father_name`, `mother_name`, `phone`, `occupation`, `address`) yang dikaitkan langsung ke `User` (untuk otentikasi login) dan `School` (sebagai konteks data). Class ini memiliki fungsi `children()` untuk menarik kumpulan (koleksi) data anak secara *one-to-many*.
+- **Class `Student`**: Model utama entitas siswa anak usia dini. Merupakan objek tanpa kredensial akses, yang hanya menampung properti riwayat pendidikan (`enrollment_date`, `status`, `class_id`) serta biodata lengkap. Entitas ini secara penuh bergantung pada metode `parent()` sebagai penunjuk kepemilikan. Model ini juga memiliki fungsi-fungsi pintar untuk memproduksi nilai utilitas seperti `getAgeInMonths()` maupun rasio persentase kehadiran `getAttendancePercentage()`.
+- **Class `School`**: Model pilar pendaftaran yang menyimpan *registry* seluruh murid, memastikan profil `Student` dan `ParentProfile` yang terdaftar hanya dapat diakses dalam ruang lingkup (*scope*) institusi yang bersangkutan.
+- **Class `ClassRoom`**: Berfungsi sebagai pengelompokan fisik penempatan murid. Profil `Student` direlasikan (*many-to-one*) kepada `ClassRoom` agar rekap murid dapat difilter per rombongan belajar.
+
+3.2.4	Wireframe
+Tampilan yang berkaitan dengan fitur ini meliputi:
+- Halaman Data Induk Siswa (/students)
+- Formulir Tambah/Edit Siswa (/students/create, /students/:id/edit)
+- Halaman Manajemen Profil Orang Tua (/parents)
+- Halaman Profil Siswa atau Detail (/students/:id)
+- Dashboard Parent (/children)
+
 3.3	Rancangan Sistem Penilaian dan Skala PAUD 
 Modul sistem penilaian ini telah sepenuhnya diadaptasi secara *custom* dengan metode Kurikulum PAUD yang bertumpu pada laporan kualitatif serta pemantauan tumbuh kembang keseharian, alih-alih kuantitatif. Guru diberikan kemudahan untuk melakukan evaluasi observatif menggunakan indikator deskriptif terstruktur dari skala PAUD resmi, yaitu: BB (Belum Berkembang), MB (Mulai Berkembang), BSH (Berkembang Sesuai Harapan), dan BSB (Berkembang Sangat Baik). Penginputan bersifat progresif sehingga poin absensi kehadiran rutin dengan pencatatan rapor evaluatif akan terkalkulasi terus menerus lalu digabungkan menjadi rekap Rapor dalam format fisik maupun cetak file (PDF) yang bisa sewaktu-waktu ditilik oleh Orang Tua secara *real-time*.
 
-3.3.1	Wireframe
-Tampilan yang berkaitan dengan pemantauan belajar meliputi:
-- Halaman Input Absensi Harian (/attendance)
-- Halaman Input Nilai Asesmen (/assessments)
-- Halaman Rekapitulasi Rapor (/reports, /reports/:studentId) ------------ INI BELOM
-- Halaman Pantauan Akademik Parent (/children/:id)
-
-3.3.2	Entity Relationship Diagram (ERD)
-
-**Entitas: assessments**
-Atribut: category, indicator, score, notes, assessment_date, semester
-Relasi:
-- Many-to-One ke entitas `students` | Kata Relasi: "Menilai Siswa"
-- Many-to-One ke entitas `teachers` | Kata Relasi: "Dinilai Oleh"
-- Many-to-One ke entitas `classes` | Kata Relasi: "Diadakan Di Kelas"
-
-**Entitas: attendance**
-Atribut: date, status, notes
-Relasi:
-- Many-to-One ke entitas `students` | Kata Relasi: "Merekam Kehadiran"
-- Many-to-One ke entitas `teachers` | Kata Relasi: "Dicatat Oleh"
-
-**Entitas: students**
-Atribut: name, nisn
-Relasi:
-- One-to-Many ke entitas `assessments` | Kata Relasi: "Mendapat Penilaian"
-- One-to-Many ke entitas `attendance` | Kata Relasi: "Memiliki Presensi"
-
-**Entitas: teachers**
-Atribut: nip, specialization
-Relasi:
-- One-to-Many ke entitas `assessments` | Kata Relasi: "Memberikan Penilaian"
-- One-to-Many ke entitas `attendance` | Kata Relasi: "Mencatat Presensi"
-
-*Penjelasan Keseluruhan:*
-Diagram ERD pada blok operasional akademik ini sangat bergantung pada keberadaan entitas bersifat *transaksional* (data yang bertambah seiring waktu). Entitas utama yang di-highlight adalah `assessments` yang mewakili rekaman nilai rapor atau buku penghubung siswa berdasarkan indikator kompetensi PAUD, serta entitas `attendance` yang berguna sebagai lembar absensi harian (status hadir, izin, sakit, atau alfa). Kedua tabel log ini mencatat peristiwa secara periodik berulang, sehingga wujud grafisnya harus berelasi *many-to-one* secara konvergen (memusat) kepada entitas dasar `students` (subjek murid siapa yang dinilai/diabsen) dan kepada entitas `teachers` (aktor tenaga pendidik mana yang bertanggung jawab menyematkan penilaian tersebut). Relasi triangulasi yang saling bersilang ini memastikan bahwa *tracer study* anak—atau riwayat rekam jejak progres belajarnya—bisa ditelusuri dan diaudit secara sangat mendetail berdasarkan urutan semester dan wali kelasnya masing-masing. Terakhir, semua pencatatan transaksi ini dijangkarkan (Foreign Key) terisolasi pada satu payung entitas `schools` yang sama agar keamanan dokumen penilaian privasi di tiap tenant dijamin tidak akan pernah tertukar.
-
-3.3.3	Database Schema
-- assessments
-- attendance
-- students
-- teachers
-- classes
-
-Tabel `attendance` menyimpan log referensi *Foreign Key* `student_id`, `teacher_id`, `class_id`, dan `school_id`. Pencatat utamanya berisi `date` dengan tipe *Enum* terhadap status rekaman `present`, `sick`, `permission`, atau `absent`. Tabel `assessments` memuat skema relasi *Foreign Key* yang persis serupa dengan absensi. Nilai kolom dikhususkan meliputi `category`, `indicator` penialaian, `score` tipe *Enum* ('BB', 'MB', 'BSH', 'BSB'), field ekstra `notes`, hingga parameter `semester`.
-
-3.3.4	Activity Diagram
+3.3.1	Activity Diagram
 ```text
 [Start]
    |
@@ -313,19 +206,33 @@ Simpan Penilaian ke Database
 ```
 Diagram ini memodelkan alur evaluasi harian dimana guru PAUD secara langsung menginputkan laporan perkembangan menggunakan instrumen kualitatif yang kemudian tersinkronisasi *real-time* dengan antarmuka wali di rumah.
 
-3.3.5	Use Case Diagram
-1. Use Case: Input Absensi
-   Role: Teacher, Headmaster
-   Deskripsi: Menginput data historis kehadiran harian murid.
+3.3.2	Use Case Diagram
+1.	Use Case: Input Absensi
+Role: Teacher	
+Deskripsi: Menginput data historis kehadiran harian murid.
+2.	Use Case: Input Nilai Asesmen
+Role: Teacher
+Deskripsi: Menginput data penilaian rapor kualitatif PAUD ke setiap entitas murid di kelas.
+3.	Use Case: View Rapor Siswa
+Role: Teacher, Parent, Headmaster
+Deskripsi: Memantau historis laporan, disaat bersamaan Parent juga memantau log evaluatif bagi anak kandungnya.
+4.	Use Case: Generate Rapor
+Role: Headmaster, Teacher
+Deskripsi: Membuat kompilasi transkrip resmi rekam nilai untuk dilebur menjadi dokumen file berektensi (*.pdf) yang diunduh pada tingkat paket Pro.
 
-2. Use Case: Input Nilai Asesmen
-   Role: Teacher
-   Deskripsi: Menginjeksi matriks data penilaian rapor kualitatif PAUD ke setiap entitas murid di kelas.
 
-3. Use Case: View Rapor Siswa
-   Role: Teacher, Parent
-   Deskripsi: Memantau historis laporan, disaat bersamaan Parent juga memantau log evaluatif bagi anak kandungnya.
+3.3.3	Class Diagram
+Pemrosesan akademik direpresentasikan menggunakan kelas-kelas *logger* periodik yang menyimpan hasil pengamatan yang berjalan, dengan ditautkan pada subjek penanggung jawab:
+- **Class `DevelopmentIndicator`**: Model statis yang memuat referensi target capaian kurikulum per aspek pertumbuhan. Kelas ini menjadi pustaka wajib yang dikonfigurasi oleh Kepala Sekolah.
+- **Class `Assessment`**: Representasi pencatatan rapor periodik per anak. Setiap *instance* ini menyimpan `scale` observasi, relasi ke `development_indicators`, dan ter-cap waktu di `assessment_month`. Class ini menyediakan fungsi validasi bawaan `isPassing()` untuk mengonversi skala PAUD kualitatif menjadi matriks evaluasi akhir.
+- **Class `Attendance`**: Model pencatatan aktivitas absensi harian yang menyematkan `status` kehadiran dan `proof_file_path` untuk data pendukung. Secara hierarkis, catatan presensi terhubung ke ruang kelas (`class_id`) yang secara spesifik menunjuk guru pembimbing kelas tersebut sebagai penanggung jawab rekam log.
+- **Class `Teacher`**: Profil spesifik untuk peran pendidik. Menyimpan `nip` dan `bio`, serta mewarisi kendali sebagai wali kelas (*homeroom teacher*) melalui relasi `homeroomClasses()`. 
+- **Class `Student`**: Subjek utama yang dikenai aktivitas penilaian. Model ini berelasi langsung *one-to-many* kepada himpunan nilai harian `Assessment` maupun daftar kehadiran harian `Attendance` miliknya.
+- **Class `ClassRoom`**: Menjadi muara tempat evaluasi dilakukan secara massal. Presensi murid tidak ditautkan ke akun individual guru, melainkan dicatat melekat pada entitas `ClassRoom` (*class_id*) yang mewakilinya.
 
-4. Use Case: Generate PDF Rapor
-   Role: Headmaster, Teacher
-   Deskripsi: Membuat kompilasi transkrip resmi rekam nilai untuk dilebur menjadi dokumen file berektensi (*.pdf) yang diunduh pada tingkat paket Pro.
+3.3.4	Wireframe
+Tampilan yang berkaitan dengan pemantauan belajar meliputi:
+- Halaman Input Absensi Harian (/attendance)
+- Halaman Input Nilai Asesmen (/assessments)
+- Halaman Rekapitulasi Rapor (/reports, /reports/:studentId)
+- Halaman Pantauan Akademik Parent (/children/:id)

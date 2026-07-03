@@ -23,7 +23,7 @@ class StudentController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher() && !$membership->isParent())) {
+        if (!$membership || (!$membership->isManager() && !$membership->isTeacher() && !$membership->isParent())) {
             return $this->error('Akses ditolak.', 403);
         }
 
@@ -105,8 +105,8 @@ class StudentController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat mendaftarkan siswa baru.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat mendaftarkan siswa baru.', 403);
         }
 
         $school = School::findOrFail($schoolId);
@@ -154,7 +154,7 @@ class StudentController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher() && !$membership->isParent())) {
+        if (!$membership || (!$membership->isManager() && !$membership->isTeacher() && !$membership->isParent())) {
             return $this->error('Akses ditolak.', 403);
         }
 
@@ -189,8 +189,8 @@ class StudentController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat memperbarui data siswa.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat memperbarui data siswa.', 403);
         }
 
         $student = Student::where('school_id', $schoolId)
@@ -231,8 +231,8 @@ class StudentController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat menghapus data siswa.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat menghapus data siswa.', 403);
         }
 
         $student = Student::where('school_id', $schoolId)

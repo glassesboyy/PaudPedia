@@ -65,7 +65,7 @@ export const assessmentService = {
     return api.post<any>(`/api/v1/schools/${schoolId}/development-programs`, payload)
   },
 
-  updateProgram(schoolId: number, programId: number, payload: { name: string; order: number }) {
+  updateProgram(schoolId: number, programId: number, payload: { name?: string; order?: number; is_active?: boolean }) {
     return api.put<any>(`/api/v1/schools/${schoolId}/development-programs/${programId}`, payload)
   },
 
@@ -77,7 +77,7 @@ export const assessmentService = {
     return api.post<any>(`/api/v1/schools/${schoolId}/development-programs/${programId}/indicators`, payload)
   },
 
-  updateIndicator(schoolId: number, indicatorId: number, payload: { name: string; order: number }) {
+  updateIndicator(schoolId: number, indicatorId: number, payload: { name?: string; order?: number; is_active?: boolean }) {
     return api.put<any>(`/api/v1/schools/${schoolId}/development-indicators/${indicatorId}`, payload)
   },
 

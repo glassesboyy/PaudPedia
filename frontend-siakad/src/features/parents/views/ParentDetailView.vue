@@ -17,7 +17,7 @@ const isLoading = ref(true)
 const parent = ref<ParentProfile | null>(null)
 const error = ref('')
 
-const isHeadmaster = computed(() => schoolStore.isHeadmaster)
+const canManageParents = computed(() => schoolStore.canManageParents)
 
 onMounted(async () => {
   if (schoolStore.currentSchoolId) {
@@ -59,7 +59,7 @@ function getParentDisplayName(p: ParentProfile): string {
           <p class="text-sm text-muted">Informasi lengkap wali murid</p>
         </div>
       </div>
-      <BaseButton v-if="isHeadmaster && parent" variant="primary" @click="router.push({ name: 'ParentEdit', params: { id: parent.id } })">
+      <BaseButton v-if="canManageParents && parent" variant="primary" @click="router.push({ name: 'ParentEdit', params: { id: parent.id } })">
         <template #prepend><Icon name="lucide:edit-3" class="w-4 h-4" /></template>
         Edit Data
       </BaseButton>
@@ -100,7 +100,10 @@ function getParentDisplayName(p: ParentProfile): string {
           <template #prepend><Icon name="lucide:refresh-cw" class="w-4 h-4" /></template>
           Coba Lagi
         </BaseButton>
-        <BaseButton variant="outline" @click="router.push({ name: 'ParentList' })">Kembali</BaseButton>
+        <BaseButton variant="outline" @click="router.push({ name: 'ParentList' })">
+              <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+              Batal
+            </BaseButton>
       </div>
     </div>
 

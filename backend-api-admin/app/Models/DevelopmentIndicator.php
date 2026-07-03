@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DevelopmentIndicator extends Model
 {
-    protected $fillable = ['program_id', 'name', 'order'];
+    protected $fillable = ['program_id', 'name', 'order', 'is_active'];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function program(): BelongsTo
     {

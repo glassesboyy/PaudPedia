@@ -87,7 +87,7 @@ async function handleSubmit() {
       </button>
       <div>
         <h1 class="text-2xl font-bold text-heading">Tambah Guru Baru</h1>
-        <p class="text-sm text-muted">Daftarkan tenaga pendidik baru ke dalam sistem</p>
+        <p class="text-sm text-muted">Daftarkan guru baru ke dalam sistem</p>
       </div>
     </div>
 
@@ -204,8 +204,9 @@ async function handleSubmit() {
             @click="router.back()"
             :disabled="isSaving"
           >
-            Batal
-          </BaseButton>
+              <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+              Batal
+            </BaseButton>
           <BaseButton 
             type="submit" 
             :loading="isSaving"

@@ -10,8 +10,10 @@ import BaseButton from '@/components/ui/Button/Button.vue'
 import Icon from '@/components/ui/Icon/Icon.vue'
 import { Pagination } from '@/components/ui'
 import { format } from 'date-fns'
+import { usePageCopy } from '@/utils/copy-helper'
 
 const schoolStore = useSchoolStore()
+const copy = usePageCopy().getCopy('assessment')
 
 const classes = ref<ClassRoom[]>([])
 const selectedClassId = ref<number | null>(null)
@@ -262,8 +264,8 @@ const hasAnyAssessment = computed(() => {
   <div class="space-y-6 animate-fade-in">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-heading">Penilaian Skala Perkembangan</h1>
-        <p class="text-sm text-muted">Input pencatatan perkembangan anak secara periodik (Bulanan).</p>
+        <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
+        <p class="text-sm text-muted">{{ copy.subtitle }}</p>
       </div>
     </div>
 

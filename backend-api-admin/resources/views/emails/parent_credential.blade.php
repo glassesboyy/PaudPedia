@@ -14,8 +14,6 @@ Silakan login melalui tautan di bawah ini:
 Masuk ke SIAKAD
 </x-mail::button>
 
-*Catatan: Demi keamanan, silakan ganti password Anda segera setelah berhasil login di menu Profil.*
-
 Terima kasih,<br>
 Tim {{ config('app.name') }}
 </x-mail::message>

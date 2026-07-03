@@ -40,7 +40,7 @@ const showDeleteModal = ref(false)
 const deleteTarget = ref<Student | null>(null)
 const isDeleting = ref(false)
 
-const isHeadmaster = computed(() => schoolStore.isHeadmaster)
+const canManageStudents = computed(() => schoolStore.canManageStudents)
 
 const statusLabels: Record<string, string> = {
   active: 'Aktif',
@@ -161,10 +161,8 @@ const genderOptions = [
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-muted">{{ copy.subtitle }}</p>
       </div>
-      <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'StudentCreate' })" class="w-full sm:w-auto">
-        <template #prepend>
-          <Icon name="lucide:plus" class="w-4 h-4" />
-        </template>
+      <BaseButton v-if="canManageStudents" @click="router.push({ name: 'StudentCreate' })" class="w-full sm:w-auto">
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Tambah Siswa
       </BaseButton>
     </div>
@@ -258,12 +256,13 @@ const genderOptions = [
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading">Belum ada Siswa</p>
-                    <p class="text-sm text-muted" v-if="isHeadmaster">Mulai tambahkan data peserta didik ke sistem.</p>
+                    <p class="text-sm text-muted" v-if="canManageStudents">Mulai tambahkan data peserta didik ke sistem.</p>
                     <p class="text-sm text-muted" v-else>Belum ada data siswa yang terdaftar di sekolah.</p>
                   </div>
-                  <BaseButton v-if="isHeadmaster" variant="primary" size="md" class="mt-2 w-full" @click="router.push({ name: 'StudentCreate' })">
-                    Tambah Siswa Pertama
-                  </BaseButton>
+                  <BaseButton v-if="canManageStudents" variant="primary" size="md" class="mt-2 w-full" @click="router.push({ name: 'StudentCreate' })">
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
+        Tambah Siswa Pertama
+      </BaseButton>
                 </div>
                 <!-- Case: Filter result empty -->
                 <div v-else class="flex flex-col items-center gap-4 max-w-xs mx-auto">
@@ -323,11 +322,10 @@ const genderOptions = [
                     @click="router.push({ name: 'StudentDetail', params: { id: s.id } })"
                   >
                     <Icon name="lucide:eye" class="w-4 h-4" />
-                    <span v-if="!isHeadmaster">Detail</span>
                   </button>
-                  <template v-if="isHeadmaster">
+                  <template v-if="canManageStudents">
                     <button class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50" title="Edit" @click="router.push({ name: 'StudentEdit', params: { id: s.id } })">
-                      <Icon name="lucide:pencil" class="w-4 h-4" />
+                      <Icon name="lucide:edit-3" class="w-4 h-4" />
                     </button>
                     <button class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50" title="Hapus" @click="confirmDelete(s)">
                       <Icon name="lucide:trash-2" class="w-4 h-4" />

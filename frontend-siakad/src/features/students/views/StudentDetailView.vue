@@ -17,7 +17,7 @@ const isLoading = ref(true)
 const student = ref<Student | null>(null)
 const error = ref('')
 
-const isHeadmaster = computed(() => schoolStore.isHeadmaster)
+const canManageStudents = computed(() => schoolStore.canManageStudents)
 
 const statusLabels: Record<string, string> = {
   active: 'Aktif',
@@ -77,7 +77,7 @@ function getParentDisplayName(): string {
           <p class="text-sm text-muted">Informasi lengkap peserta didik</p>
         </div>
       </div>
-      <BaseButton v-if="isHeadmaster && student" variant="primary" @click="router.push({ name: 'StudentEdit', params: { id: student.id } })">
+      <BaseButton v-if="canManageStudents && student" variant="primary" @click="router.push({ name: 'StudentEdit', params: { id: student.id } })">
         <template #prepend><Icon name="lucide:edit-3" class="w-4 h-4" /></template>
         Edit Data
       </BaseButton>
@@ -124,7 +124,10 @@ function getParentDisplayName(): string {
           <template #prepend><Icon name="lucide:refresh-cw" class="w-4 h-4" /></template>
           Coba Lagi
         </BaseButton>
-        <BaseButton variant="outline" @click="router.push({ name: 'StudentList' })">Kembali</BaseButton>
+        <BaseButton variant="outline" @click="router.push({ name: 'StudentList' })">
+              <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
+              Batal
+            </BaseButton>
       </div>
     </div>
 

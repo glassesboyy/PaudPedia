@@ -17,9 +17,11 @@ import BaseButton from '@/components/ui/Button/Button.vue'
 import BaseInput from '@/components/ui/Input/Input.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import { Pagination } from '@/components/ui'
+import { usePageCopy } from '@/utils/copy-helper'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
+const copy = usePageCopy().getCopy('savings')
 
 const isLoading = ref(true)
 const isSubmitting = ref(false)
@@ -153,14 +155,22 @@ function handleReset() {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <div>
-          <h1 class="text-2xl font-bold text-heading">Tabungan Siswa</h1>
-          <p class="text-sm text-muted">Kelola setoran dan penarikan tabungan siswa</p>
+          <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
+          <p class="text-sm text-muted">{{ copy.subtitle }}</p>
         </div>
       </div>
-      <BaseButton v-if="schoolStore.isPro" variant="primary" @click="showForm = true" class="shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto">
+      <BaseButton v-if="schoolStore.isPro && (schoolStore.canManageFinances || schoolStore.currentRole === 'teacher')" variant="primary" @click="showForm = true" class="shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto">
         <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Transaksi Baru
       </BaseButton>
+    </div>
+
+    <div v-if="schoolStore.currentRole === 'headmaster'" class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+      <Icon name="lucide:info" class="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+      <div>
+        <p class="text-sm font-bold text-blue-800">Mode Peninjau</p>
+        <p class="text-xs mt-1 text-blue-700">Anda mengakses halaman ini sebagai Peninjau (Read-Only). Hanya Operator dan Guru yang dapat mencatat setoran atau penarikan tabungan siswa.</p>
+      </div>
     </div>
 
     <ProPlanGate v-if="!schoolStore.isPro" featureName="Tabungan Siswa" />
@@ -311,7 +321,7 @@ function handleReset() {
                       <p class="text-lg font-bold text-heading">Belum ada Transaksi</p>
                       <p class="text-sm text-muted">Belum ada catatan transaksi tabungan siswa yang dicatat.</p>
                     </div>
-                    <BaseButton variant="primary" size="md" class="mt-2 w-full" @click="showForm = true">
+                    <BaseButton v-if="schoolStore.canManageFinances || schoolStore.currentRole === 'teacher'" variant="primary" size="md" class="mt-2 w-full" @click="showForm = true">
                       Buat Transaksi Pertama
                     </BaseButton>
                   </div>

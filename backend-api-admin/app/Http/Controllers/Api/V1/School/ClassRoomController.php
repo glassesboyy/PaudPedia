@@ -81,8 +81,8 @@ class ClassRoomController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return response()->json(['message' => 'Hanya Kepala Sekolah yang dapat menambah kelas baru.'], 403);
+        if (!$membership || !$membership->isOperator()) {
+            return response()->json(['message' => 'Hanya Operator Sekolah yang dapat menambah kelas baru.'], 403);
         }
 
         $class = ClassRoom::create(array_merge(
@@ -128,8 +128,8 @@ class ClassRoomController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return response()->json(['message' => 'Hanya Kepala Sekolah yang dapat memperbarui data kelas.'], 403);
+        if (!$membership || !$membership->isOperator()) {
+            return response()->json(['message' => 'Hanya Operator Sekolah yang dapat memperbarui data kelas.'], 403);
         }
 
         $class = ClassRoom::where('school_id', $id)
@@ -155,8 +155,8 @@ class ClassRoomController extends Controller
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return response()->json(['message' => 'Hanya Kepala Sekolah yang dapat menghapus kelas.'], 403);
+        if (!$membership || !$membership->isOperator()) {
+            return response()->json(['message' => 'Hanya Operator Sekolah yang dapat menghapus kelas.'], 403);
         }
 
         $class = ClassRoom::where('school_id', $id)

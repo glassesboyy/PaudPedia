@@ -24,6 +24,7 @@ const currentSchoolName = computed(() => schoolStore.currentSchool?.name ?? 'Sek
 const roleLabel = computed(() => {
   const labels: Record<string, string> = {
     headmaster: 'Kepala Sekolah',
+    operator: 'Operator Sekolah',
     teacher: 'Guru',
     parent: 'Orang Tua',
   }
@@ -53,38 +54,33 @@ onMounted(async () => {
 
 const navItems = computed(() => {
   const role = schoolStore.currentRole
-    const items = [
-      { name: 'Dashboard', icon: 'dashboard', to: '/', roles: ['headmaster', 'teacher', 'parent'], isPro: false },
-      
-      { name: 'Manajemen Kelas', icon: 'class', to: '/classes', roles: ['headmaster'], isPro: false },
-      { name: 'Manajemen Pendidik', icon: 'teacher', to: '/teachers', roles: ['headmaster'], isPro: false },
-      { name: 'Manajemen Siswa', icon: 'student', to: '/students', roles: ['headmaster'], isPro: false },
-      { name: 'Manajemen Wali Murid', icon: 'parent', to: '/parents', roles: ['headmaster'], isPro: false },
-      { name: 'Rekap Presensi', icon: 'attendance', to: '/attendance', roles: ['headmaster'], isPro: false },
-      { name: 'Profil Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster'], isPro: false },
+  const items = [
+    // Dashboard & Profil
+    { name: 'Dashboard', icon: 'dashboard', to: '/', roles: ['headmaster', 'operator', 'teacher', 'parent'], isPro: false },
+    { name: 'Profil Sekolah', icon: 'school', to: '/school/profile', roles: ['headmaster', 'operator', 'teacher', 'parent'], isPro: false },
+    
+    // Kelembagaan & Staf
+    { name: 'Manajemen Operator', icon: 'operator', to: '/operators', roles: ['headmaster'], isPro: false },
+    { name: role === 'headmaster' ? 'Monitoring Guru' : 'Manajemen Guru', icon: 'teacher', to: '/teachers', roles: ['headmaster', 'operator'], isPro: false },
+    
+    // Akademik & Siswa
+    { name: role === 'teacher' ? 'Kelas Saya' : (role === 'headmaster' ? 'Monitoring Kelas' : 'Manajemen Kelas'), icon: 'class', to: '/classes', roles: ['headmaster', 'operator', 'teacher'], isPro: false },
+    { name: role === 'teacher' ? 'Data Siswa' : (role === 'headmaster' ? 'Monitoring Siswa' : 'Manajemen Siswa'), icon: 'student', to: '/students', roles: ['headmaster', 'operator', 'teacher'], isPro: false },
+    { name: role === 'teacher' ? 'Data Wali Murid' : (role === 'headmaster' ? 'Monitoring Wali Murid' : 'Manajemen Wali Murid'), icon: 'parent', to: '/parents', roles: ['headmaster', 'operator', 'teacher'], isPro: false },
+    { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'], isPro: false },
+    
+    // Kehadiran & Penilaian
+    { name: role === 'teacher' ? 'Presensi Kelas' : 'Monitoring Presensi', icon: 'attendance', to: '/attendance', roles: ['headmaster', 'teacher'], isPro: false },
+    { name: 'Master Penilaian', icon: 'settings', to: '/assessments/settings', roles: ['operator'], isPro: false },
+    { name: role === 'teacher' ? 'Input Penilaian' : 'Monitoring Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'], isPro: false },
+    { name: 'Panduan Penilaian', icon: 'info', to: '/assessments/guide', roles: ['headmaster', 'operator', 'teacher', 'parent'], isPro: false },
+    { name: 'Rapor Naratif', icon: 'report_builder', to: '/assessments/report', roles: ['headmaster', 'teacher'], isPro: true },
+    { name: 'Cetak Rapor', icon: 'report', to: '/reports', roles: ['headmaster', 'teacher'], isPro: true },
 
-      { name: 'Kelas Saya', icon: 'class', to: '/classes', roles: ['teacher'], isPro: false },
-      { name: 'Data Siswa', icon: 'student', to: '/students', roles: ['teacher'], isPro: false },
-      { name: 'Data Wali Murid', icon: 'parent', to: '/parents', roles: ['teacher'], isPro: false },
-      { name: 'Presensi Kelas', icon: 'attendance', to: '/attendance', roles: ['teacher'], isPro: false },
-      
-      { name: 'Anak Saya', icon: 'child', to: '/children', roles: ['parent'], isPro: false },
-
-      { name: 'Input Penilaian', icon: 'assessment', to: '/assessments', roles: ['headmaster', 'teacher'], isPro: false },
-      { name: 'Master Penilaian', icon: 'settings', to: '/assessments/settings', roles: ['headmaster'], isPro: false },
-      { name: 'Panduan Penilaian', icon: 'info', to: '/assessments/guide', roles: ['headmaster', 'teacher', 'parent'], isPro: false },
-
-      // PRO PLAN Features
-      { name: 'Rapor Naratif', icon: 'report_builder', to: '/assessments/report', roles: ['headmaster', 'teacher'], isPro: true },
-      
-      { name: 'Manajemen SPP', icon: 'finance', to: '/finances/spp', roles: ['headmaster'], isPro: true },
-      { name: 'Manajemen Tabungan', icon: 'savings', to: '/finances/savings', roles: ['headmaster'], isPro: true },
-      { name: 'Cetak Rapor', icon: 'report', to: '/reports', roles: ['headmaster'], isPro: true },
-
-      { name: 'Tagihan SPP', icon: 'finance', to: '/finances/spp', roles: ['teacher'], isPro: true },
-      { name: 'Tabungan Siswa', icon: 'savings', to: '/finances/savings', roles: ['teacher'], isPro: true },
-      { name: 'Cetak Rapor', icon: 'report', to: '/reports', roles: ['teacher'], isPro: true },
-    ]
+    // Keuangan (Pro Domain)
+    { name: role === 'teacher' ? 'Tagihan SPP' : (role === 'headmaster' ? 'Monitoring SPP' : 'Manajemen SPP'), icon: 'finance', to: '/finances/spp', roles: ['headmaster', 'operator', 'teacher'], isPro: true },
+    { name: role === 'teacher' ? 'Tabungan Siswa' : (role === 'headmaster' ? 'Monitoring Tabungan' : 'Manajemen Tabungan'), icon: 'savings', to: '/finances/savings', roles: ['headmaster', 'operator', 'teacher'], isPro: true },
+  ]
   return items.filter((item) => {
     if (!item.roles.includes(role ?? '')) return false
     if (item.isPro && !schoolStore.isPro) return false
@@ -94,6 +90,7 @@ const navItems = computed(() => {
 
 const navIcons: Record<string, string> = {
   dashboard: 'lucide:layout-dashboard',
+  operator: 'lucide:user-cog',
   class: 'lucide:users',
   teacher: 'lucide:graduation-cap',
   student: 'lucide:backpack',

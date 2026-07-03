@@ -14,9 +14,11 @@ import BaseCard from '@/components/ui/Card/Card.vue'
 import BaseButton from '@/components/ui/Button/Button.vue'
 import Skeleton from '@/components/ui/Skeleton/Skeleton.vue'
 import { Pagination } from '@/components/ui'
+import { usePageCopy } from '@/utils/copy-helper'
 
 const router = useRouter()
 const schoolStore = useSchoolStore()
+const copy = usePageCopy().getCopy('report')
 
 const isLoading = ref(true)
 const downloadingId = ref<number | null>(null)
@@ -175,8 +177,8 @@ async function downloadReport(studentId: number) {
     <!-- Header -->
     <div class="flex items-center gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-heading">Laporan / Rapor Siswa</h1>
-        <p class="text-sm text-muted">Unduh rapor perkembangan peserta didik</p>
+        <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
+        <p class="text-sm text-muted">{{ copy.subtitle }}</p>
       </div>
     </div>
 

@@ -29,6 +29,7 @@ const matrix = ref<any>({})
 
 const isLoading = ref(true)
 const isSaving = ref(false)
+const hasExistingReport = ref(false)
 const error = ref('')
 const successMessage = ref('')
 
@@ -61,18 +62,28 @@ const availableMonths = computed(() => {
 })
 
 const isMatrixComplete = computed(() => {
+  if (hasExistingReport.value) return true
+  
   if (programs.value.length === 0) return false
   if (!availableMonths.value.length) return false
   
   for (const prog of programs.value) {
-    if (!prog.indicators || prog.indicators.length === 0) return false
-    for (const ind of prog.indicators) {
-      if (!matrix.value[ind.id]) return false
-      for (const month of availableMonths.value) {
-        if (!matrix.value[ind.id][month.value]) {
-          return false
+    let hasAtLeastOneScore = false
+    if (prog.indicators && prog.indicators.length > 0) {
+      for (const ind of prog.indicators) {
+        if (matrix.value[ind.id]) {
+          for (const month of availableMonths.value) {
+            if (matrix.value[ind.id][month.value]) {
+              hasAtLeastOneScore = true
+              break
+            }
+          }
         }
+        if (hasAtLeastOneScore) break
       }
+    }
+    if (!hasAtLeastOneScore) {
+      return false
     }
   }
   return true
@@ -157,6 +168,7 @@ async function fetchMatrixAndReport() {
   isLoading.value = true
   error.value = ''
   successMessage.value = ''
+  hasExistingReport.value = false
   try {
     // 1. Fetch Matrix
     const matrixRes = await assessmentService.getStudentMatrix(
@@ -188,6 +200,7 @@ async function fetchMatrixAndReport() {
     const reportData = (reportRes as any).data?.data || (reportRes as any).data || null
     
     if (reportData) {
+      hasExistingReport.value = true
       reportDraft.value.introduction_notes = reportData.introduction_notes || ''
       reportDraft.value.closing_notes = reportData.closing_notes || ''
       reportDraft.value.recommendation = reportData.recommendation || ''
@@ -197,6 +210,7 @@ async function fetchMatrixAndReport() {
         })
       }
     } else {
+      hasExistingReport.value = false
       reportDraft.value.introduction_notes = ''
       reportDraft.value.closing_notes = ''
       reportDraft.value.recommendation = ''

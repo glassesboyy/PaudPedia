@@ -58,8 +58,8 @@ class SchoolController extends BaseController
             ->where('school_id', $id)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Akses ditolak. Hanya Kepala Sekolah yang dapat mengubah profil.', 403);
+        if (!$membership || !$membership->isManager()) {
+            return $this->error('Akses ditolak. Hanya Kepala Sekolah dan Operator yang dapat mengubah profil.', 403);
         }
 
         $school = $membership->school;

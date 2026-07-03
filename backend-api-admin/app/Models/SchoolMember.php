@@ -52,6 +52,11 @@ class SchoolMember extends Model
         return $query->where('role_type', RoleType::HEADMASTER);
     }
 
+    public function scopeOperators($query)
+    {
+        return $query->where('role_type', RoleType::OPERATOR);
+    }
+
     public function scopeTeachers($query)
     {
         return $query->where('role_type', RoleType::TEACHER);
@@ -68,6 +73,11 @@ class SchoolMember extends Model
         return $this->role_type === RoleType::HEADMASTER;
     }
 
+    public function isOperator(): bool
+    {
+        return $this->role_type === RoleType::OPERATOR;
+    }
+
     public function isTeacher(): bool
     {
         return $this->role_type === RoleType::TEACHER;
@@ -76,5 +86,14 @@ class SchoolMember extends Model
     public function isParent(): bool
     {
         return $this->role_type === RoleType::PARENT;
+    }
+
+    /**
+     * Check if this member is a "manager" (headmaster or operator).
+     * Used for authorization on endpoints accessible by both roles.
+     */
+    public function isManager(): bool
+    {
+        return in_array($this->role_type, [RoleType::HEADMASTER, RoleType::OPERATOR]);
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Public\TestimonialController;
 use App\Http\Controllers\Api\V1\School\SchoolController;
 use App\Http\Controllers\Api\V1\School\TeacherController;
+use App\Http\Controllers\Api\V1\School\OperatorController;
 use App\Http\Controllers\Api\V1\School\ClassRoomController;
 use App\Http\Controllers\Api\V1\School\ParentProfileController;
 use App\Http\Controllers\Api\V1\School\StudentController;
@@ -76,6 +77,13 @@ Route::middleware([
     // School profile management
     Route::get('/schools/{id}', [SchoolController::class, 'show'])->name('schools.show');
     Route::put('/schools/{id}', [SchoolController::class, 'update'])->name('schools.update');
+
+    // Operator management (Headmaster only)
+    Route::get('/schools/{id}/operators', [OperatorController::class, 'index'])->name('operators.index');
+    Route::post('/schools/{id}/operators', [OperatorController::class, 'store'])->name('operators.store');
+    Route::get('/schools/{id}/operators/{operatorId}', [OperatorController::class, 'show'])->name('operators.show');
+    Route::patch('/schools/{id}/operators/{operatorId}/toggle-active', [OperatorController::class, 'toggleActive'])->name('operators.toggle-active');
+    Route::delete('/schools/{id}/operators/{operatorId}', [OperatorController::class, 'destroy'])->name('operators.destroy');
 
     // Teacher management
     Route::get('/schools/{id}/teachers', [TeacherController::class, 'index'])->name('teachers.index');

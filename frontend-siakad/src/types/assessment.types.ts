@@ -6,12 +6,14 @@ export interface DevelopmentIndicator {
   program_id: number
   name: string
   order: number
+  is_active?: boolean
 }
 
 export interface DevelopmentProgram {
   id: number
   name: string
   order: number
+  is_active?: boolean
   indicators: DevelopmentIndicator[]
 }
 

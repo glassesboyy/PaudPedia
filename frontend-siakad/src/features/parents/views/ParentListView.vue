@@ -31,7 +31,7 @@ const showDeleteModal = ref(false)
 const deleteTarget = ref<ParentProfile | null>(null)
 const isDeleting = ref(false)
 
-const isHeadmaster = computed(() => schoolStore.isHeadmaster)
+const canManageParents = computed(() => schoolStore.canManageParents)
 
 onMounted(() => {
   fetchParents()
@@ -104,10 +104,8 @@ function getParentDisplayName(p: ParentProfile): string {
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-muted">{{ copy.subtitle }}</p>
       </div>
-      <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'ParentCreate' })">
-        <template #prepend>
-          <Icon name="lucide:plus" class="w-4 h-4" />
-        </template>
+      <BaseButton v-if="canManageParents" @click="router.push({ name: 'ParentCreate' })">
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Tambah Orang Tua
       </BaseButton>
     </div>
@@ -177,12 +175,13 @@ function getParentDisplayName(p: ParentProfile): string {
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading text-center">Belum ada Orang Tua</p>
-                    <p class="text-sm text-muted" v-if="isHeadmaster">Mulai tambahkan data orang tua siswa ke sistem.</p>
+                    <p class="text-sm text-muted" v-if="canManageParents">Mulai tambahkan data orang tua siswa ke sistem.</p>
                     <p class="text-sm text-muted" v-else>Belum ada data orang tua yang terdaftar di sekolah.</p>
                   </div>
-                  <BaseButton v-if="isHeadmaster" variant="primary" size="md" class="mt-2 w-full" @click="router.push({ name: 'ParentCreate' })">
-                    Tambah Orang Tua Pertama
-                  </BaseButton>
+                  <BaseButton v-if="canManageParents" variant="primary" size="md" class="mt-2 w-full" @click="router.push({ name: 'ParentCreate' })">
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
+        Tambah Orang Tua Pertama
+      </BaseButton>
                 </div>
                 <!-- Case: Search result empty -->
                 <div v-else class="flex flex-col items-center gap-4 max-w-xs mx-auto">
@@ -236,15 +235,14 @@ function getParentDisplayName(p: ParentProfile): string {
                     @click="router.push({ name: 'ParentDetail', params: { id: p.id } })"
                   >
                     <Icon name="lucide:eye" class="w-4 h-4" />
-                    <span v-if="!isHeadmaster">Detail</span>
                   </button>
-                  <template v-if="isHeadmaster">
+                  <template v-if="canManageParents">
                     <button
                       class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50"
                       title="Edit"
                       @click="router.push({ name: 'ParentEdit', params: { id: p.id } })"
                     >
-                      <Icon name="lucide:pencil" class="w-4 h-4" />
+                      <Icon name="lucide:edit-3" class="w-4 h-4" />
                     </button>
                     <button
                       class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50"

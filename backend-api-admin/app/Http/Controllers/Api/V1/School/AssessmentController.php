@@ -58,11 +58,20 @@ class AssessmentController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Get programs & indicators
-        $programs = DevelopmentProgram::with('indicators')
+        // Get active programs & indicators valid for this grading month
+        $endOfMonth = date('Y-m-t 23:59:59', strtotime($month . '-01'));
+        $programs = DevelopmentProgram::with(['indicators' => function($q) use ($endOfMonth) {
+                $q->where('is_active', true)
+                  ->where('created_at', '<=', $endOfMonth)
+                  ->orderBy('order');
+            }])
             ->where('school_id', $school->id)
+            ->where('is_active', true)
+            ->where('created_at', '<=', $endOfMonth)
             ->orderBy('order')
             ->get();
+
+        $programs = $programs->filter(fn($p) => $p->indicators->isNotEmpty())->values();
 
         // Get assessments for this month
         $assessments = Assessment::whereHas('student', function ($query) use ($class) {
@@ -117,7 +126,7 @@ class AssessmentController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        if ($membership->isHeadmaster()) {
+        if ($membership->isHeadmaster() || $membership->isOperator()) {
             return response()->json(['message' => 'Akses ditolak. Hanya Guru Kelas yang dapat mengisi penilaian.'], 403);
         }
 
@@ -244,10 +253,31 @@ class AssessmentController extends Controller
             ];
         }
 
-        $programs = DevelopmentProgram::with('indicators')
+        $years = explode('/', $academicYear ?: (date('Y') . '/' . (date('Y') + 1)));
+        if (count($years) === 2 && is_numeric($years[0]) && is_numeric($years[1])) {
+            $endOfSemester = ($semesterEnum->value === '1') 
+                ? "{$years[0]}-12-31 23:59:59" 
+                : "{$years[1]}-06-30 23:59:59";
+        } else {
+            $endOfSemester = now()->toDateTimeString();
+        }
+
+        $programs = DevelopmentProgram::with(['indicators' => function($q) {
+                $q->orderBy('order');
+            }])
             ->where('school_id', $school->id)
             ->orderBy('order')
             ->get();
+
+        foreach ($programs as $prog) {
+            $prog->setRelation('indicators', $prog->indicators->filter(function($ind) use ($matrix, $endOfSemester) {
+                $hasAssessment = isset($matrix[$ind->id]) && count($matrix[$ind->id]) > 0;
+                $isValidActive = $ind->is_active && $ind->created_at <= $endOfSemester;
+                return $hasAssessment || $isValidActive;
+            })->values());
+        }
+
+        $programs = $programs->filter(fn($p) => $p->indicators->isNotEmpty())->values();
 
         return response()->json([
             'programs' => $programs,
@@ -289,10 +319,16 @@ class AssessmentController extends Controller
                 ->firstOrFail();
         }
 
-        $programs = \App\Models\DevelopmentProgram::with('indicators')
+        $allAssessedIndicatorIds = Assessment::where('student_id', $student->id)->pluck('indicator_id')->unique()->toArray();
+        $programs = \App\Models\DevelopmentProgram::with(['indicators' => function($q) use ($allAssessedIndicatorIds) {
+                $q->where('is_active', true)
+                  ->orWhereIn('id', $allAssessedIndicatorIds)
+                  ->orderBy('order');
+            }])
             ->where('school_id', $school->id)
             ->orderBy('order')
             ->get();
+        $programs = $programs->filter(fn($p) => $p->indicators->isNotEmpty())->values();
             
         // Get all assessments for this student
         $assessments = Assessment::where('student_id', $student->id)->get();

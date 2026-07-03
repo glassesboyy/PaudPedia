@@ -183,7 +183,7 @@ File Code: `app/Models/User.php` (Line 52 – 71)
         });
     }
 ```
-**Penjelasan:** Serupa dengan logika perlindungan berkas pada murid di atas, kode pengaturan pada tabel identitas utama pengguna (`User`) ini menargetkan pembersihan penyimpanan media otomatis pada foto profil. Prosedur pencegahan ini memastikan tidak akan pernah ada sisa berkas rongsokan gambar profil milik wali orang tua maupun profil staf tenaga pengajar jika sewaktu-waktu akun mereka dihapus dari sistem.
+**Penjelasan:** Serupa dengan logika perlindungan berkas pada murid di atas, kode pengaturan pada tabel identitas utama pengguna (`User`) ini menargetkan pembersihan penyimpanan media otomatis pada foto profil. Prosedur pencegahan ini memastikan tidak akan pernah ada sisa berkas rongsokan gambar profil milik wali orang tua maupun profil guru jika sewaktu-waktu akun mereka dihapus dari sistem.
 
 File Code: `app/Models/User.php` (Line 121 – 129)
 ```php
@@ -232,7 +232,7 @@ Penyusunan sistem skoring rapot/buku penghubung pada tingkat Pendidikan Anak Usi
 Tampilan yang berkaitan dengan pemantauan belajar meliputi:
 
 - Screenshot Halaman Input Absensi Harian (/attendance)
-  Penjelasan: Tampilan yang ditujukan bagi tenaga pengajar untuk melakukan proses absensi murid secara massal dan cepat. Desainnya berupa tabel baris yang memuat daftar nama anak di suatu kelas beserta serangkaian tombol *toggle* opsi presensi (Hadir, Sakit, Izin, Alfa).
+  Penjelasan: Tampilan yang ditujukan bagi guru untuk melakukan proses absensi murid secara massal dan cepat. Desainnya berupa tabel baris yang memuat daftar nama anak di suatu kelas beserta serangkaian tombol *toggle* opsi presensi (Hadir, Sakit, Izin, Alfa).
 
 - Screenshot Halaman Input Nilai Asesmen (/assessments)
   Penjelasan: Halaman ini menjadi kanvas kerja para guru dalam memberikan nilai observatif indikator perkembangan anak. Mengingat PAUD tidak menggunakan rentang angka mutlak, antarmukanya berwujud *dropdown* pemilih skala huruf (BB, MB, BSH, BSB) yang disertai kolom kotak teks (*text box*) untuk menyematkan deskripsi catatan naratif singkat.

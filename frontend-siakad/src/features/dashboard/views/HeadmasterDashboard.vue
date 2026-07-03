@@ -80,7 +80,7 @@ const stats = computed(() => [
     to: '/students'
   },
   { 
-    name: 'Orang Tua', 
+    name: 'Wali Murid', 
     value: schoolStore.currentSchool?.total_parents || 0, 
     icon: 'parent', 
     color: 'bg-rose-50 text-rose-600 border-rose-100',
@@ -125,43 +125,7 @@ const icons: Record<string, string> = {
         </div>
       </div>
     </div>
-
-    <!-- Quick Actions (Moved to Top) -->
-    <div class="space-y-4 mt-6">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <RouterLink to="/students/create" class="dashboard-action group">
-          <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-            <Icon name="lucide:user-plus" class="w-5 h-5" stroke-width="2" />
-          </div>
-          <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Siswa</span>
-        </RouterLink>
-        <RouterLink to="/teachers/create" class="dashboard-action group">
-          <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-            <Icon name="lucide:graduation-cap" class="w-5 h-5" stroke-width="2" />
-          </div>
-          <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Guru</span>
-        </RouterLink>
-        <RouterLink to="/parents/create" class="dashboard-action group">
-          <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-            <Icon name="lucide:heart-handshake" class="w-5 h-5" stroke-width="2" />
-          </div>
-          <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Wali</span>
-        </RouterLink>
-        <RouterLink to="/classes/create" class="dashboard-action group">
-          <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-            <Icon name="lucide:door-open" class="w-5 h-5" stroke-width="2" />
-          </div>
-          <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Tambah Kelas</span>
-        </RouterLink>
-        <RouterLink to="/school/profile" class="dashboard-action group">
-          <div class="action-icon border border-slate-200 text-slate-600 group-hover:bg-primary-600 group-hover:text-white transition-all">
-            <Icon name="lucide:settings" class="w-5 h-5" stroke-width="2" />
-          </div>
-          <span class="group-hover:text-primary-600 transition-colors font-bold whitespace-nowrap">Setting</span>
-        </RouterLink>
-      </div>
-    </div>
-
+    
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <RouterLink 

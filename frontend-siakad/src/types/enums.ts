@@ -1,5 +1,6 @@
 export enum UserRole {
   HEADMASTER = 'headmaster',
+  OPERATOR = 'operator',
   TEACHER = 'teacher',
   PARENT = 'parent',
 }

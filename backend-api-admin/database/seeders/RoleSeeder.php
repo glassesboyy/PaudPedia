@@ -85,7 +85,46 @@ class RoleSeeder extends Seeder
         ]);
 
         // ========================================
-        // 4. TEACHER ROLE (Guru)
+        // 4. OPERATOR ROLE (Operator Sekolah)
+        // ========================================
+        $operator = Role::firstOrCreate(['name' => 'operator']);
+        $operator->givePermissionTo([
+            // School Profile
+            'view school profile',
+            
+            // Students Management (Full CRUD)
+            'view students', 'view student details',
+            'create students', 'update students', 'delete students',
+            
+            // Teachers Management (Full CRUD)
+            'view teachers', 'create teachers', 'update teachers', 'delete teachers',
+            
+            // Classes Management (Full CRUD)
+            'view classes', 'create classes', 'update classes', 'delete classes',
+            
+            // Parent Profiles Management (Full CRUD)
+            'view parents', 'create parents', 'update parents', 'delete parents',
+            
+            // Attendance (Full CRUD)
+            'view attendance', 'input attendance', 'edit attendance', 'delete attendance',
+            
+            // Assessment (Full CRUD)
+            'view assessments', 'input assessments', 'edit assessments', 'delete assessments',
+            
+            // Rapor
+            'view rapor', 'generate rapor pdf',
+            
+            // Finance (Full CRUD - Pro Plan only)
+            'view finance', 'input spp', 'input tabungan', 'edit finance', 'delete finance',
+            
+            // Can also shop & learn (bonus)
+            'add to cart', 'checkout', 'view own orders',
+            'access webinars', 'download products', 'take courses', 
+            'view course progress', 'download certificates',
+        ]);
+
+        // ========================================
+        // 5. TEACHER ROLE (Guru)
         // ========================================
         $teacher = Role::firstOrCreate(['name' => 'teacher']);
         $teacher->givePermissionTo([

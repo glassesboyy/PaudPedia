@@ -152,12 +152,6 @@ class ReportController extends Controller
             }
         }
 
-        // Get programs
-        $programs = \App\Models\DevelopmentProgram::with('indicators')
-            ->where('school_id', $school->id)
-            ->orderBy('order')
-            ->get();
-
         // Get matrix
         $assessments = Assessment::where('student_id', $student->id)
             ->where('academic_year', $academicYear)
@@ -175,6 +169,22 @@ class ReportController extends Controller
                 'scale_color' => $ast->scale->color(),
             ];
         }
+
+        // Get programs with Smart Omission (exclude indicators with 0 assessments in this semester)
+        $programs = \App\Models\DevelopmentProgram::with(['indicators' => function($q) {
+                $q->orderBy('order');
+            }])
+            ->where('school_id', $school->id)
+            ->orderBy('order')
+            ->get();
+
+        foreach ($programs as $prog) {
+            $prog->setRelation('indicators', $prog->indicators->filter(function($ind) use ($matrix) {
+                return isset($matrix[$ind->id]) && count($matrix[$ind->id]) > 0;
+            })->values());
+        }
+
+        $programs = $programs->filter(fn($p) => $p->indicators->isNotEmpty())->values();
 
         return [
             'school' => [
@@ -231,6 +241,11 @@ class ReportController extends Controller
         if (!$membership) return null;
 
         $query = Student::where('id', $studentId)->where('school_id', $school->id)->with('class');
+
+        // Headmaster and Operator can access all students
+        if ($membership->isHeadmaster() || $membership->isOperator()) {
+            return $query->first();
+        }
 
         if ($membership->isTeacher()) {
             $teacher = \App\Models\Teacher::where('user_id', $user->id)

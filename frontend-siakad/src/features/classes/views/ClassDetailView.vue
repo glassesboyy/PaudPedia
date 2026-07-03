@@ -74,7 +74,7 @@ function handlePageChange(page: number) {
           <p class="text-sm text-muted">Informasi lengkap dan daftar siswa dalam kelas</p>
         </div>
       </div>
-      <div v-if="classData && schoolStore.currentRole === 'headmaster'" class="flex gap-2 w-full sm:w-auto">
+      <div v-if="classData && schoolStore.canManageClasses" class="flex gap-2 w-full sm:w-auto">
         <BaseButton variant="outline" @click="router.push({ name: 'ClassEdit', params: { id: classData.id } })" class="w-full sm:w-auto">
           <template #prepend><Icon name="lucide:pencil" class="w-4 h-4" /></template>
           Edit Kelas
@@ -228,7 +228,7 @@ function handlePageChange(page: number) {
                     class="w-9 h-9 rounded-xl bg-surface hover:bg-primary-600 hover:text-white border border-border text-muted transition-all duration-300 flex items-center justify-center mx-auto lg:ml-auto lg:mr-0 group/btn"
                     title="Lihat Detail"
                   >
-                    <Icon name="lucide:eye" class="w-4 h-4 group-hover/btn:scale-110 trasition-transform" />
+                    <Icon name="lucide:eye" class="w-4 h-4" />
                   </button>
                 </td>
               </tr>

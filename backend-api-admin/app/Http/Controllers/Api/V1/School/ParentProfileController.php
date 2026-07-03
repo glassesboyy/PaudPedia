@@ -30,7 +30,7 @@ class ParentProfileController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+        if (!$membership || (!$membership->isManager() && !$membership->isTeacher())) {
             return $this->error('Akses ditolak.', 403);
         }
 
@@ -75,8 +75,8 @@ class ParentProfileController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat mendaftarkan orang tua baru.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat mendaftarkan orang tua baru.', 403);
         }
 
         $school = School::findOrFail($schoolId);
@@ -164,7 +164,7 @@ class ParentProfileController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+        if (!$membership || (!$membership->isManager() && !$membership->isTeacher())) {
             return $this->error('Akses ditolak.', 403);
         }
 
@@ -189,8 +189,8 @@ class ParentProfileController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat memperbarui data orang tua.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat memperbarui data orang tua.', 403);
         }
 
         $parent = ParentProfile::where('school_id', $schoolId)
@@ -216,8 +216,8 @@ class ParentProfileController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat menghapus data orang tua.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat menghapus data orang tua.', 403);
         }
 
         $parent = ParentProfile::where('school_id', $schoolId)

@@ -9,7 +9,7 @@ Tabel 5.1 menunjukkan daftar prosedur pengujian yang dilakukan pada sistem.
 | :--- | :--- | :--- | :--- |
 | BB-001 | Multi-School | Pendaftaran akun dan pembuatan ruang kerja (*tenant*) sekolah baru | Black Box Testing |
 | BB-002 | Manajemen Siswa | Penambahan data biodata anak dan penautan akun profil wali murid | Black Box Testing |
-| BB-003 | Asesmen PAUD | Pengisian form skala nilai perkembangan anak oleh tenaga pendidik | Black Box Testing |
+| BB-003 | Asesmen PAUD | Pengisian form skala nilai perkembangan anak oleh guru | Black Box Testing |
 | BB-004 | Marketplace | Memasukkan produk kursus ke dalam keranjang dan proses *checkout* | Black Box Testing |
 | BB-005 | LMS | Memutar pemutar video materi dan mengisi soal pilihan ganda pada kuis | Black Box Testing |
 | E2E-001 | Pendaftaran & Akses | Integrasi pendaftaran *tenant* dengan ketepatan isolasi data ruang kerja | End-to-End Testing |
@@ -251,7 +251,7 @@ Berdasarkan hasil pengetesan simulasi komprehensif, seluruh fitur vital platform
 | :--- | :--- | :--- | :--- | :--- |
 | BB-001 | Multi-School | Pendaftaran akun dan pembuatan ruang kerja (*tenant*) sekolah baru | Black Box Testing | Passed |
 | BB-002 | Manajemen Siswa | Penambahan data biodata anak dan penautan akun profil wali murid | Black Box Testing | Passed |
-| BB-003 | Asesmen PAUD | Pengisian form skala nilai perkembangan anak oleh tenaga pendidik | Black Box Testing | Passed |
+| BB-003 | Asesmen PAUD | Pengisian form skala nilai perkembangan anak oleh guru | Black Box Testing | Passed |
 | BB-004 | Marketplace | Memasukkan produk kursus ke dalam keranjang dan proses *checkout* | Black Box Testing | Passed |
 | BB-005 | LMS | Memutar pemutar video materi dan mengisi soal pilihan ganda pada kuis | Black Box Testing | Passed |
 | E2E-001 | Pendaftaran & Akses | Integrasi pendaftaran *tenant* dengan ketepatan isolasi data ruang kerja | End-to-End Testing | Passed |

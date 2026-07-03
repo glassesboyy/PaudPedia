@@ -63,7 +63,7 @@ function formatDate(dateString: string) {
         </button>
         <div>
           <h1 class="text-2xl font-bold text-heading">Detail Guru</h1>
-          <p class="text-sm text-muted">Profil lengkap dan penugasan tenaga pendidik</p>
+          <p class="text-sm text-muted">Profil lengkap dan penugasan guru</p>
         </div>
       </div>
       <div v-if="teacherData" class="flex gap-2">
@@ -157,9 +157,7 @@ function formatDate(dateString: string) {
             </div>
           </div>
 
-          <div class="mt-8 p-4 rounded-2xl bg-slate-50 border border-slate-100 italic text-xs text-muted leading-relaxed">
-            "{{ teacherData.bio || 'Pendidik berdedikasi untuk mencerdaskan generasi bangsa di PaudPedia.' }}"
-          </div>
+
         </BaseCard>
       </div>
 

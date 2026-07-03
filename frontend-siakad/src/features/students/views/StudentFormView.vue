@@ -343,10 +343,12 @@ async function handleSubmit() {
           <!-- Actions -->
           <div class="pt-6 border-t border-border/50 flex justify-end gap-3">
             <BaseButton type="button" variant="outline" @click="router.push({ name: 'StudentList' })" :disabled="isSaving">
+              <template #prepend><Icon name="lucide:x" class="w-4 h-4" /></template>
               Batal
             </BaseButton>
             <BaseButton type="submit" variant="primary" :loading="isSaving" class="px-8 shadow-lg shadow-primary-500/20">
-              {{ isEditMode ? 'Simpan Perubahan' : 'Daftarkan Siswa' }}
+              <template #prepend><Icon name="lucide:save" class="w-4 h-4" /></template>
+              Simpan Data
             </BaseButton>
           </div>
         </div>

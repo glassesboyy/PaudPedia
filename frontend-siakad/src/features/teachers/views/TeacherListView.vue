@@ -19,7 +19,7 @@ const router = useRouter()
 const schoolStore = useSchoolStore()
 const { getCopy } = usePageCopy()
 
-const isHeadmaster = computed(() => schoolStore.isHeadmaster)
+const canManageTeachers = computed(() => schoolStore.canManageTeachers)
 const copy = computed(() => getCopy('teacher'))
 
 const isLoading = ref(false)
@@ -149,10 +149,8 @@ function formatDate(dateString: string) {
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-muted">{{ copy.subtitle }}</p>
       </div>
-      <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'TeacherCreate' })" class="w-full sm:w-auto">
-        <template #prepend>
-          <Icon name="lucide:plus" class="w-4 h-4" />
-        </template>
+      <BaseButton v-if="canManageTeachers" @click="router.push({ name: 'TeacherCreate' })" class="w-full sm:w-auto">
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Tambah Guru Baru
       </BaseButton>
     </div>
@@ -253,7 +251,7 @@ function formatDate(dateString: string) {
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading">Belum ada Guru</p>
-                    <p class="text-sm text-muted">Mulai tambahkan tenaga pengajar untuk mengelola sekolah Anda.</p>
+                    <p class="text-sm text-muted">Mulai tambahkan guru untuk mengelola sekolah Anda.</p>
                   </div>
                   <BaseButton 
                     variant="primary" 
@@ -321,7 +319,7 @@ function formatDate(dateString: string) {
                     <Icon name="lucide:eye" class="w-4 h-4" />
                   </button>
                   <button 
-                    v-if="isHeadmaster"
+                    v-if="canManageTeachers"
                     class="p-1.5 text-muted transition-colors rounded-md flex items-center justify-center"
                     :class="teacher.is_active ? 'hover:text-warning-600 hover:bg-warning-50' : 'hover:text-success-600 hover:bg-success-50'"
                     @click="confirmToggle(teacher)"
@@ -330,13 +328,13 @@ function formatDate(dateString: string) {
                     <Icon :name="teacher.is_active ? 'lucide:user-x' : 'lucide:user-check'" class="w-4 h-4" />
                   </button>
                   <button 
-                    v-if="isHeadmaster"
+                    v-if="canManageTeachers"
                     class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50 flex items-center justify-center"
                     @click="confirmDelete(teacher)"
                     title="Hapus Permanen"
                   >
                       <Icon name="lucide:trash-2" class="w-4 h-4" />
-                  </button>
+                    </button>
                 </div>
               </td>
             </tr>

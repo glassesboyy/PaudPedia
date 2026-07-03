@@ -34,7 +34,7 @@ class TeacherController extends BaseController
             ->first();
 
         // Allow Headmasters and Teachers to see teacher list
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+        if (!$membership || (!$membership->isManager() && !$membership->isTeacher())) {
             return $this->error('Akses ditolak. Anda bukan pengelola atau pengajar sekolah ini.', 403);
         }
 
@@ -97,7 +97,7 @@ class TeacherController extends BaseController
             ->first();
 
         // Allow Headmasters and Teachers to see teacher list
-        if (!$membership || (!$membership->isHeadmaster() && !$membership->isTeacher())) {
+        if (!$membership || (!$membership->isManager() && !$membership->isTeacher())) {
             return $this->error('Akses ditolak. Anda bukan pengelola atau pengajar sekolah ini.', 403);
         }
 
@@ -123,8 +123,8 @@ class TeacherController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Hanya Kepala Sekolah yang dapat mendaftarkan guru baru.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Hanya Operator Sekolah yang dapat mendaftarkan guru baru.', 403);
         }
 
         $school = $membership->school;
@@ -223,8 +223,8 @@ class TeacherController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Akses ditolak. Anda bukan pengelola sekolah ini.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Akses ditolak. Hanya Operator Sekolah yang dapat mengubah status guru.', 403);
         }
 
         $teacher = Teacher::where('school_id', $schoolId)->where('id', $teacherId)->first();
@@ -266,8 +266,8 @@ class TeacherController extends BaseController
             ->where('school_id', $schoolId)
             ->first();
 
-        if (!$membership || !$membership->isHeadmaster()) {
-            return $this->error('Akses ditolak. Anda bukan pengelola sekolah ini.', 403);
+        if (!$membership || !$membership->isOperator()) {
+            return $this->error('Akses ditolak. Hanya Operator Sekolah yang dapat menghapus guru.', 403);
         }
 
         $teacher = Teacher::where('school_id', $schoolId)->where('id', $teacherId)->first();

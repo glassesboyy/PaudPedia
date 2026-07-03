@@ -30,8 +30,8 @@ class DashboardController extends BaseController
             ->where('school_id', $school->id)
             ->first();
 
-        if (!$membership || !in_array($membership->role_type->value, ['headmaster'])) {
-            return $this->error('Akses ditolak. Hanya Kepala Sekolah.', 403);
+        if (!$membership || !in_array($membership->role_type->value, ['headmaster', 'operator'])) {
+            return $this->error('Akses ditolak. Hanya Kepala Sekolah dan Operator.', 403);
         }
 
         // Filter parameter

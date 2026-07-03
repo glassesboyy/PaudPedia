@@ -324,7 +324,8 @@ async function submitTransfer() {
               :loading="isSaving"
               class="px-8 shadow-lg shadow-primary-500/20"
             >
-              Simpan Perubahan
+              <template #prepend><Icon name="lucide:save" class="w-4 h-4" /></template>
+              Simpan Data
             </BaseButton>
           </div>
         </div>

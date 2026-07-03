@@ -85,7 +85,7 @@ class StudentReportController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        if ($membership->isHeadmaster()) {
+        if ($membership->isHeadmaster() || $membership->isOperator()) {
             return response()->json(['message' => 'Akses ditolak. Hanya Guru Kelas yang dapat mengisi rapor.'], 403);
         }
 

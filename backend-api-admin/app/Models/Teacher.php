@@ -16,7 +16,6 @@ class Teacher extends Model
         'school_id',
         'nip',
         'specialization',
-        'bio',
     ];
 
     // Relationships

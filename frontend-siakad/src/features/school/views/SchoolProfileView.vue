@@ -43,6 +43,7 @@ async function fetchSchoolProfile() {
         </div>
       </div>
       <BaseButton 
+        v-if="schoolStore.isHeadmaster"
         variant="primary" 
         @click="router.push({ name: 'SchoolSettings' })"
         class="shadow-lg shadow-primary-500/20 w-full sm:w-auto"

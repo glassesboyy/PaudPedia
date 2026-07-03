@@ -36,6 +36,17 @@ export interface SchoolMembership {
   is_active: boolean
 }
 
+export interface Operator {
+  id: number
+  user_id: number
+  name: string
+  email: string
+  phone: string | null
+  avatar_url: string | null
+  is_active: boolean
+  joined_at: string
+}
+
 export interface Teacher {
   id: number
   user_id: number
@@ -45,7 +56,6 @@ export interface Teacher {
   avatar_url: string | null
   nip: string | null
   specialization: string | null
-  bio: string | null
   is_active: boolean
   joined_at: string
 }

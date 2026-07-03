@@ -21,7 +21,7 @@ const { getCopy } = usePageCopy()
 
 const copy = computed(() => getCopy('class'))
 
-const isHeadmaster = computed(() => schoolStore.isHeadmaster)
+const canManageClasses = computed(() => schoolStore.canManageClasses)
 
 const isLoading = ref(false)
 const classes = ref<ClassRoom[]>([])
@@ -140,10 +140,8 @@ async function executeDelete() {
         <h1 class="text-2xl font-bold text-heading">{{ copy.title }}</h1>
         <p class="text-muted">{{ copy.subtitle }}</p>
       </div>
-      <BaseButton v-if="isHeadmaster" @click="router.push({ name: 'ClassCreate' })" class="w-full sm:w-auto">
-        <template #prepend>
-          <Icon name="lucide:plus" class="w-4 h-4" />
-        </template>
+      <BaseButton v-if="canManageClasses" @click="router.push({ name: 'ClassCreate' })" class="w-full sm:w-auto">
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
         Tambah Kelas Baru
       </BaseButton>
     </div>
@@ -248,18 +246,19 @@ async function executeDelete() {
                   </div>
                   <div>
                     <p class="text-lg font-bold text-heading text-center">Belum ada Kelas</p>
-                    <p class="text-sm text-muted text-center" v-if="isHeadmaster">Mulai tambahkan ruangan kelas untuk operasional sekolah.</p>
+                    <p class="text-sm text-muted text-center" v-if="canManageClasses">Mulai tambahkan ruangan kelas untuk operasional sekolah.</p>
                     <p class="text-sm text-muted text-center" v-else>Anda belum ditugaskan sebagai wali kelas.</p>
                   </div>
                   <BaseButton 
-                    v-if="isHeadmaster"
+                    v-if="canManageClasses"
                     variant="primary" 
                     size="md" 
                     class="mt-2 w-full"
                     @click="router.push({ name: 'ClassCreate' })"
                   >
-                    Tambah Kelas Pertama
-                  </BaseButton>
+        <template #prepend><Icon name="lucide:plus" class="w-4 h-4" /></template>
+        Tambah Kelas Pertama
+      </BaseButton>
                 </div>
                 <!-- Case: Search result empty -->
                 <div v-else class="flex flex-col items-center gap-4 max-w-xs mx-auto">
@@ -323,24 +322,23 @@ async function executeDelete() {
                     @click="router.push({ name: 'ClassDetail', params: { id: c.id } })"
                   >
                     <Icon name="lucide:eye" class="w-4 h-4" />
-                    <span v-if="!isHeadmaster">Detail</span>
                   </button>
                   <button 
-                    v-if="isHeadmaster"
+                    v-if="canManageClasses"
                     class="p-1.5 text-muted hover:text-primary-600 transition-colors rounded-md hover:bg-primary-50"
                     title="Edit Kelas"
                     @click.stop="router.push({ name: 'ClassEdit', params: { id: c.id } })"
                   >
-                    <Icon name="lucide:pencil" class="w-4 h-4" />
-                  </button>
+                      <Icon name="lucide:edit-3" class="w-4 h-4" />
+                    </button>
                   <button 
-                    v-if="isHeadmaster"
+                    v-if="canManageClasses"
                     class="p-1.5 text-muted hover:text-danger-600 transition-colors rounded-md hover:bg-danger-50"
                     @click.stop="confirmDelete(c)"
                     title="Hapus Kelas"
                   >
-                    <Icon name="lucide:trash-2" class="w-4 h-4" />
-                  </button>
+                      <Icon name="lucide:trash-2" class="w-4 h-4" />
+                    </button>
                 </div>
               </td>
             </tr>
