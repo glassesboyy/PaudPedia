@@ -1,763 +1,108 @@
 # Pendahuluan
 
-Entity Relationship Diagram (ERD) merupakan sebuah model konseptual yang memetakan struktur logis dari basis data dengan mendefinisikan entitas-entitas yang terlibat beserta hubungan yang mengikatnya. Pada pengembangan platform Paudpedia, penyusunan ERD memegang peranan krusial sebagai cetak biru (*blueprint*) arsitektur data guna memastikan bahwa seluruh kebutuhan fungsional sistem, mulai dari pendaftaran siswa hingga transaksi pembayaran, dapat diakomodasi secara komprehensif dan bebas dari redundansi.
+Entity Relationship Diagram (ERD) merupakan sebuah model konseptual yang memetakan struktur logis dari basis data dengan mendefinisikan entitas-entitas yang terlibat beserta hubungan yang mengikatnya. Pada pengembangan platform PaudPedia, penyusunan ERD memegang peranan krusial sebagai cetak biru (*blueprint*) arsitektur data guna memastikan bahwa seluruh kebutuhan fungsional sistem, mulai dari pendaftaran siswa, administrasi akademik, hingga transaksi pembayaran dan kursus digital, dapat diakomodasi secara komprehensif serta bebas dari redundansi.
 
-Mengingat skala kompleksitas platform yang mengusung konsep *Software as a Service* (SaaS) *multi-tenant* dan *marketplace*, arsitektur ERD ini dibagi menjadi tiga subsistem utama, yaitu Subsistem SIAKAD, Subsistem Public B2C, dan Subsistem Admin Panel. Pembagian ini dilakukan untuk mempermudah proses analisis, perancangan, implementasi, maupun pemeliharaan sistem di masa mendatang. Pendekatan modular ini memungkinkan pengembang untuk berfokus pada logika bisnis yang spesifik pada setiap modul tanpa kehilangan konteks relasional secara keseluruhan.
+Mengingat skala kompleksitas platform yang mengusung konsep *Software as a Service* (SaaS) *multi-tenant* dan *marketplace* edukasi B2C, arsitektur ERD ini dibagi menjadi tiga subsistem utama, yaitu Subsistem SIAKAD (Sekolah), Subsistem Public B2C & LMS, dan Subsistem Admin Panel. Pembagian ini dilakukan untuk mempermudah proses analisis, perancangan, implementasi, maupun pemeliharaan sistem di masa mendatang. Pendekatan modular ini memungkinkan pengembang untuk berfokus pada logika bisnis yang spesifik pada setiap modul tanpa kehilangan konteks relasional secara keseluruhan.
 
-Meskipun secara konseptual dan dokumentasi dibagi ke dalam beberapa subsistem yang terpisah, seluruh tabel dan entitas tersebut beroperasi secara fisik di dalam satu basis data tunggal yang saling terintegrasi dinamis. Integrasi lintas subsistem ini dijembatani oleh keberadaan *shared entity* (entitas berbagi) seperti entitas otentikasi pengguna, yang memastikan bahwa aliran data antar modul dapat berjalan secara mulus tanpa mengorbankan integritas konsistensi data secara arsitektural.
-
-<br><br>
-
-# ERD Untuk Subsistem SIAKAD (14 Entitas)
-
-Subsistem Sistem Informasi Akademik (SIAKAD) dirancang khusus untuk memfasilitasi kebutuhan manajemen operasional harian pada berbagai lembaga Pendidikan Anak Usia Dini (PAUD). Subsistem ini mengadopsi arsitektur *multi-tenant*, yang berarti platform mampu melayani banyak sekolah secara independen di dalam satu lingkungan aplikasi. Ruang lingkup subsistem ini mencakup pengelolaan data induk institusi, struktur kepegawaian (guru dan staf), pendaftaran siswa dan profil wali murid, pencatatan presensi harian, hingga pelaporan penilaian perkembangan anak dan manajemen penagihan finansial.
-
-[Diagram ERD Subsistem SIAKAD]
-
-Fungsi utama dari Subsistem SIAKAD adalah menjaga privasi dan batasan akses data antar-sekolah secara mutlak, di mana seluruh entitas transaksional maupun relasional sangat bergantung pada entitas institusi sebagai payung utamanya. Keterkaitan subsistem ini terhadap sistem secara keseluruhan sangatlah masif, sebab ia menjadi penggerak utama (*core engine*) bagi fungsionalitas layanan B2B (*Business-to-Business*) aplikasi. Data yang dikelola dalam SIAKAD ini nantinya akan terhubung secara terpusat dengan modul otentikasi global, memastikan pengawasan yang tersentralisasi bagi para pemangku kepentingan seperti kepala sekolah, guru, dan orang tua.
-
-## Entitas: School
-
-**Atribut**
-- id
-- name
-- npsn
-- address
-- phone
-- email
-- logo_url
-- subscription_plan
-- subscription_started_at
-- subscription_ended_at
-- is_active
-
-**Relasi**
-- One to Many dengan Entitas SchoolMember (Satu School memiliki banyak SchoolMember sebagai struktur keanggotaan pengguna di dalamnya.)
-- One to Many dengan Entitas ClassRoom (Satu School menyelenggarakan banyak ClassRoom atau rombongan belajar.)
-- One to Many dengan Entitas Teacher (Satu School menaungi banyak Teacher sebagai staf pengajarnya.)
-- One to Many dengan Entitas ParentProfile (Satu School memiliki banyak ParentProfile sebagai data profil orang tua/wali murid.)
-- One to Many dengan Entitas Student (Satu School mendidik banyak Student anak usia dini.)
-- One to Many dengan Entitas Attendance (Satu School memiliki banyak catatan rekam Attendance dari berbagai kelas.)
-- One to Many dengan Entitas Assessment (Satu School menerbitkan banyak evaluasi Assessment rapor murid.)
-- One to Many dengan Entitas DevelopmentProgram (Satu School mengonfigurasi banyak program indikator nilai akademik.)
-- One to Many dengan Entitas Finance (Satu School mencatat berbagai riwayat pembayaran tagihan SPP dan tabungan.)
-- One to Many dengan Entitas SubscriptionOrder (Satu School dapat membuat banyak riwayat langganan perpanjangan akun Pro.)
+Meskipun secara konseptual dan dokumentasi dibagi ke dalam beberapa subsistem yang terpisah, seluruh 38 tabel dan entitas tersebut beroperasi secara fisik di dalam satu basis data tunggal relasional yang saling terintegrasi dinamis. Integrasi lintas subsistem ini dijembatani oleh keberadaan *shared entity* (entitas berbagi) seperti entitas otentikasi pengguna (`User`), yang memastikan bahwa aliran data antar-modul dapat berjalan secara mulus tanpa mengorbankan integritas konsistensi data secara arsitektural.
 
 ---
 
-## Entitas: SchoolMember
+# 1. ERD Untuk Subsistem SIAKAD (15 Entitas)
 
-**Atribut**
-- id
-- school_id
-- user_id
-- role_type
-- is_active
-- joined_at
+Subsistem Sistem Informasi Akademik (SIAKAD) dirancang khusus untuk memfasilitasi kebutuhan manajemen operasional harian pada berbagai lembaga Pendidikan Anak Usia Dini (PAUD). Subsistem ini mengadopsi arsitektur *multi-tenant*, yang berarti platform mampu melayani banyak sekolah secara independen di dalam satu lingkungan aplikasi dengan isolasi data yang ketat. Ruang lingkup subsistem ini mencakup pengelolaan data induk institusi, struktur kepegawaian (Kepala Sekolah, Operator, Guru), pendaftaran siswa dan profil wali murid, pencatatan presensi harian, penilaian perkembangan anak berfilter temporal, pencatatan buku besar keuangan (*ledger*), hingga pemesanan paket berlangganan institusi (*Subscription Order*).
 
-**Relasi**
-- Many to One dengan Entitas School (Setiap SchoolMember terdaftar eksklusif pada satu instansi School tertentu.)
-- Many to One dengan Entitas User (Setiap otoritas SchoolMember diwakili dan dimiliki oleh satu kredensial global User.)
+### Tabel Rangkuman Entitas dan Relasi Subsistem SIAKAD
+Tabel berikut merangkum daftar 15 entitas yang menyusun arsitektur basis data Subsistem SIAKAD beserta fungsi utama dan penjabaran detail hubungan relasional antar-tabel di dalamnya:
 
----
-
-## Entitas: ClassRoom
-
-**Atribut**
-- id
-- school_id
-- homeroom_teacher_id
-- name
-- level
-- capacity
-- academic_year
-
-**Relasi**
-- Many to One dengan Entitas School (Setiap ClassRoom didirikan dan bernaung di bawah satu School.)
-- Many to One dengan Entitas Teacher (Setiap ruangan ClassRoom memiliki satu Teacher sebagai wali penanggung jawab kelas (homeroom_teacher).)
-- One to Many dengan Entitas Student (Satu ClassRoom ditempati secara fisik oleh banyak Student.)
-- One to Many dengan Entitas Attendance (Satu ClassRoom mewadahi banyak kegiatan absen harian Attendance.)
-- One to Many dengan Entitas Assessment (Satu ClassRoom menjadi titik temu pelaksanaan ragam Assessment murid.)
+| No | Nama Entitas | Fungsi / Deskripsi Singkat | Rincian Relasi & Penjelasannya |
+| :---: | :--- | :--- | :--- |
+| 1 | **`School`** | Payung utama institusi (*tenant* sekolah) dan pengelola batas kuota layanan paket berlangganan. | • **One-to-Many dengan `SchoolMember`**: Satu sekolah memiliki banyak anggota pengguna dengan berbagai peran (Kepala Sekolah, Operator, Guru, Orang Tua).<br>• **One-to-Many dengan `ClassRoom`**: Satu sekolah menyelenggarakan banyak rombongan belajar (kelas) dari berbagai jenjang.<br>• **One-to-Many dengan `Teacher`**: Satu sekolah menaungi banyak guru sebagai staf pengajar resmi.<br>• **One-to-Many dengan `ParentProfile`**: Satu sekolah mengelola banyak data profil keluarga atau wali murid.<br>• **One-to-Many dengan `Student`**: Satu sekolah mendidik dan mencatat biodata banyak murid PAUD.<br>• **One-to-Many dengan `Attendance`**: Satu sekolah menghimpun seluruh catatan presensi harian siswa dari berbagai kelas.<br>• **One-to-Many dengan `Assessment`**: Satu sekolah menyimpan seluruh catatan observasi penilaian perkembangan anak.<br>• **One-to-Many dengan `DevelopmentProgram`**: Satu sekolah dapat mengonfigurasi dan menerapkan banyak program perkembangan kurikulum.<br>• **One-to-Many dengan `Finance`**: Satu sekolah membukukan seluruh riwayat transaksi administratif tagihan SPP dan tabungan.<br>• **One-to-Many dengan `SchoolTransferRequest`**: Satu sekolah mencatat riwayat permohonan mutasi atau perpindahan siswa dan anggota sekolah.<br>• **One-to-Many dengan `SubscriptionOrder`**: Satu sekolah mencatat riwayat transaksi pemesanan atau perpanjangan paket *Pro Plan*. |
+| 2 | **`SchoolMember`** | Tabel pivot keanggotaan yang menetapkan peran pengguna di suatu sekolah (*Headmaster, Operator, Teacher, Parent*). | • **Many-to-One dengan `School`**: Setiap anggota keanggotaan terikat secara mutlak pada satu institusi sekolah.<br>• **Many-to-One dengan `User`**: Setiap baris keanggotaan merupakan perwujudan peran dari satu akun otentikasi global. |
+| 3 | **`Teacher`** | Profil guru spesialis, NIP, dan penanggung jawab observasi akademik siswa. | • **Many-to-One dengan `User`**: Setiap profil guru mengandalkan satu akun otentikasi global untuk *login*.<br>• **Many-to-One dengan `School`**: Setiap guru mengabdi di bawah naungan satu institusi sekolah.<br>• **One-to-Many dengan `ClassRoom`**: Seorang guru dapat ditugaskan sebagai wali kelas (*homeroom teacher*) bagi banyak rombongan belajar di berbagai tahun ajaran.<br>• **One-to-Many dengan `Attendance`**: Seorang guru bertugas mencatat dan memverifikasi banyak log presensi harian siswa.<br>• **One-to-Many dengan `Assessment`**: Seorang guru menginput dan mengesahkan banyak catatan nilai observasi perkembangan anak.<br>• **One-to-Many dengan `StudentReport`**: Seorang guru bertugas merumuskan catatan pengantar dan menandatangani banyak dokumen rapor siswa. |
+| 4 | **`ParentProfile`** | Data biodata, nomor kontak, dan latar belakang pekerjaan orang tua/wali murid. | • **Many-to-One dengan `School`**: Setiap profil orang tua dibentuk di dalam lingkungan satu institusi sekolah.<br>• **Many-to-One dengan `User`**: Setiap profil orang tua menempel pada satu akun pengguna yang bertindak sebagai wali *login*.<br>• **One-to-Many dengan `Student`**: Satu profil keluarga dapat mewali serta mengelola biodata banyak anak sekaligus di sekolah tersebut. |
+| 5 | **`ClassRoom`** | Rombongan belajar, penentuan jenjang kelompok (Playgroup, Kelompok A/B), dan kapasitas kelas. | • **Many-to-One dengan `School`**: Setiap kelas didirikan dan bernaung di bawah naungan satu sekolah.<br>• **Many-to-One dengan `Teacher`**: Setiap ruangan kelas memiliki satu guru penanggung jawab sebagai wali kelas (`homeroom_teacher`).<br>• **One-to-Many dengan `Student`**: Satu kelas ditempati secara fisik dan administratif oleh banyak siswa.<br>• **One-to-Many dengan `Attendance`**: Satu kelas mewadahi pencatatan rekam presensi harian dari seluruh siswa di kelas tersebut.<br>• **One-to-Many dengan `Assessment`**: Satu kelas menjadi wadah pengelompokan penilaian observasi perkembangan murid.<br>• **One-to-Many dengan `StudentReport`**: Satu kelas merangkum penerbitan banyak dokumen akhir rapor semester siswa. |
+| 6 | **`Student`** | Data induk biodata murid PAUD, nomor induk (NISN), dan status aktif pembelajaran. | • **Many-to-One dengan `School`**: Setiap siswa terdaftar resmi di satu institusi sekolah.<br>• **Many-to-One dengan `ClassRoom`**: Setiap siswa ditempatkan pada satu rombongan belajar kelas pada semester berjalan.<br>• **Many-to-One dengan `ParentProfile`**: Setiap siswa diasuh oleh satu entitas keluarga atau wali murid.<br>• **One-to-Many dengan `Attendance`**: Setiap siswa memiliki rekam jejak panjang riwayat presensi harian.<br>• **One-to-Many dengan `Assessment`**: Setiap siswa memiliki banyak riwayat penilaian observasi kualitatif bulanan.<br>• **One-to-Many dengan `Finance`**: Setiap siswa memiliki catatan kewajiban tagihan SPP dan buku saldo tabungan.<br>• **One-to-Many dengan `StudentReport`**: Setiap siswa menghasilkan dokumen rapor naratif di setiap akhir semester. |
+| 7 | **`Attendance`** | Rekam jejak presensi harian siswa (*Present, Sick, Permission, Alpha*) beserta bukti surat dokter. | • **Many-to-One dengan `School`**: Setiap data presensi dicatat di bawah naungan satu institusi sekolah.<br>• **Many-to-One dengan `Student`**: Setiap data presensi merekam kehadiran harian dari tepat satu peserta didik.<br>• **Many-to-One dengan `ClassRoom`**: Setiap data presensi dikelompokkan berdasarkan rombongan belajar (kelas) tempat peserta didik belajar.<br>• **Many-to-One dengan `Teacher`**: Setiap data presensi mencantumkan guru pengampu yang bertugas melakukan pencatatan dan verifikasi kehadiran. |
+| 8 | **`DevelopmentProgram`** | Master aspek penilaian atau program pengembangan kurikulum nasional PAUD (Nilai Agama & Moral, Motorik, Kognitif, Bahasa, Sosial-Emosional). | • **Many-to-One dengan `School`**: Program pengembangan dapat bersifat global (standar nasional) atau dikonfigurasi kustom untuk satu sekolah tertentu.<br>• **One-to-Many dengan `DevelopmentIndicator`**: Satu aspek program pengembangan membawahi banyak butir rincian indikator penilaian.<br>• **One-to-Many dengan `StudentReportDetail`**: Satu program pengembangan direkap skor rata-ratanya pada rincian dokumen rapor siswa. |
+| 9 | **`DevelopmentIndicator`** | Butir rincian indikator kompetensi anak per kelompok usia (3-4 tahun, 4-5 tahun, 5-6 tahun) dengan fitur proteksi *Soft Deletes*. | • **Many-to-One dengan `DevelopmentProgram`**: Setiap indikator terikat sebagai rincian spesifik dari satu program pengembangan.<br>• **One-to-Many dengan `Assessment`**: Setiap butir indikator dievaluasi berulang kali oleh guru melalui log penilaian observasi bulanan. |
+| 10 | **`Assessment`** | Log observasi penilaian kualitatif bulanan berskala huruf (BB, MB, BSH, BSB) dengan proteksi *Temporal Assessment Integrity*. | • **Many-to-One dengan `Student`**: Setiap catatan observasi merekam pencapaian perkembangan dari tepat satu peserta didik.<br>• **Many-to-One dengan `DevelopmentIndicator`**: Setiap nilai observasi mengukur tingkat ketercapaian dari satu butir indikator perkembangan. |
+| 11 | **`Finance`** | Buku besar administratif (*ledger*) pencatatan tagihan SPP bulanan dan tabungan celengan siswa oleh Operator/Guru. | • **Many-to-One dengan `School`**: Setiap baris transaksi pembukuan tercatat dalam kas administratif satu sekolah.<br>• **Many-to-One dengan `Student`**: Setiap tagihan SPP atau mutasi tabungan merupakan hak/kewajiban dari satu siswa.<br>• **Many-to-One dengan `User`**: Setiap entri pembukuan mencantumkan identitas Operator atau Guru yang menginput data (`recorded_by`). |
+| 12 | **`StudentReport`** | Header dan status publikasi (*Draft, Published*) dokumen rapor naratif semester siswa yang dilengkapi catatan wali kelas dan kepala sekolah. | • **Many-to-One dengan `School`**: Dokumen rapor diterbitkan di bawah naungan satu sekolah.<br>• **Many-to-One dengan `Student`**: Setiap dokumen rapor milik eksklusif dari satu siswa.<br>• **Many-to-One dengan `ClassRoom`**: Dokumen rapor dikompilasi berdasarkan kelas tempat siswa belajar.<br>• **Many-to-One dengan `Teacher`**: Dokumen rapor diringkas dan diberi catatan pengantar oleh satu wali kelas.<br>• **One-to-Many dengan `StudentReportDetail`**: Satu header rapor membawahi banyak rincian narasi per aspek kompetensi (berfitur *Smart Omission*). |
+| 13 | **`StudentReportDetail`** | Rincian narasi pengantar deskriptif dan kalkulasi rata-rata skala kualitatif per aspek perkembangan pada rapor siswa. | • **Many-to-One dengan `StudentReport`**: Setiap baris rincian narasi menjadi bagian dari satu dokumen induk rapor.<br>• **Many-to-One dengan `DevelopmentProgram`**: Setiap rincian menyimpulkan pencapaian akhir dari satu aspek program pengembangan. |
+| 14 | **`SchoolTransferRequest`** | Permohonan mutasi atau perpindahan siswa dan anggota sekolah antar-*tenant* yang dilengkapi token verifikasi keamanan. | • **Many-to-One dengan `School`**: Setiap permohonan mutasi diajukan dari atau menuju satu instansi sekolah.<br>• **Many-to-One dengan `User`**: Setiap permohonan mutasi diinisiasi oleh satu akun pemohon yang sah (`from_user_id`). |
+| 15 | **`SubscriptionOrder`** | Transaksi pemesanan atau perpanjangan paket langganan *Pro Plan* institusi sekolah yang terintegrasi pembayaran Midtrans. | • **Many-to-One dengan `School`**: Setiap tagihan dan riwayat perpanjangan langganan paket *Pro* dibuat oleh satu institusi sekolah. |
 
 ---
 
-## Entitas: Teacher
+# 2. ERD Untuk Subsistem Public B2C & LMS (22 Entitas)
 
-**Atribut**
-- id
-- user_id
-- school_id
-- nip
-- specialization
-- bio -> ini hilangkan
+Subsistem Public B2C dan *Learning Management System* (LMS) dirancang untuk melayani masyarakat umum, khususnya orang tua, guru luar, maupun praktisi PAUD yang ingin meningkatkan kompetensi atau membeli materi pembelajaran daring secara mandiri. Subsistem ini memfasilitasi etalase *e-commerce* (*Marketplace*), keranjang belanja interaktif, pembayaran otomatis via Midtrans, konsumsi video belajar asinkron, hingga evaluasi kuis pilihan ganda yang bermuara pada penerbitan sertifikat kelulusan (*e-certificate*) secara otomatis setelah progres mencapai 100%.
 
-**Relasi**
-- Many to One dengan Entitas User (Setiap profil Teacher mengandalkan satu akun otentikasi global User.)
-- Many to One dengan Entitas School (Setiap Teacher mengabdi di satu instansi School.)
-- One to Many dengan Entitas ClassRoom (Seorang Teacher dapat mengabdi sebagai penanggung jawab wali bagi banyak riwayat ClassRoom di tahun-tahun ajaran berbeda.)
-- One to Many dengan Entitas Attendance (Seorang guru Teacher bertugas melaporkan banyak Attendance siswa.) --- terakhir sampe sini
-- One to Many dengan Entitas Assessment (Seorang guru Teacher memberikan dan mensahkan banyak catatan nilai Assessment ke muridnya.)
+### Tabel Rangkuman Entitas dan Relasi Subsistem Public B2C & LMS
+Tabel berikut merangkum daftar 22 entitas yang membentuk arsitektur basis data Subsistem Public B2C dan LMS beserta fungsi utama dan penjabaran detail hubungan relasional antar-tabel di dalamnya:
 
----
+| No | Nama Entitas | Fungsi / Deskripsi Singkat | Rincian Relasi & Penjelasannya |
+| :---: | :--- | :--- | :--- |
+| 1 | **`User`** | Akun pelanggan B2C sekaligus entitas berbagi otentikasi global lintas subsistem. | • **One-to-Many dengan `SchoolMember`**: Satu akun pengguna dapat memegang banyak keanggotaan di berbagai sekolah (*multi-school*).<br>• **One-to-Many dengan `Order`**: Satu pengguna dapat mencatat banyak riwayat transaksi pembelian produk B2C.<br>• **One-to-Many dengan `CourseEnrollment`**: Satu pengguna dapat memiliki banyak lisensi kepemilikan kelas pembelajaran.<br>• **One-to-Many dengan `QuizAttempt`**: Satu pengguna dapat melakukan banyak riwayat percobaan ujian kuis.<br>• **One-to-Many dengan `Article`**: Satu pengguna (sebagai Moderator/Admin) dapat menulis banyak artikel blog edukasi.<br>• **One-to-Many dengan `Testimonial`**: Satu pengguna dapat memberikan banyak ulasan kepuasan layanan.<br>• **One-to-One dengan `Teacher`**: Satu akun pengguna dapat berasosiasi dengan tepat satu profil guru di SIAKAD.<br>• **One-to-One dengan `ParentProfile`**: Satu akun pengguna dapat berasosiasi dengan tepat satu profil wali murid di SIAKAD.<br>• **One-to-One dengan `Cart`**: Satu pengguna memiliki tepat satu dompet keranjang belanja aktif. |
+| 2 | **`Category`** | Taksonomi pengelompokan jenis konten portal publik (*Course, Product, Article*). | • **One-to-Many dengan `Course`**: Satu kategori dapat mengelompokkan banyak kelas kursus asinkron.<br>• **One-to-Many dengan `Product`**: Satu kategori dapat mengelompokkan banyak produk digital atau *e-book*.<br>• **One-to-Many dengan `Article`**: Satu kategori dapat mengelompokkan banyak berita dan artikel edukasi. |
+| 3 | **`Product`** | Katalog aset digital, *e-book*, dan materi cetak komersial B2C beserta harga dan berkas unduhan. | • **Many-to-One dengan `Category`**: Setiap produk diklasifikasikan ke dalam satu kategori taksonomi.<br>• **Relasi Polimorfik dengan `CartItem`**: Satu produk dapat ditambahkan ke dalam banyak rincian keranjang belanja.<br>• **Relasi Polimorfik dengan `OrderItem`**: Satu produk dapat tercatat sebagai barang yang dibeli dalam banyak faktur pesanan. |
+| 4 | **`Webinar`** | Jadwal acara sesi tatap muka interaktif, harga tiket, kapasitas, dan pengelolaan tautan rapat Zoom rahasia. | • **Many-to-One dengan `Mentor`**: Setiap webinar dibawakan dan dipandu oleh satu narasumber profesional.<br>• **Relasi Polimorfik dengan `OrderItem`**: Satu tiket webinar dapat tercatat sebagai barang yang dibeli dalam banyak faktur pesanan. |
+| 5 | **`Course`** | Katalog kelas daring asinkron beserta tingkat kesulitan, total bab, harga asli, dan potongan diskon. | • **Many-to-One dengan `Category`**: Setiap kelas kursus dikelompokkan ke dalam satu kategori.<br>• **Many-to-One dengan `Mentor`**: Setiap kelas kursus diajar oleh satu pengajar/instruktur utama.<br>• **One-to-Many dengan `Module`**: Satu kelas kursus menyusun silabus pembelajarannya ke dalam banyak bab modul.<br>• **One-to-Many dengan `CourseEnrollment`**: Satu kelas kursus dapat dipelajari oleh banyak peserta yang memiliki lisensi aktif.<br>• **Relasi Polimorfik dengan `CartItem`**: Satu kelas kursus dapat dimasukkan ke dalam banyak keranjang belanja.<br>• **Relasi Polimorfik dengan `OrderItem`**: Satu kelas kursus dapat tercatat sebagai item transaksional dalam banyak faktur pesanan. |
+| 6 | **`Module`** | Silabus bab pembelajaran yang membagi urutan tahapan materi di dalam suatu kelas kursus. | • **Many-to-One dengan `Course`**: Setiap bab modul merupakan bagian dari silabus satu kelas kursus.<br>• **One-to-Many dengan `Lesson`**: Satu bab modul memuat banyak tahapan materi pembelajaran (*video/PDF*).<br>• **One-to-Many dengan `Quiz`**: Satu bab modul dapat memiliki banyak evaluasi ujian kuis. |
+| 7 | **`Lesson`** | Materi bacaan panduan, sematan pemutar video daring, durasi, dan lampiran dokumen PDF. | • **Many-to-One dengan `Module`**: Setiap materi pembelajaran terikat dalam urutan satu bab modul.<br>• **One-to-Many dengan `LessonProgress`**: Satu materi pelajaran dilacak status ketuntasannya dalam banyak log penyelesaian siswa. |
+| 8 | **`Quiz`** | Wadah evaluasi ujian akhir modul, penetapan standar kelulusan minimal (*passing score*), dan batas waktu pengerjaan. | • **Many-to-One dengan `Module`**: Setiap evaluasi kuis menguji tingkat pemahaman materi dari satu bab modul.<br>• **One-to-Many dengan `QuizQuestion`**: Satu wadah kuis berisi banyak butir soal pertanyaan evaluasi.<br>• **One-to-Many dengan `QuizAttempt`**: Satu kuis dikerjakan berulang kali dalam banyak riwayat sesi percobaan ujian oleh peserta. |
+| 9 | **`QuizQuestion`** | Butir soal pertanyaan pilihan ganda, pembahasan jawaban, dan bobot nilai poin kuis. | • **Many-to-One dengan `Quiz`**: Setiap butir soal terhimpun di dalam satu evaluasi kuis.<br>• **One-to-Many dengan `QuizAnswer`**: Satu butir soal menyediakan banyak opsi pilihan ganda jawaban.<br>• **One-to-Many dengan `QuizAttemptAnswer`**: Satu butir soal dicatat pilihan jawabannya dalam banyak rekam jejak pengerjaan siswa. |
+| 10 | **`QuizAnswer`** | Opsi pilihan ganda dan penetapan status kunci jawaban benar (*is_correct*). | • **Many-to-One dengan `QuizQuestion`**: Setiap opsi jawaban merupakan pilihan dari satu butir soal pertanyaan.<br>• **One-to-Many dengan `QuizAttemptAnswer`**: Satu opsi jawaban dapat dipilih berkali-kali oleh peserta dalam log riwayat pengerjaan kuis. |
+| 11 | **`QuizAttemptAnswer`** | Rekam rincian pilihan jawaban yang diklik peserta pada tiap butir soal kuis beserta status koreksinya. | • **Many-to-One dengan `QuizAttempt`**: Setiap log rincian jawaban menjadi bagian dari satu sesi percobaan ujian kuis.<br>• **Many-to-One dengan `QuizQuestion`**: Setiap baris log merekam jawaban untuk tepat satu butir soal.<br>• **Many-to-One dengan `QuizAnswer`**: Setiap baris log mencatat opsi pilihan ganda yang diklik oleh peserta saat ujian berlangsung. |
+| 12 | **`Cart`** | Dompet keranjang belanja aktif dan penampung sementara kupon promo diskon yang diterapkan. | • **Many-to-One (logis One-to-One) dengan `User`**: Setiap keranjang belanja dimiliki secara eksklusif oleh satu pelanggan.<br>• **One-to-Many dengan `CartItem`**: Satu keranjang belanja menampung banyak rincian barang belanjaan di dalamnya. |
+| 13 | **`CartItem`** | Rincian barang, kuantitas item, dan subtotal harga di dalam keranjang belanja. | • **Many-to-One dengan `Cart`**: Setiap baris rincian keranjang berada di dalam wadah satu keranjang belanja.<br>• **Many-to-One (Polimorfik) dengan `Course`**: Satu kelas kursus dapat dimasukkan ke dalam rincian keranjang belanja.<br>• **Many-to-One (Polimorfik) dengan `Webinar`**: Satu tiket webinar dapat dimasukkan ke dalam rincian keranjang belanja.<br>• **Many-to-One (Polimorfik) dengan `Product`**: Satu produk digital dapat dimasukkan ke dalam rincian keranjang belanja. |
+| 14 | **`PromoCode`** | Kupon diskon (*percentage/fixed*), batas kuota pemakaian, batas minimal belanja, dan masa berlaku. | • **Relasi String-Matching dengan `Order`**: Satu kupon promo dapat digunakan pada banyak faktur pesanan melalui pencocokan kolom `promo_code` (string) pada `Order` dengan kolom `code` pada `PromoCode`. |
+| 15 | **`Order`** | Faktur transaksi pembelian B2C yang terintegrasi pembayaran Midtrans Snap beserta rincian kalkulasi tagihan. | • **Many-to-One dengan `User`**: Setiap faktur pesanan diterbitkan atas nama satu pembeli terdaftar.<br>• **One-to-Many dengan `OrderItem`**: Satu faktur pesanan merangkum banyak baris rincian barang yang dibeli. |
+| 16 | **`OrderItem`** | Rincian baris barang yang dibeli dan penguncian harga saat transaksi terjadi di dalam faktur. | • **Many-to-One dengan `Order`**: Setiap baris rincian pesanan merupakan bagian dari satu faktur transaksi.<br>• **Many-to-One (Polimorfik) dengan `Course`**: Satu kelas kursus dapat tercatat sebagai barang yang dibeli dalam rincian pesanan.<br>• **Many-to-One (Polimorfik) dengan `Webinar`**: Satu tiket webinar dapat tercatat sebagai barang yang dibeli dalam rincian pesanan.<br>• **Many-to-One (Polimorfik) dengan `Product`**: Satu produk digital dapat tercatat sebagai barang yang dibeli dalam rincian pesanan. |
+| 17 | **`CourseEnrollment`** | Lisensi kepemilikan kelas, persentase progres belajar 0-100%, dan tautan unduhan sertifikat kelulusan (*e-certificate*). | • **Many-to-One dengan `User`**: Setiap lisensi kepemilikan kelas dimiliki mutlak oleh satu peserta.<br>• **Many-to-One dengan `Course`**: Setiap lisensi memberi hak akses belajar penuh pada satu kelas kursus.<br>• **One-to-Many dengan `LessonProgress`**: Satu lisensi kelas memantau banyak log penyelesaian materi pelajaran. |
+| 18 | **`LessonProgress`** | Log pelacakan status tontonan dan ketuntasan materi penyelesaian satu `Lesson` oleh siswa. | • **Many-to-One dengan `CourseEnrollment`**: Setiap log ketuntasan materi merupakan bagian dari pelacakan satu lisensi kelas.<br>• **Many-to-One dengan `Lesson`**: Setiap baris log mencatat selesainya pemutaran atau pembacaan satu materi pelajaran. |
+| 19 | **`QuizAttempt`** | Riwayat pengerjaan kuis, pencatatan skor akhir 0-100, waktu pengerjaan, dan status kelulusan peserta. | • **Many-to-One dengan `User`**: Setiap riwayat pengerjaan kuis dilakukan oleh satu peserta.<br>• **Many-to-One dengan `Quiz`**: Setiap sesi pengerjaan menguji butir soal dari satu evaluasi kuis.<br>• **Many-to-One dengan `CourseEnrollment`**: Setiap percobaan ujian menyumbang validasi kelulusan bagi satu lisensi kelas (`enrollment_id`).<br>• **One-to-Many dengan `QuizAttemptAnswer`**: Satu sesi pengerjaan merekam banyak rincian jawaban pada setiap butir soal kuis. |
+| 20 | **`Article`** | Berita, artikel blog edukasi, *tags*, gambar sampul, dan penghitungan estimasi waktu baca otomatis (*reading time*). | • **Many-to-One dengan `Category`**: Setiap artikel diklasifikasikan ke dalam satu kategori topik.<br>• **Many-to-One dengan `User`**: Setiap artikel ditulis dan dipublikasikan oleh satu staf redaksi atau moderator (`author_id`). |
+| 21 | **`Mentor`** | Profil portofolio narasumber, gelar keahlian, biografi singkat, dan tautan sosial media profesional. | • **One-to-Many dengan `Course`**: Seorang narasumber dapat mengampu dan mengajar banyak kelas kursus daring.<br>• **One-to-Many dengan `Webinar`**: Seorang narasumber dapat menjadi pembicara utama di banyak sesi acara webinar. |
+| 22 | **`Testimonial`** | Ulasan kepuasan, rating bintang 1-5, identitas pemberi ulasan, dan kurasi penayangan publik (*is_featured*). | • **Many-to-One dengan `User`**: Ulasan kepuasan dapat diajukan secara terverifikasi dari akun satu pelanggan terdaftar. |
 
-## Entitas: ParentProfile
+> [!NOTE]
+> **Panduan Menggambar Relasi Polimorfik di Aplikasi ERD (Draw.io / Lucidchart / Visual Paradigm):**
+> Pada struktur database Laravel, relasi polimorfik (seperti pada entitas `CartItem` dan `OrderItem`) tidak menggunakan 3 kolom *foreign key* terpisah, melainkan menggunakan 2 kolom dinamis: `item_type` (menyimpan nama model: Course, Webinar, atau Product) dan `item_id` (menyimpan ID dari entitas tersebut).
+> 
+> Saat menggambarkannya secara visual dalam **Diagram ERD Tugas Akhir**, Anda cukup menggambarkannya sebagai **relasi One-to-Many biasa** dari ketiga entitas induk tersebut menuju tabel item. Langkah mudah menggambarkannya:
+> 1. Tarik garis **One-to-Many** (1 ke N / tanda panah cabang tiga) dari kotak **`Course`** menuju **`CartItem`** dan **`OrderItem`**.
+> 2. Tarik garis **One-to-Many** dari kotak **`Webinar`** menuju **`CartItem`** dan **`OrderItem`**.
+> 3. Tarik garis **One-to-Many** dari kotak **`Product`** menuju **`CartItem`** dan **`OrderItem`**.
+> *(Tips: Anda dapat menuliskan label kecil `(polymorphic / item_id)` pada garis relasi tersebut agar dosen penguji memahami bahwa ketiga entitas tersebut berbagi kolom kunci yang sama di dalam database).*
 
-**Atribut**
-- id
-- school_id
-- user_id
-- email
-- father_name
-- mother_name
-- phone
-- father_occupation
-- mother_occupation
-- address
-
-**Relasi**
-- Many to One dengan Entitas School (Setiap profil ParentProfile dibentuk di dalam lingkungan satu institusi School.)
-- Many to One dengan Entitas User (Setiap ParentProfile menempel pada satu akun User yang bertindak sebagai wali login.)
-- One to Many dengan Entitas Student (Satu profil keluarga ParentProfile dapat mewali serta mengelola banyak biodata Student (anak) sekaligus di sebuah sekolah.)
-
----
-
-## Entitas: Student
-
-**Atribut**
-- id
-- school_id
-- class_id
-- parent_profile_id
-- name
-- nisn
-- birth_date
-- gender
-- address
-- photo_url
-- enrollment_date
-- status
-
-**Relasi**
-- Many to One dengan Entitas School (Setiap anak Student secara mutlak terdaftar di satu School.)
-- Many to One dengan Entitas ClassRoom (Setiap Student diplot atau dipetakan pada satu ClassRoom rombel belajar pada satu semester berjalan.)
-- Many to One dengan Entitas ParentProfile (Setiap anak Student diasuh mutlak oleh satu entitas keluarga ParentProfile.)
-- One to Many dengan Entitas Attendance (Setiap Student memiliki rekam jejak panjang presensi Attendance harian.)
-- One to Many dengan Entitas Assessment (Setiap Student memiliki banyak riwayat penilaian rapor kualitatif Assessment.)
-- One to Many dengan Entitas Finance (Setiap Student memiliki berbagai kewajiban catatan tagihan SPP dan tabungan Finance.)
-- One to Many dengan Entitas StudentReport (Setiap Student dapat menghasilkan banyak cetakan akhir rapor StudentReport.)
+> [!NOTE]
+> **Panduan Menggambar Relasi String-Matching (`PromoCode` → `Order`) di Aplikasi ERD:**
+> Dalam ilmu basis data relasional (RDBMS), relasi antara tabel `PromoCode` dan `Order` tidak menggunakan ID angka (*Surrogate Key* seperti `promo_code_id`), melainkan menggunakan teks kode promo itu sendiri (*Natural Key* bertipe string/varchar seperti `"DISKON50"`). Pada Laravel Eloquent, ini tetap didefinisikan secara resmi sebagai relasi `HasMany` / `BelongsTo`.
+> 
+> Saat menggambarkannya secara visual dalam **Diagram ERD Tugas Akhir**, Anda **tetap menggambarkannya sebagai relasi One-to-Many biasa**:
+> 1. Tarik garis **One-to-Many** (1 ke N / tanda panah cabang tiga) dari kotak **`PromoCode`** menuju kotak **`Order`**.
+> 2. *(Tips: Pada garis relasi atau spesifikasi atributnya, Anda dapat memberi label kecil `(FK: promo_code → code)` untuk menunjukkan bahwa pencocokan data dilakukan melalui kolom string `code` ke `promo_code`).*
 
 ---
 
-## Entitas: Attendance
-
-**Atribut**
-- id
-- student_id
-- class_id
-- date
-- status
-- notes
-- proof_file_path
-
-**Relasi**
-- Many to One dengan Entitas Student (Catatan harian Attendance ini mendeskripsikan kehadiran satu orang Student.)
-- Many to One dengan Entitas ClassRoom (Kegiatan presensi Attendance ini diadakan pada ruang lingkup satu ClassRoom tertentu.)
-
----
-
-## Entitas: Assessment
-
-**Atribut**
-- id
-- student_id
-- indicator_id
-- assessment_month
-- scale
-- semester
-- academic_year
-- notes
-- assessed_at
-
-**Relasi**
-- Many to One dengan Entitas Student (Sebuah catatan nilai Assessment diperuntukkan bagi perkembangan satu Student.)
-- Many to One dengan Entitas DevelopmentIndicator (Nilai skala evaluasi ini merujuk kepada poin kurikulum DevelopmentIndicator tertentu.)
-
----
-
-## Entitas: DevelopmentProgram
-
-**Atribut**
-- id
-- school_id
-- name
-- order
-
-**Relasi**
-- Many to One dengan Entitas School (Kategori kompetensi kurikulum ini diracik khusus untuk satu School.)
-- One to Many dengan Entitas DevelopmentIndicator (Satu DevelopmentProgram memayungi secara hierarkis banyak sub-kompetensi penilaian DevelopmentIndicator.)
-
----
-
-## Entitas: DevelopmentIndicator
-
-**Atribut**
-- id
-- program_id
-- name
-- order
-
-**Relasi**
-- Many to One dengan Entitas DevelopmentProgram (Setiap instrumen penilai DevelopmentIndicator bernaung dan diorganisir oleh satu DevelopmentProgram induk.)
-- One to Many dengan Entitas Assessment (Sebuah DevelopmentIndicator ini akan dipakai berkali-kali sebagai tolak ukur dari puluhan atau ratusan Assessment.)
-
----
-
-## Entitas: StudentReport
-
-**Atribut**
-- id
-- school_id
-- student_id
-- class_id
-- teacher_id
-- semester
-- academic_year
-- introduction_notes
-- closing_notes
-- recommendation
-
-**Relasi**
-- Many to One dengan Entitas Student (Buku rekapitulasi StudentReport ini dikeluarkan khusus bagi satu Student.)
-- Many to One dengan Entitas Teacher (Dokumen resmi StudentReport ini ditandatangani serta disahkan oleh satu guru Teacher penanggung jawab.)
-- One to Many dengan Entitas StudentReportDetail (Satu dokumen utuh StudentReport menyertakan banyak item matriks nilai StudentReportDetail.)
-
----
-
-## Entitas: StudentReportDetail
-
-**Atribut**
-- id
-- student_report_id
-- program_id
-- final_scale
-- narrative
-
-**Relasi**
-- Many to One dengan Entitas StudentReport (Rincian nilai naratif ini adalah bagian dari kumpulan lembar satu dokumen StudentReport.)
-- Many to One dengan Entitas DevelopmentProgram (Hasil agregat matriks evaluatif ini disarikan per-aspek kurikulum dari entitas DevelopmentProgram.)
-
----
-
-## Entitas: Finance
-
-**Atribut**
-- id
-- student_id
-- type
-- amount
-- description
-- month
-- is_paid
-- payment_method
-- transaction_type
-- paid_at
-- recorded_by
-
-**Relasi**
-- Many to One dengan Entitas Student (Setiap beban kewajiban tagihan SPP maupun rekening celengan ditujukan ke satu siswa Student.)
-- Many to One dengan Entitas User (Setiap lembar log penerimaan Finance diverifikasi serta diinput oleh satu pengelola (bendahara/guru) yang terekam pada properti recorded_by dengan rujukan ke tabel global User.)
-
----
-
-## Entitas: SchoolTransferRequest
-
-**Atribut**
-- id
-- school_id
-- from_user_id
-- to_email
-- token
-- status
-- expired_at
-
-**Relasi**
-- Many to One dengan Entitas School (Formulir pengajuan pendaftaran dan pindah instansi ditujukan menuju satu School tujuan.)
-- Many to One dengan Entitas User (Surat permohonan ini diinisialisasi oleh satu akun User pengaju form (from_user_id).)
-
-<br><br>
-
-# ERD Untuk Subsistem Public B2C (21 Entitas)
-
-Subsistem Public B2C (*Business-to-Consumer*) merupakan wajah publik dari platform Paudpedia yang mewadahi interaksi langsung dengan konsumen secara terbuka, tanpa terikat pada batasan *tenant* institusi sekolah tertentu. Ruang lingkup subsistem ini sangat luas, mencakup operasional *marketplace* untuk katalog produk digital, penyelenggaraan *Learning Management System* (LMS) asinkronus, pendaftaran sesi webinar, hingga portal konten informasi berupa artikel blog dan testimoni. Secara fungsional, subsistem ini menargetkan pengguna mandiri atau masyarakat umum yang ingin mengakses layanan peningkatan kapasitas keilmuan secara langsung.
-
-[Diagram ERD Subsistem Public B2C]
-
-Peran subsistem Public B2C di dalam arsitektur aplikasi adalah sebagai mesin penghasil profit (*revenue generator*) sekunder sekaligus sebagai sarana diseminasi informasi edukasi publik. Dengan memanfaatkan integrasi keranjang belanja, manajemen pesanan, dan perhitungan kode promo yang dinamis, subsistem ini mampu memproses siklus transaksi dari hulu ke hilir secara independen. Lebih lanjut, subsistem ini terintegrasi erat dengan subsistem lain melalui penggunaan entitas otentikasi global sebagai subjek transaksi, sehingga aktivitas pembelajaran mandiri maupun riwayat pembelian pengguna dapat dilacak dan divalidasi oleh administrator pusat.
-
-## Entitas: Category
-
-**Atribut**
-- id
-- name
-- slug
-- description
-- type
-
-**Relasi**
-- One to Many dengan Entitas Course (Satu Category tipe pembelajaran menaungi banyak Course edukasi.)
-- One to Many dengan Entitas Product (Satu Category tipe e-commerce dapat mengklasifikasikan ragam Product digital.)
-- One to Many dengan Entitas Article (Satu Category publikasi bertugas mengelompokkan ribuan pos Article blog/berita.)
-
----
-
-## Entitas: Mentor
-
-**Atribut**
-- id
-- name
-- title
-- bio
-- photo_url
-- expertise
-- social_media
-- is_active
-
-**Relasi**
-- One to Many dengan Entitas Webinar (Seorang Mentor dapat menjadi pemateri untuk jadwal tayang banyak sesi Webinar interaktif.)
-- One to Many dengan Entitas Course (Seorang pemateri ahli Mentor dapat memproduksi susunan materi banyak Course independen.)
-
----
-
-## Entitas: Product
-
-**Atribut**
-- id
-- category_id
-- title
-- slug
-- description
-- thumbnail_url
-- file_url
-- price
-- original_price
-- is_active
-
-**Relasi**
-- Many to One dengan Entitas Category (Setiap arsip Product digital ini dimasukkan ke dalam satu Category tertentu.)
-- One to Many (Polymorphic) dengan Entitas OrderItem (Setiap aset Product dapat dipesan ratusan kali ke dalam baris OrderItem milik konsumen.)
-
----
-
-## Entitas: Webinar
-
-**Atribut**
-- id
-- mentor_id
-- title
-- slug
-- description
-- thumbnail_url
-- price
-- original_price
-- zoom_link
-- zoom_meeting_id
-- zoom_passcode
-- scheduled_at
-- duration_minutes
-- max_participants
-- is_active
-
-**Relasi**
-- Many to One dengan Entitas Mentor (Setiap tayangan kelas jarak jauh Webinar diisi dan diampu khusus oleh satu orang Mentor profesional.)
-- One to Many (Polymorphic) dengan Entitas OrderItem (Setiap tayangan sesi Webinar dapat ter-checkout masuk ke keranjang dan riwayat OrderItem pembeli di saat bertransaksi.)
-
----
-
-## Entitas: Course
-
-**Atribut**
-- id
-- mentor_id
-- category_id
-- title
-- slug
-- description
-- thumbnail_url
-- price
-- original_price
-- level
-- duration_hours
-- is_published
-
-**Relasi**
-- Many to One dengan Entitas Mentor (Setiap kemasan paket kelas Course dikonstruksi secara berdedikasi oleh satu Mentor.)
-- Many to One dengan Entitas Category (Setiap kelas asinkronus Course dikelompokkan pada rumpun keahlian satu Category.)
-- One to Many dengan Entitas Module (Satu pokok Course akan dicacah-cacah materi bab utamanya ke dalam puluhan entitas Module.)
-- One to Many dengan Entitas CourseEnrollment (Satu akses Course akan dibeli dan dilisensikan kapabilitas hak belajarnya kepada himpunan pendaftar/peserta CourseEnrollment.)
-- One to Many (Polymorphic) dengan Entitas OrderItem (Katalog tayang Course dapat ditransaksikan kapan saja pada catatan invoice OrderItem.)
-
----
-
-## Entitas: Module
-
-**Atribut**
-- id
-- course_id
-- title
-- description
-- order
-
-**Relasi**
-- Many to One dengan Entitas Course (Setiap pecahan unit Module adalah pecahan organik bab silabus turunan dari satu Course induk.)
-- One to Many dengan Entitas Lesson (Satu bab Module terdiri atas banyak serpihan file dokumen interaktif berwujud Lesson yang siap dibaca/ditonton.)
-- One to Many dengan Entitas Quiz (Satu bab Module dapat memuat penugasan terukur berupa banyak kumpulan Quiz objektif.)
-
----
-
-## Entitas: Lesson
-
-**Atribut**
-- id
-- module_id
-- title
-- content_type
-- video_url
-- pdf_file
-- text_content
-- duration_minutes
-- order
-
-**Relasi**
-- Many to One dengan Entitas Module (Setiap lembar materi asinkronus Lesson terkait dan terurut dalam naungan satu Module.)
-- One to Many dengan Entitas LessonProgress (Setiap keping aset media interaktif Lesson akan dipantau riwayat penyelesaian sentuhannya (progress) lewat baris pencatatan log LessonProgress pada ribuan user.)
-
----
-
-## Entitas: LessonProgress
-
-**Atribut**
-- id
-- enrollment_id
-- lesson_id
-- is_completed
-- completed_at
-
-**Relasi**
-- Many to One dengan Entitas CourseEnrollment (Setiap rekam kemajuan progress LessonProgress berkontribusi menaikkan skor kelulusan keseluruhan untuk satu lisensi CourseEnrollment sang pengguna.)
-- Many to One dengan Entitas Lesson (Jejak keberhasilan LessonProgress secara definitif menyatakan tamatnya satu lembar Lesson.)
-
----
-
-## Entitas: Quiz
-
-**Atribut**
-- id
-- module_id
-- title
-- description
-
-**Relasi**
-- Many to One dengan Entitas Module (Bentuk penugasan interaktif Quiz selalu bergantung merujuk diletakkan pada penyelesaian bab sebuah Module.)
-- One to Many dengan Entitas QuizQuestion (Satu instrumen lembar tugas Quiz menyimpan deretan banyak baris butir soal QuizQuestion.)
-- One to Many dengan Entitas QuizAttempt (Satu penugasan Quiz akan dieksekusi simulasi pengerjaannya oleh pengguna melahirkan banyak log QuizAttempt.)
-
----
-
-## Entitas: QuizQuestion
-
-**Atribut**
-- id
-- quiz_id
-- question
-
-**Relasi**
-- Many to One dengan Entitas Quiz (Bentuk butir pertanyaan soal terikat secara ketat bersama satu lembar lembar tugas Quiz.)
-- One to Many dengan Entitas QuizAnswer (Satu pertayaan spesifik QuizQuestion mutlak menyimpan setidaknya dua/empat ragam opsi jawaban ganda QuizAnswer yang menemaninya.)
-
----
-
-## Entitas: QuizAnswer
-
-**Atribut**
-- id
-- quiz_question_id
-- answer
-- is_correct
-
-**Relasi**
-- Many to One dengan Entitas QuizQuestion (Sebuah butir opsi distraktor QuizAnswer menempel kepada batang soal QuizQuestion.)
-
----
-
-## Entitas: QuizAttempt
-
-**Atribut**
-- id
-- quiz_id
-- user_id
-- enrollment_id
-- score
-- total_questions
-- percentage
-- is_passed
-- started_at
-- completed_at
-
-**Relasi**
-- Many to One dengan Entitas Quiz (Pengerjaan rekam hasil percobaan interaktif ini dikhususkan pada penyelesaian satu tugas Quiz.)
-- Many to One dengan Entitas User (Rekaman log QuizAttempt sepenuhnya diverifikasi atas nama satu orang pelaksana otentik kredensial User.)
-- Many to One dengan Entitas CourseEnrollment (Penempatan persentase kelulusan kuis ini menjadi parameter tamat/tidaknya sebuah lisensi kelas tunggal CourseEnrollment.)
-- One to Many dengan Entitas QuizAttemptAnswer (Satu siklus utuh usaha pengerjaan (QuizAttempt) beranak-pinak melahirkan log serpihan klik detail dari pengguna untuk merujuk pada banyak rekaman log jawaban mentah (QuizAttemptAnswer).)
-
----
-
-## Entitas: QuizAttemptAnswer
-
-**Atribut**
-- id
-- quiz_attempt_id
-- quiz_question_id
-- selected_answer_id
-- is_correct
-
-**Relasi**
-- Many to One dengan Entitas QuizAttempt (Catatan *draft* jawaban kuis milik pengguna menyambung secara utuh dan terakumulasi untuk sebuah rekap sesi final di entitas QuizAttempt.)
-- Many to One dengan Entitas QuizQuestion (Referensi titik soal mana yang dijawab ditarik menuju sumber QuizQuestion.)
-- Many to One dengan Entitas QuizAnswer (Sebuah relasi penunjukan statis di mana opsi yang disubmit pengguna diarahkan menunjuk persis pada satu pilihan *true/false* di kunci jawaban asli milik basis data di tabel QuizAnswer (melalui panah selected_answer_id).)
-
----
-
-## Entitas: CourseEnrollment
-
-**Atribut**
-- id
-- course_id
-- user_id
-- enrolled_at
-- progress_percentage
-- completed_at
-- certificate_url
-
-**Relasi**
-- Many to One dengan Entitas Course (Dokumen kepemilikan kursus asinkronus (CourseEnrollment) terbit mewakili lisensi untuk satu ragam layanan produk Course.)
-- Many to One dengan Entitas User (Dokumen kepemilikan lisensi dikreditkan berhak melekat tak tergantikan milik satu akun pengguna terdaftar User.)
-- One to Many dengan Entitas LessonProgress (Properti dokumen tunggal Enrollment disokong oleh kalkulasi kompilator ratusan log centang ketuntasan bab turunan yakni kumpulan LessonProgress.)
-- One to Many dengan Entitas QuizAttempt (Dokumen Enrollment juga diperkaya dengan rangkuman kolektif evaluasi pencapaian skor pada tumpukan lembar tes (QuizAttempt).)
-
----
-
-## Entitas: Cart
-
-**Atribut**
-- id
-- user_id
-
-**Relasi**
-- One to One (secara logika fungsional) dengan Entitas User (Setiap kantong belanja Cart diciptakan berpasangan eksklusif menjadi dompet penyimpan sementara untuk hanya satu kredensial User. Model `Cart` dan `User` sangatlah personal.)
-- One to Many dengan Entitas CartItem (Satu keranjang transaksi Cart akan diisi beragam serpihan aset komoditas atau entitas CartItem.)
-
----
-
-## Entitas: CartItem
-
-**Atribut**
-- id
-- cart_id
-- item_type
-- item_id
-- quantity
-
-**Relasi**
-- Many to One dengan Entitas Cart (Rekapitulasi rinci keranjang ini berisikan muara satu tempat wadah utama Cart.)
-- Relasi Polymorphic (MorphTo) (Relasi referensi fleksibel di mana satu rekaman log sementara ini dapat menyasar rujukan entitas acak antara 'Course', 'Webinar', atau 'Product' melalui kolaborasi kolom fiktif (item_id) dan (item_type).)
-
----
-
-## Entitas: PromoCode
-
-**Atribut**
-- id
-- code
-- description
-- discount_type
-- discount_value
-- min_purchase_amount
-- max_discount_amount
-- usage_limit
-- usage_count
-- start_date
-- end_date
-- is_active
-
-**Relasi**
-- One to Many dengan Entitas Order (Satu kode diskon PromoCode bisa dieksploitasi untuk memotong margin harga pada raturan tagihan final cetak invoice log di tabel Order.)
-
----
-
-## Entitas: Order
-
-**Atribut**
-- id
-- user_id
-- order_number
-- total_amount
-- discount_amount
-- final_amount
-- promo_code
-- status
-- payment_method
-- payment_url
-- midtrans_order_id
-- midtrans_transaction_id
-- paid_at
-
-**Relasi**
-- Many to One dengan Entitas User (Selembar cetakan transaksi pesanan Order ditagihkan otorisasi pembayarannya berpusat pada satu kredensial pembeli User.)
-- One to Many dengan Entitas OrderItem (Selembar kwitansi statis cetak Order merinci sub-tagihan komprehensif atas puluhan unit belanja digital pada model OrderItem yang mengikutinya.)
-
----
-
-## Entitas: OrderItem
-
-**Atribut**
-- id
-- order_id
-- item_type
-- item_id
-- item_title
-- item_price
-- quantity
-- subtotal
-
-**Relasi**
-- Many to One dengan Entitas Order (Detail rincian belanja *snapshot* ini terlampir definitif ke dalam satu faktur induk Order yang menaunginya.)
-- Relasi Polymorphic (MorphTo) (Menautkan koneksi identitas sumber produk aslinya ke bermacam-macam rujukan entitas seperti Course, Webinar, ataupun Product sebagai rujukan riwayat rekam jejak (*tracer*) seandainya harga di masa depan mengalami modifikasi fluktuatif.)
-
----
-
-## Entitas: Article
-
-**Atribut**
-- id
-- category_id
-- author_id
-- title
-- slug
-- content
-- excerpt
-- featured_image_url
-- tags
-- view_count
-- reading_time
-- is_featured
-- is_published
-- published_at
-
-**Relasi**
-- Many to One dengan Entitas Category (Satu siaran majalah digital / post Article ini diklasifikasikan bernaung rimbun di bawah satu Category tipe artikel.)
-- Many to One dengan Entitas User (Seuntaian publikasi karya blog Article dikaitkan hak cipta penerbitannya diwakili *author_id* yang membelok ke basis tabel User (kredensial author/admin).)
-
----
-
-## Entitas: Testimonial
-
-**Atribut**
-- id
-- user_id
-- name
-- title
-- content
-- rating
-- photo_url
-- is_featured
-- is_approved
-
-**Relasi**
-- Many to One dengan Entitas User (Setiap ulasan testimoni platform Testimonial dapat ditautkan *optional* (jika *login*) ke identitas otentik pemberi rating ke entitas User.)
-
-<br><br>
-
-# ERD Untuk Subsistem Admin Panel (5 Entitas)
-
-Subsistem Admin Panel bertindak sebagai pusat kendali utama (*command center*) yang menyediakan pandangan menyeluruh (*helicopter view*) terhadap aktivitas yang terjadi di dalam platform Paudpedia. Ruang lingkup fungsional dari subsistem ini difokuskan pada pengawasan operasional tingkat tinggi, yang meliputi manajemen entitas pengguna global, konfigurasi variabel sistem aplikasi, validasi transaksi B2B untuk perpanjangan paket langganan institusi, serta moderasi keseluruhan aktivitas transaksi dan konten publik. Subsistem ini didesain khusus bagi administrator sistem dan tim pengelola internal aplikasi.
-
-[Diagram ERD Subsistem Admin Panel]
-
-Dalam kaitannya dengan arsitektur sistem secara menyeluruh, Subsistem Admin Panel berfungsi sebagai jembatan *shared entity* yang menghubungkan ekosistem SIAKAD dan ekosistem B2C. Entitas-entitas yang beroperasi pada subsistem ini memegang wewenang hierarkis tertinggi, memungkinkan pengelola untuk melakukan intervensi data secara lintas subsistem, seperti membekukan operasional *tenant* sekolah yang melanggar ketentuan, atau mencabut lisensi kelas dari transaksi yang bermasalah. Dengan demikian, subsistem ini menjamin terciptanya tata kelola platform yang aman, terkontrol, dan tetap patuh terhadap aturan bisnis yang telah ditetapkan.
-
-## Entitas: User (Shared Entity Utama)
-
-Entitas `User` merupakan jantung autentikasi bagi seluruh aplikasi. Data kredensial pengguna terpusat di sini untuk mencegah duplikasi akun. *Role* atau peran spesifik diurus secara dinamis via dependensi lain (seperti Spatie Role di level sistem atau SchoolMember di level institusi).
-
-**Atribut**
-- id
-- name
-- email
-- email_verified_at
-- password
-- phone
-- gender
-- date_of_birth
-- address
-- avatar_url
-- is_active
-
-**Relasi Ekstensif Global**
-- One to Many dengan Entitas SchoolMember (Seorang akun otentik tunggal User dimungkinkan mendaftar ke beraneka ragam peranan SchoolMember di bermacam-macam tenant institusi SIAKAD.)
-- One to One (Fungsional) dengan Entitas Teacher (Satu entitas global User dapat memiliki identitas kepegawaian sebagai Teacher di SIAKAD.)
-- One to One (Fungsional) dengan Entitas ParentProfile (Satu entitas global User dapat diwariskan ke entitas kepengasuhan untuk memonitor perkembangan anak lewat ParentProfile SIAKAD.)
-- One to Many dengan Entitas CourseEnrollment (Seorang pelanggan User berkesempatan mengikuti dan melisensikan kapabilitas belajarnya pada banyak produk akademi interaktif di ekosistem CourseEnrollment B2C.)
-- One to Many dengan Entitas Order (Seorang pelanggan User memiliki deretan *history* panjang kwitansi checkout *gateway* transaksi Order pada sistem Marketplace e-commerce.)
-- One to Many dengan Entitas Article (Seorang jurnalis staf kredensial User berwewenang menayangkan ratusan terbitan portofolio siaran Article berita.)
-- One to Many dengan Entitas Testimonial (Seorang publik kredensial User meninggalkan rekam jejak tanggapan ulasan murni pada sistem Testimonial CMS.)
-- Relasi Polymorphic Many to Many dengan Entitas Role & Permission dari paket Spatie RBAC (Mengatur struktur delegasi matriks sistem otorisasi Administrator, Editor, hingga Guest).
-
----
-
-## Entitas: SiteSetting
-
-**Atribut**
-- id
-- key
-- value
-- type
-- description
-
-**Relasi**
-- (Entitas Standalone / Tidak memiliki relasi spesifik) Entitas mandiri berbasis *Key-Value Pair* (*Dictionary*) yang bertindak sebagai *environment* tempat Admin Panel menyetel dan menghidup-matikan parameter global (contoh: konfigurasi kontak global, batasan notifikasi aplikasi, tautan jejaring sosial, dan syarat regulasi term & condition platform).
-
----
-
-## Entitas: SubscriptionOrder
-
-Entitas ini mengelola proses B2B (Business-to-Business) di mana Headmaster sebuah tenant sekolah melakukan perpanjangan paket berlangganan dari level "Free" menjadi tier "Pro". Admin platform mengendalikan perputaran profit pada area entitas pengawasan transaksi berlangganan ini.
-
-**Atribut**
-- id
-- school_id
-- amount
-- status
-- midtrans_order_id
-- midtrans_transaction_id
-- snap_token
-- payment_method
-- duration_months
-- paid_at
-- expired_at
-
-**Relasi**
-- Many to One dengan Entitas School (Setiap tagihan B2B perpanjangan kapasitas *software-as-a-service* ini merepresentasikan identitas tagih yang berafiliasi tunggal menuju rujukan satu institusi bernaung yakni School.)
-
----
-
-## Entitas: Order (Shared Entity B2C)
-
-*Catatan: Entitas ini sama seperti Order yang ada di Subsistem B2C.*
-Di lingkungan Admin Panel, administrator memiliki kemampuan supervisi komprehensif menginspeksi tabel kwitansi global, memvalidasi dan mencabut paksa lisensi dari *checkout* yang menyalahi kaidah regulasi.
-
----
-
-## Entitas: School (Shared Entity SIAKAD)
-
-*Catatan: Entitas ini adalah kerangka awal yang sama dengan Subsistem SIAKAD.*
-Namun, dari kacamata Admin Panel (Superadmin Platform), tabel global `School` (tenant) sepenuhnya berada di telapak tangannya untuk dibekukan status operasionalnya jika terlambat melaksanakan *renewal* tenggat batas waktu perpanjangan atau melanggar terms of service platform. 
+# 3. ERD Untuk Subsistem Admin Panel (8 Entitas Inti untuk Diagram 3)
+
+Subsistem Admin Panel merupakan pusat pengawasan infrastruktur tingkat peladen (*Admin*) sekaligus dasbor editorial konten (*Moderator Panel*) yang dibangun menggunakan ekosistem Laravel Filament. 
+
+Guna mempersingkat pengerjaan **Diagram ERD ke-3 (ERD Admin Panel)** dan menghindari duplikasi visual dengan Diagram 2, diagram ini difokuskan pada **8 Entitas Inti Pengawasan dan Kendali Back-Office** (Manajemen Tenant, Verifikasi Keuangan, Pengaturan Situs, Kampanye Marketing, dan Moderasi Konten). Entitas katalog pembelajaran seperti `Course`, `Module`, `Lesson`, `Quiz`, dan `Webinar` yang telah digambarkan secara detail pada Diagram 2 tidak perlu digambar ulang di Diagram 3.
+
+### Tabel Rangkuman Entitas dan Relasi Subsistem Admin Panel (Versi Ringkas - 8 Entitas)
+Tabel berikut merangkum 8 entitas inti yang cukup Anda gambarkan dalam Diagram ERD Admin Panel beserta fungsi kendali (*back-office*) dan penjabaran relasinya:
+
+| No | Nama Entitas | Fungsi / Deskripsi Singkat di Admin Panel | Rincian Relasi di Admin Panel & Penjelasannya |
+| :---: | :--- | :--- | :--- |
+| 1 | **`SiteSetting`** | Konfigurasi universal situs (*Key-Value*: Logo, Kontak WA, & SEO). | • **Mandiri (*Standalone / Key-Value Store*)**: Entitas ini tidak memiliki relasi Foreign Key ke tabel manapun, melainkan bertindak sebagai penyedia variabel konfigurasi universal yang disunting secara *real-time* oleh Admin. |
+| 2 | **`User`** | Manajemen akun global, penentuan peran (*Admin, Moderator, User*), dan pembekuan akun. | • **One-to-Many dengan `Order`**: Admin melacak riwayat transaksi pembelian produk dari setiap pengguna terdaftar.<br>• **One-to-Many dengan `SubscriptionOrder`**: Admin melacak riwayat pemesanan paket langganan sekolah dari setiap pengguna.<br>• **One-to-Many dengan `Article`**: Moderator mengelola kepemilikan dan penayangan artikel blog yang ditulis oleh pengguna.<br>• **One-to-Many dengan `Testimonial`**: Moderator mengelola kepemilikan dan kurasi ulasan kepuasan dari setiap pengguna. |
+| 3 | **`School`** | Inspeksi *tenant*, pengawasan limit siswa paket *Free*, dan intervensi masa aktif Pro. | • **One-to-Many dengan `SubscriptionOrder`**: Admin memantau riwayat perpanjangan paket dan dapat melakukan perpanjangan masa aktif langganan sekolah secara manual (*bypass*). |
+| 4 | **`SubscriptionOrder`** | Verifikasi, pengawasan, dan konfirmasi manual pembayaran langganan B2B sekolah. | • **Many-to-One dengan `School`**: Admin memverifikasi bukti bayar dan mengesahkan status langganan *Pro* dari institusi sekolah.<br>• **Many-to-One dengan `User`**: Mencantumkan akun pengguna (Kepala Sekolah/Operator) yang melakukan pemesanan langganan. |
+| 5 | **`Order`** | Agregasi laporan penjualan, analitik omset B2C, dan manajemen status pesanan pelanggan. | • **Many-to-One dengan `User`**: Admin memantau grafik pendapatan platform dan mengelola status pembayaran pesanan pelanggan. |
+| 6 | **`PromoCode`** | Pembuatan kupon diskon, penetapan batas kuota pakai, minimal belanja, dan masa berlaku oleh Admin/Moderator. | • **Relasi String-Matching dengan `Order`**: Admin/Moderator menerbitkan kupon diskon yang dicocokkan via kolom string `code` ke kolom `promo_code` pada faktur pesanan. |
+| 7 | **`Testimonial`** | Kurasi ulasan kepuasan pelanggan, moderasi konten, dan persetujuan penayangan di beranda oleh Moderator. | • **Many-to-One dengan `User`**: Moderator menyeleksi ulasan terbaik dari pengguna untuk ditampilkan sebagai testimoni unggulan (*is_featured*). |
+| 8 | **`Article`** | Redaksi penulisan artikel blog edukasi, *tags*, gambar sampul, dan status penayangan oleh Moderator. | • **Many-to-One dengan `User`**: Moderator menulis dan mempublikasikan artikel edukasi untuk meningkatkan SEO situs. |
