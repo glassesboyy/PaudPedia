@@ -1,23 +1,11 @@
 4.4	Implementasi Manajemen Keuangan: SPP dan Tabungan
-Implementasi modul manajemen keuangan sekolah dibangun berlandaskan prinsip sentralisasi log transaksi. Semua bentuk pencatatan arus masuk dan keluar dana, baik itu berupa pembayaran Sumbangan Pembinaan Pendidikan (SPP) bulanan maupun penyetoran/penarikan tabungan siswa, diintegrasikan ke dalam satu tabel tunggal. Arsitektur ini memudahkan sistem pemrograman inti untuk merangkum arus kas harian tanpa perlu menelusuri banyak tabel yang berbeda. Setiap catatan keuangan secara langsung akan dikaitkan dengan profil siswa pelaksana transaksi serta petugas sekolah yang memvalidasinya.
+Implementasi modul manajemen keuangan sekolah dibangun berlandaskan prinsip sentralisasi log transaksi dan berfungsi murni sebagai buku besar pencatatan administratif (*Ledger/Log*). Semua bentuk pencatatan arus masuk dan keluar dana, baik itu berupa pembayaran Sumbangan Pembinaan Pendidikan (SPP) bulanan maupun penyetoran/penarikan tabungan siswa, diintegrasikan ke dalam satu tabel tunggal. Arsitektur ini memudahkan sistem pemrograman inti untuk merangkum arus kas harian tanpa perlu menelusuri banyak tabel yang berbeda. Sesuai batasan sistem, pembayaran riil dilakukan secara konvensional di luar sistem, kemudian disahkan statusnya ke dalam sistem oleh **Operator Sekolah** atau **Guru Wali Kelas** yang berwenang.
 
-4.4.1	Tampilan Antarmuka
-Tampilan yang berkaitan dengan fitur ini meliputi:
-
-- Screenshot Halaman Ringkasan Keuangan/Overview (/finances)
-  Penjelasan: Merupakan layar utama pusat kendali uang masuk institusi. Antarmuka dasbor ini menyuguhkan ruang pandang luas berupa kumpulan infografis, statistik akumulasi pendapatan SPP bulanan, serta total saldo agregat tabungan murid. Kehadiran antarmuka ringkas ini ditujukan agar Kepala Sekolah dan staf bendahara dapat meninjau kesehatan finansial sekolah secara menyeluruh dalam satu lirikan mata, mendeteksi bulan dengan tingkat penunggakan tertinggi, dan membuat keputusan manajerial dengan cepat.
-
-- Screenshot Halaman Manajemen Pembayaran SPP (/finances/spp)
-  Penjelasan: Halaman khusus yang murni dirancang untuk mencatat log aktivitas pelunasan iuran wajib bulanan sekolah. Tampilannya berwujud tabel transaksi interaktif yang memisahkan baris nama tagihan siswa yang masih tertunggak (*Unpaid*) dan mana yang sudah dikonfirmasi lunas (*Paid*). Fitur andalan pada laman ini adalah kemampuannya menampung catatan metode pembayaran (tunai/transfer) dan kemampuan mencetak kuitansi pembayaran SPP otomatis secara instan sesaat setelah status diubah.
-
-- Screenshot Halaman Manajemen Saldo Tabungan (/finances/savings)
-  Penjelasan: Antarmuka yang difungsikan layaknya pembukuan buku tabungan bank mini di dalam ruang lingkup sekolah. Staf guru dapat memasukkan histori uang masuk (setoran debit) maupun uang keluar (penarikan kredit) anak secara terperinci dengan merujuk pada nama siswa terkait. Antarmuka ini sangat mementingkan akurasi angka, sehingga input nominal dilengkapi dengan pemformatan titik ribuan otomatis (*auto-format*) guna menghindari kesalahan ketik input uang oleh staf tata usaha.
-
-- Screenshot Halaman Riwayat Keuangan Siswa (di dalam /students/:id)
-  Penjelasan: Tampilan antarmuka sekunder yang dibenamkan (*embedded*) menjadi satu bagian di dalam lembaran buku induk profil siswa. Tabulasi ini memperlihatkan daftar buku besar yang menyortir log transaksi spesifik hanya milik satu anak tersebut secara historis. Fasilitas ini sangat berguna untuk mempermudah staf sekolah melakukan penelusuran rekam jejak audit (*audit trail*) apabila di kemudian hari terjadi perselisihan atau klaim selisih pembayaran dari pihak wali murid.
-
-- Screenshot Dasbor Pantauan Keuangan Orang Tua (di dalam /children/:id)
-  Penjelasan: Bagian dari aplikasi sisi tamu (Wali murid) yang dirancang agar sangat transparan dan transaksional. Halaman dasbor ini memperlihatkan indikator saldo sisa tabungan sang anak terkini secara gamblang, serta menyuguhkan notifikasi peringatan visual bernuansa warna merah halus apabila ada tunggakan iuran SPP yang belum dibayar di bulan berjalan. Hal ini meningkatkan kesadaran pembayaran tanpa sekolah harus menyebarkan tagihan kertas secara manual.
+4.4.1	Tabel Inti Terkait pada Database
+Modul keuangan sekolah disokong oleh relasi antar entitas database berikut:
+1. `finances` : Tabel transaksional utama yang merekam setiap aktivitas aliran dana, mencakup atribut `type` (enum: SPP atau Tabungan), `transaction_type` (deposit atau withdrawal), `amount`, `month`, `is_paid`, `payment_method` (cash atau transfer), serta *foreign key* ke siswa (`student_id`) dan petugas penginput (`recorded_by`).
+2. `students` : Tabel referensi siswa yang menjadi subjek pemilik tagihan atau rekening tabungan sekolah.
+3. `classes` : Tabel referensi kelas rombel untuk memfasilitasi filter tagihan massal (*batch billing*) oleh Operator atau Guru.
 
 4.4.2	Implementasi Kode Utama
 Berikut adalah struktur dasar logika pelacakan rekam keuangan dan pemformatan data tampilannya:
@@ -80,26 +68,31 @@ File Code: `app/Models/Finance.php` (Line 86 – 105)
 ```
 **Penjelasan:** Blok fungsi pelengkap ini diciptakan guna mempermudah pemrograman di sisi antarmuka halaman pengguna. Tiga fungsi pertama bertugas menguji secara matematis apakah baris transaksi yang ditarik berjenis SPP, Tabungan, atau sudah dilunasi. Sementara itu, fungsi pembantu `getFormattedAmountAttribute()` secara proaktif memformat angka riil mata uang dari tabel basis data (contoh: 500000) agar seketika berubah menjadi teks mata uang Rupiah standar yang rapi (contoh: Rp 500.000) secara otomatis sebelum diteruskan ke halaman web.
 
-4.5	Implementasi Marketplace dan Manajemen Transaksi
-Untuk mendukung lini bisnis edukasi institusi, modul *Marketplace* diimplementasikan untuk menangani proses komersial B2C (Business to Consumer). Penerapannya mencakup kalkulasi penyusunan tagihan keranjang belanja, penerapan potongan harga dari kode promo (*Voucher*), hingga manajemen penerbitan nomor faktur pemesanan secara unik. Selain itu, berhubung barang yang diperjualbelikan bervariasi jenisnya (Kursus Mandiri, Webinar Langsung, atau Produk Fisik), struktur pemrogramannya menggunakan arsitektur relasi yang sangat dinamis dan fleksibel sehingga tidak terkunci pada satu tabel produk tunggal saja.
-
-4.5.1	Tampilan Antarmuka
+4.4.3	Tampilan Antarmuka
 Tampilan yang berkaitan dengan fitur ini meliputi:
 
-- Screenshot Katalog Produk, Webinar, dan Kursus (/products, /webinars, /courses)
-  Penjelasan: Bertindak layaknya etalase muka (*storefront*) toko digital, halaman ini menghidangkan hamparan kartu-kartu visual berjejer (*grid cards*) yang menjajakan beraneka penawaran edukasi *B2C* kepada publik. Tampilannya dirancang sangat persuasif dan kekinian, turut memajang fitur emblem potongan diskon berupa angka coret (harga asli disilang merah berdampingan dengan harga promo) guna memancing aspek psikologis *Fear Of Missing Out* (FOMO) dan ketertarikan kilat dari calon pembeli.
+- Screenshot Halaman Ringkasan Keuangan/Overview (/finances)
+  Penjelasan: Merupakan layar utama pusat kendali uang masuk institusi. Antarmuka dasbor ini menyuguhkan ruang pandang luas berupa kumpulan infografis, statistik akumulasi pendapatan SPP bulanan, serta total saldo agregat tabungan murid. Kehadiran antarmuka ringkas ini ditujukan agar Kepala Sekolah dan Operator dapat meninjau kesehatan finansial sekolah secara menyeluruh dalam satu lirikan mata.
 
-- Screenshot Detail Item Katalog (/[category]/[slug])
-  Penjelasan: Laman pendaratan (*landing page*) per rincian produk yang menjabarkan deskripsi spesifikasi barang dagangan secara memanjang. Jika produk tersebut berupa kursus edukasi berseri, maka antarmukanya akan menyorot rincian detail daftar isi kurikulum silabus secara transparan dan memaparkan biografi pengajarnya. Di pojok kanan, layar ini secara persisten akan menampilkan kotak stiker harga yang dilengkapi dengan *Call To Action* tombol utama berukuran besar bertuliskan "Beli Sekarang/Add to Cart".
+- Screenshot Halaman Manajemen Pembayaran SPP (/finances/spp)
+  Penjelasan: Halaman khusus yang dikelola oleh Operator dan Guru untuk mencatat log aktivitas pelunasan iuran wajib bulanan sekolah. Tampilannya berwujud tabel transaksi interaktif yang memisahkan baris nama tagihan siswa yang masih tertunggak (*Unpaid*) dan mana yang sudah dikonfirmasi lunas (*Paid*). Dilengkapi fasilitas pembuatan tagihan massal (*batch*) per rombel dan pencetakan bukti kuitansi.
 
-- Screenshot Halaman Keranjang Belanja (/cart)
-  Penjelasan: Tempat persinggahan area penampungan barang digital sesaat yang hendak dipesan. Desainnya amat sangat interaktif tanpa harus memuat ulang laman (*AJAX-based*), memungkinkan pengunjung memanipulasi rentetan jumlah kuantitas produk, mencoret produk tersebut, atau melihat akumulasi penambahan subtotal angka secara seketika (*real-time*) sebelum mereka mantap melangkah masuk ke tahapan proses hitungan kasir.
+- Screenshot Halaman Manajemen Saldo Tabungan (/finances/savings)
+  Penjelasan: Antarmuka yang difungsikan layaknya pembukuan buku tabungan bank mini di dalam ruang lingkup sekolah. Operator atau Guru dapat memasukkan histori uang masuk (setoran debit) maupun uang keluar (penarikan kredit) anak secara terperinci dengan validasi saldo real-time agar penarikan tidak melebihi sisa tabungan.
 
-- Screenshot Halaman Checkout & Pembayaran (/checkout)
-  Penjelasan: Laman pengunci kalkulasi keranjang sekaligus penagihan akhir sebelum pembayaran disahkan. Pada antarmuka pelunasan inilah pengunjung disajikan kolom validasi dinamis untuk menyuntikkan kode promo (kupon diskon). Begitu pengunjung menekan tombol sepakat, *script* di balik layar seketika memicu kemunculan gerbang pembayaran pihak ketiga (*Payment Gateway Midtrans Snap*) yang melayang di atas layar dalam bentuk *pop-up iframe* canggih, mendukung pelunasan via Virtual Account, QRIS, hingga e-Wallet.
+- Screenshot Dasbor Pantauan Keuangan Orang Tua (di dalam /children/:id)
+  Penjelasan: Bagian dari aplikasi sisi wali murid yang dirancang transparan. Halaman dasbor ini memperlihatkan indikator saldo sisa tabungan sang anak terkini secara gamblang, serta menyuguhkan notifikasi visual apabila ada tunggakan iuran SPP yang belum dibayar di bulan berjalan.
 
-- Screenshot Halaman Kelola Pesanan dan Produk yang Dibeli (/account/orders, /account/products)
-  Penjelasan: Ruang dasbor akun privat eksklusif bagi para konsumen (*B2C*) setelah mereka sukses merampungkan transaksi *checkout*. Halaman historis ini tidak hanya sekadar mendaftarkan riwayat lembar faktur pesanan (Invoice) bulanan sebagai bukti bayar, namun sekaligus menyajikan pustaka tombol pintas (*shortcuts*) yang langsung menuntun pengguna menuju ruang kelas atau rak perpustakaan digital dari aset materi yang sudah berhasil mereka miliki secara legal.
+4.5	Implementasi Marketplace dan Manajemen Transaksi
+Untuk mendukung lini bisnis edukasi institusi, modul *Marketplace* diimplementasikan untuk menangani proses komersial B2C (Business to Consumer). Penerapannya mencakup kalkulasi penyusunan tagihan keranjang belanja, penerapan potongan harga dari kode promo (*Voucher*), hingga manajemen penerbitan nomor faktur pemesanan secara unik. Berhubung barang yang diperjualbelikan bervariasi jenisnya (Kursus Mandiri, Webinar Langsung, atau Produk Digital), struktur pemrogramannya menggunakan arsitektur relasi yang sangat dinamis dan fleksibel (*Polymorphic Relations*) sehingga tidak terkunci pada satu tabel produk tunggal saja.
+
+4.5.1	Tabel Inti Terkait pada Database
+Proses perniagaan digital B2C melibatkan entitas-entitas transaksional berikut:
+1. `orders` : Tabel utama transaksi pembelian yang mencatat nomor faktur unik (`order_number`), total belanja, potongan diskon, total akhir, status pembayaran Midtrans, serta *foreign key* pembeli (`user_id`).
+2. `order_items` : Tabel rincian barang yang dibeli di dalam suatu pesanan. Menggunakan skema relasi polimorfik (`item_type` dan `item_id`) untuk menautkan baris pesanan ke tabel `courses`, `webinars`, atau `products`.
+3. `carts` & `cart_items` : Tabel penampungan sementara keranjang belanja aktif milik pengguna sebelum masuk ke tahap *checkout*.
+4. `promo_codes` : Tabel katalog kupon diskon (potongan persentase atau nominal tetap) yang dapat disuntikkan pada proses validasi pembayaran.
+5. `products`, `webinars`, `courses` : Tabel-tabel katalog produk komersial yang menjadi target item perdagangan.
 
 4.5.2	Implementasi Kode Utama
 Landasan perumusan pesanan dan keranjang digital disusun menggunakan baris instruksi berikut:
@@ -144,28 +137,36 @@ File Code: `app/Models/OrderItem.php` (Line 38 – 41)
         return $this->morphTo('item', 'item_type', 'item_id');
     }
 ```
-**Penjelasan:** Deklarasi di atas adalah inti dari kecanggihan relasi tabel fleksibel (*Polymorphic Relations*) dalam merajut rincian keranjang belanja. Melalui fungsi bawaan `morphTo()`, satu tabel rincian pemesanan (*Order Item*) mampu menyimpan tautan secara bebas ke banyak tabel produk lainnya, terlepas dari apakah barang yang di-klik pengguna berasal dari tabel produk fisik, tabel acara webinar, maupun tabel kursus edukasi daring.
+**Penjelasan:** Deklarasi di atas adalah inti dari kecanggihan relasi tabel fleksibel (*Polymorphic Relations*) dalam merajut rincian keranjang belanja. Melalui fungsi bawaan `morphTo()`, satu tabel rincian pemesanan (*Order Item*) mampu menyimpan tautan secara bebas ke banyak tabel produk lainnya, terlepas dari apakah barang yang di-klik pengguna berasal dari tabel produk fisik/digital, tabel acara webinar, maupun tabel kursus edukasi daring.
+
+4.5.3	Tampilan Antarmuka
+Tampilan yang berkaitan dengan fitur ini meliputi:
+
+- Screenshot Katalog Produk, Webinar, dan Kursus (/products, /webinars, /courses)
+  Penjelasan: Bertindak layaknya etalase muka (*storefront*) toko digital, halaman ini menghidangkan hamparan kartu-kartu visual berjejer (*grid cards*) yang menjajakan beraneka penawaran edukasi *B2C* kepada publik. Tampilannya dirancang interaktif dan dilengkapi fitur emblem potongan diskon berupa angka coret (harga asli disilang berdampingan dengan harga promo).
+
+- Screenshot Detail Item Katalog (/[category]/[slug])
+  Penjelasan: Laman pendaratan (*landing page*) per rincian produk yang menjabarkan deskripsi spesifikasi barang dagangan secara memanjang. Jika produk tersebut berupa kursus edukasi berseri, maka antarmukanya akan menyorot rincian detail daftar isi kurikulum silabus secara transparan dan memaparkan biografi pengajarnya.
+
+- Screenshot Halaman Keranjang Belanja (/cart)
+  Penjelasan: Tempat persinggahan area penampungan barang digital sesaat yang hendak dipesan. Desainnya amat interaktif tanpa harus memuat ulang laman (*AJAX-based*), memungkinkan pengunjung memanipulasi rentetan jumlah kuantitas produk atau menghapusnya sebelum melangkah ke tahapan kasir.
+
+- Screenshot Halaman Checkout & Pembayaran (/checkout)
+  Penjelasan: Laman pengunci kalkulasi keranjang sekaligus penagihan akhir sebelum pembayaran disahkan. Pada antarmuka pelunasan inilah pengunjung disajikan kolom validasi dinamis untuk menyuntikkan kode promo. Begitu pengguna menekan tombol sepakat, *script* di balik layar seketika memicu kemunculan gerbang pembayaran pihak ketiga (*Payment Gateway Midtrans Snap*) dalam bentuk *pop-up iframe*.
+
+- Screenshot Halaman Kelola Pesanan dan Produk yang Dibeli (/account/orders, /account/products)
+  Penjelasan: Ruang dasbor akun privat eksklusif bagi para konsumen (B2C) setelah mereka sukses merampungkan transaksi checkout. Halaman manampilkan informasi Produk / Webinar / Kursus yang sudah dibeli atau didaftar oleh pengguna.
 
 4.6	Implementasi Learning Management System dan Sertifikasi
 Pembangunan ruang edukasi terpadu atau *Learning Management System* (LMS) memerlukan susunan fungsi pemantauan yang berlapis-lapis. Modul implementasi di sini tidak hanya memetakan silabus secara hierarkis (dari materi video hingga ujian interaktif), tetapi juga difokuskan pada mesin pelacakan kemajuan (*Progress Tracker*). Fitur andalan yang ditanamkan adalah kalkulasi algoritma ketat yang mewajibkan seluruh materi video telah disaksikan dan ujian telah dilalui dengan standar kelulusan, barulah pada akhirnya sistem dapat menerbitkan sertifikat pencapaian otomatis secara utuh.
 
-4.6.1	Tampilan Antarmuka
-Tampilan yang berkaitan dengan fitur ini meliputi:
-
-- Screenshot Halaman Induk Pembelajaran Kursus (/account/courses)
-  Penjelasan: Antarmuka yang menampilkan daftar kelas atau kursus yang telah dibeli pengguna. Tampilannya dilengkapi indikator *progress bar* untuk menunjukkan persentase penyelesaian materi.
-
-- Screenshot Antarmuka LMS (/learn/[courseSlug])
-  Penjelasan: Halaman utama pembelajaran video/PDF. Tampilannya dibagi dua, yaitu layar pemutar media utama di bagian tengah dan bilah samping (*sidebar*) untuk navigasi daftar materi silabus.
-
-- Screenshot Formulir Kuis (Di dalam komponen /learn/[courseSlug])
-  Penjelasan: Halaman evaluasi berisi soal pilihan ganda di akhir bab. Sistem akan langsung mengalkulasi skor kelulusan secara otomatis saat formulir dikumpulkan.
-
-- Screenshot Halaman Direktori Sertifikat (/account/certificates)
-  Penjelasan: Halaman yang mendaftarkan seluruh sertifikat digital dari kursus yang telah diselesaikan 100%. Dilengkapi dengan tombol untuk mengunduh dokumen PDF.
-
-- Screenshot Panel Manajemen Konten Kursus (Berada pada Panel Admin/Filament)
-  Penjelasan: Panel khusus untuk admin atau moderator untuk memanajemen konten kursus seperti silabus, video, menyusun urutan materi, dan membuat kuis interaktif per kursus.
+4.6.1	Tabel Inti Terkait pada Database
+Aktivitas pembelajaran daring asinkron dicatat dan diolah dalam tabel-tabel berikut:
+1. `course_enrollments` : Tabel kepemilikan lisensi kursus oleh pengguna yang merekam persentase kemajuan (`progress_percentage`), status kelulusan, tanggal tamat (`completed_at`), serta tautan berkas sertifikat (`certificate_url`).
+2. `lesson_progress` : Tabel log rekam jejak yang mencatat status penyelesaian per satu materi pelajaran video/PDF oleh seorang pengguna (`is_completed`).
+3. `quiz_attempts` : Tabel log riwayat percobaan ujian kuis yang mencatat skor persentase kelulusan (`score`) dan status lulus/gagal (`is_passed`).
+4. `quizzes`, `quiz_questions`, `quiz_answers` : Tabel-tabel relasional yang menyusun instrumen evaluasi pilihan ganda pada setiap modul kursus.
+5. `courses`, `modules`, `lessons` : Tabel-tabel hierarki silabus kurikulum pembelajaran.
 
 4.6.2	Implementasi Kode Utama
 Mesin algoritma di belakang layar pemantauan pembelajaran beroperasi dengan urutan validasi sebagai berikut:
@@ -244,26 +245,34 @@ File Code: `app/Models/CourseEnrollment.php` (Line 115 – 132)
 ```
 **Penjelasan:** Pada tahap penghujung penelusuran silabus, blok pemrograman penutup ini secara reaktif mengambil alih perintah bilamana parameter kelulusan tercapai namun sistem melihat kolom unduhan sertifikat masih kosong. Kode tersebut akan membangunkan servis peladen eksternal pencetak dokumen (`CertificateGeneratorService`) guna menaruh nama dan nilai siswa ke dalam sebuah berkas desain lembaran cetak PDF. Usai dicetak di balik layar, tautan dokumennya akan dikaitkan pada pangkalan data profil peserta agar siap diunduh sewaktu-waktu.
 
+4.6.3	Tampilan Antarmuka
+Tampilan yang berkaitan dengan fitur ini meliputi:
+
+- Screenshot Halaman Induk Pembelajaran Kursus (/account/courses)
+  Penjelasan: Antarmuka yang menampilkan daftar kelas atau kursus yang telah dibeli pengguna. Tampilannya dilengkapi indikator *progress bar* untuk menunjukkan persentase penyelesaian materi.
+
+- Screenshot Antarmuka LMS (/learn/[courseSlug])
+  Penjelasan: Halaman utama pembelajaran video/PDF. Tampilannya dibagi dua, yaitu layar pemutar media utama di bagian tengah dan bilah samping (*sidebar*) untuk navigasi daftar materi silabus.
+
+- Screenshot Formulir Kuis (Di dalam komponen /learn/[courseSlug])
+  Penjelasan: Halaman evaluasi berisi soal pilihan ganda di akhir bab. Sistem akan langsung mengalkulasi skor kelulusan secara otomatis saat formulir dikumpulkan.
+
+- Screenshot Halaman Direktori Sertifikat (/account/certificates)
+  Penjelasan: Halaman yang mendaftarkan seluruh sertifikat digital dari kursus yang telah diselesaikan 100%. Dilengkapi dengan tombol untuk mengunduh dokumen PDF resmi.
+
+- Screenshot Panel Manajemen Konten Kursus (Berada pada Panel Admin/Filament)
+  Penjelasan: Panel khusus bagi Admin atau Moderator untuk memanajemen konten kursus seperti silabus, video, menyusun urutan materi, dan membuat kuis interaktif per kursus.
+
 4.7	Implementasi Portal Informasi dan Konten Statis
 Platform juga dilengkapi dengan modul operasional portal publik yang mengelola penyajian wacana dan konfigurasi dasar laman pengunjung. Implementasi pada pengolahan artikel (*blog*) ditekankan pada penyajian fitur otomatisasi perkiraan masa waktu membaca konten serta strategi menekan konsumsi kecepatan pengolahan data tatkala memuat daftar pencarian konten web. Lebih jauh, pengelolaan konfigurasi fundamental keseluruhan arsitektur web juga dirancang terpusat lewat satu jembatan tabel independen yang mengatur injeksi jenis nilai konfigurasi global (berformat struktur teks JSON).
 
-4.7.1	Tampilan Antarmuka
-Tampilan yang berkaitan dengan fitur ini meliputi:
-
-- Screenshot Halaman Utama atau Landing Page (/)
-  Penjelasan: Halaman beranda utama situs yang difokuskan untuk pemasaran (*marketing*). Dilengkapi dengan elemen karousel interaktif, tombol *Call to Action*, dan testimoni pengguna.
-
-- Screenshot Halaman Artikel & Edukasi (/articles)
-  Penjelasan: Halaman *blog* untuk menampilkan artikel edukasi. Menggunakan tampilan kartu *grid* dengan kategorisasi materi dan estimasi waktu baca untuk pengguna.
-
-- Screenshot Halaman Direktori Profil Mentor (/mentors)
-  Penjelasan: Halaman direktori yang menampilkan profil dan spesialisasi para pengajar. Halaman ini juga menghubungkan profil mentor dengan kursus yang mereka ajar.
-
-- Screenshot Halaman Tanya Jawab atau FAQ (/faq)
-  Penjelasan: Laman statis yang memuat panduan dan jawaban dari pertanyaan umum pelanggan. Menggunakan gaya desain *accordion* (tutup-buka) untuk menghemat ruang tampilan layar.
-
-- Screenshot Halaman Kontak & Bantuan (/contact)
-  Penjelasan: Antarmuka yang menyediakan formulir kontak, alamat operasional, surel, tautan media sosial, serta peta lokasi integrasi dari Google Maps.
+4.7.1	Tabel Inti Terkait pada Database
+Penyajian konten statis dan literasi edukasi publik diatur melalui entitas berikut:
+1. `articles` : Tabel katalog blog dan berita edukasi yang menyimpan judul, *slug*, konten *rich text*, cuplikan (*excerpt*), penulis, kategori, tag, waktu publikasi, serta atribut komputasi durasi waktu baca (`reading_time`).
+2. `mentors` : Tabel direktori instruktur atau narasumber yang mengajar pada webinar maupun kursus daring platform.
+3. `testimonials` : Tabel ulasan kepuasan pengguna yang telah divalidasi dan disetujui untuk ditampilkan pada beranda situs.
+4. `categories` : Tabel taksonomi yang mengelompokkan artikel, webinar, kursus, maupun produk digital.
+5. `site_settings` : Tabel *key-value store* universal yang merekam parameter konfigurasi publik situs (logo, kontak layanan, teks footer, dan metadata SEO).
 
 4.7.2	Implementasi Kode Utama
 Teknik optimalisasi artikel berita serta penanganan sistem konfigurasi global dipaparkan pada blok kode di bawah ini:
@@ -347,3 +356,21 @@ File Code: `app/Models/SiteSetting.php` (Line 46 – 64)
     }
 ```
 **Penjelasan:** Mengingat konfigurasi website memiliki rentang bentuk yang sangat campur aduk (seperti susunan pengaturan bertipe bilangan bulat, angka pecahan, label aktif benar-salah, hingga struktur panjang terstruktur teks kustom), model perlu menseragamkannya. Fungsi pendukung di atas menjamin kepastian proses tersebut. Sebelum disimpan ke pangkalan data, variabel pengaturan yang kompleks dibungkus ke dalam rentetan karakter teks tunggal murni (`prepareValue`). Begitu data tersebut hendak dipanggil kembali menuju halaman web yang membutuhkannya, fungsi pembaca akan mengekstrak bungkusan teks tadi untuk merekonstruksinya utuh kembali ke bentuk format kerangka asalnya (`castValue`).
+
+4.7.3	Tampilan Antarmuka
+Tampilan yang berkaitan dengan fitur ini meliputi:
+
+- Screenshot Halaman Utama atau Landing Page (/)
+  Penjelasan: Halaman beranda utama situs yang difokuskan untuk pemasaran (*marketing*). Dilengkapi dengan elemen karousel interaktif, tombol *Call to Action*, dan testimoni pengguna.
+
+- Screenshot Halaman Artikel & Edukasi (/articles)
+  Penjelasan: Halaman *blog* untuk menampilkan artikel edukasi. Menggunakan tampilan kartu *grid* dengan kategorisasi materi dan estimasi waktu baca untuk pengguna.
+
+- Screenshot Halaman Direktori Profil Mentor (/mentors)
+  Penjelasan: Halaman direktori yang menampilkan profil dan spesialisasi para pengajar. Halaman ini juga menghubungkan profil mentor dengan kursus yang mereka ajar.
+
+- Screenshot Halaman Tanya Jawab atau FAQ (/faq)
+  Penjelasan: Laman statis yang memuat panduan dan jawaban dari pertanyaan umum pelanggan. Menggunakan gaya desain *accordion* (tutup-buka) untuk menghemat ruang tampilan layar.
+
+- Screenshot Halaman Kontak & Bantuan (/contact)
+  Penjelasan: Antarmuka yang menyediakan formulir kontak, alamat operasional, surel, tautan media sosial, serta peta lokasi integrasi dari Google Maps.

@@ -1,18 +1,16 @@
-# BAB 5 PENGUJIAN
+# BAB 5	PENGUJIAN
 
 ## 5.1 Metode Pengujian
 Pengujian sistem dilakukan untuk memastikan bahwa seluruh fitur, alur kerja, dan proses bisnis pada platform layanan *Software as a Service* (SaaS) PAUD ini dapat berjalan sesuai dengan spesifikasi rancangan arsitektur yang telah dibangun. Pengujian diimplementasikan pada fungsi-fungsi utama aplikasi, ketepatan pertukaran data antar-modul, serta keakuratan validasi aturan bisnis yang ditanamkan pada sistem manajemen akademik, tata kelola keuangan, *marketplace*, hingga *Learning Management System* (LMS).
 
-Metode pengujian yang digunakan dalam penelitian ini sepenuhnya dilakukan melalui pendekatan simulasi langsung pada antarmuka pengguna (*User Interface*), tanpa melakukan pengujian otomatis berbasis kode (*Automated Code Testing*). Oleh karena itu, metode yang paling representatif untuk digunakan adalah *Black Box Testing*, *End-to-End (E2E) Testing*, dan *Business Rule Validation Testing*. Ketiga metode ini saling melengkapi untuk memastikan bahwa fungsionalitas visual, alur integrasi antar-halaman, dan aturan logika bisnis dapat berjalan mulus saat dioperasikan secara nyata.
+Metode pengujian yang digunakan dalam penelitian ini sepenuhnya dilakukan melalui pendekatan **Pengujian Fungsional (*Functional Testing*)** berbasis simulasi langsung pada antarmuka pengguna (*User Interface*), tanpa melakukan pengujian otomatis berbasis kode (*Automated Code Testing*). Pengujian fungsional ini mengevaluasi sistem dari sudut pandang pengguna akhir (*end-user*) dengan memberikan berbagai variasi masukan (*input*) yang wajar maupun tidak wajar, kemudian mengamati respons keluaran (*output*), perubahan status data, dan pesan validasi sistem pada layar aplikasi.
 
-### 5.1.1 Black Box Testing (Pengujian Fungsional)
-*Black Box Testing* merupakan metode pengujian perangkat lunak yang berfokus pada fungsionalitas sistem tanpa perlu mengetahui struktur kode internal di baliknya. Dalam konteks penelitian ini, pengujian dilakukan dengan cara berinteraksi langsung dengan elemen-elemen antarmuka situs. Pengujian ini bertujuan untuk memastikan bahwa tombol navigasi, pengisian formulir data (seperti formulir pembuatan kursus atau penambahan siswa), serta respon visual dari sistem telah berjalan secara wajar dan tidak menghasilkan pesan galat (*error*) saat digunakan.
+Pengujian fungsional dalam penelitian ini mencakup tiga aspek evaluasi terpadu dalam satu tahapan pengujian yang komprehensif:
+1. **Validasi Interaksi Fitur Antarmuka:** Memeriksa apakah setiap tombol, navigasi, formulir pengisian data (seperti formulir pembuatan rombel, pengisian biodata siswa oleh Operator Sekolah, atau penilaian observasi oleh Guru), serta respons visual dari sistem telah beroperasi normal tanpa menghasilkan galat (*error*).
+2. **Validasi Alur Integrasi Lintas Modul:** Memeriksa sinkronisasi aliran data antar-halaman dari hulu ke hilir (*end-to-end*). Misalnya, menguji bagaimana pendaftaran ruang kerja (*tenant*) sekolah baru langsung membentuk isolasi data, bagaimana konfirmasi pelunasan transaksi *marketplace* otomatis membuka gembok kelas di LMS, atau bagaimana pencatatan tabungan oleh Operator langsung memperbarui saldo di dasbor Orang Tua.
+3. **Validasi Aturan Logika Bisnis (*Business Rule Validation*):** Memeriksa keandalan sistem dalam menolak tindakan pengguna yang melanggar ketentuan batas sistem atau logika institusi. Contohnya adalah penolakan penambahan siswa baru saat kuota langganan gratis (*Free*) sekolah telah habis, pencegahan input nilai diskon agar harga barang tidak menjadi negatif, serta pemblokiran pencetakan sertifikat jika progres materi LMS belum mencapai 100%.
 
-### 5.1.2 End-to-End Testing (Pengujian Alur Integrasi)
-Meskipun tidak menguji kode *backend* secara langsung, integrasi sistem tetap dievaluasi menggunakan metode *End-to-End Testing* (E2E). Pengujian E2E adalah proses pengujian perangkat lunak dari awal hingga akhir (*hulu ke hilir*) untuk memastikan bahwa aliran data antar berbagai antarmuka berjalan sinkron. Pada sistem ini, E2E dilakukan dengan menyimulasikan skenario perjalanan pengguna secara utuh, contohnya: menguji alur mulai dari seorang pengguna awam membuka katalog di halaman *landing page*, memasukkan kursus ke keranjang belanja, melakukan simulasi pembayaran, hingga akhirnya pengguna tersebut dapat mengakses modul video di ruang LMS.
-
-### 5.1.3 Business Rule Validation Testing
-*Business Rule Validation Testing* tetap relevan dan diterapkan melalui antarmuka, di mana pengujian difokuskan untuk mengevaluasi apakah sistem mampu menolak tindakan pengguna yang menyalahi aturan logika institusi. Pengujian ini dilaksanakan dengan menyuntikkan skenario ketidakwajaran saat pengisian formulir antarmuka untuk melihat apakah sistem memunculkan peringatan penolakan yang sesuai. Pada sistem PAUD ini, validasi yang diuji secara manual meliputi: percobaan menambahkan siswa saat kuota langganan gratis telah penuh, percobaan mencetak sertifikat saat progres kelas belum mencapai 100%, hingga percobaan menginput nilai diskon produk agar tidak menyebabkan harga akhir menjadi negatif.
+Dengan menyatukan ketiga aspek evaluasi di atas ke dalam metode **Pengujian Fungsional**, hasil pengujian dapat memberikan gambaran empiris yang nyata bahwa perangkat lunak yang dibangun telah matang, aman, dan siap dioperasikan pada ekosistem pendidikan anak usia dini sesungguhnya.
 
 ## 5.2 Lingkungan Pengujian
 Lingkungan pengujian merupakan kondisi ekosistem perangkat keras (*hardware*) dan perangkat lunak (*software*) terisolasi yang diatur sedemikian rupa untuk menjalankan, mengkompilasi, dan menguji aplikasi. Tahapan pengujian ini diinisialisasi sepenuhnya pada lingkungan lokal (*local development environment*) untuk memberikan ruang yang aman bagi pengembang guna melakukan eksperimen, mencari kutu program (*debugging*), dan memvalidasi keseluruhan kualitas aplikasi sebelum versi finalnya disalurkan (*deploy*) secara terbuka ke peladen produksi.
@@ -29,7 +27,18 @@ Perangkat keras yang dilibatkan dalam memfasilitasi proses penulisan kode sumber
 | Operating System | Windows 11 Home Single Language 64-bit |
 
 ### 5.2.2 Perangkat Lunak
-[Placeholder untuk tabel/daftar Perangkat Lunak - Harap isi secara manual]
+Perangkat lunak pendukung yang digunakan dalam membangun, menjalankan layanan peladen, dan mengeksekusi pengujian fungsional sistem disajikan pada tabel berikut:
+
+| Perangkat Lunak | Versi / Spesifikasi | Fungsi dan Kegunaan |
+| :--- | :--- | :--- |
+| **PHP / Laravel** | PHP 8.2 / Laravel 12 | Bahasa pemrograman dan *framework* utama untuk pengembangan *Backend API* dan *Admin Panel* (Filament). |
+| **Vue.js** | Vue.js versi 3 | *Framework JavaScript* untuk pengembangan antarmuka portal SIAKAD Sekolah. |
+| **Nuxt.js** | Nuxt.js versi 4 | *Framework Vue.js* untuk pengembangan antarmuka portal publik (*Marketplace* & LMS B2C). |
+| **MySQL / MariaDB** | MariaDB 10.10+ | Sistem manajemen basis data relasional (*RDBMS*) untuk penyimpan data *multi-tenant*. |
+| **Laragon** | Laragon Full / WAMP | Local server environment untuk memfasilitasi peladen web Apache/Nginx, PHP, dan MySQL. |
+| **Visual Studio Code** | Versi Terbaru | Code editor (*IDE*) utama untuk penulisan dan modifikasi baris kode sistem. |
+| **Git & GitHub** | Git 2.40+ | Sistem kontrol versi (*Version Control System*) dan manajemen repositori proyek. |
+| **Web Browser** | Google Chrome / Microsoft Edge | Peramban web untuk menjalankan tampilan antarmuka dan mengeksekusi pengujian fungsional UI. |
 
 ### 5.2.3 Environment Pengujian
 Pengujian operasional sistem dijalankan murni di atas lingkungan lokal (*local environment*). Arsitektur perancangan diatur dengan memisahkan area tugas antara layanan *backend* dan *frontend*. 
@@ -37,11 +46,11 @@ Pengujian operasional sistem dijalankan murni di atas lingkungan lokal (*local e
 Aplikasi antarmuka sisi publik dan manajemen sisi pengguna berjalan secara mandiri, sementara pangkalan peladen API utama menggunakan kerangka kerja Laravel (PHP) yang menjadi otak pemrosesan basis data terpusatnya. Komunikasi lintas layanan di antara kedua sisi ini dijembatani menggunakan standar pertukaran data *REST API*.
 
 ### 5.2.4 Material Pengujian
-Material pengujian merepresentasikan kerangka modul-modul sistem utama yang disorot dan diawasi kinerjanya selama fase pengujian berlangsung. Sesuai dengan spesifikasi arsitektur yang dirancang pada bab-bab sebelumnya, ruang lingkup pengujian dipadatkan ke dalam tiga pilar kelompok modul utama:
+Material pengujian merepresentasikan kerangka modul-modul sistem utama yang disorot dan diawasi kinerjanya selama fase pengujian berlangsung. Sesuai dengan spesifikasi arsitektur terkini yang telah diperbarui, ruang lingkup pengujian dipadatkan ke dalam tiga pilar kelompok modul utama:
 
-1. **Sistem Manajemen Akademik**: Meliputi pengujian alur pendaftaran *multi-school* (pembuatan *tenant*), penataan kelengkapan data induk siswa dan wali, hingga simulasi pemrosesan asesmen harian dan rekapitulasi rapor akhir PAUD.
-2. **E-Learning & Marketplace**: Meliputi serangkaian pengujian simulasi transaksi komersial kelas *online* publik, pengecekan pemutaran video materi di ruang *Learning Management System* (LMS), pengerjaan kuis, dan alur penerbitan dokumen kelulusan (sertifikasi).
-3. **Administrasi Portal & Super Admin**: Meliputi verifikasi modul pengaturan tata letak konten statis portal publik (laman artikel, FAQ), pembatasan delegasi hak akses kepemimpinan instansi, serta pemonitoran metrik global khusus bagi level hierarki *Super Admin*.
+1. **Sistem Manajemen Akademik & Keuangan SIAKAD**: Meliputi pengujian alur pendaftaran *multi-school* (pembuatan *tenant*), pengelolaan pembagian hak akses (khususnya peran **Operator Sekolah** dalam mengelola CRUD biodata siswa, kelas rombel, dan relasi wali murid), pencatatan keuangan SPP dan Tabungan sebagai buku besar administratif (*ledger*) oleh Operator dan Guru, hingga simulasi pemrosesan asesmen bulanan berfilter *Temporal Assessment Integrity* dan pencetakan rapor naratif berfitur *Smart Omission*.
+2. **E-Learning & Marketplace B2C**: Meliputi serangkaian pengujian simulasi transaksi komersial kelas *online* publik, pengecekan validasi kode promo diskon, pembukaan gembok otomatis kelas LMS setelah *checkout* berhasil, pemutaran video materi di ruang *Learning Management System* (LMS), pengerjaan kuis, dan alur penerbitan dokumen kelulusan (*e-certificate*) otomatis saat progres mencapai 100%.
+3. **Administrasi Portal & Super Admin**: Meliputi verifikasi modul pengaturan tata letak konten statis portal publik (laman artikel, FAQ), isolasi keamanan data *multi-tenant*, validasi pembatasan kuota registrasi siswa untuk paket *Free*, serta pemonitoran metrik global khusus bagi level hierarki *Super Admin*.
 
 Setiap gugusan komponen aplikasi di atas menjalani proses validasi operasional yang menyeluruh guna meminimalisasi potensi celah anomali komputasi (*bug*) yang sanggup mengganggu ketertiban rantai proses kegiatan para pengguna di dunia nyata.
 
