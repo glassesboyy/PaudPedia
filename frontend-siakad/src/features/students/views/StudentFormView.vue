@@ -75,7 +75,7 @@ const parentOptions = computed(() => {
 })
 
 const classOptions = computed(() => [
-  { value: '', label: 'Belum ditentukan' },
+  { value: '', label: 'Pilih kelas...' },
   ...classesList.value.map(c => ({ value: String(c.id), label: c.name })),
 ])
 

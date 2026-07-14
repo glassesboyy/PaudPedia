@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Enums\RoleType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SchoolMember extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'school_id',
@@ -37,32 +39,32 @@ class SchoolMember extends Model
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeByRole($query, RoleType $role)
+    public function scopeByRole(Builder $query, RoleType $role)
     {
         return $query->where('role_type', $role);
     }
 
-    public function scopeHeadmasters($query)
+    public function scopeHeadmasters(Builder $query)
     {
         return $query->where('role_type', RoleType::HEADMASTER);
     }
 
-    public function scopeOperators($query)
+    public function scopeOperators(Builder $query)
     {
         return $query->where('role_type', RoleType::OPERATOR);
     }
 
-    public function scopeTeachers($query)
+    public function scopeTeachers(Builder $query)
     {
         return $query->where('role_type', RoleType::TEACHER);
     }
 
-    public function scopeParents($query)
+    public function scopeParents(Builder $query)
     {
         return $query->where('role_type', RoleType::PARENT);
     }

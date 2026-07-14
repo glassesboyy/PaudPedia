@@ -22,6 +22,8 @@ const selectedSemester = ref<Semester>('1')
 
 const students = ref<any[]>([])
 const selectedStudentId = ref<number | null>(null)
+const selectedStudent = computed(() => students.value.find(s => s.id === selectedStudentId.value))
+const isStudentInactive = computed(() => selectedStudent.value?.status && selectedStudent.value.status !== 'active')
 
 const programs = ref<DevelopmentProgram[]>([])
 // matrix state: Record<indicator_id, Record<month_string, {scale_label, scale_color}>>
@@ -334,10 +336,15 @@ function getFinalScale(indicatorId: number) {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
       <div>
-        <h1 class="text-2xl font-bold text-heading">Penyusunan Rapor Naratif</h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-heading">Penyusunan Rapor Naratif</h1>
+          <span v-if="isStudentInactive" class="px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+            Arsip: {{ selectedStudent?.status === 'graduated' ? 'Lulus' : 'Pindah' }} (Read-Only)
+          </span>
+        </div>
         <p class="text-sm text-muted">Lihat rekapitulasi 6 bulan dan susun deskripsi perkembangan.</p>
       </div>
-      <BaseButton v-if="schoolStore.isTeacher && schoolStore.isPro" variant="primary" :disabled="isSaving || !selectedStudentId" @click="saveReport" class="shadow-md w-full sm:w-auto">
+      <BaseButton v-if="schoolStore.isTeacher && schoolStore.isPro && !isStudentInactive" variant="primary" :disabled="isSaving || !selectedStudentId" @click="saveReport" class="shadow-md w-full sm:w-auto">
         <Icon v-if="!isSaving" name="lucide:save" class="w-4 h-4 mr-2" />
         <div v-else class="animate-spin w-4 h-4 rounded-full border-2 border-white/30 border-t-white mr-2"></div>
         {{ isSaving ? 'Menyimpan...' : 'Simpan Draft Rapor' }}
@@ -392,6 +399,13 @@ function getFinalScale(indicatorId: number) {
       <div>
         <p class="text-sm font-bold text-blue-800">Mode Peninjau</p>
         <p class="text-xs mt-1 text-blue-700">Anda mengakses halaman ini sebagai Peninjau (Read-Only). Hanya wali kelas yang berhak menyusun Narasi Rapor.</p>
+      </div>
+    </div>
+    <div v-else-if="isStudentInactive" class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 flex items-start gap-3 shrink-0">
+      <Icon name="lucide:lock" class="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+      <div>
+        <p class="text-sm font-bold">Arsip Rapor Read-Only</p>
+        <p class="text-xs mt-1 text-amber-700">Siswa berstatus {{ selectedStudent?.status === 'graduated' ? 'Lulus' : 'Pindah' }}. Rapor Naratif ini bersifat Arsip (Read-Only) dan tidak dapat diubah kembali untuk menjaga integritas riwayat akademik.</p>
       </div>
     </div>
     <div v-else-if="!isMatrixComplete" class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 flex items-start gap-3 shrink-0">
@@ -449,7 +463,7 @@ function getFinalScale(indicatorId: number) {
                     <div v-if="matrix[ind.id] && matrix[ind.id][m.value]" 
                          :class="['inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold border cursor-help shadow-sm', 
                                   matrix[ind.id][m.value].scale_color || 'bg-slate-100 text-slate-600 border-slate-200']"
-                         :title="matrix[ind.id][m.value].scale_label">
+                         :title="matrix[ind.id][m.value].scale_label + (matrix[ind.id][m.value].notes ? ' | Catatan: ' + matrix[ind.id][m.value].notes : '')">
                       {{ matrix[ind.id][m.value].scale }}
                     </div>
                     <div v-else class="text-slate-300 text-xs">-</div>
@@ -495,9 +509,9 @@ function getFinalScale(indicatorId: number) {
           
           <template v-else>
           <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-700">1. Pendahuluan <span class="text-rose-500">*</span></label>
+            <label class="text-sm font-bold text-slate-700">1. Pendahuluan <span v-if="!isStudentInactive" class="text-rose-500">*</span></label>
             <p class="text-xs text-slate-500 mb-2">Tuliskan pengantar rapor atau kalimat sambutan untuk orang tua.</p>
-            <textarea v-model="reportDraft.introduction_notes" :disabled="!schoolStore.isTeacher || !isMatrixComplete" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[100px] disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
+            <textarea v-model="reportDraft.introduction_notes" :disabled="!schoolStore.isTeacher || !isMatrixComplete || isStudentInactive" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[100px] disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
           </div>
 
           <div class="space-y-6">
@@ -508,8 +522,8 @@ function getFinalScale(indicatorId: number) {
             </div>
 
             <div v-for="prog in programs" :key="`draft-${prog.id}`" class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
-              <label class="text-sm font-bold text-slate-800">{{ prog.name }} <span class="text-rose-500">*</span></label>
-              <textarea v-model="reportDraft.details[prog.id]" :disabled="!schoolStore.isTeacher || !isMatrixComplete" placeholder="Contoh: Ananda berkembang sangat baik dalam hal..." class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[120px] shadow-sm disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
+              <label class="text-sm font-bold text-slate-800">{{ prog.name }} <span v-if="!isStudentInactive" class="text-rose-500">*</span></label>
+              <textarea v-model="reportDraft.details[prog.id]" :disabled="!schoolStore.isTeacher || !isMatrixComplete || isStudentInactive" placeholder="Contoh: Ananda berkembang sangat baik dalam hal..." class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[120px] shadow-sm disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
             </div>
           </div>
 
@@ -521,13 +535,13 @@ function getFinalScale(indicatorId: number) {
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-bold text-slate-700">Penutup <span class="text-rose-500">*</span></label>
-              <textarea v-model="reportDraft.closing_notes" :disabled="!schoolStore.isTeacher || !isMatrixComplete" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[100px] disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
+              <label class="text-sm font-bold text-slate-700">Penutup <span v-if="!isStudentInactive" class="text-rose-500">*</span></label>
+              <textarea v-model="reportDraft.closing_notes" :disabled="!schoolStore.isTeacher || !isMatrixComplete || isStudentInactive" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[100px] disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-bold text-slate-700">Rekomendasi / Saran <span class="text-rose-500">*</span></label>
-              <textarea v-model="reportDraft.recommendation" :disabled="!schoolStore.isTeacher || !isMatrixComplete" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[100px] disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
+              <label class="text-sm font-bold text-slate-700">Rekomendasi / Saran <span v-if="!isStudentInactive" class="text-rose-500">*</span></label>
+              <textarea v-model="reportDraft.recommendation" :disabled="!schoolStore.isTeacher || !isMatrixComplete || isStudentInactive" class="w-full text-sm px-4 py-3 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none bg-white transition-all resize-y min-h-[100px] disabled:opacity-70 disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-600"></textarea>
             </div>
           </div>
           </template>

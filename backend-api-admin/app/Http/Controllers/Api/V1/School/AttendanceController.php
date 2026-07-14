@@ -68,6 +68,7 @@ class AttendanceController extends Controller
                 'student_id' => $student->id,
                 'name' => $student->name,
                 'nisn' => $student->nisn,
+                'student_status' => $student->status->value,
                 'status' => $attendance ? $attendance->status->value : null,
                 'notes' => $attendance ? $attendance->notes : null,
                 'attendance_id' => $attendance ? $attendance->id : null,
@@ -134,7 +135,7 @@ class AttendanceController extends Controller
                 ->where('class_id', $class->id)
                 ->first();
 
-            if (!$student) continue;
+            if (!$student || $student->status !== \App\Enums\StudentStatus::ACTIVE) continue;
 
             $updateData = [
                 'status' => $data['status'],

@@ -82,19 +82,23 @@ class AssessmentController extends Controller
             ->where('academic_year', $academicYear)
             ->get();
 
-        // Group assessments by student_id -> indicator_id
+        // Group assessments and notes by student_id -> indicator_id
         $groupedAssessments = [];
+        $groupedNotes = [];
         foreach ($assessments as $a) {
             $groupedAssessments[$a->student_id][$a->indicator_id] = $a->scale->value;
+            $groupedNotes[$a->student_id][$a->indicator_id] = $a->notes;
         }
 
         // Prepare the payload
-        $result = $students->map(function ($student) use ($groupedAssessments) {
+        $result = $students->map(function ($student) use ($groupedAssessments, $groupedNotes) {
             return [
                 'student_id' => $student->id,
                 'name' => $student->name,
                 'nisn' => $student->nisn,
-                'assessments' => $groupedAssessments[$student->id] ?? [] // Map of indicator_id => scale value
+                'student_status' => $student->status->value,
+                'assessments' => $groupedAssessments[$student->id] ?? [], // Map of indicator_id => scale value
+                'notes' => $groupedNotes[$student->id] ?? [] // Map of indicator_id => notes string
             ];
         });
 
@@ -150,7 +154,7 @@ class AssessmentController extends Controller
             'assessments.*.student_id' => 'required|exists:students,id',
             'assessments.*.indicator_id' => 'required|exists:development_indicators,id',
             'assessments.*.scale' => ['required', new Enum(AssessmentScale::class)],
-            'assessments.*.notes' => 'nullable|string',
+            'assessments.*.notes' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -169,7 +173,7 @@ class AssessmentController extends Controller
                 ->where('class_id', $class->id)
                 ->first();
 
-            if (!$student) continue;
+            if (!$student || $student->status !== \App\Enums\StudentStatus::ACTIVE) continue;
 
             $scaleEnum = AssessmentScale::from($data['scale']);
 
@@ -250,6 +254,7 @@ class AssessmentController extends Controller
                 'scale' => $assessment->scale->value,
                 'scale_label' => $assessment->scale->label(),
                 'scale_color' => $assessment->scale->color(),
+                'notes' => $assessment->notes,
             ];
         }
 
@@ -285,6 +290,7 @@ class AssessmentController extends Controller
             'student' => [
                 'id' => $student->id,
                 'name' => $student->name,
+                'status' => $student->status->value,
             ]
         ]);
     }
@@ -354,6 +360,7 @@ class AssessmentController extends Controller
                 'scale' => $ast->scale->value,
                 'scale_label' => $ast->scale->label(),
                 'scale_color' => $ast->scale->color(),
+                'notes' => $ast->notes,
             ];
         }
         
@@ -380,7 +387,8 @@ class AssessmentController extends Controller
 
         return response()->json([
             'programs' => $programs,
-            'history' => $history
+            'history' => $history,
+            'student_status' => $student->status->value,
         ]);
     }
 }

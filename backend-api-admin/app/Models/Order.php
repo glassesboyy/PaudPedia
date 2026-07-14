@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,32 +49,32 @@ class Order extends Model
     }
 
     // Scopes
-    public function scopePending($query)
+    public function scopePending(Builder $query)
     {
         return $query->where('status', OrderStatus::PENDING);
     }
 
-    public function scopePaid($query)
+    public function scopePaid(Builder $query)
     {
         return $query->where('status', OrderStatus::PAID);
     }
 
-    public function scopeCancelled($query)
+    public function scopeCancelled(Builder $query)
     {
         return $query->where('status', OrderStatus::CANCELLED);
     }
 
-    public function scopeExpired($query)
+    public function scopeExpired(Builder $query)
     {
         return $query->where('status', OrderStatus::EXPIRED);
     }
 
-    public function scopeByStatus($query, OrderStatus $status)
+    public function scopeByStatus(Builder $query, OrderStatus $status)
     {
         return $query->where('status', $status);
     }
 
-    public function scopeByPaymentMethod($query, PaymentMethod $method)
+    public function scopeByPaymentMethod(Builder $query, PaymentMethod $method)
     {
         return $query->where('payment_method', $method);
     }

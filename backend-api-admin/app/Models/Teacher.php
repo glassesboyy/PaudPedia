@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Teacher extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -34,14 +35,9 @@ class Teacher extends Model
         return $this->hasMany(ClassRoom::class, 'homeroom_teacher_id');
     }
 
-    public function attendance(): HasMany
+    public function studentReports(): HasMany
     {
-        return $this->hasMany(Attendance::class);
-    }
-
-    public function assessments(): HasMany
-    {
-        return $this->hasMany(Assessment::class);
+        return $this->hasMany(StudentReport::class);
     }
 
     // Helper Methods

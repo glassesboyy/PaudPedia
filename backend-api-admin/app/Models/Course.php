@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CourseLevel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -88,17 +89,17 @@ class Course extends Model
     }
 
     // Scopes
-    public function scopePublished($query)
+    public function scopePublished(Builder $query)
     {
         return $query->where('is_published', true);
     }
 
-    public function scopeByLevel($query, CourseLevel $level)
+    public function scopeByLevel(Builder $query, CourseLevel $level)
     {
         return $query->where('level', $level);
     }
 
-    public function scopeBeginner($query)
+    public function scopeBeginner(Builder $query)
     {
         return $query->where('level', CourseLevel::BEGINNER);
     }

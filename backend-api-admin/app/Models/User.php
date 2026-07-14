@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Gender;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -107,12 +108,12 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeVerified($query)
+    public function scopeVerified(Builder $query)
     {
         return $query->whereNotNull('email_verified_at');
     }
@@ -140,7 +141,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->schoolMemberships()
                     ->where('school_id', $schoolId)
-                    ->whereHas('role', function($query) use ($roleName) {
+                    ->whereHas('role', function(Builder $query) use ($roleName) {
                         $query->where('name', $roleName);
                     })
                     ->exists();

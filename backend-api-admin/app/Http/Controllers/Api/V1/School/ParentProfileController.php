@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -142,7 +143,7 @@ class ParentProfileController extends BaseController
                 try {
                     Mail::to($user->email)->send(new ParentCredentialMail($user, $school, $newPassword));
                 } catch (\Exception $e) {
-                    \Log::error('Gagal mengirim email kredensial orang tua: ' . $e->getMessage());
+                    Log::error('Gagal mengirim email kredensial orang tua: ' . $e->getMessage());
                 }
             }
 
@@ -229,13 +230,17 @@ class ParentProfileController extends BaseController
             return $this->notFound('Data orang tua tidak ditemukan.');
         }
 
+        if ($parent->children()->exists()) {
+            return $this->error("Tidak dapat menghapus data wali murid karena masih terhubung dengan data siswa ({$parent->children()->count()} anak). Demi menjaga integritas data historis sekolah, silakan hapus atau ubah data siswa terkait terlebih dahulu.", 400);
+        }
+
         return DB::transaction(function () use ($parent, $schoolId) {
             $userId = $parent->user_id;
 
-            // Delete parent profile (cascade deletes students due to FK)
+            // Delete (SoftDelete) parent profile
             $parent->delete();
 
-            // Remove school membership
+            // Remove (SoftDelete) school membership
             SchoolMember::where('school_id', $schoolId)
                 ->where('user_id', $userId)
                 ->where('role_type', RoleType::PARENT)

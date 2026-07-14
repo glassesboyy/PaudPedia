@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -81,28 +82,28 @@ class Article extends Model
     }
 
     // Scopes
-    public function scopePublished($query)
+    public function scopePublished(Builder $query)
     {
         return $query->where('is_published', true)
                     ->where('published_at', '<=', now());
     }
 
-    public function scopeFeatured($query)
+    public function scopeFeatured(Builder $query)
     {
         return $query->where('is_featured', true);
     }
 
-    public function scopeByTag($query, string $tag)
+    public function scopeByTag(Builder $query, string $tag)
     {
         return $query->whereJsonContains('tags', $tag);
     }
 
-    public function scopePopular($query)
+    public function scopePopular(Builder $query)
     {
         return $query->orderBy('view_count', 'desc');
     }
 
-    public function scopeRecent($query)
+    public function scopeRecent(Builder $query)
     {
         return $query->orderBy('published_at', 'desc');
     }
@@ -110,7 +111,7 @@ class Article extends Model
     /**
      * Select only the columns needed for list/card views (excludes heavy content column).
      */
-    public function scopeListColumns($query)
+    public function scopeListColumns(Builder $query)
     {
         return $query->select([
             'id', 'category_id', 'author_id', 'title', 'slug',

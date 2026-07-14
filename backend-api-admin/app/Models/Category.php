@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CategoryType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -39,22 +40,22 @@ class Category extends Model
     }
 
     // Scopes
-    public function scopeByType($query, CategoryType $type)
+    public function scopeByType(Builder $query, CategoryType $type)
     {
         return $query->where('type', $type);
     }
 
-    public function scopeCourseCategories($query)
+    public function scopeCourseCategories(Builder $query)
     {
         return $query->where('type', CategoryType::COURSE);
     }
 
-    public function scopeProductCategories($query)
+    public function scopeProductCategories(Builder $query)
     {
         return $query->where('type', CategoryType::PRODUCT);
     }
 
-    public function scopeArticleCategories($query)
+    public function scopeArticleCategories(Builder $query)
     {
         return $query->where('type', CategoryType::ARTICLE);
     }

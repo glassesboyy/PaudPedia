@@ -17,7 +17,7 @@ const isInCart = computed(() => webinar.value ? hasItem(webinar.value.id, 'webin
 const isAdding = computed(() => webinar.value ? isAddingItem(webinar.value.id, 'webinar') : false)
 
 function handleAddToCart() {
-  if (!webinar.value || isInCart.value) return
+  if (!webinar.value || isInCart.value || webinar.value.is_past || !webinar.value.is_upcoming || webinar.value.is_full || webinar.value.is_owned) return
   addToCart({
     id: webinar.value.id,
     type: 'webinar',
@@ -378,7 +378,12 @@ const statusConfig = computed(() => {
                   </div>
                   <div v-if="webinar.max_participants" class="flex items-start gap-3">
                     <dt class="text-muted shrink-0 w-20">Kuota</dt>
-                    <dd class="text-heading font-medium">{{ webinar.max_participants }} peserta</dd>
+                    <dd class="text-heading font-medium">
+                      {{ webinar.max_participants }} peserta
+                      <span v-if="webinar.total_purchases !== undefined" class="text-xs text-muted block">
+                        ({{ webinar.total_purchases }} terisi)
+                      </span>
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -408,7 +413,25 @@ const statusConfig = computed(() => {
                 </div>
 
                 <!-- Action Buttons -->
-                <div v-if="webinar.is_owned" class="mt-4">
+                <div v-if="webinar.is_past || !webinar.is_upcoming" class="mt-4">
+                  <div class="w-full px-5 py-3 rounded-xl text-sm font-semibold bg-gray-100 text-gray-500 border border-gray-200 text-center flex items-center justify-center gap-2">
+                    <Icon name="lucide:calendar-x" class="w-4 h-4" />
+                    Webinar Telah Selesai
+                  </div>
+                  <p class="text-[11px] text-center text-muted mt-2">
+                    Jadwal webinar ini telah berlalu dan pendaftaran ditutup.
+                  </p>
+                </div>
+                <div v-else-if="webinar.is_full" class="mt-4">
+                  <div class="w-full px-5 py-3 rounded-xl text-sm font-semibold bg-danger-50 text-danger-600 border border-danger-200 text-center flex items-center justify-center gap-2">
+                    <Icon name="lucide:users" class="w-4 h-4" />
+                    Kuota Telah Penuh
+                  </div>
+                  <p class="text-[11px] text-center text-muted mt-2">
+                    Mohon maaf, kuota peserta untuk webinar ini sudah penuh.
+                  </p>
+                </div>
+                <div v-else-if="webinar.is_owned" class="mt-4">
                   <NuxtLink
                     to="/account/webinars"
                     class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-success-50 text-success-700 border border-success-200 hover:bg-success-100 transition-all shadow-sm"
@@ -420,7 +443,7 @@ const statusConfig = computed(() => {
                      Anda sudah terdaftar di webinar ini.
                   </p>
                 </div>
-                <div v-else-if="webinar.price && webinar.price > 0" class="mt-4">
+                <div v-else class="mt-4">
                   <button
                     type="button"
                     class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm"

@@ -355,7 +355,7 @@ async function submitTransfer() {
         </BaseAlert>
         
         <p class="text-sm text-slate-600">
-          Masukkan alamat email pengguna yang akan menggantikan posisi Anda sebagai Kepala Sekolah. Sebuah undangan akan dikirimkan ke email tersebut. Jika undangan diterima, <strong>Anda akan langsung kehilangan akses ke panel ini dan status Anda diturunkan menjadi Guru biasa.</strong>
+          Masukkan alamat email pengguna yang akan menggantikan posisi Anda sebagai Kepala Sekolah. Sebuah undangan akan dikirimkan ke email tersebut. Jika undangan diterima, <strong>Anda akan langsung kehilangan akses ke panel ini!</strong>
         </p>
 
         <form @submit.prevent="handleTransfer" class="flex gap-4 items-end">

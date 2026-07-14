@@ -3,8 +3,11 @@
 namespace App\Services\Api;
 
 use App\Enums\OrderItemType;
+use App\Enums\OrderStatus;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\CourseEnrollment;
+use App\Models\OrderItem;
 use App\Models\PromoCode;
 use App\Models\User;
 use App\Services\Content\PromoCodeService;
@@ -67,38 +70,49 @@ class CartService
             ]);
         }
 
-        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+        // Check if user already purchased this course, webinar, or digital product
+        if ($type === OrderItemType::COURSE || $type === OrderItemType::WEBINAR || $type === OrderItemType::PRODUCT) {
+            $alreadyPurchased = OrderItem::where('item_type', $type->value)
+                ->where('item_id', $model->id)
+                ->whereHas('order', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->where('status', OrderStatus::PAID);
+                })
+                ->exists();
 
-        // Course/webinar: quantity always 1, no duplicates
-        if ($type === OrderItemType::COURSE || $type === OrderItemType::WEBINAR) {
-            $quantity = 1;
-            $existing = $cart->items()
-                ->where('item_type', $type->value)
-                ->where('item_id', $itemId)
-                ->first();
+            if ($type === OrderItemType::COURSE && !$alreadyPurchased) {
+                $alreadyPurchased = CourseEnrollment::where('user_id', $user->id)
+                    ->where('course_id', $model->id)
+                    ->exists();
+            }
 
-            if ($existing) {
+            if ($alreadyPurchased) {
                 throw ValidationException::withMessages([
-                    'item_id' => ["{$type->label()} \"{$model->title}\" sudah ada di keranjang."],
+                    'item_id' => ["Anda sudah memiliki {$type->label()} \"{$model->title}\"."],
                 ]);
             }
         }
 
-        // Product: increment quantity if exists
+        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+        // All digital items (Course, Webinar, Product): quantity always 1, no duplicates
+        $quantity = 1;
         $existing = $cart->items()
             ->where('item_type', $type->value)
             ->where('item_id', $itemId)
             ->first();
 
         if ($existing) {
-            $existing->update(['quantity' => $existing->quantity + $quantity]);
-        } else {
-            $cart->items()->create([
-                'item_type' => $type->value,
-                'item_id'   => $itemId,
-                'quantity'  => $quantity,
+            throw ValidationException::withMessages([
+                'item_id' => ["{$type->label()} \"{$model->title}\" sudah ada di keranjang."],
             ]);
         }
+
+        $cart->items()->create([
+            'item_type' => $type->value,
+            'item_id'   => $itemId,
+            'quantity'  => $quantity,
+        ]);
 
         return $this->getCart($user);
     }
@@ -230,7 +244,9 @@ class CartService
     {
         return match ($type) {
             OrderItemType::COURSE  => (bool) $model->is_published,
-            OrderItemType::WEBINAR => (bool) $model->is_active,
+            OrderItemType::WEBINAR => (bool) $model->is_active
+                && (!$model->scheduled_at || $model->scheduled_at->isFuture())
+                && (!$model->max_participants || $model->total_purchases < $model->max_participants),
             OrderItemType::PRODUCT => (bool) $model->is_active,
         };
     }

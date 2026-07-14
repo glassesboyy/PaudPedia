@@ -243,6 +243,14 @@ class StudentController extends BaseController
             return $this->notFound('Data siswa tidak ditemukan.');
         }
 
+        $hasAssessments = $student->assessments()->exists();
+        $hasFinances = $student->finances()->exists();
+        $hasAttendance = $student->attendance()->exists();
+
+        if ($hasAssessments || $hasFinances || $hasAttendance) {
+            return $this->error('Tidak dapat menghapus data siswa karena telah memiliki rekam jejak akademik, presensi, atau transaksi keuangan. Demi menjaga integritas data historis sekolah, silakan ubah status siswa menjadi Lulus atau Pindah untuk menonaktifkan data siswa.', 400);
+        }
+
         $student->delete();
 
         return $this->success(null, 'Data siswa berhasil dihapus.');

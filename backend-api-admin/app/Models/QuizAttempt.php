@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -57,22 +58,22 @@ class QuizAttempt extends Model
     }
 
     // Scopes
-    public function scopePassed($query)
+    public function scopePassed(Builder $query)
     {
         return $query->where('is_passed', true);
     }
 
-    public function scopeFailed($query)
+    public function scopeFailed(Builder $query)
     {
         return $query->where('is_passed', false);
     }
 
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query)
     {
         return $query->whereNotNull('completed_at');
     }
 
-    public function scopeByUser($query, int $userId)
+    public function scopeByUser(Builder $query, int $userId)
     {
         return $query->where('user_id', $userId);
     }

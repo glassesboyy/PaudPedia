@@ -178,6 +178,7 @@ class FinanceController extends Controller
 
         $students = Student::where('class_id', $class->id)
             ->where('school_id', $school->id)
+            ->where('status', \App\Enums\StudentStatus::ACTIVE)
             ->whereIn('id', $accessibleStudentIds)
             ->get();
 
@@ -246,6 +247,10 @@ class FinanceController extends Controller
 
         if (!$student) {
             return response()->json(['message' => 'Siswa tidak ditemukan di sekolah ini.'], 404);
+        }
+
+        if ($student->status !== \App\Enums\StudentStatus::ACTIVE) {
+            return response()->json(['message' => 'Siswa berstatus Nonaktif (' . $student->status->label() . '). Tidak dapat membuat tagihan atau transaksi SPP baru.'], 422);
         }
 
         $accessibleStudentIds = $this->getAccessibleStudentIds($request, $school->id);
@@ -443,6 +448,10 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Siswa tidak ditemukan di sekolah ini.'], 404);
         }
 
+        if ($student->status !== \App\Enums\StudentStatus::ACTIVE) {
+            return response()->json(['message' => 'Siswa berstatus Nonaktif (' . $student->status->label() . '). Transaksi tabungan baru tidak dapat dicatat untuk siswa nonaktif.'], 422);
+        }
+
         $accessibleStudentIds = $this->getAccessibleStudentIds($request, $school->id);
         if (!in_array($student->id, $accessibleStudentIds)) {
             return response()->json(['message' => 'Anda tidak memiliki akses ke siswa ini.'], 403);
@@ -583,6 +592,7 @@ class FinanceController extends Controller
             'student_id' => $finance->student_id,
             'student_name' => $finance->student?->name,
             'student_nisn' => $finance->student?->nisn,
+            'student_status' => $finance->student?->status?->value,
             'class_name' => $finance->student?->class?->name,
             'type' => $finance->type->value,
             'type_label' => $finance->type->shortLabel(),

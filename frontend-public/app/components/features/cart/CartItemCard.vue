@@ -87,35 +87,15 @@ function formatPrice(price: number): string {
         {{ item.name }}
       </NuxtLink>
 
-      <!-- Bottom row: quantity + price -->
+      <!-- Bottom row: item info + price -->
       <div class="mt-3 flex items-center justify-between gap-3">
-        <!-- Quantity controls (only for product type) -->
-        <div v-if="item.type === 'product'" class="flex items-center gap-0.5 bg-surface-muted rounded-lg p-0.5">
-          <button
-            type="button"
-            class="w-7 h-7 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface transition-all"
-            :disabled="item.quantity <= 1"
-            :class="item.quantity <= 1 && 'opacity-30 cursor-not-allowed'"
-            @click="emit('updateQuantity', item.id, item.type, item.quantity - 1)"
-          >
-            <Icon name="lucide:minus" class="w-3.5 h-3.5" />
-          </button>
-          <span class="w-8 text-center text-sm font-semibold text-heading tabular-nums">{{ item.quantity }}</span>
-          <button
-            type="button"
-            class="w-7 h-7 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface transition-all"
-            @click="emit('updateQuantity', item.id, item.type, item.quantity + 1)"
-          >
-            <Icon name="lucide:plus" class="w-3.5 h-3.5" />
-          </button>
-        </div>
-        <div v-else class="text-xs text-muted font-medium">
+        <div class="text-xs text-muted font-medium">
           1 item
         </div>
 
         <!-- Price -->
         <span class="text-sm font-bold text-primary-600 flex-shrink-0 tabular-nums">
-          {{ item.price === 0 ? 'Gratis' : formatPrice(item.price * item.quantity) }}
+          {{ item.price === 0 ? 'Gratis' : formatPrice(item.price) }}
         </span>
       </div>
     </div>

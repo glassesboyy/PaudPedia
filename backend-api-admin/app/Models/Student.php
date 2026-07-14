@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\Enums\Gender;
 use App\Enums\StudentStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +15,7 @@ use Carbon\Carbon;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'school_id',
@@ -92,22 +94,22 @@ class Student extends Model
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('status', StudentStatus::ACTIVE);
     }
 
-    public function scopeBySchool($query, int $schoolId)
+    public function scopeBySchool(Builder $query, int $schoolId)
     {
         return $query->where('school_id', $schoolId);
     }
 
-    public function scopeByClass($query, int $classId)
+    public function scopeByClass(Builder $query, int $classId)
     {
         return $query->where('class_id', $classId);
     }
 
-    public function scopeByGender($query, Gender $gender)
+    public function scopeByGender(Builder $query, Gender $gender)
     {
         return $query->where('gender', $gender);
     }

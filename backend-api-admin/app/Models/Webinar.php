@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -75,17 +76,17 @@ class Webinar extends Model
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeUpcoming($query)
+    public function scopeUpcoming(Builder $query)
     {
         return $query->where('scheduled_at', '>', now());
     }
 
-    public function scopePast($query)
+    public function scopePast(Builder $query)
     {
         return $query->where('scheduled_at', '<=', now());
     }
@@ -94,7 +95,7 @@ class Webinar extends Model
      * Select only the columns needed for list views.
      * Excludes sensitive Zoom credentials not needed in public listings.
      */
-    public function scopeListColumns($query)
+    public function scopeListColumns(Builder $query)
     {
         return $query->select([
             'id', 'mentor_id', 'title', 'slug', 'description',

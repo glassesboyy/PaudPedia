@@ -38,6 +38,8 @@ export interface Webinar {
   scheduled_time: string | null
   duration_minutes: number | null
   max_participants: number | null
+  total_purchases?: number
+  is_full?: boolean
   is_upcoming: boolean
   mentor: WebinarMentor | null
   created_at: string

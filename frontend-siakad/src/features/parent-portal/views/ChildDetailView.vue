@@ -33,6 +33,7 @@ const activeTab = ref('profile')
 const selectedAcademicYear = ref<string>('')
 const attendanceFilter = ref('all') // 'semester1', 'semester2', 'all'
 const assessmentSemesterFilter = ref('all') // '1', '2', 'all'
+const showIndicatorNotes = ref(true) // Toggle untuk menampilkan catatan observasi guru
 const isAttendanceLoading = ref(false)
 const isAssessmentLoading = ref(false)
 const financeData = ref<StudentFinanceSummary | null>(null)
@@ -277,6 +278,26 @@ function getFinalScale(matrix: Record<string, any>, indicatorId: number, semeste
     scale: pointScales[average],
     color: pointColors[average]
   }
+}
+
+function getNotesListForIndicator(matrix: Record<string, any>, indicatorId: number, semester: string) {
+  if (!matrix || !matrix[indicatorId]) return []
+  const months = getAvailableMonths(semester)
+  const notesList: { monthLabel: string; notes: string; scale: string; scaleColor: string }[] = []
+
+  months.forEach(m => {
+    const data = getScaleForMonth(matrix, indicatorId, m.value)
+    if (data && data.notes && typeof data.notes === 'string' && data.notes.trim() !== '') {
+      notesList.push({
+        monthLabel: m.label,
+        notes: data.notes.trim(),
+        scale: data.scale || '',
+        scaleColor: data.scale_color || 'bg-slate-100 text-slate-600 border-slate-200'
+      })
+    }
+  })
+
+  return notesList
 }
 
 const attendanceFilterLabel = computed(() => {
@@ -537,6 +558,18 @@ const computedAttendanceSummary = computed(() => {
               <Icon name="lucide:bar-chart-2" class="w-5 h-5 text-primary-600" /> Pencapaian Perkembangan
             </h3>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button 
+                @click="showIndicatorNotes = !showIndicatorNotes"
+                :class="[
+                  'inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer shrink-0',
+                  showIndicatorNotes 
+                    ? 'bg-primary-50 text-primary-700 border-primary-200 shadow-2xs' 
+                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                ]"
+              >
+                <Icon :name="showIndicatorNotes ? 'lucide:eye' : 'lucide:eye-off'" class="w-3.5 h-3.5" />
+                {{ showIndicatorNotes ? 'Sembunyikan Catatan Observasi' : 'Tampilkan Catatan Observasi' }}
+              </button>
               <select v-model="selectedAcademicYear" class="w-full sm:w-auto text-xs font-bold bg-slate-100 border-none rounded-lg px-3 py-2 sm:py-1.5 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer">
                 <option v-for="year in availableAcademicYears" :key="year" :value="year">{{ year }}</option>
               </select>
@@ -575,27 +608,48 @@ const computedAttendanceSummary = computed(() => {
                             {{ prog.name }}
                           </td>
                         </tr>
-                        <tr v-for="ind in prog.indicators" :key="`ind-${ind.id}`" class="hover:bg-slate-50 transition-colors">
-                          <td class="px-4 py-3 text-sm text-slate-700 pl-8">
-                            • {{ ind.name }}
-                          </td>
-                          <td v-for="m in getAvailableMonths(group.semester)" :key="m.value" class="px-2 py-3 text-center border-l border-slate-100">
-                            <div v-if="getScaleForMonth(group.matrix, ind.id, m.value)" 
-                                :class="['inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold border shadow-sm cursor-help', 
-                                          getScaleForMonth(group.matrix, ind.id, m.value)?.scale_color || 'bg-slate-100 text-slate-600 border-slate-200']"
-                                :title="getScaleForMonth(group.matrix, ind.id, m.value)?.scale_label">
-                              {{ getScaleForMonth(group.matrix, ind.id, m.value)?.scale }}
-                            </div>
-                            <div v-else class="text-slate-300 text-xs">-</div>
-                          </td>
-                          <td class="px-3 py-3 text-center border-l border-slate-100 bg-slate-50/50">
-                            <div v-if="getFinalScale(group.matrix, ind.id, group.semester)" 
-                                :class="['inline-flex items-center justify-center px-2 py-1 rounded-lg text-xs font-bold border shadow-sm w-full', getFinalScale(group.matrix, ind.id, group.semester)?.color]">
-                              {{ getFinalScale(group.matrix, ind.id, group.semester)?.scale }}
-                            </div>
-                            <div v-else class="text-slate-300 text-xs">-</div>
-                          </td>
-                        </tr>
+                        <template v-for="ind in prog.indicators" :key="`ind-${ind.id}`">
+                          <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-3 text-sm text-slate-700 pl-8 font-medium">
+                              • {{ ind.name }}
+                            </td>
+                            <td v-for="m in getAvailableMonths(group.semester)" :key="m.value" class="px-2 py-3 text-center border-l border-slate-100">
+                              <div v-if="getScaleForMonth(group.matrix, ind.id, m.value)" 
+                                  :class="['inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold border shadow-sm cursor-help', 
+                                            getScaleForMonth(group.matrix, ind.id, m.value)?.scale_color || 'bg-slate-100 text-slate-600 border-slate-200']"
+                                  :title="getScaleForMonth(group.matrix, ind.id, m.value)?.scale_label + (getScaleForMonth(group.matrix, ind.id, m.value)?.notes ? ' | Catatan: ' + getScaleForMonth(group.matrix, ind.id, m.value)?.notes : '')">
+                                {{ getScaleForMonth(group.matrix, ind.id, m.value)?.scale }}
+                              </div>
+                              <div v-else class="text-slate-300 text-xs">-</div>
+                            </td>
+                            <td class="px-3 py-3 text-center border-l border-slate-100 bg-slate-50/50">
+                              <div v-if="getFinalScale(group.matrix, ind.id, group.semester)" 
+                                  :class="['inline-flex items-center justify-center px-2 py-1 rounded-lg text-xs font-bold border shadow-sm w-full', getFinalScale(group.matrix, ind.id, group.semester)?.color]">
+                                {{ getFinalScale(group.matrix, ind.id, group.semester)?.scale }}
+                              </div>
+                              <div v-else class="text-slate-300 text-xs">-</div>
+                            </td>
+                          </tr>
+                          <!-- Baris Catatan Observasi untuk Indikator (jika ada & toggle aktif) -->
+                          <tr v-if="showIndicatorNotes && getNotesListForIndicator(group.matrix, ind.id, group.semester).length > 0" class="bg-amber-50/25 border-b border-slate-100">
+                            <td :colspan="getAvailableMonths(group.semester).length + 2" class="px-4 py-2.5 pl-8 text-xs">
+                              <div class="space-y-1.5 border-l-2 border-primary-400 pl-3 my-1">
+                                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                  <Icon name="lucide:file-text" class="w-3.5 h-3.5 text-primary-500" /> Catatan Observasi Guru:
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 pt-0.5">
+                                  <div v-for="n in getNotesListForIndicator(group.matrix, ind.id, group.semester)" :key="n.monthLabel" class="flex flex-col gap-1 bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-2xs">
+                                    <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-1">
+                                      <span class="font-bold text-slate-700 text-[11px]">{{ n.monthLabel }}</span>
+                                      <span :class="['px-1.5 py-0.5 rounded text-[10px] font-bold border', n.scaleColor]">{{ n.scale }}</span>
+                                    </div>
+                                    <p class="text-slate-600 text-xs italic leading-relaxed">"{{ n.notes }}"</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </template>
                       </template>
                     </tbody>
                   </table>
@@ -609,7 +663,7 @@ const computedAttendanceSummary = computed(() => {
                     <template #prepend><Icon name="lucide:download" class="w-4 h-4" /></template>
                     Unduh Rapor {{ group.semester_label }}
                   </BaseButton>
-                  <p v-if="!group.is_report_generated" class="text-xs sm:text-sm text-amber-600 font-medium flex items-center gap-1.5">
+                  <p v-if="!group.is_report_generated" class="text-xs text-amber-600 font-medium flex items-center gap-1.5">
                     <Icon name="lucide:info" class="w-4 h-4" />
                     Rapor naratif untuk semester ini belum disusun oleh Wali Kelas, sehingga dokumen belum dapat diunduh.
                   </p>

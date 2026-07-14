@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -195,7 +196,7 @@ class TeacherController extends BaseController
                 } catch (\Exception $e) {
                     // Log error but don't fail transaction? Or fail?
                     // Better log it
-                    \Log::error('Gagal mengirim email kredensial guru: ' . $e->getMessage());
+                    Log::error('Gagal mengirim email kredensial guru: ' . $e->getMessage());
                 }
             }
 
@@ -277,9 +278,10 @@ class TeacherController extends BaseController
         }
 
         $hasClass = \App\Models\ClassRoom::where('homeroom_teacher_id', $teacher->id)->exists();
+        $hasReports = $teacher->studentReports()->exists();
         
-        if ($hasClass) {
-            return $this->error('Tidak dapat menghapus guru karena terdaftar sebagai wali kelas. Silakan gunakan fitur Nonaktifkan guru.', 400);
+        if ($hasClass || $hasReports) {
+            return $this->error('Tidak dapat menghapus data guru karena telah memiliki rekam jejak akademik (terdaftar sebagai wali kelas atau pernah mengisi rapor/penilaian siswa). Demi menjaga integritas data historis sekolah, silakan ubah status guru menjadi Nonaktif.', 400);
         }
 
         return DB::transaction(function () use ($teacher, $schoolId) {

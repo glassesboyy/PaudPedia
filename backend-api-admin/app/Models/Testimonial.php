@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,17 +60,17 @@ class Testimonial extends Model
     }
 
     // Scopes
-    public function scopeApproved($query)
+    public function scopeApproved(Builder $query)
     {
         return $query->where('is_approved', true);
     }
 
-    public function scopeFeatured($query)
+    public function scopeFeatured(Builder $query)
     {
         return $query->where('is_featured', true);
     }
 
-    public function scopeHighRated($query)
+    public function scopeHighRated(Builder $query)
     {
         return $query->where('rating', '>=', 4);
     }

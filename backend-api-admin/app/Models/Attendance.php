@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AttendanceStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,17 +50,24 @@ class Attendance extends Model
     }
 
     // Scopes
-    public function scopeByDate($query, $date)
+    /**
+     * @param string|\DateTimeInterface $date
+     */
+    public function scopeByDate(Builder $query, $date)
     {
         return $query->whereDate('date', $date);
     }
 
-    public function scopeByDateRange($query, $startDate, $endDate)
+    /**
+     * @param string|\DateTimeInterface $startDate
+     * @param string|\DateTimeInterface $endDate
+     */
+    public function scopeByDateRange(Builder $query, $startDate, $endDate)
     {
         return $query->whereBetween('date', [$startDate, $endDate]);
     }
 
-    public function scopeByMonth($query, int $month, ?int $year = null)
+    public function scopeByMonth(Builder $query, int $month, ?int $year = null)
     {
         $query->whereMonth('date', $month);
         
@@ -70,12 +78,12 @@ class Attendance extends Model
         return $query;
     }
 
-    public function scopeByStatus($query, AttendanceStatus $status)
+    public function scopeByStatus(Builder $query, AttendanceStatus $status)
     {
         return $query->where('status', $status);
     }
 
-    public function scopePresent($query)
+    public function scopePresent(Builder $query)
     {
         return $query->where('status', AttendanceStatus::PRESENT);
     }

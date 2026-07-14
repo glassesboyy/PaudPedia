@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Enums\SubscriptionPlan;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class School extends Model
 {
@@ -101,17 +103,17 @@ class School extends Model
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('is_active', true);
     }
 
-    public function scopePro($query)
+    public function scopePro(Builder $query)
     {
         return $query->where('subscription_plan', SubscriptionPlan::PRO);
     }
 
-    public function scopeFree($query)
+    public function scopeFree(Builder $query)
     {
         return $query->where('subscription_plan', SubscriptionPlan::FREE);
     }
@@ -207,7 +209,7 @@ class School extends Model
     // Helper Methods
     public function getLogoUrl(): string
     {
-        if ($this->logo_url && \Storage::disk('public')->exists($this->logo_url)) {
+        if ($this->logo_url && Storage::disk('public')->exists($this->logo_url)) {
             return asset('storage/' . $this->logo_url);
         }
 
@@ -275,7 +277,11 @@ class School extends Model
             return PHP_INT_MAX; // Unlimited
         }
 
-        $activeTeachers = $this->teachers()->count();
+        $activeTeachers = \App\Models\SchoolMember::where('school_id', $this->id)
+            ->where('role_type', \App\Enums\RoleType::TEACHER)
+            ->where('is_active', true)
+            ->count();
+
         return max(0, $this->teacher_limit - $activeTeachers);
     }
 }

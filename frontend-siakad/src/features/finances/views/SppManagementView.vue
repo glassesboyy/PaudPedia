@@ -416,7 +416,12 @@ function handleReset() {
               <!-- Data Rows -->
               <tr v-else v-for="r in sppRecords" :key="r.id" class="hover:bg-primary-50/30 transition-all duration-300">
                 <td class="px-6 py-4">
-                  <p class="font-bold text-heading">{{ r.student_name }}</p>
+                  <p class="font-bold text-heading flex items-center gap-1.5">
+                    <span>{{ r.student_name }}</span>
+                    <span v-if="r.student_status && r.student_status !== 'active'" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200 shrink-0">
+                      Arsip
+                    </span>
+                  </p>
                   <p class="text-xs text-muted">{{ r.class_name || '-' }}</p>
                 </td>
                 <td class="px-6 py-4 font-medium text-muted whitespace-nowrap">{{ formatMonth(r.month) }}</td>

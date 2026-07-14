@@ -359,8 +359,8 @@ async function executeDelete() {
     <!-- Delete Confirmation Modal -->
     <ConfirmModal
       :show="showDeleteModal"
-      title="Hapus Kelas?"
-      :message="`Anda akan menghapus kelas '${deleteTarget?.name || ''}'. Kelas yang masih memiliki siswa tidak dapat dihapus.`"
+      title="Hapus Data Kelas?"
+      :message="`Anda akan menghapus data kelas '${deleteTarget?.name || ''}'. Jika kelas ini masih memiliki siswa terdaftar atau riwayat aktivitas, penghapusan akan diproteksi oleh sistem.`"
       confirm-text="Ya, Hapus"
       variant="danger"
       :loading="isDeleting"

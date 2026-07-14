@@ -61,9 +61,9 @@ export function useCart() {
       return
     }
 
-    // Optimistic: check local duplicate for course/webinar
+    // Optimistic: check local duplicate for all items (course/webinar/product)
     if (
-      (item.type === 'course' || item.type === 'webinar')
+      (item.type === 'course' || item.type === 'webinar' || item.type === 'product')
       && cartStore.hasItem(item.id, item.type)
     ) {
       toast.warning(`${item.name} sudah ada di keranjang`)

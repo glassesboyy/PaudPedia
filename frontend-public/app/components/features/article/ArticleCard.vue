@@ -23,8 +23,8 @@ function formatDate(dateStr: string): string {
   }
 }
 
-function getImageUrl(article: Article): string | null {
-  return article.featured_image_url || (article as any).thumbnail_url || null
+function getImageUrl(article: Article | LandingArticle): string | null {
+  return (article as any).featured_image_url || (article as any).thumbnail_url || null
 }
 
 function normalizeTags(tags: unknown): string[] {

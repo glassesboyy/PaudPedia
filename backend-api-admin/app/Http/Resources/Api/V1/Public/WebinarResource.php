@@ -43,6 +43,8 @@ class WebinarResource extends JsonResource
             'scheduled_time' => $this->scheduled_at?->format('H:i'),
             'duration_minutes' => $this->duration_minutes,
             'max_participants' => $this->max_participants,
+            'total_purchases' => $this->total_purchases,
+            'is_full' => $this->max_participants ? ($this->total_purchases >= $this->max_participants) : false,
             'is_upcoming' => $this->isUpcoming(),
             'mentor' => $this->whenLoaded('mentor', function () {
                 return [

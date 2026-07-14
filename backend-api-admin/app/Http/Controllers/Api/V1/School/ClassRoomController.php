@@ -8,10 +8,12 @@ use App\Http\Requests\Api\V1\School\UpdateClassRoomRequest;
 use App\Http\Resources\Api\V1\School\ClassRoomResource;
 use App\Models\ClassRoom;
 use App\Models\School;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
 class ClassRoomController extends Controller
 {
+    use ApiResponse;
     /**
      * Display a listing of the resource.
      */
@@ -165,13 +167,11 @@ class ClassRoomController extends Controller
 
         // Check if there are students in this class before deleting
         if ($class->students()->exists()) {
-            return response()->json([
-                'message' => 'Tidak dapat menghapus kelas karena masih memiliki siswa terdaftar.'
-            ], 422);
+            return $this->error('Tidak dapat menghapus data kelas karena masih memiliki siswa terdaftar atau riwayat aktivitas. Silakan kosongkan atau pindahkan siswa terlebih dahulu.', 400);
         }
 
         $class->delete();
 
-        return response()->json(null, 204);
+        return $this->noContent('Data kelas berhasil dihapus.');
     }
 }

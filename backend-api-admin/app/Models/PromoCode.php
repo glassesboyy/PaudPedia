@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DiscountType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,7 +45,7 @@ class PromoCode extends Model
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('is_active', true)
                     ->where('start_date', '<=', now())
@@ -54,7 +55,7 @@ class PromoCode extends Model
                     });
     }
 
-    public function scopeAvailable($query)
+    public function scopeAvailable(Builder $query)
     {
         return $query->active()
                     ->where(function($q) {

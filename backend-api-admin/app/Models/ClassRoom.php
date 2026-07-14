@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,12 +54,12 @@ class ClassRoom extends Model
     }
 
     // Scopes
-    public function scopeByAcademicYear($query, string $year)
+    public function scopeByAcademicYear(Builder $query, string $year)
     {
         return $query->where('academic_year', $year);
     }
 
-    public function scopeByLevel($query, string $level)
+    public function scopeByLevel(Builder $query, string $level)
     {
         return $query->where('level', $level);
     }

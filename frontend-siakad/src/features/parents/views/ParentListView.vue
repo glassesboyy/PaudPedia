@@ -272,8 +272,8 @@ function getParentDisplayName(p: ParentProfile): string {
     <!-- Delete Confirmation Modal -->
     <ConfirmModal
       :show="showDeleteModal"
-      title="Hapus Data Orang Tua?"
-      :message="`Anda akan menghapus data ${deleteTarget ? getParentDisplayName(deleteTarget) : ''}. Semua data siswa yang terkait juga akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.`"
+      title="Hapus Data Wali Murid?"
+      :message="`Anda akan menghapus data wali murid '${deleteTarget ? getParentDisplayName(deleteTarget) : ''}'. Jika wali murid masih terhubung dengan data siswa, penghapusan akan diproteksi oleh sistem.`"
       confirm-text="Ya, Hapus"
       variant="danger"
       :loading="isDeleting"

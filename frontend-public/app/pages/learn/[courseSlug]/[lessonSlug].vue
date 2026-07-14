@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
       </div>
 
       <div v-else-if="store.lessonDetail?.type === 'text'" class="p-6 md:p-8">
-        <article class="prose prose-sm md:prose-base max-w-none text-body" v-html="store.textLessonHtml" />
+        <article class="lesson-content" v-html="store.textLessonHtml" />
       </div>
 
       <QuizViewer
@@ -230,3 +230,209 @@ onBeforeUnmount(() => {
     <p class="text-sm text-muted">Kursus ini belum memiliki materi untuk ditampilkan.</p>
   </div>
 </template>
+
+<style scoped>
+/* ══════════════════════════════════════════════════════════════════
+   Lesson Content — Rich Text & Typography Styling
+   Handles all HTML output from RichEditor: h1-h3, p, ol, ul, li, etc.
+   ══════════════════════════════════════════════════════════════════ */
+
+.lesson-content {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: rgb(var(--color-body));
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.lesson-content :deep(h1) {
+  font-size: 1.75rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: rgb(var(--color-heading));
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #eff6ff;
+}
+
+.lesson-content :deep(h2) {
+  font-size: 1.45rem;
+  line-height: 1.35;
+  font-weight: 700;
+  color: rgb(var(--color-heading));
+  margin-top: 1.85rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid rgb(var(--color-border-muted));
+}
+
+.lesson-content :deep(h3) {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: rgb(var(--color-heading));
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.lesson-content :deep(:first-child) {
+  margin-top: 0;
+}
+
+.lesson-content :deep(p) {
+  margin-bottom: 1.25rem;
+  color: rgb(var(--color-body));
+  line-height: 1.8;
+}
+
+.lesson-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.lesson-content :deep(strong),
+.lesson-content :deep(b) {
+  font-weight: 600;
+  color: rgb(var(--color-heading));
+}
+
+.lesson-content :deep(em),
+.lesson-content :deep(i) {
+  font-style: italic;
+}
+
+.lesson-content :deep(u) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #93c5fd;
+}
+
+.lesson-content :deep(a) {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #bfdbfe;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.lesson-content :deep(a:hover) {
+  color: #1d4ed8;
+}
+
+.lesson-content :deep(blockquote) {
+  position: relative;
+  margin: 1.75rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 4px solid #3b82f6;
+  background: #eff6ff;
+  border-radius: 0 0.75rem 0.75rem 0;
+  color: rgb(var(--color-heading));
+  font-style: italic;
+}
+
+.lesson-content :deep(ul) {
+  list-style-type: disc;
+  margin: 1.25rem 0;
+  padding-left: 1.75rem;
+}
+
+.lesson-content :deep(ol) {
+  list-style-type: decimal;
+  margin: 1.25rem 0;
+  padding-left: 1.75rem;
+}
+
+.lesson-content :deep(li) {
+  margin-bottom: 0.625rem;
+  padding-left: 0.375rem;
+  line-height: 1.75;
+  color: rgb(var(--color-body));
+}
+
+.lesson-content :deep(li::marker) {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.lesson-content :deep(li > ul),
+.lesson-content :deep(li > ol) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.lesson-content :deep(code) {
+  font-family: 'Cascadia Code', monospace;
+  font-size: 0.875em;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.15em 0.45em;
+  border-radius: 0.375rem;
+  border: 1px solid #dbeafe;
+}
+
+.lesson-content :deep(pre) {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  background: #1e293b;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  border: 1px solid #334155;
+}
+
+.lesson-content :deep(pre code) {
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0;
+  border: none;
+}
+
+.lesson-content :deep(hr) {
+  margin: 2rem 0;
+  border: none;
+  height: 1px;
+  background: rgb(var(--color-border));
+}
+
+.lesson-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  margin: 1.75rem auto;
+  border-radius: 0.75rem;
+  display: block;
+}
+
+.lesson-content :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.75rem 0;
+  font-size: 0.9375rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.lesson-content :deep(th),
+.lesson-content :deep(td) {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgb(var(--color-border-muted));
+  text-align: left;
+}
+
+.lesson-content :deep(th) {
+  background: #eff6ff;
+  font-weight: 600;
+  color: rgb(var(--color-heading));
+}
+
+@media (max-width: 640px) {
+  .lesson-content {
+    font-size: 1rem;
+  }
+  .lesson-content :deep(h1) {
+    font-size: 1.5rem;
+  }
+  .lesson-content :deep(h2) {
+    font-size: 1.25rem;
+  }
+}
+</style>

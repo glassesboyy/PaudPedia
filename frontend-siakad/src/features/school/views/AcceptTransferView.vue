@@ -64,6 +64,11 @@ async function handleReject() {
     isProcessing.value = false
   }
 }
+
+async function handleLogoutAndSwitch() {
+  await authStore.logout()
+  router.push({ name: 'Login', query: { redirect: `/transfer/accept/${token}` } })
+}
 </script>
 
 <template>
@@ -96,10 +101,18 @@ async function handleReject() {
           </BaseButton>
         </div>
 
-        <div v-else-if="error" class="bg-red-50 text-red-700 p-4 rounded-xl text-center border border-red-100">
-          <Icon name="lucide:alert-circle" class="w-6 h-6 mx-auto mb-2" />
+        <div v-else-if="error" class="bg-red-50 text-red-700 p-4 rounded-xl text-center border border-red-100 space-y-3">
+          <Icon name="lucide:alert-circle" class="w-6 h-6 mx-auto mb-1" />
           <p class="text-sm font-medium">{{ error }}</p>
-          <BaseButton v-if="!requestDetails" variant="outline" class="mt-4 w-full" @click="router.push({ name: 'Dashboard' })">
+          <div v-if="requestDetails && authStore.user?.email !== requestDetails?.to_email" class="pt-3 border-t border-red-200/60 text-left space-y-2">
+            <p class="text-xs text-red-600">
+              Anda saat ini sedang login sebagai <strong class="underline">{{ authStore.user?.email }}</strong>. Undangan transfer ini dikhususkan untuk akun <strong class="underline">{{ requestDetails?.to_email }}</strong>.
+            </p>
+            <BaseButton variant="primary" size="sm" class="w-full bg-red-600 hover:bg-red-700 text-white shadow-sm mt-2" @click="handleLogoutAndSwitch">
+              Keluar & Login sebagai {{ requestDetails?.to_email }}
+            </BaseButton>
+          </div>
+          <BaseButton v-else-if="!requestDetails" variant="outline" class="mt-4 w-full" @click="router.push({ name: 'Dashboard' })">
             Kembali ke Beranda
           </BaseButton>
         </div>

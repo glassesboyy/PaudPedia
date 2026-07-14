@@ -43,7 +43,7 @@ class HeadmasterTransferMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.headmaster-transfer',
+            markdown: 'emails.headmaster-transfer',
         );
     }
 

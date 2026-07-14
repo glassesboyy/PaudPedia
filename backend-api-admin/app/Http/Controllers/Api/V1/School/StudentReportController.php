@@ -50,9 +50,12 @@ class StudentReportController extends Controller
             ->where('academic_year', $request->academic_year)
             ->first();
 
+        $student = Student::where('school_id', $schoolId)->where('id', $studentId)->first();
+
         return response()->json([
             'message' => 'Rapor siswa berhasil diambil',
-            'data' => $report
+            'data' => $report,
+            'student_status' => $student ? $student->status->value : null
         ]);
     }
 
@@ -98,6 +101,13 @@ class StudentReportController extends Controller
             if (!$class->homeroomTeacher || $class->homeroomTeacher->user_id !== $request->user()->id) {
                 return response()->json(['message' => 'Akses ditolak. Anda hanya dapat mengisi rapor kelas Anda sendiri.'], 403);
             }
+        }
+
+        $student = Student::where('school_id', $schoolId)->where('id', $studentId)->firstOrFail();
+        if ($student->status !== \App\Enums\StudentStatus::ACTIVE) {
+            return response()->json([
+                'message' => 'Tidak dapat mengubah atau membuat rapor untuk siswa berstatus Nonaktif (' . $student->status->label() . '). Rapor bersifat Arsip Read-Only.'
+            ], 422);
         }
 
         DB::beginTransaction();

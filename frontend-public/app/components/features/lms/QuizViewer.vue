@@ -343,6 +343,7 @@ function getReviewQuestionStatus(questionId: number) {
         <ul class="text-sm text-primary-800 space-y-2.5 list-disc pl-5">
           <li>Anda harus memperoleh nilai <strong>minimal 70</strong> untuk lulus.</li>
           <li>Anda diizinkan mengulang kuis berulang kali untuk memperbaiki nilai dan status kelulusan.</li>
+          <li>Nilai yang ditampilkan adalah nilai terbaik dari semua percobaan.</li>
         </ul>
       </div>
 

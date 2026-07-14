@@ -179,7 +179,9 @@ class CheckoutService
     {
         return match ($type) {
             OrderItemType::COURSE  => (bool) $model->is_published,
-            OrderItemType::WEBINAR => (bool) $model->is_active,
+            OrderItemType::WEBINAR => (bool) $model->is_active
+                && (!$model->scheduled_at || $model->scheduled_at->isFuture())
+                && (!$model->max_participants || $model->total_purchases < $model->max_participants),
             OrderItemType::PRODUCT => (bool) $model->is_active,
         };
     }

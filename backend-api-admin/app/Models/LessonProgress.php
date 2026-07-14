@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,7 +37,7 @@ class LessonProgress extends Model
     }
 
     // Scopes
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query)
     {
         return $query->where('is_completed', true);
     }

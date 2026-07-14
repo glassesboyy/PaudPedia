@@ -355,8 +355,8 @@ function formatDate(dateString: string) {
     <!-- Delete Confirmation Modal -->
     <ConfirmModal
       :show="showDeleteModal"
-      title="Hapus Guru?"
-      :message="`Anda akan menghapus ${deleteTarget?.name || ''} dari sekolah ini. Tindakan ini tidak dapat dibatalkan.`"
+      title="Hapus Data Guru?"
+      :message="`Anda akan menghapus data guru '${deleteTarget?.name || ''}'. Jika guru memiliki riwayat akademik (sebagai wali kelas atau pengisi nilai), penghapusan akan diproteksi oleh sistem.`"
       confirm-text="Ya, Hapus"
       variant="danger"
       :loading="isDeleting"

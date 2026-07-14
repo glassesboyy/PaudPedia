@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ParentProfile extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'school_id',
@@ -40,7 +42,7 @@ class ParentProfile extends Model
     }
 
     // Scopes
-    public function scopeBySchool($query, int $schoolId)
+    public function scopeBySchool(Builder $query, int $schoolId)
     {
         return $query->where('school_id', $schoolId);
     }

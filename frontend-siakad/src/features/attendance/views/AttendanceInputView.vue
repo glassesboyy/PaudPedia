@@ -117,10 +117,8 @@ async function fetchStudents() {
 
     students.value = rawList.map(item => ({
       ...item,
-      ...item,
-      // Only set default 'present' for Teachers when creating new records.
-      // For Headmaster or existing records, keep the original status (could be null).
-      status: item.status || (schoolStore.isTeacher ? 'present' : null),
+      // Only set default 'present' for Teachers when creating new records and student is active.
+      status: item.status || ((schoolStore.isTeacher && (!item.student_status || item.student_status === 'active')) ? 'present' : null),
       proof_file: null,
       proof_file_url: item.proof_file_url || null,
       remove_proof_file: false
@@ -318,34 +316,39 @@ const attendanceStats = computed(() => {
           <tbody class="divide-y divide-slate-100">
             <tr v-for="student in paginatedStudents" :key="student.student_id" class="hover:bg-slate-50/50 transition-colors">
               <td class="px-6 py-4">
-                <p class="font-bold text-slate-800">{{ student.name }}</p>
+                <p class="font-bold text-slate-800 flex items-center gap-2">
+                  {{ student.name }}
+                  <span v-if="student.student_status && student.student_status !== 'active'" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                    Arsip: {{ student.student_status === 'graduated' ? 'Lulus' : 'Pindah' }}
+                  </span>
+                </p>
                 <p class="text-xs text-slate-500 font-mono">{{ student.nisn || '-' }}</p>
               </td>
               <td class="px-6 py-4">
                 <div class="grid grid-cols-2 xl:grid-cols-4 gap-2 min-w-[240px]">
                   <label v-for="(label, val) in {'present': 'Hadir', 'sick': 'Sakit', 'permission': 'Izin', 'absent': 'Alfa'}" :key="val" class="cursor-pointer h-10">
-                    <input type="radio" :disabled="!schoolStore.isTeacher" :name="`status-${student.student_id}`" :value="val" v-model="student.status" class="hidden" />
-                    <div :class="['flex items-center justify-center h-full px-2 rounded-lg text-xs font-bold border transition-all', student.status === val ? getStatusColor(val) : 'bg-white text-slate-500 border-slate-200 border-dashed', schoolStore.isTeacher ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
+                    <input type="radio" :disabled="!schoolStore.isTeacher || Boolean(student.student_status && student.student_status !== 'active')" :name="`status-${student.student_id}`" :value="val" v-model="student.status" class="hidden" />
+                    <div :class="['flex items-center justify-center h-full px-2 rounded-lg text-xs font-bold border transition-all', student.status === val ? getStatusColor(val) : 'bg-white text-slate-500 border-slate-200 border-dashed', (schoolStore.isTeacher && (!student.student_status || student.student_status === 'active')) ? 'hover:bg-slate-50' : 'opacity-70 cursor-not-allowed']">
                       {{ label }}
                     </div>
                   </label>
-                  <div v-if="!student.status && !schoolStore.isTeacher" class="col-span-2 xl:col-span-4 py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic text-center">
-                    Belum diinput
+                  <div v-if="!student.status && (!schoolStore.isTeacher || (student.student_status && student.student_status !== 'active'))" class="col-span-2 xl:col-span-4 py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider bg-slate-50 rounded-lg border border-slate-100 italic text-center">
+                    Belum diinput / Arsip
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <input type="text" v-model="student.notes" :disabled="!schoolStore.isTeacher" placeholder="Tuliskan catatan..." class="w-full text-sm px-3 py-2 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all bg-white disabled:opacity-50 disabled:bg-slate-50" />
+                <input type="text" v-model="student.notes" :disabled="!schoolStore.isTeacher || Boolean(student.student_status && student.student_status !== 'active')" placeholder="Tuliskan catatan..." class="w-full text-sm px-3 py-2 rounded-xl border border-slate-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all bg-white disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed" />
               </td>
               <td class="px-6 py-4">
                 <div v-if="student.proof_file_url" class="relative group inline-block w-full max-w-[120px]">
                   <img :src="student.proof_file_url" @click="showPreview(student.proof_file_url)" class="h-16 w-full object-cover rounded-xl border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity" alt="Bukti Absen" title="Klik untuk memperbesar" />
-                  <button v-if="schoolStore.isTeacher" @click.stop="removeProofFile(student)" type="button" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity" title="Hapus Bukti">
+                  <button v-if="schoolStore.isTeacher && (!student.student_status || student.student_status === 'active')" @click.stop="removeProofFile(student)" type="button" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity" title="Hapus Bukti">
                     <Icon name="lucide:x" class="w-3 h-3" />
                   </button>
                 </div>
                 <div v-else>
-                  <input type="file" @change="e => handleFileUpload(e, student)" :disabled="!schoolStore.isTeacher" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 disabled:opacity-50" />
+                  <input type="file" @change="e => handleFileUpload(e, student)" :disabled="!schoolStore.isTeacher || Boolean(student.student_status && student.student_status !== 'active')" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 disabled:opacity-50 disabled:cursor-not-allowed" />
                 </div>
               </td>
             </tr>

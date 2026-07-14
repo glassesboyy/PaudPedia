@@ -173,9 +173,10 @@ async function fetchStudents() {
       programs.value.forEach(program => {
         program.indicators.forEach((indicator: any) => {
           const existingScale = student.assessments && student.assessments[indicator.id] ? student.assessments[indicator.id] : null
+          const existingNotes = student.notes && student.notes[indicator.id] ? student.notes[indicator.id] : ''
           newFormState[student.student_id][indicator.id] = {
             scale: existingScale || (schoolStore.isTeacher ? 'MB' : null),
-            notes: '' // We could load existing notes if API returned them
+            notes: existingNotes
           }
         })
       })
@@ -197,20 +198,28 @@ async function saveAssessment() {
   
   isSaving.value = true
   showValidationErrors.value = true
+  error.value = ''
+  successMessage.value = ''
   
   // Flatten form state into array for API
   const payloadAssessments: any[] = []
+  let missingNotesCount = 0
   
   students.value.forEach(student => {
+    if (student.student_status && student.student_status !== 'active') return
     programs.value.forEach(program => {
       program.indicators.forEach((indicator: any) => {
         const data = formState.value[student.student_id]?.[indicator.id as number]
         if (data && data.scale) {
+          const notesText = data.notes ? data.notes.trim() : ''
+          if (!notesText) {
+            missingNotesCount++
+          }
           payloadAssessments.push({
             student_id: student.student_id,
             indicator_id: indicator.id,
             scale: data.scale,
-            notes: data.notes || null
+            notes: notesText
           })
         }
       })
@@ -219,6 +228,12 @@ async function saveAssessment() {
 
   if (payloadAssessments.length === 0) {
     error.value = 'Belum ada penilaian yang diisi.'
+    isSaving.value = false
+    return
+  }
+
+  if (missingNotesCount > 0) {
+    error.value = `Catatan perkembangan wajib diisi untuk setiap indikator yang dinilai (${missingNotesCount} indikator belum dilengkapi catatan).`
     isSaving.value = false
     return
   }
@@ -353,7 +368,12 @@ const hasAnyAssessment = computed(() => {
           >
             <div v-if="activeStudentId === student.student_id" class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500"></div>
             <div>
-              <p :class="['font-bold text-sm line-clamp-1', activeStudentId === student.student_id ? 'text-primary-700' : 'text-slate-700']">{{ student.name }}</p>
+              <p :class="['font-bold text-sm line-clamp-1 flex items-center gap-1.5', activeStudentId === student.student_id ? 'text-primary-700' : 'text-slate-700']">
+                <span>{{ student.name }}</span>
+                <span v-if="student.student_status && student.student_status !== 'active'" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200 shrink-0">
+                  Arsip
+                </span>
+              </p>
               <p class="text-[10px] text-slate-400 font-mono mt-0.5">{{ student.nisn || '-' }}</p>
             </div>
             <Icon name="lucide:chevron-right" :class="['w-4 h-4 shrink-0 ml-2', activeStudentId === student.student_id ? 'text-primary-500' : 'text-slate-300']" />
@@ -381,8 +401,15 @@ const hasAnyAssessment = computed(() => {
         <!-- Form Header -->
         <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center sticky top-0 z-20 backdrop-blur-md">
           <div>
-            <h2 class="text-xl font-bold text-slate-800">{{ activeStudent.name }}</h2>
-            <p class="text-sm text-slate-500 mt-1">Isi penilaian indikator untuk siswa ini.</p>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-bold text-slate-800">{{ activeStudent.name }}</h2>
+              <span v-if="activeStudent.student_status && activeStudent.student_status !== 'active'" class="px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                Arsip: {{ activeStudent.student_status === 'graduated' ? 'Lulus' : 'Pindah' }} (Read-Only)
+              </span>
+            </div>
+            <p class="text-sm text-slate-500 mt-1">
+              {{ activeStudent.student_status && activeStudent.student_status !== 'active' ? 'Siswa ini berstatus nonaktif. Data penilaian bersifat arsip dan tidak dapat diubah lagi.' : 'Isi penilaian indikator untuk siswa ini.' }}
+            </p>
           </div>
           <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-slate-200 shadow-sm text-primary-600 font-bold text-lg overflow-hidden shrink-0">
             <img v-if="activeStudent.photo_url" :src="activeStudent.photo_url" class="w-full h-full object-cover" />
@@ -406,31 +433,63 @@ const hasAnyAssessment = computed(() => {
             </div>
 
             <div class="space-y-3 px-2 md:px-11">
-              <div v-for="(indicator, idx) in program.indicators" :key="indicator.id" class="p-4 rounded-xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm transition-all grid grid-cols-1 xl:grid-cols-2 gap-4 items-center">
+              <div v-for="(indicator, idx) in program.indicators" :key="indicator.id" class="p-4 rounded-xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm transition-all space-y-3">
                 
-                <div class="flex gap-3 items-start pr-4">
-                  <span class="text-slate-300 font-mono text-sm mt-0.5">{{ idx + 1 }}.</span>
-                  <p class="text-sm text-slate-700 leading-relaxed">{{ indicator.name }}</p>
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 items-center">
+                  <div class="flex gap-3 items-start pr-4">
+                    <span class="text-slate-300 font-mono text-sm mt-0.5">{{ idx + 1 }}.</span>
+                    <p class="text-sm font-semibold text-slate-700 leading-relaxed">{{ indicator.name }}</p>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <label v-for="(label, val) in {'BB': 'BB', 'MB': 'MB', 'BSH': 'BSH', 'BSB': 'BSB'}" :key="val" class="cursor-pointer h-10">
+                      <input 
+                        type="radio" 
+                        :disabled="!schoolStore.isTeacher || Boolean(activeStudent.student_status && activeStudent.student_status !== 'active')" 
+                        :name="`scale-${activeStudent.student_id}-${indicator.id}`" 
+                        :value="val" 
+                        v-model="formState[activeStudent.student_id]![indicator.id as number]!.scale" 
+                        class="hidden" 
+                      />
+                      <div :class="[
+                        'flex items-center text-center justify-center px-2 py-1 rounded-lg text-xs font-bold border transition-all h-full', 
+                        formState[activeStudent.student_id]?.[indicator.id as number]?.scale === val ? getScaleColor(val) : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100', 
+                        (schoolStore.isTeacher && (!activeStudent.student_status || activeStudent.student_status === 'active')) ? 'hover:shadow-sm' : 'opacity-70 cursor-not-allowed'
+                      ]">
+                        {{ label }}
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <label v-for="(label, val) in {'BB': 'BB', 'MB': 'MB', 'BSH': 'BSH', 'BSB': 'BSB'}" :key="val" class="cursor-pointer h-10">
-                    <input 
-                      type="radio" 
-                      :disabled="!schoolStore.isTeacher" 
-                      :name="`scale-${activeStudent.student_id}-${indicator.id}`" 
-                      :value="val" 
-                      v-model="formState[activeStudent.student_id]![indicator.id as number]!.scale" 
-                      class="hidden" 
-                    />
-                    <div :class="[
-                      'flex items-center text-center justify-center px-2 py-1 rounded-lg text-xs font-bold border transition-all h-full', 
-                      formState[activeStudent.student_id]?.[indicator.id as number]?.scale === val ? getScaleColor(val) : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100', 
-                      (schoolStore.isTeacher) ? 'hover:shadow-sm' : 'opacity-70 cursor-not-allowed'
-                    ]">
-                      {{ label }}
-                    </div>
-                  </label>
+                <!-- Input Catatan Perkembangan Anak (Wajib Diisi) -->
+                <div class="pt-2 border-t border-slate-100/80">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <label class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                      <Icon name="lucide:file-text" class="w-3.5 h-3.5 text-primary-500" />
+                      Catatan Perkembangan Anak <span v-if="!activeStudent.student_status || activeStudent.student_status === 'active'" class="text-rose-500 font-bold">*</span>
+                    </label>
+                    <span v-if="!activeStudent.student_status || activeStudent.student_status === 'active'" class="text-[10px] text-slate-400 italic">Wajib diisi saat penilaian</span>
+                    <span v-else class="text-[10px] text-amber-700 font-bold italic">Read-Only</span>
+                  </div>
+                  <textarea
+                    v-if="formState[activeStudent.student_id]?.[indicator.id as number]"
+                    v-model="formState[activeStudent.student_id]![indicator.id as number]!.notes"
+                    :disabled="!schoolStore.isTeacher || Boolean(activeStudent.student_status && activeStudent.student_status !== 'active')"
+                    rows="2"
+                    placeholder="Tuliskan catatan observasi perkembangan anak pada indikator ini (Wajib diisi)..."
+                    :class="[
+                      'w-full px-3 py-2 text-xs rounded-lg border focus:outline-none transition-all',
+                      !formState[activeStudent.student_id]![indicator.id as number]!.notes && showValidationErrors
+                        ? 'border-rose-300 bg-rose-50/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500'
+                        : 'border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+                      (!schoolStore.isTeacher || (activeStudent.student_status && activeStudent.student_status !== 'active')) && 'opacity-75 cursor-not-allowed bg-slate-100'
+                    ]"
+                  ></textarea>
+                  <p v-if="formState[activeStudent.student_id]?.[indicator.id as number] && !formState[activeStudent.student_id]![indicator.id as number]!.notes && showValidationErrors && (!activeStudent.student_status || activeStudent.student_status === 'active')" class="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
+                    <Icon name="lucide:alert-circle" class="w-3 h-3" />
+                    Catatan perkembangan belum diisi.
+                  </p>
                 </div>
 
               </div>
@@ -440,13 +499,17 @@ const hasAnyAssessment = computed(() => {
         </div>
 
         <!-- Sticky Save Button -->
-        <div v-if="schoolStore.isTeacher" class="p-4 border-t border-slate-100 bg-white flex justify-between items-center sticky bottom-0 z-20 shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.1)]">
+        <div v-if="schoolStore.isTeacher && (!activeStudent.student_status || activeStudent.student_status === 'active')" class="p-4 border-t border-slate-100 bg-white flex justify-between items-center sticky bottom-0 z-20 shadow-[0_-10px_20px_-15px_rgba(0,0,0,0.1)]">
           <p class="text-xs text-slate-500 hidden sm:block">Perubahan otomatis disimpan saat menekan tombol simpan.</p>
           <BaseButton variant="primary" :disabled="isSaving" @click="saveAssessment" class="px-8 shadow-md hover:shadow-lg transition-all w-full sm:w-auto">
             <Icon v-if="!isSaving" name="lucide:save" class="w-4 h-4 mr-2" />
             <div v-else class="animate-spin w-4 h-4 rounded-full border-2 border-white/30 border-t-white mr-2"></div>
-            {{ isSaving ? 'Menyimpan...' : 'Simpan Seluruh Penilaian Kelas' }}
+            {{ isSaving ? 'Menyimpan...' : 'Simpan Penilaian Kelas' }}
           </BaseButton>
+        </div>
+        <div v-else-if="activeStudent.student_status && activeStudent.student_status !== 'active'" class="p-4 border-t border-amber-200 bg-amber-50 text-amber-800 flex items-center justify-center gap-2 sticky bottom-0 z-20 text-xs font-semibold">
+          <Icon name="lucide:lock" class="w-4 h-4 text-amber-600" />
+          <span>Data penilaian untuk siswa Lulus/Pindah dikunci (Read-Only).</span>
         </div>
 
       </div>

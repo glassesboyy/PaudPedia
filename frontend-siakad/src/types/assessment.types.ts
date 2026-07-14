@@ -22,7 +22,7 @@ export interface AssessmentRecord {
   name: string
   nisn: string | null
   assessments: Record<number, AssessmentScale> // mapping indicator_id to scale value
-  notes?: Record<number, string> // Optional notes mapping indicator_id to notes (if you want notes per indicator. Actually, the backend API uses notes. Let's see how the backend stores it.)
+  notes?: Record<number, string | null> // mapping indicator_id to notes string
 }
 
 export interface AssessmentResponse {
@@ -45,7 +45,7 @@ export interface BulkAssessmentPayload {
     student_id: number
     indicator_id: number
     scale: AssessmentScale
-    notes?: string | null
+    notes: string // Wajib diisi sesuai aturan validasi backend
   }[]
 }
 
@@ -69,6 +69,7 @@ export interface AssessmentSemesterGroup {
     scale: AssessmentScale
     scale_label: string
     scale_color: string
+    notes?: string | null
   }>>
 }
 
@@ -83,6 +84,7 @@ export interface AssessmentMatrixResponse {
     scale: AssessmentScale
     scale_label: string
     scale_color: string
+    notes?: string | null
   }>>
   student: {
     id: number

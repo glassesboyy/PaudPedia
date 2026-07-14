@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SubscriptionOrderStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,12 +40,12 @@ class SubscriptionOrder extends Model
     }
 
     // Scopes
-    public function scopePending($query)
+    public function scopePending(Builder $query)
     {
         return $query->where('status', SubscriptionOrderStatus::PENDING);
     }
 
-    public function scopePaid($query)
+    public function scopePaid(Builder $query)
     {
         return $query->where('status', SubscriptionOrderStatus::PAID);
     }

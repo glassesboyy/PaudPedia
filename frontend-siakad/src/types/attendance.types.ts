@@ -11,6 +11,7 @@ export interface AttendanceRecord {
   proof_file?: File | null
   proof_file_url?: string | null
   remove_proof_file?: boolean
+  student_status?: string
 }
 
 export interface AttendanceResponse {

@@ -352,7 +352,7 @@ const genderOptions = [
     <ConfirmModal
       :show="showDeleteModal"
       title="Hapus Data Siswa?"
-      :message="`Anda akan menghapus data siswa '${deleteTarget?.name || ''}'. Tindakan ini tidak dapat dibatalkan.`"
+      :message="`Anda akan menghapus data siswa '${deleteTarget?.name || ''}'. Jika siswa memiliki riwayat akademik, presensi, atau keuangan, penghapusan akan diproteksi oleh sistem.`"
       confirm-text="Ya, Hapus"
       variant="danger"
       :loading="isDeleting"

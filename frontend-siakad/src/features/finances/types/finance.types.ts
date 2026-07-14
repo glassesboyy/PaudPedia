@@ -21,6 +21,7 @@ export interface FinanceRecord {
   transaction_type_label: string | null
   paid_at: string | null
   created_at: string
+  student_status?: string
 }
 
 export interface FinanceSummary {

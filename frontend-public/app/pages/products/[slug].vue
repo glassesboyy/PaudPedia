@@ -18,7 +18,7 @@ const isInCart = computed(() => product.value ? hasItem(product.value.id, 'produ
 const isAdding = computed(() => product.value ? isAddingItem(product.value.id, 'product') : false)
 
 function handleAddToCart() {
-  if (!product.value || isInCart.value) return
+  if (!product.value || isInCart.value || product.value.is_owned) return
   addToCart({
     id: product.value.id,
     type: 'product',

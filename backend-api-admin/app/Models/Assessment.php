@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AssessmentScale;
 use App\Enums\Semester;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,22 +53,22 @@ class Assessment extends Model
     }
 
     // Scopes
-    public function scopeBySemester($query, Semester $semester)
+    public function scopeBySemester(Builder $query, Semester $semester)
     {
         return $query->where('semester', $semester);
     }
 
-    public function scopeByMonth($query, string $month)
+    public function scopeByMonth(Builder $query, string $month)
     {
         return $query->where('assessment_month', $month);
     }
 
-    public function scopeByScale($query, AssessmentScale $scale)
+    public function scopeByScale(Builder $query, AssessmentScale $scale)
     {
         return $query->where('scale', $scale);
     }
 
-    public function scopePassing($query)
+    public function scopePassing(Builder $query)
     {
         return $query->whereIn('scale', [AssessmentScale::BSH, AssessmentScale::BSB]);
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\Lms\CertificateGeneratorService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,12 +48,12 @@ class CourseEnrollment extends Model
     }
 
     // Scopes
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query)
     {
         return $query->whereNotNull('completed_at');
     }
 
-    public function scopeInProgress($query)
+    public function scopeInProgress(Builder $query)
     {
         return $query->whereNull('completed_at');
     }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\FinanceType;
 use App\Enums\PaymentMethod;
 use App\Enums\TransactionType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,32 +54,32 @@ class Finance extends Model
     }
 
     // Scopes
-    public function scopeByType($query, FinanceType $type)
+    public function scopeByType(Builder $query, FinanceType $type)
     {
         return $query->where('type', $type);
     }
 
-    public function scopeSpp($query)
+    public function scopeSpp(Builder $query)
     {
         return $query->where('type', FinanceType::SPP);
     }
 
-    public function scopeTabungan($query)
+    public function scopeTabungan(Builder $query)
     {
         return $query->where('type', FinanceType::TABUNGAN);
     }
 
-    public function scopeByMonth($query, string $month)
+    public function scopeByMonth(Builder $query, string $month)
     {
         return $query->where('month', $month);
     }
 
-    public function scopePaid($query)
+    public function scopePaid(Builder $query)
     {
         return $query->where('is_paid', true);
     }
 
-    public function scopeUnpaid($query)
+    public function scopeUnpaid(Builder $query)
     {
         return $query->where('is_paid', false);
     }
