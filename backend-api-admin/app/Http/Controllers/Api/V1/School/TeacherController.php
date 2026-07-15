@@ -132,7 +132,7 @@ class TeacherController extends BaseController
 
         // Check subscription limit (Lite/Pro)
         if (!$school->canAddTeacher()) {
-            return $this->error('Batas jumlah guru untuk paket Anda telah tercapai. Silakan upgrade ke pro.', 422);
+            return $this->error('Batas jumlah guru untuk paket sekolah Anda telah tercapai. Silakan upgrade ke pro.', 422);
         }
 
         $validated = $request->validated();

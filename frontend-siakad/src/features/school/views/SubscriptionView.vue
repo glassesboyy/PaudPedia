@@ -280,8 +280,8 @@ function viewDetail(order: SubscriptionOrder) {
             <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
               <div class="h-full rounded-full transition-all duration-500" :class="usagePercentStudent >= 90 ? 'bg-red-500' : usagePercentStudent >= 70 ? 'bg-amber-500' : 'bg-emerald-500'" :style="{ width: usagePercentStudent + '%' }" />
             </div>
-            <p v-if="usagePercentStudent >= 90" class="text-xs text-red-600 font-medium flex items-center gap-1">
-              <Icon name="lucide:alert-triangle" class="w-3 h-3" /> Kuota hampir penuh!
+            <p v-if="usagePercentStudent == 100" class="text-xs text-red-600 font-medium flex items-center gap-1">
+              <Icon name="lucide:alert-triangle" class="w-3 h-3" /> Kuota siswa penuh!
             </p>
           </div>
           <!-- Teacher Quota -->
@@ -295,8 +295,8 @@ function viewDetail(order: SubscriptionOrder) {
             <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
               <div class="h-full rounded-full transition-all duration-500" :class="usagePercentTeacher >= 90 ? 'bg-red-500' : usagePercentTeacher >= 70 ? 'bg-amber-500' : 'bg-emerald-500'" :style="{ width: usagePercentTeacher + '%' }" />
             </div>
-            <p v-if="usagePercentTeacher >= 90" class="text-xs text-red-600 font-medium flex items-center gap-1">
-              <Icon name="lucide:alert-triangle" class="w-3 h-3" /> Kuota hampir penuh!
+            <p v-if="usagePercentTeacher >= 100" class="text-xs text-red-600 font-medium flex items-center gap-1">
+              <Icon name="lucide:alert-triangle" class="w-3 h-3" /> Kuota guru penuh!
             </p>
           </div>
         </div>

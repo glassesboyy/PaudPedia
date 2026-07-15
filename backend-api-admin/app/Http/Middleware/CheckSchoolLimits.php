@@ -23,11 +23,17 @@ class CheckSchoolLimits
             return $next($request);
         }
 
-        // Exclude specific routes that should always be allowed (e.g. upgrading subscription, profile)
-        if ($request->routeIs('api.v1.auth.subscription.upgrade') || 
-            $request->routeIs('api.v1.auth.schools.register') ||
-            $request->routeIs('api.v1.auth.profile.*') ||
-            $request->routeIs('api.v1.auth.logout')) {
+        // Exclude specific routes that should always be allowed (e.g. upgrading subscription, profile, transfer)
+        if ($request->routeIs('subscription.*') || 
+            $request->routeIs('*.subscription.*') || 
+            $request->routeIs('schools.register') || 
+            $request->routeIs('*.schools.register') || 
+            $request->routeIs('profile.*') || 
+            $request->routeIs('*.profile.*') || 
+            $request->routeIs('logout') ||
+            $request->routeIs('*.logout') ||
+            $request->routeIs('transfer.*') ||
+            $request->routeIs('*.transfer.*')) {
             return $next($request);
         }
 
@@ -55,13 +61,15 @@ class CheckSchoolLimits
         $teacherUsage = $school->total_teachers;
 
         if ($studentUsage > $freeMaxStudents || $teacherUsage > $freeMaxTeachers) {
-            // Check if user is trying to delete a resource (allow deletion to get under limit)
-            if ($request->isMethod('DELETE')) {
+            // Check if user is trying to delete or deactivate a resource (allow deletion/deactivation to get under limit)
+            if ($request->isMethod('DELETE') || 
+                $request->routeIs('*.toggle-active') || 
+                $request->routeIs('teachers.toggle-active') || 
+                $request->routeIs('operators.toggle-active') ||
+                $request->routeIs('students.update') ||
+                $request->routeIs('*.students.update')) {
                 return $next($request);
             }
-            
-            // Check if user is toggling active status to deactivate (allow to get under limit)
-            // It's a bit complex, but generally deleting is allowed.
             
             return response()->json([
                 'message' => 'Akses Terkunci: Jumlah data Siswa (' . $studentUsage . '/' . $freeMaxStudents . ') atau Guru (' . $teacherUsage . '/' . $freeMaxTeachers . ') melebihi batas Paket Gratis. Silakan hapus data atau Upgrade ke Pro.'

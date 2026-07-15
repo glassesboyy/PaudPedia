@@ -318,7 +318,7 @@ const activeItemTo = computed(() => {
                 <Icon name="lucide:lock" class="w-6 h-6" /> Akses Terkunci
               </h2>
               <p class="text-danger-600 font-medium max-w-3xl leading-relaxed">
-                Jumlah data Anda (Siswa: {{ schoolStore.subscriptionInfo?.student_usage }}/{{ schoolStore.subscriptionInfo?.student_limit }}, Guru: {{ schoolStore.subscriptionInfo?.teacher_usage }}/{{ schoolStore.subscriptionInfo?.teacher_limit }}) melebihi batas Paket Gratis. Untuk menggunakan seluruh fitur SIAKAD kembali secara normal, Anda harus Upgrade ke Paket Pro atau menonaktifkan/menghapus kelebihan data.
+                Jumlah data Anda (Siswa: {{ schoolStore.subscriptionInfo?.student_usage }}/{{ schoolStore.subscriptionInfo?.student_limit }}, Guru: {{ schoolStore.subscriptionInfo?.teacher_usage }}/{{ schoolStore.subscriptionInfo?.teacher_limit }}) melebihi batas Paket Gratis. Untuk menggunakan seluruh fitur SIAKAD kembali secara normal, Anda harus Upgrade ke Paket Pro atau menghapus kelebihan data.
               </p>
             </div>
             <BaseButton variant="danger" size="lg" @click="$router.push('/school/subscription')" class="whitespace-nowrap shadow-lg shadow-danger-500/30">
