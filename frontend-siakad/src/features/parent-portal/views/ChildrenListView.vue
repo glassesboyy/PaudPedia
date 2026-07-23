@@ -43,6 +43,20 @@ async function fetchMyChildren(page = 1) {
     isLoading.value = false
   }
 }
+
+function getStatusLabel(status: string) {
+  if (status === 'active') return 'Aktif'
+  if (status === 'graduated') return 'Lulus'
+  if (status === 'transferred') return 'Pindah'
+  return status || '-'
+}
+
+function getStatusClass(status: string) {
+  if (status === 'active') return 'bg-emerald-50 text-emerald-700'
+  if (status === 'graduated') return 'bg-primary-50 text-primary-700'
+  if (status === 'transferred') return 'bg-slate-100 text-slate-700'
+  return 'bg-slate-100 text-slate-700'
+}
 </script>
 
 <template>
@@ -104,8 +118,11 @@ async function fetchMyChildren(page = 1) {
           <div class="flex-1 min-w-0 w-full text-center sm:text-left">
             <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-2 mb-1">
               <h4 class="font-bold text-heading group-hover:text-primary-700 transition-colors text-lg leading-tight break-words">{{ child.name }}</h4>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider shrink-0">
-                {{ child.status }}
+              <span :class="[
+                'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0',
+                getStatusClass(child.status)
+              ]">
+                {{ getStatusLabel(child.status) }}
               </span>
             </div>
             <div class="flex items-center justify-center sm:justify-start gap-1.5 text-sm text-primary-600 font-bold mb-3">

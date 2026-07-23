@@ -100,6 +100,12 @@ async function fetchStudents() {
   } catch { /* silent */ }
 }
 
+const previewImageUrl = ref<string | null>(null)
+
+function showPreview(url: string) {
+  previewImageUrl.value = url
+}
+
 async function fetchSppRecords(page = 1) {
   isLoading.value = true
   try {
@@ -151,11 +157,22 @@ const isUpdating = ref<number | null>(null)
 const showVerificationModal = ref(false)
 const verificationRecord = ref<FinanceRecord | null>(null)
 const verificationPaymentMethod = ref('cash')
+const verificationProofFile = ref<File | null>(null)
 
 function openVerificationModal(record: FinanceRecord) {
   verificationRecord.value = record
   verificationPaymentMethod.value = 'cash'
+  verificationProofFile.value = null
   showVerificationModal.value = true
+}
+
+function handleVerificationFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    verificationProofFile.value = target.files[0] || null
+  } else {
+    verificationProofFile.value = null
+  }
 }
 
 async function confirmMarkAsPaid() {
@@ -167,7 +184,8 @@ async function confirmMarkAsPaid() {
   try {
     const res = await financeService.updateSpp(schoolStore.currentSchoolId!, verificationRecord.value.id, {
       is_paid: true,
-      payment_method: verificationPaymentMethod.value as 'cash' | 'transfer'
+      payment_method: verificationPaymentMethod.value as 'cash' | 'transfer',
+      proof_file: verificationProofFile.value
     })
     success.value = (res as any).message
     showVerificationModal.value = false
@@ -437,16 +455,27 @@ function handleReset() {
                   </span>
                 </td>
                 <td class="px-6 py-4 text-center whitespace-nowrap">
-                  <BaseButton 
-                    v-if="!r.is_paid && (schoolStore.canManageFinances || schoolStore.currentRole === 'teacher')" 
-                    variant="outline" 
-                    size="sm" 
-                    class="text-xs h-8 px-3 whitespace-nowrap" 
-                    :loading="isUpdating === r.id"
-                    @click="openVerificationModal(r)"
-                  >
-                    Tandai Lunas
-                  </BaseButton>
+                  <div class="flex items-center justify-center gap-2">
+                    <button 
+                      v-if="r.proof_file_url" 
+                      @click="showPreview(r.proof_file_url)" 
+                      type="button" 
+                      class="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-primary-100"
+                      title="Lihat Bukti"
+                    >
+                      <Icon name="lucide:file-image" class="w-3.5 h-3.5" /> Bukti
+                    </button>
+                    <BaseButton 
+                      v-if="!r.is_paid && (schoolStore.canManageFinances || schoolStore.currentRole === 'teacher')" 
+                      variant="outline" 
+                      size="sm" 
+                      class="text-xs h-8 px-3 whitespace-nowrap" 
+                      :loading="isUpdating === r.id"
+                      @click="openVerificationModal(r)"
+                    >
+                      Tandai Lunas
+                    </BaseButton>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -477,6 +506,11 @@ function handleReset() {
           </select>
         </div>
 
+        <div class="space-y-1.5 pt-2">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Upload Bukti (Opsional)</label>
+          <input type="file" accept="image/*,application/pdf" @change="handleVerificationFileChange" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" />
+        </div>
+
         <div class="flex justify-end gap-3 pt-4">
           <BaseButton variant="ghost" class="w-full" @click="showVerificationModal = false">Batal</BaseButton>
           <BaseButton variant="primary" class="w-full" :loading="isUpdating === verificationRecord.id" @click="confirmMarkAsPaid">
@@ -488,6 +522,35 @@ function handleReset() {
       <!-- Overlay for Verification Modal -->
       <div v-if="showVerificationModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 transition-opacity" @click="showVerificationModal = false"></div>
 
+    </template>
+
+    <!-- Image Preview Modal -->
+    <template v-if="previewImageUrl">
+      <!-- Overlay -->
+      <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[55] transition-opacity" @click="previewImageUrl = null"></div>
+
+      <!-- Modal Container -->
+      <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-xl shadow-2xl w-[90vw] max-w-3xl flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <h3 class="font-bold text-heading text-base flex items-center gap-2.5">
+            <Icon name="lucide:image" class="w-5 h-5 text-primary-500" /> Preview Bukti
+          </h3>
+          <div class="flex items-center gap-1.5">
+            <a :href="previewImageUrl" target="_blank" class="text-slate-500 hover:text-primary-600 hover:bg-primary-50 p-2 rounded-full transition-colors" title="Buka Ukuran Penuh">
+              <Icon name="lucide:maximize" class="w-4 h-4" />
+            </a>
+            <div class="w-px h-4 bg-slate-200 mx-1"></div>
+            <button @click="previewImageUrl = null" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors" title="Tutup Preview">
+              <Icon name="lucide:x" class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <!-- Body -->
+        <div class="bg-slate-100/80 p-4 md:p-6 rounded-b-xl flex items-center justify-center">
+          <img :src="previewImageUrl" style="max-width: 100%; max-height: 70vh;" class="object-contain drop-shadow-sm rounded-md" alt="Preview Bukti" />
+        </div>
+      </div>
     </template>
   </div>
 </template>

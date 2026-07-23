@@ -373,13 +373,32 @@ const attendanceStats = computed(() => {
     </BaseCard>
 
     <!-- Image Preview Modal -->
-    <div v-if="previewImageUrl" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4" @click="previewImageUrl = null">
-      <div class="relative max-w-2xl max-h-[80vh] w-full" @click.stop>
-        <button @click="previewImageUrl = null" class="absolute -top-12 right-0 text-white hover:text-slate-200 p-2">
-          <Icon name="lucide:x" class="w-8 h-8" />
-        </button>
-        <img :src="previewImageUrl" class="max-w-full max-h-[80vh] mx-auto object-contain rounded-2xl shadow-2xl" alt="Preview Bukti Absen" />
+    <template v-if="previewImageUrl">
+      <!-- Overlay -->
+      <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[55] transition-opacity" @click="previewImageUrl = null"></div>
+
+      <!-- Modal Container -->
+      <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-xl shadow-2xl w-[90vw] max-w-3xl flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <h3 class="font-bold text-heading text-base flex items-center gap-2.5">
+            <Icon name="lucide:image" class="w-5 h-5 text-primary-500" /> Preview Bukti
+          </h3>
+          <div class="flex items-center gap-1.5">
+            <a :href="previewImageUrl" target="_blank" class="text-slate-500 hover:text-primary-600 hover:bg-primary-50 p-2 rounded-full transition-colors" title="Buka Ukuran Penuh">
+              <Icon name="lucide:maximize" class="w-4 h-4" />
+            </a>
+            <div class="w-px h-4 bg-slate-200 mx-1"></div>
+            <button @click="previewImageUrl = null" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors" title="Tutup Preview">
+              <Icon name="lucide:x" class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <!-- Body -->
+        <div class="bg-slate-100/80 p-4 md:p-6 rounded-b-xl flex items-center justify-center">
+          <img :src="previewImageUrl" style="max-width: 100%; max-height: 70vh;" class="object-contain drop-shadow-sm rounded-md" alt="Preview Bukti" />
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>

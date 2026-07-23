@@ -90,7 +90,16 @@ class UserService
 
             // Sync role if provided (single role)
             if (isset($data['role'])) {
-                $user->syncRoles([$data['role']]);
+                $systemRoles = ['admin', 'moderator', 'user'];
+                $currentRoles = $user->roles->pluck('name')->toArray();
+                
+                // Keep only SIAKAD roles
+                $rolesToKeep = array_diff($currentRoles, $systemRoles);
+                
+                // Add the new system role
+                $rolesToKeep[] = $data['role'];
+                
+                $user->syncRoles($rolesToKeep);
             }
 
             DB::commit();

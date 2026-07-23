@@ -22,6 +22,7 @@ export interface FinanceRecord {
   paid_at: string | null
   created_at: string
   student_status?: string
+  proof_file_url?: string | null
 }
 
 export interface FinanceSummary {
@@ -58,6 +59,7 @@ export interface SppPaymentPayload {
   payment_method: PaymentMethodSchool
   description?: string
   is_paid?: boolean
+  proof_file?: File | null
 }
 
 export interface SavingsPayload {
@@ -65,4 +67,5 @@ export interface SavingsPayload {
   amount: number
   transaction_type: SavingsTransactionType
   description?: string
+  proof_file?: File | null
 }

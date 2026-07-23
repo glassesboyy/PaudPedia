@@ -111,6 +111,11 @@ const availableAcademicYears = computed(() => {
 })
 
 const isAcademicYearInitialized = ref(false)
+const previewImageUrl = ref<string | null>(null)
+
+function showPreview(url: string) {
+  previewImageUrl.value = url
+}
 
 watch([availableAcademicYears, student, isLoading], () => {
   if (isAcademicYearInitialized.value) return
@@ -243,6 +248,22 @@ function getScaleForMonth(matrix: Record<string, any>, indicatorId: number, mont
   const key = Object.keys(matrix[indicatorId]).find(k => k.endsWith(`-${monthPad}`))
   if (key) return matrix[indicatorId][key]
   return null
+}
+
+function getStatusLabel(status: string | undefined) {
+  if (!status) return '-'
+  if (status === 'active') return 'Aktif'
+  if (status === 'graduated') return 'Lulus'
+  if (status === 'transferred') return 'Pindah'
+  return status
+}
+
+function getStatusClass(status: string | undefined) {
+  if (!status) return 'bg-slate-100 text-slate-700'
+  if (status === 'active') return 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+  if (status === 'graduated') return 'bg-primary-50 text-primary-700 border border-primary-100'
+  if (status === 'transferred') return 'bg-slate-50 text-slate-700 border border-slate-200'
+  return 'bg-slate-100 text-slate-700 border border-slate-200'
 }
 
 function getFinalScale(matrix: Record<string, any>, indicatorId: number, semester: string) {
@@ -410,27 +431,38 @@ const computedAttendanceSummary = computed(() => {
     </div>
 
     <!-- Detail Content -->
-    <BaseCard v-else-if="student" class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
-      <!-- Photo + Name Section -->
-      <div class="p-8 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
-        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-white border-2 border-slate-200 shadow-sm shrink-0">
-          <img v-if="student.photo_url" :src="student.photo_url" class="w-full h-full object-cover" />
-          <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
-            <Icon name="lucide:user" class="w-12 h-12" />
-          </div>
-        </div>
-        <div class="space-y-3 sm:space-y-2 mt-2 sm:mt-0">
-          <h2 class="text-2xl font-black text-heading leading-tight">{{ student.name }}</h2>
-          <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-            <span :class="['px-3 py-1 rounded-full text-xs font-bold border', statusColors[student.status] || 'bg-slate-50 text-slate-700']">
-              {{ statusLabels[student.status] || student.status }}
-            </span>
-            <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200 flex items-center gap-1.5">
-              <Icon name="lucide:school" class="w-3.5 h-3.5" /> {{ student.class?.name || 'Belum ada kelas' }}
-            </span>
-          </div>
+    <div v-else-if="student" class="space-y-6">
+      
+      <!-- Warning Banner for Inactive Student -->
+      <div v-if="student.status !== 'active'" class="animate-fade-in py-3 px-5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 shadow-sm">
+        <Icon name="lucide:alert-triangle" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+        <div>
+          <h4 class="text-sm font-bold text-amber-800">Status Siswa Tidak Aktif ({{ getStatusLabel(student.status) }})</h4>
+          <p class="text-xs text-amber-700 font-medium mt-0.5">Data siswa ini bersifat arsip karena status anak Anda sudah tidak aktif di sekolah. Anda tetap dapat mengunduh rapor dan melihat riwayat yang ada.</p>
         </div>
       </div>
+
+      <BaseCard class="p-0 border-none shadow-xl shadow-primary-900/5 overflow-hidden">
+        <!-- Photo + Name Section -->
+        <div class="p-8 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-white border-2 border-slate-200 shadow-sm shrink-0">
+            <img v-if="student.photo_url" :src="student.photo_url" class="w-full h-full object-cover" />
+            <div v-else class="w-full h-full flex items-center justify-center text-slate-300">
+              <Icon name="lucide:user" class="w-12 h-12" />
+            </div>
+          </div>
+          <div class="space-y-3 sm:space-y-2 mt-2 sm:mt-0">
+            <h2 class="text-2xl font-black text-heading leading-tight">{{ student.name }}</h2>
+            <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+              <span :class="['px-3 py-1 rounded-full text-xs font-bold border', getStatusClass(student.status)]">
+                {{ getStatusLabel(student.status) }}
+              </span>
+              <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+                <Icon name="lucide:school" class="w-3.5 h-3.5" /> {{ student.class?.name || 'Belum ada kelas' }}
+              </span>
+            </div>
+          </div>
+        </div>
       
       <!-- Tabs Navigation -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 p-2 bg-slate-100 rounded-2xl mx-4 sm:mx-8 mt-4 border border-slate-200">
@@ -711,6 +743,9 @@ const computedAttendanceSummary = computed(() => {
                 <div>
                   <p class="text-sm font-bold text-left" :class="rec.is_paid ? 'text-slate-800' : 'text-red-900'">Tagihan SPP - {{ rec.month }}</p>
                   <p class="text-xs mt-1 text-left" :class="rec.is_paid ? 'text-slate-500' : 'text-red-700'">{{ rec.description || '-' }}</p>
+                  <button v-if="rec.proof_file_url" @click="showPreview(rec.proof_file_url)" type="button" class="text-xs font-bold text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5 mt-2 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg transition-colors border border-primary-100">
+                    <Icon name="lucide:file-image" class="w-4 h-4" /> Lihat Bukti
+                  </button>
                 </div>
                 <div class="text-left sm:text-right flex items-center justify-between sm:block">
                   <p class="text-sm font-bold mb-1.5" :class="rec.is_paid ? 'text-slate-900' : 'text-red-900'">{{ rec.amount_formatted }}</p>
@@ -748,6 +783,9 @@ const computedAttendanceSummary = computed(() => {
                 <div>
                   <p class="text-sm font-bold text-slate-800">{{ rec.transaction_type_label }}</p>
                   <p class="text-xs text-slate-400">{{ rec.description || '-' }}</p>
+                  <button v-if="rec.proof_file_url" @click="showPreview(rec.proof_file_url)" type="button" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1.5 mt-2 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors border border-emerald-100">
+                    <Icon name="lucide:file-image" class="w-4 h-4" /> Lihat Bukti
+                  </button>
                 </div>
                 <p class="text-sm font-bold" :class="rec.transaction_type === 'withdrawal' ? 'text-red-600' : 'text-emerald-700'">
                   {{ rec.transaction_type === 'withdrawal' ? '-' : '+' }}{{ rec.amount_formatted }}
@@ -771,5 +809,35 @@ const computedAttendanceSummary = computed(() => {
         </div>
       </div>
     </BaseCard>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <template v-if="previewImageUrl">
+      <!-- Overlay -->
+      <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[55] transition-opacity" @click="previewImageUrl = null"></div>
+
+      <!-- Modal Container -->
+      <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-xl shadow-2xl w-[90vw] max-w-3xl flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <h3 class="font-bold text-heading text-base flex items-center gap-2.5">
+            <Icon name="lucide:image" class="w-5 h-5 text-primary-500" /> Preview Bukti
+          </h3>
+          <div class="flex items-center gap-1.5">
+            <a :href="previewImageUrl" target="_blank" class="text-slate-500 hover:text-primary-600 hover:bg-primary-50 p-2 rounded-full transition-colors" title="Buka Ukuran Penuh">
+              <Icon name="lucide:maximize" class="w-4 h-4" />
+            </a>
+            <div class="w-px h-4 bg-slate-200 mx-1"></div>
+            <button @click="previewImageUrl = null" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors" title="Tutup Preview">
+              <Icon name="lucide:x" class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <!-- Body -->
+        <div class="bg-slate-100/80 p-4 md:p-6 rounded-b-xl flex items-center justify-center">
+          <img :src="previewImageUrl" style="max-width: 100%; max-height: 70vh;" class="object-contain drop-shadow-sm rounded-md" alt="Preview Bukti" />
+        </div>
+      </div>
+    </template>
   </div>
 </template>

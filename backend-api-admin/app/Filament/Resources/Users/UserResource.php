@@ -9,6 +9,7 @@ use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Filament\Resources\Users\RelationManagers\SchoolMembershipsRelationManager;
 use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -52,7 +53,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SchoolMembershipsRelationManager::class,
         ];
     }
 

@@ -25,6 +25,7 @@ class Finance extends Model
         'payment_method',
         'transaction_type',
         'recorded_by',
+        'proof_file_path',
     ];
 
     protected $casts = [

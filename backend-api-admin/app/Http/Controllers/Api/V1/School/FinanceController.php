@@ -234,6 +234,7 @@ class FinanceController extends Controller
             'payment_method' => ['required', 'in:cash,transfer'],
             'description' => 'nullable|string|max:255',
             'is_paid' => 'boolean',
+            'proof_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -271,6 +272,11 @@ class FinanceController extends Controller
             ], 422);
         }
 
+        $proofFilePath = null;
+        if ($request->hasFile('proof_file')) {
+            $proofFilePath = $request->file('proof_file')->store('finance_proofs', 'public');
+        }
+
         $finance = Finance::create([
             'student_id' => $student->id,
             'type' => FinanceType::SPP,
@@ -281,6 +287,7 @@ class FinanceController extends Controller
             'paid_at' => $request->boolean('is_paid', true) ? now() : null,
             'payment_method' => $request->payment_method,
             'recorded_by' => $request->user()->id,
+            'proof_file_path' => $proofFilePath,
         ]);
 
         return response()->json([
@@ -318,6 +325,7 @@ class FinanceController extends Controller
             'payment_method' => ['sometimes', 'in:cash,transfer'],
             'description' => 'nullable|string|max:255',
             'is_paid' => 'sometimes|boolean',
+            'proof_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -327,6 +335,13 @@ class FinanceController extends Controller
         $updateData = $request->only(['amount', 'payment_method', 'description', 'is_paid']);
         if (isset($updateData['is_paid']) && $updateData['is_paid'] && !$finance->is_paid) {
             $updateData['paid_at'] = now();
+        }
+
+        if ($request->hasFile('proof_file')) {
+            if ($finance->proof_file_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($finance->proof_file_path);
+            }
+            $updateData['proof_file_path'] = $request->file('proof_file')->store('finance_proofs', 'public');
         }
 
         $finance->update($updateData);
@@ -434,6 +449,7 @@ class FinanceController extends Controller
             'amount' => 'required|numeric|min:1',
             'transaction_type' => ['required', new Enum(TransactionType::class)],
             'description' => 'nullable|string|max:255',
+            'proof_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -477,6 +493,11 @@ class FinanceController extends Controller
             }
         }
 
+        $proofFilePath = null;
+        if ($request->hasFile('proof_file')) {
+            $proofFilePath = $request->file('proof_file')->store('finance_proofs', 'public');
+        }
+
         $finance = Finance::create([
             'student_id' => $student->id,
             'type' => FinanceType::TABUNGAN,
@@ -487,6 +508,7 @@ class FinanceController extends Controller
             'is_paid' => true,
             'paid_at' => now(),
             'recorded_by' => $request->user()->id,
+            'proof_file_path' => $proofFilePath,
         ]);
 
         return response()->json([
@@ -607,6 +629,7 @@ class FinanceController extends Controller
             'transaction_type_label' => $finance->transaction_type?->label(),
             'paid_at' => $finance->paid_at?->toISOString(),
             'created_at' => $finance->created_at->toISOString(),
+            'proof_file_url' => $finance->proof_file_path ? asset('storage/' . $finance->proof_file_path) : null,
         ];
     }
 }

@@ -104,8 +104,8 @@ class UserForm
                 ->columnSpan(1),
 
                     Select::make('role')
-                        ->label('Role Pengguna')
-                        ->options(fn () => Role::all()->pluck('name', 'name'))
+                        ->label('Role Utama (Sistem)')
+                        ->options(fn () => \Spatie\Permission\Models\Role::whereIn('name', ['admin', 'moderator', 'user'])->pluck('name', 'name'))
                         ->required()
                         ->native(false)
                         ->searchable()

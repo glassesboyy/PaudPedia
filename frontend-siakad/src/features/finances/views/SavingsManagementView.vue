@@ -48,6 +48,7 @@ const form = ref<SavingsPayload>({
   amount: 0,
   transaction_type: 'deposit',
   description: '',
+  proof_file: null,
 })
 
 const filteredStudents = computed(() => {
@@ -55,6 +56,12 @@ const filteredStudents = computed(() => {
   if (!selectedClassId.value) return activeStudents
   return activeStudents.filter(s => s.class_id === selectedClassId.value)
 })
+
+const previewImageUrl = ref<string | null>(null)
+
+function showPreview(url: string) {
+  previewImageUrl.value = url
+}
 
 onMounted(async () => {
   if (schoolStore.isPro) {
@@ -111,7 +118,7 @@ async function submitSavings() {
     const res = await financeService.storeSavings(schoolStore.currentSchoolId!, form.value)
     success.value = (res as any).message
     showForm.value = false
-    form.value = { student_id: 0, amount: 0, transaction_type: 'deposit', description: '' }
+    form.value = { student_id: 0, amount: 0, transaction_type: 'deposit', description: '', proof_file: null }
     await fetchSavings()
   } catch (err: any) {
     formError.value = err.response?.data?.message || 'Gagal mencatat transaksi.'
@@ -123,6 +130,7 @@ async function submitSavings() {
 function closeForm() {
   showForm.value = false
   formError.value = ''
+  form.value = { student_id: 0, amount: 0, transaction_type: 'deposit', description: '', proof_file: null }
 }
 
 function formatCurrency(val: number): string {
@@ -215,9 +223,13 @@ function handleReset() {
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Nominal (Rp)</label>
             <input v-model.number="form.amount" type="number" min="1" placeholder="50000" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
-          <div class="space-y-1.5">
+          <div class="space-y-1.5 md:col-span-2">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Catatan (Opsional)</label>
             <input v-model="form.description" type="text" placeholder="Catatan transaksi..." class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+          </div>
+          <div class="space-y-1.5 md:col-span-2">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Upload Bukti (Opsional)</label>
+            <input type="file" accept="image/*,application/pdf" @change="e => { const target = e.target as HTMLInputElement; form.proof_file = target.files && target.files.length > 0 ? target.files[0] : null; }" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
           </div>
         </div>
         <template #footer>
@@ -293,6 +305,7 @@ function handleReset() {
                 <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Jenis</th>
                 <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Nominal</th>
                 <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Catatan</th>
+                <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Bukti</th>
                 <th class="px-6 py-5 text-left text-[10px] font-extrabold text-muted uppercase tracking-widest whitespace-nowrap">Tanggal</th>
               </tr>
             </thead>
@@ -308,11 +321,12 @@ function handleReset() {
                 <td class="px-6 py-4"><Skeleton width="80px" height="1.5rem" class="rounded-full" /></td>
                 <td class="px-6 py-4"><Skeleton width="100px" height="1rem" /></td>
                 <td class="px-6 py-4"><Skeleton width="150px" height="0.875rem" /></td>
+                <td class="px-6 py-4"><Skeleton width="100px" height="1.5rem" class="rounded-lg" /></td>
                 <td class="px-6 py-4"><Skeleton width="80px" height="0.875rem" /></td>
               </tr>
               <!-- Empty States -->
               <tr v-else-if="savingsRecords.length === 0">
-                <td colspan="5" class="px-8 py-20 text-center">
+                <td colspan="6" class="px-8 py-20 text-center">
                   <!-- Case: Data truly empty -->
                   <div v-if="!isFiltering" class="flex flex-col items-center gap-4 max-w-xs mx-auto">
                     <div class="w-20 h-20 bg-surface-muted rounded-2xl flex items-center justify-center text-muted border-2 border-dashed border-border">
@@ -361,7 +375,15 @@ function handleReset() {
                 <td class="px-6 py-4 font-bold" :class="r.transaction_type === 'withdrawal' ? 'text-red-600' : 'text-emerald-700'">
                   {{ r.transaction_type === 'withdrawal' ? '-' : '+' }}{{ r.amount_formatted }}
                 </td>
-                <td class="px-6 py-4 text-muted text-xs">{{ r.description || '-' }}</td>
+                <td class="px-6 py-4 text-muted text-xs">
+                  <span>{{ r.description || '-' }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <button v-if="r.proof_file_url" @click="showPreview(r.proof_file_url)" type="button" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors border border-emerald-100 w-fit whitespace-nowrap">
+                    <Icon name="lucide:file-image" class="w-4 h-4" /> Lihat Bukti
+                  </button>
+                  <span v-else class="text-xs text-muted">-</span>
+                </td>
                 <td class="px-6 py-4 text-xs font-bold text-muted">{{ formatDate(r.created_at) }}</td>
               </tr>
             </tbody>
@@ -376,6 +398,35 @@ function handleReset() {
           @page-change="fetchSavings"
         />
       </BaseCard>
+    </template>
+
+    <!-- Image Preview Modal -->
+    <template v-if="previewImageUrl">
+      <!-- Overlay -->
+      <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[55] transition-opacity" @click="previewImageUrl = null"></div>
+
+      <!-- Modal Container -->
+      <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-xl shadow-2xl w-[90vw] max-w-3xl flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <h3 class="font-bold text-heading text-base flex items-center gap-2.5">
+            <Icon name="lucide:image" class="w-5 h-5 text-primary-500" /> Preview Bukti
+          </h3>
+          <div class="flex items-center gap-1.5">
+            <a :href="previewImageUrl" target="_blank" class="text-slate-500 hover:text-primary-600 hover:bg-primary-50 p-2 rounded-full transition-colors" title="Buka Ukuran Penuh">
+              <Icon name="lucide:maximize" class="w-4 h-4" />
+            </a>
+            <div class="w-px h-4 bg-slate-200 mx-1"></div>
+            <button @click="previewImageUrl = null" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors" title="Tutup Preview">
+              <Icon name="lucide:x" class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        <!-- Body -->
+        <div class="bg-slate-100/80 p-4 md:p-6 rounded-b-xl flex items-center justify-center">
+          <img :src="previewImageUrl" style="max-width: 100%; max-height: 70vh;" class="object-contain drop-shadow-sm rounded-md" alt="Preview Bukti" />
+        </div>
+      </div>
     </template>
   </div>
 </template>

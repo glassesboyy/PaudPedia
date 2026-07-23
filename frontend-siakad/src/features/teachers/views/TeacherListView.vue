@@ -223,6 +223,7 @@ function formatDate(dateString: string) {
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest">Spesialisasi</th>
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest text-center">Status</th>
               <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest text-right">Aksi</th>
+              <th class="px-8 py-5 text-[10px] font-extrabold text-muted uppercase tracking-widest text-center">Terdaftar Pada</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border/50 bg-white">
@@ -336,6 +337,10 @@ function formatDate(dateString: string) {
                       <Icon name="lucide:trash-2" class="w-4 h-4" />
                     </button>
                 </div>
+              </td>
+              <td class="px-8 py-5">
+                <span v-if="teacher.joined_at" class="text-xs text-body font-medium">{{ formatDate(teacher.joined_at) }}</span>
+                <span v-else class="text-xs text-muted font-medium italic">-</span>
               </td>
             </tr>
           </tbody>

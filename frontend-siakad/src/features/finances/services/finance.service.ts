@@ -26,6 +26,21 @@ export const financeService = {
    * Record a new SPP payment
    */
   storeSpp(schoolId: number, payload: SppPaymentPayload) {
+    if (payload.proof_file) {
+      const formData = new FormData()
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (key === 'is_paid') {
+            formData.append(key, value ? '1' : '0')
+          } else {
+            formData.append(key, value instanceof File ? value : String(value))
+          }
+        }
+      })
+      return api.post<{ message: string; data: FinanceRecord }>(`/api/v1/schools/${schoolId}/finances/spp`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    }
     return api.post<{ message: string; data: FinanceRecord }>(`/api/v1/schools/${schoolId}/finances/spp`, payload)
   },
 
@@ -40,6 +55,22 @@ export const financeService = {
    * Update an SPP payment
    */
   updateSpp(schoolId: number, financeId: number, payload: Partial<SppPaymentPayload>) {
+    if (payload.proof_file) {
+      const formData = new FormData()
+      formData.append('_method', 'PUT')
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (key === 'is_paid') {
+            formData.append(key, value ? '1' : '0')
+          } else {
+            formData.append(key, value instanceof File ? value : String(value))
+          }
+        }
+      })
+      return api.post<{ message: string; data: FinanceRecord }>(`/api/v1/schools/${schoolId}/finances/spp/${financeId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    }
     return api.put<{ message: string; data: FinanceRecord }>(`/api/v1/schools/${schoolId}/finances/spp/${financeId}`, payload)
   },
 
@@ -54,6 +85,17 @@ export const financeService = {
    * Record a savings deposit or withdrawal
    */
   storeSavings(schoolId: number, payload: SavingsPayload) {
+    if (payload.proof_file) {
+      const formData = new FormData()
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value instanceof File ? value : String(value))
+        }
+      })
+      return api.post<{ message: string; data: FinanceRecord }>(`/api/v1/schools/${schoolId}/finances/savings`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    }
     return api.post<{ message: string; data: FinanceRecord }>(`/api/v1/schools/${schoolId}/finances/savings`, payload)
   },
 
