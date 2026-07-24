@@ -1,268 +1,250 @@
 ## 5.3 Prosedur Pengujian
-Prosedur pengujian dilakukan untuk memastikan bahwa seluruh antarmuka fitur, integrasi antar-halaman, serta aturan logika bisnis pada platform *SaaS* PAUD ini dapat berjalan sesuai dengan kebutuhan spesifikasi dan proses operasional institusi pendidikan. Seluruh tahapan pengujian ini dieksekusi secara manual mengacu pada metode terpadu **Pengujian Fungsional (*Functional Testing*)**.
+Prosedur pengujian dilakukan untuk memastikan bahwa seluruh antarmuka fitur, integrasi antar halaman, serta aturan logika bisnis pada platform SaaS PAUD ini dapat berjalan sesuai dengan kebutuhan spesifikasi dan proses operasional institusi pendidikan. Pengujian dilakukan secara manual menggunakan pendekatan *Functional Testing* (Howden, 1980).
 
-Pengujian difokuskan pada fitur-fitur esensial sistem yang berkaitan dengan manajemen akademik oleh Kepala Sekolah dan Operator Sekolah, tata kelola keuangan internal, perniagaan digital di *marketplace*, proses integrasi transaksi, kegiatan belajar asinkron di LMS, hingga validasi hierarki administrator dan kuota langganan. Setiap pengujian dieksekusi berdasarkan skenario terstruktur guna memverifikasi apakah keluaran dari antarmuka sistem sudah tepat dalam menangani masukan pengguna yang wajar maupun tidak wajar.
+Pengujian difokuskan pada fitur-fitur esensial sistem yang berkaitan dengan manajemen akademik, tata kelola keuangan, marketplace, proses transaksi, kegiatan belajar asinkron di LMS, hingga validasi hierarki administrator. Setiap pengujian dieksekusi berdasarkan skenario terstruktur guna memverifikasi apakah hasil keluaran dari antarmuka sistem sudah tepat dalam menangani masukan pengguna yang wajar maupun tidak wajar. Rincian skenario pengujian yang digunakan pada penelitian ini disajikan pada Tabel 12.
 
-Tabel 5.1 menunjukkan daftar prosedur pengujian fungsional yang dilakukan pada sistem.
+**Tabel 12 Prosedur Pengujian**
 
-| ID | Object | Butir Uji | Teknik Pengujian |
+| ID | Object | Butir Uji | Teknik |
 | :--- | :--- | :--- | :--- |
-| FT-001 | Multi-School | Pendaftaran akun Kepala Sekolah dan pembuatan ruang kerja (*tenant*) sekolah baru | Pengujian Fungsional |
-| FT-002 | Manajemen Siswa | Penambahan data biodata anak dan penautan akun profil wali murid oleh **Operator Sekolah** | Pengujian Fungsional |
-| FT-003 | Asesmen PAUD | Pengisian form skala nilai perkembangan anak oleh guru dengan validasi *Temporal Assessment Integrity* | Pengujian Fungsional |
-| FT-004 | Rapor Naratif | Penyusunan narasi rapor akhir semester dan pencetakan PDF dengan penyaringan cerdas *Smart Omission* | Pengujian Fungsional |
-| FT-005 | Keuangan SIAKAD | Pencatatan iuran SPP dan tabungan siswa sebagai buku besar administratif (*ledger*) oleh Operator & Guru | Pengujian Fungsional |
-| FT-006 | Marketplace | Memasukkan produk kursus ke dalam keranjang, perhitungan diskon, dan proses *checkout* B2C | Pengujian Fungsional |
-| FT-007 | Integrasi LMS | Pembukaan gembok akses kelas LMS secara otomatis setelah konfirmasi pembayaran *marketplace* lunas | Pengujian Fungsional |
-| FT-008 | LMS Interaktif | Pemutaran video materi pembelajaran dan pengisian soal pilihan ganda pada kuis | Pengujian Fungsional |
-| FT-009 | Sertifikasi | Penerbitan sertifikat PDF secara otomatis setelah progres materi mencapai 100% dan lulus kuis | Pengujian Fungsional |
-| FT-010 | Limit Registrasi | Validasi penolakan siswa baru oleh sistem jika kuota paket langganan *Free* sekolah telah penuh | Pengujian Fungsional |
-| FT-011 | Validasi Diskon | Validasi penolakan input harga diskon produk agar harga akhir tidak bernilai negatif atau melampaui harga asli | Pengujian Fungsional |
-| FT-012 | Validasi Sertifikat | Validasi penolakan pencetakan sertifikat jika progres materi belajar siswa di LMS belum mencapai 100% | Pengujian Fungsional |
+| FT-001 | Multi-School | Pendaftaran Tenant (Sekolah) | Functional Testing |
+| FT-002 | Manajemen Siswa | Penambahan profil murid & relasi wali | Functional Testing |
+| FT-003 | Asesmen PAUD | Input nilai perkembangan (Asesmen) | Functional Testing |
+| FT-004 | Marketplace | Pengecekan Checkout Marketplace | Functional Testing |
+| FT-005 | LMS | Eksekusi LMS dan Kuis | Functional Testing |
+| FT-006 | Pendaftaran & Akses | Integrasi Isolasi Data Lintas Tenant | Functional Testing |
+| FT-007 | Pembayaran SPP | Integrasi Pelunasan Tagihan SPP | Functional Testing |
+| FT-008 | Limit Registrasi | Validasi Kuota Langganan Student Limit | Functional Testing |
+| FT-009 | Validasi Diskon | Validasi Harga Diskon Negatif | Functional Testing |
+| FT-010 | Kelulusan LMS | Validasi Prematur Klaim Sertifikat | Functional Testing |
 
 ## 5.4 Hasil Uji dan Kesimpulan
-Pengujian sistem dilakukan untuk memastikan bahwa fungsionalitas UI, alur integrasi antar-halaman, dan keakuratan validasi aturan bisnis pada platform PAUD dapat berjalan sesuai dengan kebutuhan operasional pengguna. Pengujian dieksekusi mengacu pada rancangan skenario uji di tahap prosedur pengujian dengan menggunakan instrumen **Pengujian Fungsional (*Functional Testing*)**. Hasil pengujian memvalidasi bahwa sistem mampu memfasilitasi administrasi sekolah multi-tenant, perputaran catatan keuangan, e-commerce, serta manajemen pembelajaran digital secara terintegrasi penuh.
+Pengujian sistem dilakukan untuk memastikan bahwa fungsionalitas UI, alur integrasi antar-halaman, dan keakuratan validasi aturan bisnis pada platform PAUD dapat berjalan sesuai dengan kebutuhan operasional pengguna. Pengujian dieksekusi mengacu pada rancangan skenario uji di tahap prosedur pengujian dengan menggunakan instrumen *Functional Testing*. Hasil pengujian memvalidasi bahwa sistem mampu memfasilitasi administrasi sekolah, perputaran keuangan, e-commerce, serta manajemen pembelajaran digital secara terintegrasi penuh.
 
 ### 5.4.1 Detail Hasil Pengujian
-Bagian ini berisi detail hasil pengujian secara menyeluruh dari seluruh kasus uji (*test case*) yang telah dirancang untuk mewakili proses utama pada platform PAUD. Pengujian berikut membuktikan kapabilitas fungsional antarmuka, sinkronisasi status antar modul, serta kekuatan validasi perlindungan logika bisnis.
+Rincian hasil pengujian untuk setiap skenario yang telah dirancang disajikan pada Tabel 13 hingga Tabel 22. Setiap tabel memuat informasi mengenai kondisi awal, skenario pengujian, hasil yang diharapkan, hasil pengamatan, serta kesimpulan untuk memverifikasi bahwa setiap fungsi sistem telah berjalan sesuai dengan kebutuhan yang ditetapkan.
+
+**Tabel 13 Hasil Uji - Pembuatan Tenant**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-001 |
-| **Nama Butir Uji** | Pembuatan Ruang Kerja (*Tenant*) Sekolah Baru |
-| **Deskripsi** | Memeriksa fungsi registrasi akun Kepala Sekolah agar secara otomatis memisahkan *environment* data sekolah baru. |
-| **Kondisi Awal** | Pengguna berada di halaman registrasi awal (`/auth/register`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Mengisi form pendaftaran dengan identitas Kepala Sekolah dan profil sekolah.<br>2. Menekan tombol submit registrasi.<br>3. *Login* menggunakan akun yang baru saja dibuat. |
+| **Nama Butir Uji** | Pendaftaran Tenant (Sekolah) |
+| **Deskripsi** | Memeriksa fungsi registrasi akun institusi agar secara otomatis memisahkan environment data sekolah baru. |
+| **Kondisi Awal** | Pengguna berada di halaman registrasi sekolah. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Mengisi form pendaftaran dengan profil sekolah.<br>2. Menekan tombol submit registrasi.<br>3. Login menggunakan akun yang baru saja dibuat. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Dasbor terbuka dengan tabel data murid kosong (bersih) dan nama sekolah tercantum di *header* | Ruang kerja baru sukses terbentuk dan terisolasi sempurna |
-**Kesimpulan:** Pengujian sukses. Sistem mampu membentuk ekosistem *tenant* yang siap pakai.
+| Dasbor terbuka dengan tabel data murid kosong (bersih) | Ruang kerja baru sukses terbentuk dan terisolasi |
+**Kesimpulan:** Pengujian berhasil. Sistem mampu membentuk ekosistem tenant yang siap pakai.
 
 <br>
+
+**Tabel 14 Hasil Uji - Penambahan Profil Murid & Relasi Wali**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-002 |
-| **Nama Butir Uji** | Penambahan Profil Murid & Relasi Wali oleh Operator |
-| **Deskripsi** | Memeriksa apakah form penambahan siswa oleh Operator Sekolah berhasil mengaitkan identitas anak dengan akun profil wali muridnya. |
-| **Kondisi Awal** | Operator Sekolah berada di halaman tambah siswa (`/students/create`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Operator memasukkan data identitas lengkap siswa.<br>2. Operator memilih kelas rombel dan nama orang tua dari kotak *dropdown* relasi.<br>3. Menekan tombol simpan data ke *database*. |
+| **Nama Butir Uji** | Penambahan Profil Murid & Relasi Wali |
+| **Deskripsi** | Memeriksa apakah form penambahan siswa berhasil mengaitkan identitas anak dengan akun (user) wali muridnya. |
+| **Kondisi Awal** | Berada di halaman tambah siswa. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Memasukkan data identitas siswa.<br>2. Memilih email orang tua dari kotak dropdown relasi.<br>3. Menyimpan data ke database. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Siswa tersimpan ke dalam rombel kelas dan namanya otomatis tertaut ke panel dasbor keluarga orang tua tersebut | Profil anak seketika muncul di dasbor *Parent* secara *read-only* |
-**Kesimpulan:** Pengujian fungsional sukses. Relasi data antara entitas siswa, operator, dan wali murid terjalin sempurna.
+| Nama siswa tertaut ke panel keluarga orang tua tersebut | Profil anak otomatis muncul di dasbor Parent |
+**Kesimpulan:** Pengujian berhasil. Relasi data antara entitas siswa dan pengguna terjalin sempurna.
 
 <br>
+
+**Tabel 15 Hasil Uji - Input Nilai Perkembangan (Assesmen)**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-003 |
-| **Nama Butir Uji** | Input Nilai Perkembangan dengan *Temporal Assessment Integrity* |
-| **Deskripsi** | Memeriksa fungsionalitas guru saat memberikan nilai kualitatif berskala huruf (BB, MB, BSH, BSB) dan memastikan indikator baru tidak muncul pada masa penilaian lampau. |
-| **Kondisi Awal** | Guru membuka halaman form asesmen observasi bulanan siswa (`/assessments`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Guru memilih bulan penilaian lampau (misal: Juli).<br>2. Memeriksa daftar indikator yang tampil (indikator yang baru dibuat Operator di bulan November tidak boleh muncul).<br>3. Memilih skala huruf (*dropdown*) dan menyimpannya. |
+| **Nama Butir Uji** | Input Nilai Perkembangan (Asesmen) |
+| **Deskripsi** | Memeriksa fungsionalitas guru saat memberikan nilai kualitatif berskala huruf (MB, BSH, dan sejenisnya) kepada siswa. |
+| **Kondisi Awal** | Guru membuka halaman form asesmen harian siswa. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Memilih kelas, program pembelajaran, semester, dan bulan.<br>2. Memilih skala huruf (BB, MB, BSH, BSB) pada setiap indikator di program pembelajaran.<br>3. Menyimpan nilai atau assesmen. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Daftar indikator terfilter sesuai waktu pembuatannya (*timestamp*), dan nilai observasi berhasil tersimpan ke pangkalan data | Filter temporal aktif dan nilai kualitatif terekam akurat tanpa *error* |
-**Kesimpulan:** Pengujian lulus. *Temporal Assessment Integrity* bekerja baik melindungi konsistensi penilaian guru.
+| Nilai berhasil tersimpan dan muncul di rekapitulasi rapor | Nilai kualitatif terekam di pangkalan data |
+**Kesimpulan:** Pengujian fungsional lulus. Guru dapat menginput nilai kualitatif tanpa kendala error.
 
 <br>
+
+**Tabel 16 Hasil Uji - Pengecekan Checkout Marketplace**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-004 |
-| **Nama Butir Uji** | Cetak Rapor Naratif dengan Penyaringan *Smart Omission* |
-| **Deskripsi** | Memeriksa apakah pencetakan dokumen resmi PDF rapor akhir semester oleh Kepala Sekolah/Operator otomatis menyaring indikator yang bernilai kosong (0). |
-| **Kondisi Awal** | Wali kelas telah melengkapi catatan pengantar dan rekomendasi di halaman rapor siswa (`/reports/:studentId`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Kepala Sekolah/Operator membuka halaman detail rapor siswa.<br>2. Menekan tombol "Cetak Rapor PDF".<br>3. Memeriksa isi dokumen PDF yang dihasilkan sistem. |
+| **Nama Butir Uji** | Pengecekan Checkout Marketplace |
+| **Deskripsi** | Memeriksa apakah pengguna dapat memesan kursus dari katalog publik dan melihat rincian keranjang belanjanya. |
+| **Kondisi Awal** | Pengguna sudah terdaftar pada sistem, sudah melakukan login sistem dan berada di halaman utama aplikasi. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Menekan tombol keranjang lalu beli pada salah satu kursus / webinar / produk.<br>2. Masuk ke halaman checkout.<br>3. Sistem menghitung harga, diskon, dan total pembayaran. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Dokumen PDF tercetak rapi, di mana aspek/indikator yang tidak memiliki catatan observasi (kosong) tidak ditampilkan pada tabel cetakan | Fitur *Smart Omission* aktif mengabaikan indikator kosong pada cetakan PDF |
-**Kesimpulan:** Pengujian sukses. Dokumen rapor naratif tetap ringkas, estetik, dan informatif bagi orang tua.
+| Total invoice sesuai dengan harga item setelah perhitungan diskon dan biaya terkait | Nominal checkout terhitung dengan tepat dan sesuai perhitungan |
+**Kesimpulan:** Pengujian berhasil. Proses pemesanan, penambahan ke keranjang, dan perhitungan total pembayaran berjalan sesuai fungsinya.
 
 <br>
+
+**Tabel 17 Hasil Uji - Eksekusi LMS dan Kuis**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-005 |
-| **Nama Butir Uji** | Pencatatan Keuangan SPP & Tabungan sebagai *Ledger* Administratif |
-| **Deskripsi** | Membuktikan fungsi Modul Keuangan sebagai buku besar pembukuan sekolah oleh Operator & Guru, tanpa transaksi langsung di aplikasi bagi Orang Tua. |
-| **Kondisi Awal** | Operator atau Guru membuka menu Manajemen Pembayaran SPP (`/finances/spp`) atau Tabungan (`/finances/savings`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Operator/Guru memilih siswa yang telah membayar SPP secara tunai/transfer bank konvensional.<br>2. Menekan konfirmasi status "Lunas / Paid".<br>3. Orang tua membuka ulang (*refresh*) dasbor pemantauan keuangannya. |
+| **Nama Butir Uji** | Eksekusi LMS dan Kuis |
+| **Deskripsi** | Memeriksa apakah video/PDF/teks pembelajaran dapat ditampilkan dan soal kuis dapat dijawab oleh peserta didik. |
+| **Kondisi Awal** | Siswa memiliki akses ke kursus dan membuka modul video/PDF/teks pembelajaran pertama. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Membuka ataupun memutar PDF/video/teks pembelajaran.<br>2. Membuka halaman kuis.<br>3. Menjawab pertanyaan pilihan ganda melalui radio button. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Status tagihan di dasbor Operator berubah lunas, dan notifikasi merah tunggakan di dasbor Orang Tua seketika berubah menjadi hijau (*Paid*) | Sinkronisasi buku besar keuangan aktif secara *real-time* |
-**Kesimpulan:** Pengujian lulus. Alur pencatatan kasir oleh Operator/Guru beroperasi logis sesuai batasan sistem.
+| Pemutar video dan penampil PDF dan teks berfungsi dengan baik dan pilihan jawaban kuis dapat dipilih oleh pengguna | Fungsionalitas multimedia dan komponen kuis berjalan normal |
+**Kesimpulan:** Pengujian berhasil. Antarmuka LMS responsif, video dapat diputar dengan baik, PDF dan teks pembelajaran dapat dibuka dengan baik, dan elemen kuis interaktif dapat digunakan sesuai fungsinya.
 
 <br>
+
+**Tabel 18 Hasil Uji - Integrasi Isolasi Data Lintas Tenant**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-006 |
-| **Nama Butir Uji** | Pengecekan Keranjang & *Checkout Marketplace* B2C |
-| **Deskripsi** | Memeriksa apakah pengguna publik dapat memasukkan kursus ke keranjang, menyuntikkan kupon diskon, dan melihat kalkulasi tagihan. |
-| **Kondisi Awal** | Pengguna publik *login* ke portal B2C dan melihat etalase katalog (`/courses`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Menekan tombol beli ("Add to Cart") pada suatu kelas kursus.<br>2. Masuk ke halaman keranjang (`/cart`) dan menuju layar *checkout*.<br>3. Memasukkan kode promo diskon dan menekan terapkan. |
+| **Nama Butir Uji** | Integrasi Isolasi Data Lintas Tenant |
+| **Deskripsi** | Memastikan bahwa pengguna dari satu sekolah tidak dapat mengakses atau melihat data yang dimiliki oleh sekolah lain. |
+| **Kondisi Awal** | Tersedia dua sekolah berbeda (Sekolah A dan Sekolah B) dengan data siswa yang berbeda. Penguji login sebagai guru Sekolah A. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Guru Sekolah A membuka menu direktori siswa.<br>2. Sistem mengambil data berdasarkan identitas tenant yang aktif.<br>3. Penguji mencoba memanipulasi parameter URL untuk mengakses data siswa milik Sekolah B. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Sistem menghitung ulang subtotal, mengurangi nominal potongan promo, dan memunculkan *popup iframe Payment Gateway Midtrans Snap* | Kalkulasi *invoice* presisi dan gerbang pembayaran muncul |
-**Kesimpulan:** Pengujian fungsional perniagaan digital berhasil, alur pesanan berjalan akurat.
+| Permintaan akses terhadap data siswa Sekolah B ditolak oleh sistem dengan respons Error 403 atau Error 404 | Sistem berhasil menolak upaya akses data lintas tenant yang tidak sah |
+**Kesimpulan:** Pengujian berhasil. Mekanisme isolasi data antar tenant berjalan dengan baik sehingga setiap sekolah hanya dapat mengakses data yang menjadi hak aksesnya.
 
 <br>
+
+**Tabel 19 Hasil Uji - Integrasi Pelunasan Tagihan SPP**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-007 |
-| **Nama Butir Uji** | Integrasi Pembukaan Gembok LMS setelah *Checkout* Lunas |
-| **Deskripsi** | Menguji pembukaan gembok akses materi LMS secara otomatis sesaat setelah transaksi pembayaran *marketplace* dikonfirmasi lunas. |
-| **Kondisi Awal** | Pelanggan memesan kursus dengan status "Pending" (tombol belajar di LMS dikunci). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Sistem mensimulasikan respons *callback/webhook* lunas dari Midtrans.<br>2. Pelanggan membuka halaman daftar kelas miliknya (`/account/courses`).<br>3. Menekan tombol "Mulai Belajar". |
+| **Nama Butir Uji** | Integrasi Pelunasan Tagihan SPP |
+| **Deskripsi** | Memastikan bahwa perubahan status pembayaran SPP yang dilakukan oleh operator sekolah atau guru secara otomatis tercermin pada aplikasi wali murid. |
+| **Kondisi Awal** | Siswa memiliki satu tagihan SPP berstatus belum dibayar. Pada dasbor wali murid terdapat informasi tunggakan yang masih aktif. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Operator sekolah atau guru membuka detail tagihan SPP.<br>2. Operator sekolah atau guru mengubah status tagihan menjadi "Lunas" atau "Paid".<br>3. Wali murid melakukan refresh pada halaman dasbor miliknya. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Gembok kelas terbuka lebar, memungkinkan pengguna mengakses seluruh video dan silabus materi | Status kepemilikan lisensi aktif seketika tanpa verifikasi manual admin |
-**Kesimpulan:** Pengujian integrasi *marketplace* ke LMS terbukti mulus dan otomatis.
+| Status tagihan pada panel wali murid berubah menjadi "Paid" dan notifikasi tunggakan tidak lagi ditampilkan | Status tagihan berhasil diperbarui dan indikator pembayaran berubah sesuai status pelunasan |
+**Kesimpulan:** Pengujian berhasil. Perubahan status pembayaran pada modul administrasi sekolah tersinkronisasi dengan baik ke aplikasi wali murid sehingga informasi tagihan selalu konsisten pada kedua sisi sistem.
 
 <br>
+
+**Tabel 20 Hasil Uji - Validasi Kuota Langganan Student Limit**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-008 |
-| **Nama Butir Uji** | Eksekusi Pemutar Video LMS dan Evaluasi Kuis Interaktif |
-| **Deskripsi** | Memeriksa apakah media video bisa diputar dan soal ujian kuis pilihan ganda dapat dipilih serta dihitung skornya. |
-| **Kondisi Awal** | Siswa membuka ruang kelas LMS (`/learn/[courseSlug]`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Memutar media video hingga selesai lalu menekan tombol "Tandai Selesai".<br>2. Membuka modul kuis pilihan ganda di akhir bab.<br>3. Memilih opsi jawaban (*radio button*) dan menekan tombol kumpulkan kuis. |
+| **Nama Butir Uji** | Validasi Kuota Langganan Student Limit |
+| **Deskripsi** | Memastikan sistem menolak penambahan siswa baru ketika jumlah siswa aktif telah mencapai batas maksimum yang ditentukan oleh paket langganan sekolah. |
+| **Kondisi Awal** | Sekolah menggunakan paket Free dan jumlah siswa aktif telah mencapai batas maksimum kuota yang diperbolehkan (misalnya 20 siswa). |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Admin sekolah membuka halaman tambah siswa baru.<br>2. Mengisi seluruh data siswa baru pada formulir.<br>3. Menekan tombol simpan (Submit).<br>4. Sistem melakukan validasi jumlah siswa aktif terhadap batas kuota paket langganan yang digunakan. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| *Progress bar* materi meningkat dan sistem langsung menampilkan persentase skor kelulusan kuis | Multimedia beroperasi normal dan evaluasi ujian merespons akurat |
-**Kesimpulan:** Fungsionalitas antarmuka LMS responsif dan interaktif.
+| Sistem menolak penyimpanan data siswa baru ke dalam database. Sistem menampilkan notifikasi bahwa kuota siswa telah penuh | Proses penyimpanan dibatalkan karena kuota siswa telah mencapai batas maksimum. Pesan peringatan ditampilkan dan pengguna diarahkan untuk meningkatkan paket langganan |
+**Kesimpulan:** Pengujian berhasil. Sistem mampu menerapkan pembatasan jumlah siswa sesuai ketentuan paket langganan sehingga penggunaan layanan tetap sesuai dengan aturan yang berlaku.
 
 <br>
+
+**Tabel 21 Hasil Uji - Validasi Harga Diskon Negatif**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-009 |
-| **Nama Butir Uji** | Penerbitan Sertifikat Kelulusan PDF Otomatis |
-| **Deskripsi** | Memeriksa apakah sistem mampu memproduksi dokumen PDF sertifikat secara otomatis seketika setelah progres materi menyentuh 100%. |
-| **Kondisi Awal** | Siswa telah menonton seluruh video materi dan menyisakan satu kuis akhir yang siap dikumpulkan. |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Siswa mengumpulkan jawaban kuis akhir dengan skor memenuhi *passing grade*.<br>2. Sistem memperbarui persentase progres menjadi 100% (*Completed*).<br>3. Siswa memeriksa halaman direktori sertifikat (`/account/certificates`). |
+| **Nama Butir Uji** | Validasi Harga Diskon Negatif |
+| **Deskripsi** | Memastikan sistem menerapkan validasi harga sehingga nilai diskon atau harga jual tidak menghasilkan kondisi harga yang tidak logis. |
+| **Kondisi Awal** | Administrator Marketplace sedang membuat atau mengubah data kursus pada halaman manajemen produk. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Memasukkan Harga Asli (Original Price) sebesar Rp50.000.<br>2. Memasukkan Harga Jual (Discount Price) sebesar Rp150.000 sehingga nilainya tidak sesuai dengan aturan diskon yang berlaku.<br>3. Menekan tombol Simpan.<br>4. Sistem melakukan validasi terhadap nilai harga yang dimasukkan. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Tautan unduhan dokumen PDF sertifikat kelulusan muncul di dasbor dan dapat diunduh | Sertifikat resmi beratasnamakan pengguna tercetak otomatis oleh sistem |
-**Kesimpulan:** Pengujian pembuatan sertifikat instan lulus dengan mulus.
+| Sistem menolak penyimpanan data karena nilai harga atau diskon tidak memenuhi aturan yang ditetapkan | Proses penyimpanan dibatalkan dan sistem menampilkan pesan validasi pada formulir |
+**Kesimpulan:** Pengujian berhasil. Sistem mampu mendeteksi dan menolak konfigurasi harga yang tidak valid sehingga integritas data harga produk tetap terjaga.
 
 <br>
+
+**Tabel 22 Hasil Uji - Validasi Prematur Klaim Sertifikat**
 
 | Item | Keterangan |
 | :--- | :--- |
 | **ID Pengujian** | FT-010 |
-| **Nama Butir Uji** | Validasi Batas Kuota Registrasi Siswa (*Student Limit*) |
-| **Deskripsi** | Memeriksa ketahanan sistem dalam menolak pendaftaran siswa baru jika sekolah tersebut telah menyentuh batas kuota maksimal paket *Free*. |
-| **Kondisi Awal** | Tenant sekolah berstatus *Free Plan*, dan akumulasi siswa aktif di *database* sudah mencapai angka batas kuota (misal: 50 siswa). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Operator Sekolah masuk ke halaman tambah siswa baru (`/students/create`).<br>2. Mengisi biodata siswa fiktif secara lengkap.<br>3. Menekan tombol simpan (*Submit*). |
+| **Nama Butir Uji** | Validasi Prematur Klaim Sertifikat |
+| **Deskripsi** | Memastikan sistem hanya mengizinkan penerbitan sertifikat kepada peserta yang telah memenuhi seluruh persyaratan penyelesaian kursus. |
+| **Kondisi Awal** | Peserta berada di dalam LMS dengan progres pembelajaran baru mencapai 20% dan belum menyelesaikan seluruh materi maupun evaluasi akhir. |
+| **Tanggal Pengujian** | 19 Mei 2026 |
+| **Penguji** | Teguh Surya Zulfikar |
+| **Skenario Pengujian** | 1. Peserta mencoba mengakses halaman sertifikat melalui tombol yang tersedia.<br>2. Peserta mencoba mengakses URL sertifikat secara langsung tanpa memenuhi syarat kelulusan.<br>3. Sistem melakukan validasi terhadap progres pembelajaran peserta terhadap nilai harga yang dimasukkan. |
 
 **Hasil Pengujian:**
 | Yang Diharapkan | Hasil Pengamatan |
 | :--- | :--- |
-| Sistem memblokir penyimpanan data ke *database* dan menampilkan peringatan warna merah bahwa kuota penuh (saran *upgrade* ke paket *Pro*) | Tolakan validasi bekerja aktif melindungi batasan model bisnis langganan |
-**Kesimpulan:** Validasi aturan bisnis lolos sempurna mencegah kelebihan kuota layanan.
-
-<br>
-
-| Item | Keterangan |
-| :--- | :--- |
-| **ID Pengujian** | FT-011 |
-| **Nama Butir Uji** | Validasi Harga Diskon Katalog yang Tidak Wajar |
-| **Deskripsi** | Mengevaluasi sistem agar tidak mengizinkan formasi potongan harga diskon yang merugikan (contoh: harga diskon lebih mahal dari harga asli atau minus). |
-| **Kondisi Awal** | Admin/Moderator sedang membuat atau menyunting harga sebuah kelas di Admin Panel (`/admin/courses`). |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Memasukkan Harga Asli (*Original Price*) Rp 50.000.<br>2. Memasukkan Harga Jual (*Discount Price*) Rp 150.000 (lebih tinggi dari asli) atau minus.<br>3. Menekan tombol Simpan. |
-
-**Hasil Pengujian:**
-| Yang Diharapkan | Hasil Pengamatan |
-| :--- | :--- |
-| Formulir menolak penyimpanan dan memunculkan pesan galat (*error*) warna merah pada kolom harga | Validasi proteksi distorsi harga beroperasi normal |
-**Kesimpulan:** Aturan bisnis perlindungan harga produk bekerja dengan baik.
-
-<br>
-
-| Item | Keterangan |
-| :--- | :--- |
-| **ID Pengujian** | FT-012 |
-| **Nama Butir Uji** | Validasi Prematur Klaim Sertifikat LMS |
-| **Deskripsi** | Memastikan peserta yang belum menuntaskan materi belajar tidak dapat meretas atau memicu pencetakan sertifikat kelulusan. |
-| **Kondisi Awal** | Siswa berada di dalam LMS dengan progres belajar baru mencapai 30% tanpa menyelesaikan kuis akhir. |
-| **Tanggal Pengujian** | 10 Juni 2026 |
-| **Penguji** | [Nama Penulis / Anda Sendiri] |
-| **Skenario Pengujian** | 1. Siswa mencoba menekan tombol "Klaim Sertifikat" atau menembus parameter rute URL pencetakan berkas secara paksa (*bypass*). |
-
-**Hasil Pengujian:**
-| Yang Diharapkan | Hasil Pengamatan |
-| :--- | :--- |
-| Sistem menolak permintaan dan mengembalikan peringatan bahwa syarat kelulusan 100% belum terpenuhi (*Unauthorized / Incomplete*) | Tameng proteksi kelulusan aktif mencegat akses prematur |
-**Kesimpulan:** Logika pencegahan penerbitan sertifikat ilegal sangat kuat dan dapat diandalkan.
+| Sistem menolak permintaan penerbitan atau akses sertifikat karena progres pembelajaran belum mencapai 100% | Sistem menampilkan pesan bahwa kursus belum selesai dan akses sertifikat tidak diberikan |
+**Kesimpulan:** Pengujian berhasil. Sistem mampu mencegah akses maupun penerbitan sertifikat bagi peserta yang belum menyelesaikan seluruh persyaratan kursus sehingga proses sertifikasi tetap sesuai dengan ketentuan yang berlaku.
 
 ### 5.4.2 Rekapitulasi Hasil Pengujian
-Setelah menempuh penyelesaian eksekusi pengujian pada seluruh butir uji fungsional antarmuka, pengetesan integrasi alur lintas modul, serta injeksi validasi aturan bisnis sistem, seluruh capaian ini direkapitulasi untuk mengukur tingkat keberhasilan (*Success Rate*) aplikasi secara gamblang. Perekapan matriks di bawah ini dikompilasi berdasarkan peta skenario di tahap prosedur pengujian awal.
+Setelah seluruh skenario pengujian dilaksanakan, hasil pengujian direkapitulasi untuk mengukur tingkat keberhasilan implementasi fungsional sistem secara keseluruhan. Rekapitulasi tersebut disusun berdasarkan seluruh skenario pengujian yang telah dirancang pada tahap prosedur pengujian. Rincian rekapitulasi hasil pengujian disajikan pada Tabel 23.
 
-Berdasarkan hasil pengetesan simulasi komprehensif, seluruh fitur vital platform PAUD berhasil beroperasi mulus merespons masukan (*input*) sesuai dengan proses bisnis instansi. Integrasi antar-*endpoint* layar serta tameng perlindungan aturan peladen juga terbukti tidak tertembus kegagalan (*error-free*).
+Berdasarkan hasil pengujian, seluruh fitur utama pada platform PAUD berhasil beroperasi sesuai dengan kebutuhan fungsional yang telah ditetapkan. Integrasi antar modul, validasi aturan bisnis, serta respons sistem terhadap masukan pengguna juga berjalan dengan baik tanpa ditemukan kegagalan pada seluruh skenario pengujian.
 
-| ID | Object | Butir Uji | Teknik Pengujian | Status |
+**Tabel 23 Rekapitulasi Hasil Pengujian**
+
+| ID | Object | Butir Uji | Teknik | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| FT-001 | Multi-School | Pendaftaran akun Kepala Sekolah dan pembuatan ruang kerja (*tenant*) sekolah baru | Pengujian Fungsional | Passed |
-| FT-002 | Manajemen Siswa | Penambahan data biodata anak dan penautan akun profil wali murid oleh **Operator Sekolah** | Pengujian Fungsional | Passed |
-| FT-003 | Asesmen PAUD | Pengisian form skala nilai perkembangan anak oleh guru dengan validasi *Temporal Assessment Integrity* | Pengujian Fungsional | Passed |
-| FT-004 | Rapor Naratif | Penyusunan narasi rapor akhir semester dan pencetakan PDF dengan penyaringan cerdas *Smart Omission* | Pengujian Fungsional | Passed |
-| FT-005 | Keuangan SIAKAD | Pencatatan iuran SPP dan tabungan siswa sebagai buku besar administratif (*ledger*) oleh Operator & Guru | Pengujian Fungsional | Passed |
-| FT-006 | Marketplace | Memasukkan produk kursus ke dalam keranjang, perhitungan diskon, dan proses *checkout* B2C | Pengujian Fungsional | Passed |
-| FT-007 | Integrasi LMS | Pembukaan gembok akses kelas LMS secara otomatis setelah konfirmasi pembayaran *marketplace* lunas | Pengujian Fungsional | Passed |
-| FT-008 | LMS Interaktif | Pemutaran video materi pembelajaran dan pengisian soal pilihan ganda pada kuis | Pengujian Fungsional | Passed |
-| FT-009 | Sertifikasi | Penerbitan sertifikat PDF secara otomatis setelah progres materi mencapai 100% dan lulus kuis | Pengujian Fungsional | Passed |
-| FT-010 | Limit Registrasi | Validasi penolakan siswa baru oleh sistem jika kuota paket langganan *Free* sekolah telah penuh | Pengujian Fungsional | Passed |
-| FT-011 | Validasi Diskon | Validasi penolakan input harga diskon produk agar harga akhir tidak bernilai negatif atau melampaui harga asli | Pengujian Fungsional | Passed |
-| FT-012 | Validasi Sertifikat | Validasi penolakan pencetakan sertifikat jika progres materi belajar siswa di LMS belum mencapai 100% | Pengujian Fungsional | Passed |
+| FT-001 | Multi-School | Pendaftaran Tenant (Sekolah) | FunctionalTesting | Passed |
+| FT-002 | Manajemen Siswa | Penambahan profil murid & relasi wali | FunctionalTesting | Passed |
+| FT-003 | Asesmen PAUD | Input nilai perkembangan (Asesmen) | FunctionalTesting | Passed |
+| FT-004 | Marketplace | Pengecekan Checkout Marketplace | FunctionalTesting | Passed |
+| FT-005 | LMS | Eksekusi LMS dan KuiS | FunctionalTesting | Passed |
+| FT-006 | Pendaftaran & Akses | Integrasi Isolasi Data Lintas Tenant | FunctionalTesting | Passed |
+| FT-007 | Pembayaran SPP | Integrasi Pelunasan Tagihan SPP | FunctionalTesting | Passed |
+| FT-008 | Limit Registrasi | Validasi Kuota Langganan Student Limit | FunctionalTesting | Passed |
+| FT-009 | Validasi Diskon | Validasi Harga Diskon Negatif | FunctionalTesting | Passed |
+| FT-010 | Kelulusan LMS | Validasi Prematur Klaim Sertifikat | FunctionalTesting | Passed |
 
-Berdasarkan himpunan rekapitulasi data empiris di atas, keseluruhan sampel prosedur uji coba berhasil menyandang status **Passed** (100% Tingkat Keberhasilan). Fakta kuantitatif ini mensahkan bahwa fungsionalitas antarmuka publik, persilangan data alur pengguna, dan pilar logika algoritma bisnis aplikasi telah beroperasi dengan semestinya.
+Berdasarkan rekapitulasi hasil pengujian pada Tabel 23, seluruh skenario pengujian memperoleh status Passed. Hasil tersebut menunjukkan bahwa seluruh fungsi yang diuji telah berjalan sesuai dengan kebutuhan sistem, baik pada aspek fungsional antarmuka, integrasi antar modul, maupun penerapan aturan logika bisnis.
 
 ### 5.4.3 Kesimpulan Pengujian
-Mempertimbangkan seluruh pencapaian pada fase **Pengujian Fungsional (*Functional Testing*)**, dapat disimpulkan bahwa platform manajemen SaaS PAUD ini telah berdiri kokoh dan sanggup memfasilitasi kebutuhan alur bisnis ekosistem persekolahan maupun perniagaan digital modern. Skenario evaluasi krusial yang membentang dari operasi registrasi *tenant*, manajemen operasional siswa oleh Operator Sekolah, pencatatan keuangan *ledger*, pengolahan asesmen berfilter temporal, hingga area belajar LMS mandiri tercatat sukses menyelesaikan tugasnya masing-masing tanpa cacat.
+Mempertimbangkan seluruh pencapaian pada fase pengujian berbasis Functional Testing, dapat disimpulkan bahwa platform manajemen SaaS PAUD ini telah berdiri kokoh dan sanggup memfasilitasi kebutuhan alur bisnis ekosistem persekolahan PAUD modern. Skenario evaluasi krusial yang membentang dari operasi registrasi instansi, manajemen ruang kelas siswa, pengolahan transaksi e-commerce, hingga area belajar LMS mandiri tercatat sukses menyelesaikan tugasnya masing-masing.
 
-Lebih dari sekadar fungsionalitas UI murni, antarmuka sistem juga membuktikan ketahanannya dalam menjaga sinkronisasi (*integration*) di layar maupun memblokir upaya *input* yang menyalahi logika transaksi melalui pembatasan keamanan bisnis (*business rule validation*). Dengan perolehan angka ketuntasan uji fungsional sempurna (100% *Passed*) ini, sistem perangkat lunak berbasis layanan multitenan ini dapat dinyatakan layak (*feasible*) untuk melenggang ke tahap operasional pada lingkungan instansi pendidikan sesungguhnya.
+Lebih dari sekadar fungsionalitas UI murni, antarmuka sistem juga membuktikan ketahanannya dalam menjaga sinkronisasi (integration) di layar maupun memblokir upaya input yang menyalahi logika transaksi melalui pembatasan keamanan bisnis (business rule). Dengan perolehan angka ketuntasan uji fungsional sempurna ini, sistem perangkat lunak berbasis layanan multi-tenant ini dapat dinyatakan layak untuk masuk ke tahap operasional pada lingkungan sekolah sesungguhnya.
